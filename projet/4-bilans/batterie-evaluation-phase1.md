@@ -167,4 +167,5 @@ python -m foret.batterie phase1      # tout (environ 35 min sur 2 cœurs)
 python -m foret.batterie rapport     # resultats/batterie/rapport.json
 python -m foret.conformite --mesures
 ```
+**Sur GitHub (moteur 1.6, 12 oct. au soir).** La batterie se joue aussi par lots (`--lot i/n`, puis `--fusionner`), et par le workflow **Batterie** du dépôt `Projet_Jeu`. Premier passage complet : 16 lots, 96 200 parties, 0 erreur, environ 2 min 30 de bout en bout (contre 35 min sur 2 cœurs). Le rapport obtenu est **identique** à celui de ce document (hors date et version du moteur) : mêmes verdicts, 21 témoins sur 26. Il est publié sur la branche `resultats`, dans `batterie/run1/`, avec le tableau de bord.
 Le moteur complet est dans `claude/moteur-v1/` ; l'archive `foret_moteur_1_5.zip` est le moyen le plus simple de le relancer dans une autre discussion.

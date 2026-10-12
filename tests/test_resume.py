@@ -51,3 +51,4 @@ def test_le_resume_de_batterie_lit_le_rapport_publie():
     assert "**Lots** : 8" in sortie
     assert "Témoins réussis** : 21 sur 26" in sortie
     assert "| V2, sans rêve |" in sortie and "0,03" in sortie
+    assert "🔴 4 |" in sortie                      # un nombre de duos s'écrit sans décimales

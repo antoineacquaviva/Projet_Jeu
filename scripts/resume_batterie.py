@@ -15,6 +15,8 @@ PASTILLE = {"vert": "🟢", "orange": "🟠", "rouge": "🔴"}
 def _num(x):
     if not isinstance(x, (int, float)) or isinstance(x, bool):
         return ""
+    if float(x).is_integer():
+        return str(int(x))
     return (f"{x:.2f}" if abs(x) < 10 else f"{x:.1f}").replace(".", ",")
 
 
