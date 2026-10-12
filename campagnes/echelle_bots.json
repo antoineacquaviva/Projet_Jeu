@@ -1,0 +1,19 @@
+{
+  "nom": "echelle_bots",
+  "description": "Phase 2a (12 oct. 2026) : l'échelle des bots. Les 15 duos, mêmes graines pour tous les bots (comparaisons appariées). Aléatoire, glouton (sans rêve), bot Monte-Carlo (mode central, suites jouées par le glouton sans rêve) à 8, 32 et 128 suites par décision. Le bot MC peut choisir de rêver : test de bon sens (redécouvre-t-il que rêver domine ?).",
+  "maquette": "v1",
+  "blocs": [
+    {"nom": "echelle",
+     "variantes": ["defaut"],
+     "bots": [{"type": "aleatoire"},
+              {"type": "glouton", "params": {"reves_par_tour": 0.0}},
+              {"type": "glouton", "params": {"reves_par_tour": 1.0}},
+              {"type": "mc", "params": {"budget": 8}},
+              {"type": "mc", "params": {"budget": 32}}],
+     "tables": [{"tailles": [2], "parties": 4}]},
+    {"nom": "echelle_128",
+     "variantes": ["defaut"],
+     "bots": [{"type": "mc", "params": {"budget": 128}}],
+     "tables": [{"tailles": [2], "parties": 2}]}
+  ]
+}

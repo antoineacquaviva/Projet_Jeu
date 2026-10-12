@@ -39,7 +39,7 @@ from .decisions import DECISIONS
 from .observateurs import Compteur, Journal
 from .plans import Plans
 
-VERSION = "1.6"
+VERSION = "1.7"
 CENTRE = 7                      # R5.1 : 2-6 éveil, 7 centre, 8-12 rêve
 CASES = tuple(range(2, 13))
 PROBA = {c: (6 - abs(c - CENTRE)) / 36 for c in CASES}
@@ -233,6 +233,8 @@ class Partie(Plans):
         self._init_pistes_v2()
         self._init_sieges(peuples, bots)
         self.ordre = [s.idx for s in self.sieges]
+        if any(getattr(s.bot, "reprises", False) for s in self.sieges):
+            self.reprises = True             # bots qui copient la partie (mc) : photo à chaque segment
         self._init_pouvoirs()
         self._init_presence()
         self._verifier_silence_possible()
