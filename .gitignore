@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+lots/
+resultats/essai*/
+resultats/batterie/
+resultats/fusion/

@@ -1,0 +1,24 @@
+{
+  "nom": "v2_options",
+  "description": "Phase 1c (12 oct. 2026) : premier essai de la v2 avec le glouton (indices). « V2 proposée » (defaut), les préréglages de l'atelier et une option changée à la fois pour les décisions ouvertes 1 à 6, 8 et 9. Aperçu de la grille de la phase 3 ; le glouton ne joue pas les options comme le ferait le bot fort.",
+  "maquette": "v2",
+  "blocs": [
+    {"nom": "options",
+     "variantes": ["defaut", "coeur", "gang", "heritage_v1",
+                   "code:c:A2b,d_fav,C2a,D2v_choix|m:C3|p:",
+                   "code:c:A2a,d_bb,C2a,D2v_choix|m:C3|p:",
+                   "code:c:A2a,d_hes,C2a,D2v_choix|m:C3|p:",
+                   "code:c:A2a,d_six,C2a,D2v_choix|m:C3|p:",
+                   "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:represailles=attaque",
+                   "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:hs=organe",
+                   "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:hs=rien",
+                   "code:c:A2a,d_fav,C2a,D2v_deux|m:C3|p:",
+                   "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:seuil=2",
+                   "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:seuil=4",
+                   "code:c:A2a,d_fav,C2b,D2v_choix|m:C3|p:",
+                   "code:c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:"],
+     "bots": [{"type": "glouton", "params": {"reves_par_tour": 0.0}},
+              {"type": "glouton", "params": {"reves_par_tour": 1.0}}],
+     "tables": [{"tailles": [2], "parties": 12}, {"tailles": [3], "parties": 6}, {"tailles": [5], "parties": 6}]}
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "nom": "v0",
+  "description": "Maquette v0 (moteur du 11 oct. 2026), conservée comme référence : mêmes règles et mêmes choix par défaut que le premier moteur.",
+  "document": "Moteur de règles v0 - lacunes et incohérences (projet)",
+  "tours": 6,
+  "etapes": 3,
+
+  "plateau": {
+    "zones": {
+      "Z1": {"foret": 2, "profondeur": 0},
+      "Z2": {"foret": 2, "profondeur": 0},
+      "Z3": {"foret": 3, "profondeur": 1},
+      "Z4": {"foret": 3, "profondeur": 1},
+      "Z5": {"foret": 3, "profondeur": 1},
+      "Z6": {"foret": 4, "profondeur": 2},
+      "Z7": {"foret": 4, "profondeur": 2}
+    },
+    "adjacences": [["Z1", "Z2"], ["Z1", "Z3"], ["Z1", "Z4"], ["Z2", "Z4"], ["Z2", "Z5"], ["Z3", "Z4"],
+                   ["Z4", "Z5"], ["Z3", "Z6"], ["Z4", "Z6"], ["Z4", "Z7"], ["Z5", "Z7"], ["Z6", "Z7"]],
+    "rivieres": [["Z1", "Z3"], ["Z3", "Z6"], ["Z6", "Z7"], ["Z7", "Z5"]]
+  },
+
+  "machines": {
+    "en_jeu": [
+      {"nom": "Bouteur", "organes": ["moteur", "chenilles"], "zone": "Z1"},
+      {"nom": "Abatteuse", "organes": ["moteur", "chenilles", "phares"], "zone": "Z2"},
+      {"nom": "Pelleteuse", "organes": ["moteur", "phares"], "zone": "Z2"}
+    ],
+    "reserve": [
+      {"nom": "Debardeuse", "organes": ["moteur", "chenilles"]},
+      {"nom": "Broyeuse", "organes": ["moteur", "chenilles", "phares"]}
+    ]
+  },
+
+  "tuiles": {
+    "Cupidite":     {"genre": "tactique", "critere": "plus_boisee"},
+    "Opportunisme": {"genre": "tactique", "critere": "moins_defendue"},
+    "Represailles": {"genre": "tactique", "critere": "derniere_attaque", "params": {"repli": "plus_boisee", "fenetre": null}},
+    "Percee":       {"genre": "tactique", "critere": "devant_la_plus_avancee"},
+    "Reparer":      {"genre": "chantier", "ordre": "reparer", "params": {"hs": true}},
+    "Renfort":      {"genre": "chantier", "ordre": "renfort"}
+  },
+
+  "piste": {
+    "placement": "hasard",
+    "tirage": {
+      "tuiles": ["Cupidite", "Cupidite", "Opportunisme", "Opportunisme", "Represailles", "Represailles",
+                 "Percee", "Percee", "Reparer", "Renfort"],
+      "esprits_depart": 1
+    }
+  },
+
+  "cartes": {"main": 5, "paquet": 7, "reprendre_du_paquet": false},
+  "presence": {"pions": 3, "placement": "hasard"},
+
+  "peuples": {
+    "oiseaux":    {"haut": {"compartiment": "mechant", "pouvoir": "voir"},
+                   "bas":  {"compartiment": "plateau", "pouvoir": "voler"}},
+    "mammiferes": {"haut": {"compartiment": "plateau", "pouvoir": "tenir"},
+                   "bas":  {"compartiment": "machines", "pouvoir": "renverser"}},
+    "reptiles":   {"haut": {"compartiment": "plans", "pouvoir": "attendre"},
+                   "bas":  {"compartiment": "plateau", "pouvoir": "se_fondre"},
+                   "traits": ["invisible"]},
+    "insectes":   {"haut": {"compartiment": "plans", "pouvoir": "s_unir"},
+                   "bas":  {"compartiment": "machines", "pouvoir": "enrayer"}},
+    "humains":    {"haut": {"compartiment": "mechant", "pouvoir": "tromper"},
+                   "bas":  {"compartiment": "plans", "pouvoir": "parler"}},
+    "entites":    {"haut": {"compartiment": "mechant", "pouvoir": "hanter"},
+                   "bas":  {"compartiment": "machines", "pouvoir": "egarer"}}
+  },
+
+  "pouvoirs": {
+    "voir":      {"par_tour": null},
+    "voler":     {},
+    "tenir":     {"mode": "v0_carte"},
+    "renverser": {"organes": ["chenilles"]},
+    "enrayer":   {"organes": ["moteur"]},
+    "egarer":    {"organes": ["phares"]},
+    "attendre":  {"embuscades_par_tour": null, "immobiliser": true, "par_tour": null, "duree": "etape"},
+    "se_fondre": {},
+    "invisible": {},
+    "s_unir":    {},
+    "tromper":   {},
+    "parler":    {},
+    "hanter":    {"par_tour": null, "choix": false}
+  },
+
+  "regles": {
+    "pouvoirs": true,
+    "fin_de_partie": "immediate",
+    "barrage": "v0",
+    "echec_face_esprit": "echange",
+    "reves_par_joueur_et_tour": null,
+    "reussite": "effet",
+    "alliance": "presence",
+    "action_soutenir": true,
+    "effets_organes": false,
+    "silence_reserve_vide": false,
+    "criteres_ignorent_zones_rasees": true,
+    "departage_zones": ["foret", "proximite", "numero"],
+    "departage_machines": ["avancee", "numero"],
+    "premier_joueur_tournant": true,
+    "bruit": false,
+    "dernier_sursaut": false,
+    "sursaut_max": 3,
+    "communication": "aucun_signe",
+    "presage": false,
+    "traces_par_joueur": 2,
+    "traces_datees": true,
+    "traces_engagent": false,
+    "partage_max": 2,
+    "rondes_conseil": 3,
+    "plan": "une_piste",
+    "double": "favori",
+    "portee": "plateau",
+    "machine_hs_designee": "rien",
+    "escalade": null,
+    "voies_reve": "sommeil",
+    "cercle_par_joueur": 3,
+    "silence_du_chantier": true,
+    "bonus_fin": 0,
+    "reves_par_tour_table": null,
+    "lunes": null,
+    "egarer": "retiree",
+    "barrage_sortie": true,
+    "des_fixes": null,
+    "apprentissage": true
+  },
+
+  "variantes": {
+    "sans_pouvoirs":        {"regles": {"pouvoirs": false}},
+    "fin_de_tour":          {"regles": {"fin_de_partie": "fin_de_tour"}},
+    "alliance_conjointe":   {"regles": {"alliance": "conjointe"}},
+    "tenir_passive":        {"pouvoirs": {"tenir": {"mode": "v0_passive"}}},
+    "effets_organes":       {"regles": {"effets_organes": true}},
+    "chantier_litteral":    {"regles": {"reussite": "foret"}},
+    "reparer_sans_hs":      {"tuiles": {"Reparer": {"params": {"hs": false}}}},
+    "silence_reserve_vide": {"regles": {"silence_reserve_vide": true}},
+    "hanter_off":           {"pouvoirs": {"hanter": {"actif": false}}},
+    "sursaut_et_bruit":     {"regles": {"dernier_sursaut": true, "bruit": true}},
+    "paquet_repioche":      {"cartes": {"reprendre_du_paquet": true}},
+    "zones_rasees_visees":  {"regles": {"criteres_ignorent_zones_rasees": false}},
+    "sans_esprit_depart":   {"piste": {"tirage": {"esprits_depart": 0,
+                              "tuiles": ["Cupidite", "Cupidite", "Opportunisme", "Opportunisme", "Represailles",
+                                         "Represailles", "Percee", "Percee", "Reparer", "Renfort", "Cupidite"]}}}
+  }
+}

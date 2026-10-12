@@ -1,0 +1,78 @@
+{
+  "nom": "v2",
+  "base": "v1",
+  "description": "Maquette v2 : préréglage « V2 proposée » de l'atelier du 12 oct. 2026 (deux pistes qui et où, doublé du favori, traces, deux voies du rêve au choix, présage). N'écrit que ses différences avec v1. Toute autre variante de l'atelier se charge par son code : charger(\"v2\", \"code:c:...|m:...|p:...\").",
+  "document": "docs/noeuds_v2.md",
+  "atelier": "c:A2a,d_fav,C2a,D2v_choix|m:C3|p:",
+  "variantes_heritees": false,
+
+  "plateau": {
+    "fleches": {"Z1": "Z4", "Z2": "Z5", "Z3": "Z5", "Z4": "Z6", "Z5": "Z7"}
+  },
+
+  "machines": {
+    "en_jeu": [
+      {"nom": "Grosse Gueule", "organes": ["moteur", "chenilles"], "zone": "Z1", "entree": "Z1"},
+      {"nom": "Rapiat", "organes": ["moteur", "chenilles", "phares"], "zone": "Z2", "entree": "Z2"},
+      {"nom": "Mâchoire", "organes": ["moteur", "phares"], "zone": "Z3", "entree": "Z3"}
+    ],
+    "reserve": [
+      {"nom": "Tonton Débard", "organes": ["moteur", "chenilles"], "entree": "Z1"},
+      {"nom": "Ripaille", "organes": ["moteur", "chenilles", "phares"], "entree": "Z3"}
+    ],
+    "sixieme": {"nom": "Zizanie", "organes": ["moteur", "chenilles"], "entree": "Z2"}
+  },
+
+  "tuiles": {
+    "Represailles": {"genre": "tactique", "critere": "plus_defendue"}
+  },
+
+  "piste": {
+    "placement": "fixe",
+    "disposition": ["Percee", "Represailles", "Percee", "Represailles", "Opportunisme", "Cupidite",
+                    "Opportunisme", "Represailles", "Percee", "Cupidite", "Cupidite"],
+    "tirage": {
+      "tuiles": ["Percee", "Represailles", "Percee", "Represailles", "Opportunisme", "Cupidite",
+                 "Opportunisme", "Represailles", "Percee", "Cupidite", "Cupidite"],
+      "esprits_depart": 0
+    }
+  },
+
+  "manoeuvres": {"disposition": ["Encercler", "Avancer", "Foncer", "Raser", "Reparer", "Renfort"]},
+
+  "regles": {
+    "plan": "qui_ou",
+    "double": "favori",
+    "portee": "rayon",
+    "machine_hs_designee": "remorquee",
+    "escalade": null,
+    "voies_reve": "choix",
+    "cercle_par_joueur": 3,
+    "silence_du_chantier": false,
+    "bonus_fin": 0,
+    "reves_par_joueur_et_tour": 1,
+    "reves_par_tour_table": null,
+    "lunes": null,
+    "egarer": "chantier",
+    "barrage_sortie": true,
+    "communication": "traces",
+    "traces_par_joueur": 2,
+    "traces_datees": true,
+    "traces_engagent": false,
+    "presage": true
+  },
+
+  "variantes": {
+    "coeur":        {"atelier": "c:A2a,d_fav,C2a,D2v_choix|m:|p:"},
+    "gang":         {"atelier": "c:A2a,d_fav,C2b,D2v_choix|m:C3,D5|p:"},
+    "heritage_v1":  {"atelier": "c:A2c,d_fav,C2c,D2v_choix|m:C3|p:represailles=attaque,bonus=10"},
+    "comm_aucun_signe": {"atelier": "c:A2a,d_fav,C2d,D2v_choix|m:C3|p:"},
+    "comm_tout_dire":   {"atelier": "c:A2a,d_fav,C2e,D2v_choix|m:C3|p:"},
+
+    "temoin_une_tactique":   {"piste": {"disposition": ["Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite"]}},
+    "temoin_des_fixes":      {"regles": {"des_fixes": [3, 4]}},
+    "temoin_sans_apprentissage": {"regles": {"apprentissage": false}},
+    "temoin_essoufflement":  {"regles": {"machine_hs_designee": "rien"}, "machines": {"reserve": []}},
+    "temoin_hanter_illimite": {"pouvoirs": {"hanter": {"par_tour": null}}}
+  }
+}

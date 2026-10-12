@@ -1,0 +1,127 @@
+{
+  "nom": "v1",
+  "base": "v0",
+  "description": "Maquette v1 : dix décisions du 11 oct. 2026 et précisions de l'audit de conformité. N'écrit que ses différences avec v0.",
+  "document": "docs/regles_v1.md",
+
+  "plateau": {
+    "zones": {
+      "Z1": {"foret": 2, "profondeur": 0},
+      "Z2": {"foret": 1, "profondeur": 0},
+      "Z3": {"foret": 2, "profondeur": 0},
+      "Z4": {"foret": 3, "profondeur": 1},
+      "Z5": {"foret": 4, "profondeur": 1},
+      "Z6": {"foret": 4, "profondeur": 2},
+      "Z7": {"foret": 5, "profondeur": 2}
+    },
+    "adjacences": [["Z1", "Z2"], ["Z2", "Z3"], ["Z1", "Z4"], ["Z2", "Z4"], ["Z2", "Z5"], ["Z3", "Z5"],
+                   ["Z4", "Z5"], ["Z4", "Z6"], ["Z5", "Z6"], ["Z5", "Z7"], ["Z6", "Z7"]],
+    "rivieres": [["Z3", "Z5"], ["Z5", "Z7"], ["Z7", "Z6"], ["Z6", "Z4"]]
+  },
+
+  "machines": {
+    "en_jeu": [
+      {"nom": "Bouteur", "organes": ["moteur", "chenilles"], "zone": "Z1"},
+      {"nom": "Abatteuse", "organes": ["moteur", "chenilles", "phares"], "zone": "Z2"},
+      {"nom": "Pelleteuse", "organes": ["moteur", "phares"], "zone": "Z3"}
+    ]
+  },
+
+  "piste": {
+    "placement": "fixe",
+    "disposition": ["Renfort", "Reparer", "Percee", "Represailles", "Opportunisme", "Cupidite",
+                    "Opportunisme", "Represailles", "Percee", "Cupidite", "Cupidite"],
+    "tirage": {
+      "tuiles": ["Renfort", "Reparer", "Percee", "Represailles", "Opportunisme", "Cupidite",
+                 "Opportunisme", "Represailles", "Percee", "Cupidite", "Cupidite"],
+      "esprits_depart": 0
+    }
+  },
+
+  "presence": {"placement": "choix"},
+
+  "peuples": {
+    "reptiles": {"actions": ["aller", "barrer"]}
+  },
+
+  "pouvoirs": {
+    "tenir":     {"mode": "zones_presence"},
+    "renverser": {"organes": "tous"},
+    "attendre":  {"embuscades_par_tour": null, "immobiliser": true, "par_tour": 1, "duree": "tour"},
+    "hanter":    {"par_tour": 1, "choix": true}
+  },
+
+  "regles": {
+    "barrage": "bloque",
+    "echec_face_esprit": "reste",
+    "reves_par_joueur_et_tour": 1,
+    "action_soutenir": false,
+    "communication": "parle",
+    "presage": true,
+    "traces_par_joueur": 3,
+    "traces_datees": false
+  },
+
+  "variantes": {
+    "tenir_passive":      {"pouvoirs": {"tenir": {"mode": "passif"}}},
+    "sans_esprit_depart": null,
+    "un_esprit_depart":   {"piste": {"disposition": ["Renfort", "Reparer", "Percee", "Represailles", "Opportunisme",
+                             "Cupidite", "Opportunisme", "Represailles", "Percee", "Cupidite", "Esprit"]}},
+
+    "retour_v0_barrage":         {"regles": {"barrage": "v0"}},
+    "retour_v0_echec_esprit":    {"regles": {"echec_face_esprit": "echange"}},
+    "retour_v0_reves_illimites": {"regles": {"reves_par_joueur_et_tour": null}},
+    "retour_v0_limites_pouvoirs": {"pouvoirs": {"hanter": {"par_tour": null}, "attendre": {"par_tour": null}}},
+    "retour_v0_plateau": {
+      "plateau": {
+        "zones": {
+          "Z1": {"foret": 2, "profondeur": 0}, "Z2": {"foret": 2, "profondeur": 0},
+          "Z3": {"foret": 3, "profondeur": 1}, "Z4": {"foret": 3, "profondeur": 1}, "Z5": {"foret": 3, "profondeur": 1},
+          "Z6": {"foret": 4, "profondeur": 2}, "Z7": {"foret": 4, "profondeur": 2}
+        },
+        "adjacences": [["Z1", "Z2"], ["Z1", "Z3"], ["Z1", "Z4"], ["Z2", "Z4"], ["Z2", "Z5"], ["Z3", "Z4"],
+                       ["Z4", "Z5"], ["Z3", "Z6"], ["Z4", "Z6"], ["Z4", "Z7"], ["Z5", "Z7"], ["Z6", "Z7"]],
+        "rivieres": [["Z1", "Z3"], ["Z3", "Z6"], ["Z6", "Z7"], ["Z7", "Z5"]]
+      },
+      "machines": {"en_jeu": [
+        {"nom": "Bouteur", "organes": ["moteur", "chenilles"], "zone": "Z1"},
+        {"nom": "Abatteuse", "organes": ["moteur", "chenilles", "phares"], "zone": "Z2"},
+        {"nom": "Pelleteuse", "organes": ["moteur", "phares"], "zone": "Z2"}
+      ]}
+    },
+    "retour_v0_mise_en_place":   {"piste": {"placement": "hasard"}, "presence": {"placement": "hasard"}},
+    "retour_v0_piste":           {"piste": {"placement": "hasard"}},
+    "retour_v0_presence":        {"presence": {"placement": "hasard"}},
+    "retour_v0_tenir":           {"pouvoirs": {"tenir": {"mode": "v0_carte"}}},
+    "retour_v0_renverser":       {"pouvoirs": {"renverser": {"organes": ["chenilles"]}}},
+    "retour_v0_reptiles":        {"peuples": {"reptiles": {"actions": ["aller", "barrer", "saboter"]}},
+                                  "pouvoirs": {"attendre": {"duree": "etape"}}},
+    "retour_v0_soutenir":        {"regles": {"action_soutenir": true}},
+
+    "sans_presage":              {"regles": {"presage": false}},
+    "reference_1_0":             {"regles": {"communication": "aucun_signe", "presage": false}},
+    "comm_aucun_signe":          {"regles": {"communication": "aucun_signe"}},
+    "comm_traces":               {"regles": {"communication": "traces", "traces_par_joueur": 2, "traces_datees": true}},
+    "comm_traces_engagent":      {"regles": {"communication": "traces", "traces_par_joueur": 2, "traces_datees": true,
+                                             "traces_engagent": true}},
+    "comm_partage":              {"regles": {"communication": "partage"}},
+    "comm_tout_dire":            {"regles": {"communication": "tout_dire"}},
+
+    "temoin_une_tactique":   {"piste": {"disposition": ["Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite"]}},
+    "temoin_des_fixes":      {"regles": {"des_fixes": [3, 4]}},
+    "temoin_sans_apprentissage": {"regles": {"apprentissage": false}},
+    "temoin_essoufflement":  {"piste": {"disposition": ["Cupidite", "Opportunisme", "Percee", "Represailles", "Opportunisme",
+                                                        "Cupidite", "Opportunisme", "Represailles", "Percee", "Cupidite", "Cupidite"]}},
+    "temoin_assaut":         {"machines": {"en_jeu": [
+                                {"nom": "Bouteur", "organes": ["moteur", "chenilles"], "zone": "Z1"},
+                                {"nom": "Abatteuse", "organes": ["moteur", "chenilles", "phares"], "zone": "Z2"},
+                                {"nom": "Pelleteuse", "organes": ["moteur", "phares"], "zone": "Z3"},
+                                {"nom": "Debardeuse", "organes": ["moteur", "chenilles"], "zone": "Z1"},
+                                {"nom": "Broyeuse", "organes": ["moteur", "chenilles", "phares"], "zone": "Z3"}],
+                              "reserve": []}},
+    "temoin_hanter_illimite": {"pouvoirs": {"hanter": {"par_tour": null}}},
+    "temoin_mammiferes_sans_pouvoir": {"pouvoirs": {"tenir": {"actif": false}, "renverser": {"actif": false}}},
+    "temoin_spectateur":     {"peuples": {"humains": {"actions": []}},
+                              "pouvoirs": {"tromper": {"actif": false}, "parler": {"actif": false}}}
+  }
+}

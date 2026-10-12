@@ -1,0 +1,1169 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<title>Atelier de la Forêt qui rêve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Young+Serif&display=swap">
+<style>
+:root{
+  /* Planche d'atelier : l'arbre des variantes sur papier quadrillé à gauche, la fiche du nœud épinglée à droite, puis le livret assemblé en colonne de lecture. Même famille visuelle que la maquette v1 (feutre vert, tuiles colorées). */
+  --bg:#EDF0E8; --paper:#F8F9F4; --card:#FCFCF8; --ink:#1B211D; --muted:#56615A; --line:#C8CFC4; --grid:#E2E7DD;
+  --accent:#2D6A44; --accent-bg:#DEEADF;
+  --wake:#93590E; --wake-bg:#F4E8D3;
+  --dream:#4B3E95; --dream-bg:#E7E3F5;
+  --param:#1D6A74; --param-bg:#DAECEE;
+  --retire:#A2463A; --retire-bg:#F3E1DC;
+  --felt:#2C4234; --felt-ink:#E9F1EA; --felt-muted:#B1C4B5;
+  --t-cup:#E9C653; --t-opp:#8ACBC2; --t-rep:#E5937F; --t-per:#EFAB60; --t-ch:#D9D2B4; --t-esp:#5446A6; --t-esp-ink:#F4F1FF; --t-ink:#1D231F;
+  --machine:#E6B110; --machine-ink:#2A2306; --forest:#2F7A4B;
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Alegreya", Georgia, "Times New Roman", serif;
+  --f-ui:"Alegreya Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101511; --paper:#172019; --card:#1B251E; --ink:#E2E9E1; --muted:#9AA79C; --line:#2F3B32; --grid:#1A231C;
+    --accent:#7CC196; --accent-bg:#1C2E22;
+    --wake:#E2A95C; --wake-bg:#33270F;
+    --dream:#AFA3F2; --dream-bg:#262140;
+    --param:#6EC3CC; --param-bg:#14302F;
+    --retire:#E58C7C; --retire-bg:#3A1F1A;
+    --felt:#16221A; --felt-ink:#DCE7DE; --felt-muted:#8FA494;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101511; --paper:#172019; --card:#1B251E; --ink:#E2E9E1; --muted:#9AA79C; --line:#2F3B32; --grid:#1A231C;
+  --accent:#7CC196; --accent-bg:#1C2E22;
+  --wake:#E2A95C; --wake-bg:#33270F;
+  --dream:#AFA3F2; --dream-bg:#262140;
+  --param:#6EC3CC; --param-bg:#14302F;
+  --retire:#E58C7C; --retire-bg:#3A1F1A;
+  --felt:#16221A; --felt-ink:#DCE7DE; --felt-muted:#8FA494;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font:17px/1.58 var(--f-body);margin:0;padding-inline:16px;padding-block:0 72px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:400;line-height:1.18;text-wrap:balance;margin:0}
+p{margin:0}
+.wrap{max-width:1280px;margin:0 auto}
+.eyebrow{font:800 12px/1.2 var(--f-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* en-tête */
+.mast{padding-block:36px 20px;display:grid;gap:12px}
+.mast h1{font-size:clamp(34px,5.2vw,58px);letter-spacing:-.01em}
+.mast .lede{font:500 18px/1.5 var(--f-ui);color:var(--muted);max-width:70ch}
+.presets{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-top:6px}
+.presets .lab{font:800 12px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:700 14px var(--f-ui);color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.seg button:hover{border-color:var(--accent)}
+.seg button[aria-pressed="true"]{background:var(--felt);color:var(--felt-ink);border-color:var(--felt)}
+.statusline{font:600 14px/1.45 var(--f-ui);color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 16px}
+.statusline b{color:var(--ink)}
+.codebox{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:600 13px var(--f-ui);color:var(--muted)}
+.codebox code{font:600 12.5px ui-monospace,Menlo,Consolas,monospace;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--ink);word-break:break-all}
+.btn{font:700 13px var(--f-ui);background:transparent;color:var(--accent);border:1.5px solid var(--accent);border-radius:8px;padding:4px 10px;cursor:pointer}
+.btn:hover{background:var(--accent-bg)}
+.codebox input{font:600 13px ui-monospace,Menlo,Consolas,monospace;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 8px;min-width:0;width:16em;max-width:100%}
+
+.topnav{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:-16px;padding:9px 16px}
+.topnav div{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px 22px;font:700 14px var(--f-ui)}
+.topnav a{color:var(--ink);text-decoration:none}
+.topnav a:hover{color:var(--accent)}
+
+section.blk{padding-block:40px 8px;display:grid;gap:18px}
+.blk-head{display:grid;gap:8px;max-width:78ch}
+.blk-head h2{font-size:clamp(28px,3.6vw,40px)}
+.blk-head p{font:500 16.5px/1.5 var(--f-ui);color:var(--muted)}
+
+/* légende */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font:600 13.5px var(--f-ui);color:var(--muted)}
+.legend span{display:inline-flex;gap:7px;align-items:center}
+
+/* types de nœuds */
+.kind{font:800 10.5px/1 var(--f-ui);letter-spacing:.12em;text-transform:uppercase;padding:4px 7px;border-radius:5px;white-space:nowrap}
+.k-socle{color:var(--accent);background:var(--accent-bg)}
+.k-choix{color:var(--wake);background:var(--wake-bg)}
+.k-option{color:var(--wake);background:transparent;border:1.3px solid var(--wake)}
+.k-module{color:var(--dream);background:var(--dream-bg)}
+.k-param{color:var(--param);background:var(--param-bg)}
+.chip{font:700 11px/1 var(--f-ui);padding:4px 7px;border-radius:999px;border:1.2px solid currentColor;white-space:nowrap}
+.c-propose{color:var(--accent)}
+.c-atester{color:var(--wake)}
+.c-v1{color:var(--muted)}
+.c-idee{color:var(--dream);border-style:dashed}
+.c-temoin{color:var(--muted);border-style:dotted}
+.c-retire{color:var(--retire)}
+.c-alt{color:var(--param)}
+
+/* planche : arbre + fiche */
+.board{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:26px;align-items:start}
+@media (max-width:980px){.board{grid-template-columns:minmax(0,1fr)}}
+.tree{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;border:1px solid var(--line);border-radius:14px;padding:18px clamp(10px,2vw,22px) 22px;display:grid;gap:22px;min-width:0}
+.branch{display:grid;gap:8px;min-width:0}
+.branch-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;border-bottom:1.5px solid var(--ink);padding-bottom:6px}
+.branch-h h3{font-size:22px}
+.branch-h .letter{font:400 22px var(--f-display);color:var(--muted)}
+.branch-h p{font:500 14px var(--f-ui);color:var(--muted)}
+.kids{display:grid;gap:6px;margin-left:11px;padding-left:16px;border-left:1.5px solid var(--line);min-width:0}
+.branch>.kids{margin-left:4px}
+.node{position:relative;display:grid;gap:6px;min-width:0}
+.kids>.node::before{content:"";position:absolute;left:-16px;top:21px;width:13px;border-top:1.5px solid var(--line)}
+.row{display:grid;grid-template-columns:26px minmax(0,1fr);gap:8px;align-items:start;padding:7px 10px 8px 6px;border-radius:10px;border:1.5px solid transparent;background:var(--card);cursor:pointer}
+.row:hover{border-color:var(--line)}
+.node.sel>.row{border-color:var(--ink);box-shadow:0 2px 0 var(--line)}
+.node.off>.row{opacity:.6;background:transparent}
+.node.off.k-is-option>.row .ttl{text-decoration:none}
+.node.dead>.row{opacity:.55;background:transparent}
+.node.dead>.row .ttl{text-decoration:line-through;text-decoration-thickness:1.5px}
+.ctl{display:grid;place-items:center;padding-top:3px}
+.ctl input[type="radio"]{width:17px;height:17px;accent-color:var(--wake);margin:0;cursor:pointer}
+.sw{position:relative;width:26px;height:16px;display:inline-block}
+.sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;width:100%;height:100%}
+.sw i{position:absolute;inset:0;pointer-events:none;border-radius:999px;background:var(--line);transition:background .15s}
+.sw i::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--card);transition:transform .15s}
+.sw input:checked+i{background:var(--dream)}
+.sw input:checked+i::after{transform:translateX(10px)}
+.sw input:focus-visible+i{outline:2px solid var(--accent);outline-offset:2px}
+.sw input:disabled{cursor:not-allowed}
+@media (prefers-reduced-motion: reduce){.sw i,.sw i::after{transition:none}}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:5px}
+.dot.socle{background:var(--accent)}
+.dot.choix{background:transparent;border:2px solid var(--wake);transform:rotate(45deg);border-radius:2px;width:10px;height:10px}
+.body{display:grid;gap:3px;min-width:0}
+.l1{display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center}
+.ttl{font:700 16px/1.25 var(--f-ui)}
+.sum{font:500 14px/1.42 var(--f-ui);color:var(--muted)}
+.pchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.pchip{font:600 12px/1 var(--f-ui);color:var(--param);background:var(--param-bg);border-radius:6px;padding:4px 7px;border:0;cursor:pointer}
+.pchip b{font-weight:800}
+.pchip.mod{outline:1.5px solid var(--param)}
+.warn{font:600 12.5px/1.35 var(--f-ui);color:var(--retire)}
+
+.fiche{position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);max-height:calc(100vh - 76px);overflow:auto;background:var(--card);border:1.5px solid var(--ink);border-radius:14px;padding:18px 20px 22px;display:grid;gap:14px;min-width:0}
+@media (max-width:980px){.fiche{position:static;max-height:none}}
+.fiche h3{font-size:26px}
+.fiche .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fiche .sum{font-size:15.5px;color:var(--ink)}
+.fsec{display:grid;gap:7px}
+.fsec h4{font:800 11.5px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.prose{font:400 16px/1.55 var(--f-body);display:grid;gap:9px}
+.prose ul{margin:0;padding-left:20px;display:grid;gap:4px}
+.preview{display:grid;gap:8px}
+.preview .pv{font:400 15px/1.5 var(--f-body);border-left:3px solid var(--line);padding-left:10px}
+.preview .pv small{display:block;font:700 11px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:8px;align-items:center;font:600 14px var(--f-ui)}
+select{font:600 14px var(--f-ui);color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;max-width:100%;min-width:0}
+select:focus-visible{outline:2px solid var(--param)}
+.flash{animation:flash 1.2s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--param)}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion: reduce){.flash{animation:none}}
+.eng{font:600 13.5px var(--f-ui);color:var(--muted)}
+.eng b{color:var(--ink)}
+
+/* paramètres */
+.ptable-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table.pt{border-collapse:collapse;width:100%;min-width:760px;font:500 14.5px/1.4 var(--f-ui)}
+.pt th{font:800 11.5px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1.5px solid var(--line)}
+.pt td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.pt tr.grp td{font:400 18px var(--f-display);padding-top:16px;color:var(--ink);background:var(--paper)}
+.pt tr.inactive td{opacity:.5}
+.pt tr.changed td:first-child{box-shadow:inset 3px 0 0 var(--param)}
+.pt .node-link{background:none;border:0;padding:0;font:600 13.5px var(--f-ui);color:var(--accent);text-decoration:underline;cursor:pointer;text-align:left}
+.pt .def{color:var(--muted);font-size:13px}
+
+/* livret */
+.livret{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px clamp(16px,4vw,48px) 36px;display:grid;gap:26px}
+.livret .vt{display:grid;gap:6px;border-bottom:1.5px solid var(--ink);padding-bottom:14px}
+.livret .vt h3{font-size:30px}
+.livret .vt p{font:600 14.5px/1.45 var(--f-ui);color:var(--muted)}
+.chap{display:grid;gap:12px;min-width:0}
+.chap h4,.rule .rt>p,.rule .rt>ul,.rule .rt>ol,.rule .rt>.ex{max-width:70ch}
+.chap h4{font:400 24px/1.2 var(--f-display);display:flex;gap:12px;align-items:baseline}
+.chap h4 .cn{font:800 13px var(--f-ui);color:var(--muted);letter-spacing:.08em}
+.rule{display:grid;grid-template-columns:3.3em minmax(0,1fr);gap:10px;align-items:start}
+.rule .rn{font:700 13px/1.9 var(--f-ui);color:var(--muted);font-variant-numeric:tabular-nums}
+.rule .rt{display:grid;gap:7px;min-width:0}
+.rule .rt ul,.rule .rt ol{margin:0;padding-left:22px;display:grid;gap:3px}
+.src{font:700 10.5px var(--f-ui);letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:2px 6px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+.src.option{color:var(--wake);border:1px solid var(--wake)}
+.src.module{color:var(--dream);background:var(--dream-bg)}
+.ex{background:var(--accent-bg);border-radius:10px;padding:12px 14px;display:grid;gap:6px;font-size:15.5px}
+.ex b.exh{font:800 11.5px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+table.ptab{border-collapse:collapse;font:500 14px/1.4 var(--f-ui);width:100%}
+.ptab th,.ptab td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+.ptab th{font:800 11px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tabwrap{overflow-x:auto}
+.matlist{margin:0;padding-left:20px;display:grid;gap:3px}
+
+/* pyramide */
+.pyr-wrap{overflow-x:auto;max-width:100%}
+.pyr{display:grid;grid-template-columns:minmax(116px,1.4fr) repeat(11,minmax(40px,1fr));gap:4px;min-width:600px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px}
+.pyr .hd{display:grid;justify-items:center;gap:3px;padding:4px 2px}
+.pyr .hd .n{font:400 18px/1 var(--f-display)}
+.tl{font:800 8.5px/1.05 var(--f-ui);color:var(--t-ink);border-radius:6px;padding:6px 3px;text-align:center;width:100%;border:1px solid rgba(0,0,0,.18);hyphens:manual}
+.tl.cup{background:var(--t-cup)}.tl.opp{background:var(--t-opp)}.tl.rep{background:var(--t-rep)}.tl.per{background:var(--t-per)}.tl.ch{background:var(--t-ch)}.tl.esp{background:var(--t-esp);color:var(--t-esp-ink)}
+.pyr .lab{font:600 12.5px/1.25 var(--f-ui);display:grid;align-content:center;gap:1px;padding:4px 6px;border-radius:6px;background:var(--card)}
+.pyr .lab b{font-weight:800}
+.pyr .lab span{color:var(--muted);font-size:11.5px}
+.pyr .lab.ch{border-left:4px solid var(--machine)}
+.pyr .lab.fixed{border-left:4px dashed var(--muted)}
+.pc{border-radius:6px;display:flex;justify-content:center;align-items:center;min-height:30px;border:1px solid rgba(0,0,0,.12)}
+.pc.cup{background:color-mix(in srgb,var(--t-cup) 70%,transparent)}.pc.opp{background:color-mix(in srgb,var(--t-opp) 70%,transparent)}.pc.rep{background:color-mix(in srgb,var(--t-rep) 70%,transparent)}.pc.per{background:color-mix(in srgb,var(--t-per) 70%,transparent)}.pc.ch{background:color-mix(in srgb,var(--t-ch) 70%,transparent)}
+.pc i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--t-ink);margin:0 1px;opacity:.75}
+.cap{font:500 14px/1.45 var(--f-ui);color:var(--muted);max-width:80ch}
+
+/* chantiers */
+.chantier{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px 32px;padding-block:22px;border-top:1.5px solid var(--ink)}
+@media (max-width:980px){.chantier{grid-template-columns:minmax(0,1fr)}}
+.chantier .ch-h{grid-column:1/-1;display:grid;gap:6px}
+.chantier .ch-h h3{font-size:clamp(24px,3vw,32px)}
+.chantier .ch-h .ask{font:500 15.5px/1.5 var(--f-ui);color:var(--muted);max-width:90ch}
+.chantier .full{grid-column:1/-1;min-width:0}
+.chantier>*{align-self:start}
+.colprose{display:grid;gap:10px;min-width:0}
+.colprose h4{font:800 12px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.colprose ul{margin:0;padding-left:20px;display:grid;gap:5px}
+.figs{display:grid;gap:10px;min-width:0;align-content:start}
+.figs>*,.colprose>*,.board>*{min-width:0}
+.stat{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline;font:500 14.5px/1.4 var(--f-ui)}
+.stat b{font:400 22px/1 var(--f-display);font-variant-numeric:tabular-nums;text-align:right}
+svg.dg{width:100%;height:auto;display:block;font-family:var(--f-ui)}
+.dg .box{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+.dg .box.m{fill:var(--machine)}
+.dg .box.hs{fill:var(--retire-bg);stroke:var(--retire)}
+.dg .box.ch{fill:var(--paper);stroke-dasharray:5 4}
+.dg .t{fill:var(--ink);font:700 15px var(--f-ui)}
+.dg .t.mi{fill:var(--machine-ink)}
+.dg .s{fill:var(--muted);font:600 12px var(--f-ui)}
+.dg .ar{fill:none;stroke:var(--ink);stroke-width:1.6}
+.dg .ar.dash{stroke-dasharray:5 4;stroke:var(--dream)}
+.dg .ah{fill:var(--ink)}
+.dg .ah.d{fill:var(--dream)}
+.dg .sd{fill:var(--dream);font:600 12px var(--f-ui)}
+.engine{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.engine{grid-template-columns:minmax(0,1fr)}}
+.lane{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;align-content:start;background:var(--card)}
+.lane h5{font:400 19px/1.2 var(--f-display);margin:0}
+.lane p{font:500 14px/1.42 var(--f-ui);color:var(--muted)}
+.lane .end{font:800 12px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;border-radius:8px;padding:7px 9px;text-align:center}
+.lane.sleep{border-color:var(--dream)} .lane.sleep .end{background:var(--dream);color:var(--card)}
+.lane.wake{border-color:var(--accent)} .lane.wake .end{background:var(--accent);color:var(--card)}
+.lane.night .end{background:var(--ink);color:var(--bg)}
+.mini{display:flex;gap:2px;flex-wrap:wrap}
+.mini span{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;font:700 12px var(--f-ui);border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.mini span.e{background:var(--t-esp);color:var(--t-esp-ink);border-color:var(--t-esp)}
+.mini span.c{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+.mini span.c.f{background:var(--accent);color:var(--card)}
+.mini span.d{background:var(--wake-bg)}
+.mini span.n{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.engine-top{font:600 14.5px/1.45 var(--f-ui);background:var(--paper);border:1.5px dashed var(--line);border-radius:10px;padding:10px 12px}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media (max-width:760px){.flow{grid-template-columns:minmax(0,1fr)}}
+.flow div{border:1.5px solid var(--line);border-radius:10px;padding:10px;background:var(--card);display:grid;gap:4px;align-content:start}
+.flow b{font:800 11px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.flow strong{font:400 17px/1.2 var(--f-display)}
+.flow span{font:500 13.5px/1.4 var(--f-ui);color:var(--muted)}
+.flow div.hot{border-color:var(--param);background:var(--param-bg)}
+.flow div.hot b{color:var(--param)}
+
+/* décisions */
+.dlist{display:grid;gap:10px;counter-reset:d;margin:0;padding:0;list-style:none}
+.dlist li{display:grid;grid-template-columns:2.4em minmax(0,1fr);gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.dlist li::before{counter-increment:d;content:counter(d);font:400 24px/1 var(--f-display);color:var(--wake)}
+.dlist .q{font:700 16px/1.35 var(--f-ui)}
+.dlist .r{font:500 14.5px/1.45 var(--f-ui);color:var(--muted)}
+.dlist .r b{color:var(--ink)}
+.foot{margin-top:40px;font:500 14px/1.5 var(--f-ui);color:var(--muted);border-top:1px solid var(--line);padding-top:16px;display:grid;gap:6px;max-width:90ch}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--felt);color:var(--felt-ink);font:700 14px var(--f-ui);padding:9px 16px;border-radius:10px;z-index:9}
+</style>
+<div class="wrap">
+<header class="mast">
+  <p class="eyebrow">La Forêt qui rêve · maquette de conception v2 · 12 octobre 2026</p>
+  <h1>Atelier de la Forêt qui rêve</h1>
+  <p class="lede">Un socle de règles, des choix exclusifs, des modules qui s’y greffent et des paramètres réglables. Chaque chemin dans l’arbre donne une variante du même jeu, et son livret s’assemble à mesure que vous choisissez.</p>
+  <div class="presets">
+    <span class="lab" id="preset-lab">Préréglages</span>
+    <div class="seg" role="group" aria-labelledby="preset-lab" id="presets"></div>
+  </div>
+  <p class="statusline" id="statusline"></p>
+  <div class="codebox">
+    <span>Code de la variante</span><code id="vcode"></code>
+    <button class="btn" type="button" id="copy-code">Copier</button>
+    <label for="load-code" class="num">Charger un code</label>
+    <input id="load-code" type="text" placeholder="coller un code ici" autocomplete="off">
+    <button class="btn" type="button" id="apply-code">Charger</button>
+    <span class="warn" id="code-msg" role="status"></span>
+  </div>
+</header>
+</div>
+
+<nav class="topnav" aria-label="Sections"><div>
+  <a href="#arbre">L’arbre</a><a href="#parametres">Paramètres</a><a href="#livret">Livret de la variante</a><a href="#chantiers">Les quatre chantiers</a><a href="#decisions">Décisions à prendre</a>
+</div></nav>
+
+<div class="wrap">
+<section class="blk" id="arbre" aria-labelledby="arbre-h">
+  <div class="blk-head">
+    <p class="eyebrow">1 · La structure du jeu</p>
+    <h2 id="arbre-h">L’arbre des variantes</h2>
+    <p>Cinq branches. Le socle est toujours là. Un choix demande exactement une option. Un module s’ajoute ou non. Les pastilles bleues sont les paramètres : touchez-en une pour la régler. Touchez un nœud pour ouvrir sa fiche.</p>
+  </div>
+  <div class="legend" aria-label="Légende">
+    <span><span class="kind k-socle">Socle</span> toujours présent</span>
+    <span><span class="kind k-choix">Choix</span> une option et une seule</span>
+    <span><span class="kind k-option">Option</span> une réponse à un choix</span>
+    <span><span class="kind k-module">Module</span> à ajouter ou non</span>
+    <span><span class="kind k-param">Paramètre</span> une valeur à régler</span>
+    <span><span class="chip c-propose">proposé</span> recommandé ce jour</span>
+    <span><span class="chip c-idee">idée</span> à rédiger</span>
+    <span><span class="chip c-temoin">témoin</span> pour les mesures</span>
+    <span><span class="chip c-retire">retiré</span> abandonné</span>
+  </div>
+  <div class="board">
+    <div class="tree" id="tree"></div>
+    <aside class="fiche" id="fiche" aria-live="polite"></aside>
+  </div>
+</section>
+
+<section class="blk" id="parametres" aria-labelledby="param-h">
+  <div class="blk-head">
+    <p class="eyebrow">2 · Les variables</p>
+    <h2 id="param-h">Paramètres de la variante</h2>
+    <p>Tous les réglages de l’arbre, avec leur valeur actuelle et la valeur proposée. Les lignes pâles appartiennent à des nœuds absents de la variante. Un trait bleu signale un réglage modifié.</p>
+  </div>
+  <div class="ptable-wrap"><table class="pt" id="ptable"></table></div>
+</section>
+
+<section class="blk" id="livret" aria-labelledby="livret-h">
+  <div class="blk-head">
+    <p class="eyebrow">3 · Ce que lirait un joueur</p>
+    <h2 id="livret-h">Livret de la variante</h2>
+    <p>Assemblé à partir des nœuds actifs. Les règles venues d’une option ou d’un module portent leur étiquette. Les numéros changent avec la variante : ils servent à se repérer, pas à citer.</p>
+  </div>
+  <div class="livret" id="book"></div>
+</section>
+
+<section class="blk" id="chantiers" aria-labelledby="ch-h">
+  <div class="blk-head">
+    <p class="eyebrow">4 · Notes de conception</p>
+    <h2 id="ch-h">Les quatre chantiers du 12 octobre</h2>
+    <p>Tes quatre demandes, ce que je propose pour chacune, les alternatives rangées dans l’arbre, et ce qu’il faudra vérifier en simulation. Les chiffres sont des calculs exacts sur le plateau v1, avant toute défense : ils décrivent la forme de la menace, pas l’équilibre du jeu.</p>
+  </div>
+
+  <article class="chantier" aria-labelledby="c1-h">
+    <div class="ch-h">
+      <p class="eyebrow">Chantier 1 · le Méchant</p>
+      <h3 id="c1-h">Deux pistes, une phrase : qui obéit, et où</h3>
+      <p class="ask">Ta demande : rendre plus lisible le mouvement et l’action des Machines, et ajouter une seconde piste de 0 à 5 lue par l’écart des dés, qui apprend comme la première. Le plan d’une étape combine les deux tuiles désignées.</p>
+    </div>
+    <div class="colprose prose">
+      <h4>La proposition</h4>
+      <p>La piste des pensées garde son rôle : la <b>somme</b> dit ce que le Méchant veut (une tactique). La nouvelle <b>piste des Machines</b> porte les cinq Machines : l’<b>écart</b> dit laquelle obéit. Le plan se lit comme une phrase : « Grosse Gueule, par cupidité ».</p>
+      <p>La tactique ne cherche plus sa cible sur tout le plateau. Elle choisit dans le <b>rayon</b> de la Machine : sa zone et les zones voisines. La Machine entre dans la zone choisie et y abat une forêt. La zone choisie est donc toujours la zone abattue.</p>
+      <p>Réparer et Renfort quittent la piste des pensées. Ils découlent de l’état de la Machine appelée : au chantier, elle entre ; hors service, elle est remorquée au chantier ; en marche, elle exécute la tactique. Les deux tuiles apprennent du même verdict, chacune sur sa piste.</p>
+      <p>Le doublé (écart 0) n’a pas de tuile : il fait obéir le <b>favori</b>, la Machine de la case 1. Trois autres réponses sont rangées dans l’arbre.</p>
+      <h4>Ce que ça retire au joueur</h4>
+      <ul>
+        <li>Chercher la Machine la plus proche et compter les distances.</li>
+        <li>L’abattage en chemin, point ouvert de la v1 : une Machine ne frappe plus ailleurs que là où elle va.</li>
+        <li>Les égalités entre Machines (4 à 6 par partie en v1). Il reste celles entre zones d’un même rayon, tranchées par une seule règle.</li>
+        <li>Deux tuiles d’ordre de chantier à part, avec leurs critères propres.</li>
+      </ul>
+      <h4>Points de vigilance</h4>
+      <ul>
+        <li>Barrer la zone d’une Machine la paralyse pour l’étape. C’est très lisible, peut-être trop fort : Barrer est déjà l’arme principale. Le Méchant apprendra à appeler les Machines qu’on ne surveille pas ; il faut mesurer si cela suffit contre le tape-taupe.</li>
+        <li>Une Machine remorquée ou qui entre a « réussi » (décision 5 : l’ordre a eu un effet). Casser une Machine la fait donc monter sur la piste. Le thème s’y prête (il s’acharne sur son engin), le paramètre est dans l’arbre.</li>
+        <li>Représailles change de sens dans le rayon : elle charge la zone la plus défendue, en tension directe avec Opportunisme.</li>
+      </ul>
+    </div>
+    <div class="figs">
+      <div class="colprose prose">
+        <h4>La pyramide des plans</h4>
+        <p>Somme et écart ne sont pas indépendants. Une Machine en case <i>d</i> ne reçoit que les tactiques des cases 7 ± (5 − <i>d</i>), de deux en deux, <b>toutes avec la même chance</b>. En case 5, toujours le 7. En case 1, l’une des cinq cases impaires. Les cases paires de la piste des Machines ne reçoivent que des tactiques paires, les impaires que des impaires. Imprimée sous la piste, la pyramide montre les 21 plans possibles.</p>
+      </div>
+      <div id="pyr-static"></div>
+      <p class="cap">Disposition de départ proposée. Chaque cellule est un plan possible, colorée par sa tactique ; un point = 1 chance sur 36. Ligne du doublé : le favori obéit, avec les tactiques paires.</p>
+      <div class="stat">
+        <b>0,83</b><span>forêt abattue par plan au départ, sans défense (v1 : 0,92)</span>
+        <b>6/36</b><span>chances qu’une Machine du chantier entre, à chaque plan</span>
+        <b>53 %</b><span>de la menace de la première étape sur les deux zones les plus menacées, sans présence posée (v1 : 100 %, dont 82 % sur les Sources). La bande verte de l’objectif 1 est 50 à 80 %.</span>
+      </div>
+      <svg class="dg" viewBox="0 0 640 300" role="img" aria-labelledby="cyc-t">
+        <title id="cyc-t">Le cycle des Machines : au chantier, en marche, hors service, puis remorquée au chantier</title>
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="ahd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah d" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+        <rect class="box ch" x="20" y="112" width="150" height="54" rx="10"/>
+        <text class="t" x="95" y="144" text-anchor="middle">Au chantier</text>
+        <rect class="box m" x="245" y="22" width="150" height="54" rx="10"/>
+        <text class="t mi" x="320" y="54" text-anchor="middle">En marche</text>
+        <rect class="box hs" x="470" y="112" width="150" height="54" rx="10"/>
+        <text class="t" x="545" y="144" text-anchor="middle">Hors service</text>
+        <path class="ar" d="M120,112 C150,70 190,52 240,49" marker-end="url(#ah)"/>
+        <text class="s" x="20" y="34">désignée : elle entre</text>
+        <text class="s" x="20" y="50">sur sa zone d’entrée</text>
+        <path class="ar" d="M400,49 C450,52 500,70 525,108" marker-end="url(#ah)"/>
+        <text class="s" x="478" y="30">tous ses organes</text>
+        <text class="s" x="478" y="46">neutralisés</text>
+        <path class="ar" d="M545,168 C540,250 120,250 95,170" marker-end="url(#ah)"/>
+        <text class="s" x="320" y="258" text-anchor="middle">désignée : remorquée et remise en état</text>
+        <path class="ar dash" d="M290,78 C250,120 210,138 174,140" marker-end="url(#ahd)"/>
+        <text class="sd" x="205" y="182">égarée par les entités :</text>
+        <text class="sd" x="205" y="198">elle rentre seule, et il rêve</text>
+        <path class="ar" d="M350,22 C380,-4 260,-4 290,22" marker-end="url(#ah)"/>
+        <text class="s" x="282" y="12" text-anchor="end">désignée : exécute la tactique</text>
+        <text class="s" x="320" y="290" text-anchor="middle">Il n’y a plus de silence du chantier : les Machines reviennent toujours.</text>
+      </svg>
+    </div>
+  </article>
+
+  <article class="chantier" aria-labelledby="c2-h">
+    <div class="ch-h">
+      <p class="eyebrow">Chantier 2 · les fins</p>
+      <h3 id="c2-h">Le moteur des rêves : il s’endort, ou la forêt se réveille</h3>
+      <p class="ask">Ta demande : abandonner le silence du chantier, ajouter le réveil de la forêt (des renforts en masse) provoqué par l’investissement dans le rêve, en écho au long sommeil. Trois fins, et dans tous les cas le résultat se mesure aux arbres sauvés.</p>
+    </div>
+    <div class="colprose prose">
+      <h4>La proposition</h4>
+      <p>Le geste ne change pas : une carte posée en travers part en rêve et quitte la main pour la partie. Mais au moment où elle rêve, son joueur choisit sa <b>voie</b>.</p>
+      <ul>
+        <li><b>La voie du sommeil</b>, dans la tête du Méchant : un esprit entre en case 12 ou avance d’une case. Elle est contestée, car chaque tactique qui réussit à côté d’un esprit le repousse. En échange, elle protège tout de suite : un esprit tiré annule le plan, et l’esprit qui entre fait oublier la tactique de la case 12.</li>
+        <li><b>La voie du réveil</b>, dans la forêt : la carte rejoint le Cercle. Rien ne la repousse, mais elle ne protège rien avant que le Cercle soit plein.</li>
+      </ul>
+      <p>L’écho tient au même geste vu des deux côtés : le personnage qui dort entre dans le rêve du Méchant, ou il appelle les siens.</p>
+      <p><b>Le bilan</b> compte les forêts restantes, quelle que soit la fin. Une fin précoce rapporte déjà les arbres qu’elle protège. Je mets donc le bonus de fin à zéro, ce qui remplace la décision A3 (+10 %) ; le paramètre reste dans l’arbre.</p>
+      <h4>Ce que l’ancienne fin devient</h4>
+      <p>Les Machines se recyclent : une Machine hors service attend d’être remorquée au chantier, puis revient par la lisière. Les entités gardent leur place à part : une Machine égarée rentre seule au chantier, sans attendre, et fait rêver le Méchant. Saboter reste utile, parce qu’une Machine remorquée repart de la lisière.</p>
+      <h4>Points de vigilance</h4>
+      <ul>
+        <li>En v1, rêver dominait : un rêve par tour endormait le Méchant vers le tour 3 en gardant 86 % de la forêt, contre 67 % en défendant seulement. Une voie sans riposte rend le rêve plus sûr. Les leviers sont le seuil du Cercle, la limite des rêves et leur coût.</li>
+        <li>La limite d’un rêve par joueur grandit avec la table, pas la distance à parcourir. Le module des lunes remplace cette limite par un nombre fixe de rêves pour toute la table, à se disputer au conseil.</li>
+      </ul>
+    </div>
+    <div class="figs">
+      <div class="engine-top">Une carte posée en travers part en rêve à la phase Rêves. Son joueur choisit sa voie. Au plus un rêve par joueur et par tour.</div>
+      <div class="engine">
+        <div class="lane sleep">
+          <h5>Voie du sommeil</h5>
+          <div class="mini" aria-label="Cases 12 à 7 de la piste des pensées, un esprit en 10"><span>12</span><span>11</span><span class="e">10</span><span>9</span><span>8</span><span class="d">7</span></div>
+          <p>Un esprit entre en 12 ou avance d’une case. Une tactique qui réussit à côté de lui le repousse. Six rêves au moins sur le même esprit.</p>
+          <p class="end">Le long sommeil</p>
+        </div>
+        <div class="lane wake">
+          <h5>Voie du réveil</h5>
+          <div class="mini" aria-label="Le Cercle à deux joueurs : six cases, deux occupées"><span class="c f">1</span><span class="c f">2</span><span class="c">3</span><span class="c">4</span><span class="c">5</span><span class="c">6</span></div>
+          <p>La carte rejoint le Cercle. Rien ne la repousse. Trois cases par joueur : au plus tôt au tour 3, en y laissant trois cartes chacun.</p>
+          <p class="end">Le réveil de la forêt</p>
+        </div>
+        <div class="lane night">
+          <h5>La nuit</h5>
+          <div class="mini" aria-label="Six tours de la journée"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span class="n">6</span></div>
+          <p>Personne ne la provoque. Après le sixième tour, le Méchant rentre chez lui. Il reviendra.</p>
+          <p class="end">La nuit</p>
+        </div>
+      </div>
+      <p class="cap">Dans les trois cas, la partie s’arrête aussitôt et l’on compte les forêts. L’épilogue croise la forêt restante (aujourd’hui) et la fin (demain).</p>
+    </div>
+  </article>
+
+  <article class="chantier" aria-labelledby="c3-h">
+    <div class="ch-h">
+      <p class="eyebrow">Chantier 3 · le conseil</p>
+      <h3 id="c3-h">Des traces au lieu de la parole</h3>
+      <p class="ask">Ta demande : remplacer la discussion libre par des règles d’échange d’informations, pour faciliter le portage sur BGA. Piste évoquée : une phase de placement ou de révélation d’indices sans ordre de tour, comme les jetons de The Gang.</p>
+    </div>
+    <div class="colprose prose">
+      <h4>La proposition : les traces</h4>
+      <p>Chaque peuple a trois traces numérotées 1, 2 et 3, une par étape. Pendant le conseil, sans parler et sans ordre de tour, chacun pose jusqu’à deux traces sur des zones (ou sur le Cercle), les reprend, les déplace. Une trace dit : « à cette étape, j’agirai ici ». Quand tout le monde est prêt et que plus rien ne bouge, les traces se figent et l’on programme en silence.</p>
+      <p>Une trace dit <b>où</b> et <b>quand</b>. Elle ne dit ni l’action, ni la moitié, ni le personnage. Deux traces du même numéro dans une zone annoncent une alliance. La troisième étape de chacun reste secrète. Les traces n’engagent à rien : on peut changer d’avis en programmant, au risque de laisser un allié seul.</p>
+      <h4>L’alternative façon The Gang : le partage</h4>
+      <p>Au centre, deux jetons par Machine en marche. Chacun en prend, en rend, ou en prend devant un autre joueur (« laisse, je m’en charge »). Tenir une Machine, c’est annoncer qu’on s’en occupe ce tour ; être deux sur la même, c’est annoncer une alliance contre elle. Il se marie bien avec la piste des Machines, et avec le module des lunes, qui fait se disputer les rêves de la même façon.</p>
+      <h4>Pour BGA</h4>
+      <p>Les deux formes sont des phases simultanées : chaque joueur agit sans attendre son tour, chaque déplacement s’affiche chez les autres, et la phase se clôt quand tous ont validé. Aucun échange libre n’est nécessaire, et la même règle se joue à table en silence.</p>
+    </div>
+    <div class="figs">
+      <div class="flow" aria-label="Déroulé du conseil">
+        <div><b>Avant</b><strong>Voir</strong><span>Les oiseaux qui le veulent lancent les dés de leurs étapes.</span></div>
+        <div class="hot"><b>Simultané</b><strong>Les traces</strong><span>Poser, reprendre, déplacer, sans ordre de tour. Prêt ?</span></div>
+        <div><b>Module</b><strong>Le présage</strong><span>Les dés de l’étape 1 sont lancés. Tout le monde voit le premier plan.</span></div>
+        <div><b>Silence</b><strong>Programmer</strong><span>Une carte au plus par étape, face cachée, orientée ou en travers.</span></div>
+        <div><b>Ensuite</b><strong>Résolution</strong><span>Étape par étape. On ne dévoile pas ses cartes cachées.</span></div>
+      </div>
+      <div class="colprose prose">
+        <h4>Ce qu’il faudra mesurer</h4>
+        <p>L’objectif 3 a déjà sa bande : le vocabulaire permis doit récupérer 40 à 80 % de l’écart entre « aucune annonce » et « tout dire ». Les deux témoins sont dans l’arbre. Le nombre de traces et leur numérotation sont les deux curseurs naturels.</p>
+        <h4>Une prise pour les peuples des plans</h4>
+        <p>Le compartiment des plans parle de coordination ; ses trois peuples peuvent briser les règles du conseil. Un module le propose : les humains posent leurs traces même après « prêt », une trace d’insecte se pose sur celle d’un autre et la suit, les reptiles posent leurs traces face cachée.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="chantier" aria-labelledby="c4-h">
+    <div class="ch-h">
+      <p class="eyebrow">Chantier 4 · la maquette</p>
+      <h3 id="c4-h">Une maquette de conception plutôt qu’une boîte</h3>
+      <p class="ask">Ta demande : une maquette centrée sur un cœur minimaliste, avec des ajouts optionnels qui s’y greffent, certains en alternative, un arbre des possibilités, et les variables identifiées.</p>
+    </div>
+    <div class="colprose prose">
+      <h4>Comment elle est faite</h4>
+      <ul>
+        <li><b>Le socle</b> suffit à jouer une partie complète avec les réponses proposées aux choix.</li>
+        <li><b>Les choix</b> rangent les alternatives exclusives : le plan du Méchant (trois formes), le doublé (quatre), la communication (trois, plus deux témoins), la façon dont un rêve nourrit les voies (deux).</li>
+        <li><b>Les modules</b> se greffent : le présage, les lunes, l’escalade du soir, le bruit, le dernier sursaut, les peuples des plans au conseil. Les idées non rédigées y figurent, verrouillées.</li>
+        <li><b>Les paramètres</b> reprennent le catalogue du 11 octobre, avec les nouveaux : portée des tactiques, Machine hors service désignée, traces, seuil du Cercle, lunes.</li>
+        <li><b>Les préréglages</b> sont des chemins nommés dans l’arbre. Le code de variante permet d’en noter un et de le recharger.</li>
+      </ul>
+    </div>
+    <div class="colprose prose">
+      <h4>Lien avec la simulation</h4>
+      <p>Chaque fiche dit si le moteur sait déjà jouer le nœud. Le socle, les modules et les paramètres correspondent aux statuts du catalogue : invariant, libre, module, témoin. Une variante de l’atelier pourra devenir un fichier <code>maquettes/v2.json</code> qui hérite de la v1.</p>
+      <p>À coder en priorité : la piste des Machines avec le rayon et le cycle, le moteur des rêves à deux voies, puis les traces comme décision « annonce » des joueurs virtuels.</p>
+      <h4>Ce qui ne change pas</h4>
+      <p>La maquette v1 reste telle quelle : c’est la référence publiée du moteur. Cette page en est la suite.</p>
+    </div>
+  </article>
+</section>
+
+<section class="blk" id="decisions" aria-labelledby="dec-h">
+  <div class="blk-head">
+    <p class="eyebrow">5 · À trancher</p>
+    <h2 id="dec-h">Décisions à prendre</h2>
+    <p>Ma recommandation est en gras. Rien n’est figé : chaque question correspond à un choix ou un paramètre de l’arbre.</p>
+  </div>
+  <ol class="dlist">
+    <li><div><p class="q">Le plan du Méchant : qui et où, ou où et comment ?</p><p class="r"><b>Qui et où.</b> C’est la forme qui retire le plus de calcul au joueur. Où et comment ajoute de la variété mais garde la recherche de la Machine la plus proche.</p></div></li>
+    <li><div><p class="q">Que fait le doublé ?</p><p class="r"><b>Le favori (case 1).</b> Le niveau de menace reste proche de la v1 (0,83 forêt par plan contre 0,92). Branle-bas monte à 1,17 et fait de chaque doublé un drame ; « il hésite » descend à 0,67. Une sixième Machine en case 0 suit ta numérotation à la lettre mais crée une case collante.</p></div></li>
+    <li><div><p class="q">Les tactiques passent-elles dans le rayon de la Machine ?</p><p class="r"><b>Oui</b>, avec Représailles qui vise la zone la plus défendue. Cela change les quatre critères (la liste était notée 4) et les met en paires opposées.</p></div></li>
+    <li><div><p class="q">Une Machine hors service désignée : remorquée, réparée d’un organe, ou rien ?</p><p class="r"><b>Remorquée au chantier</b>, ce qui la ramène à la lisière. Réparer un organe annulerait trop vite trois sabotages.</p></div></li>
+    <li><div><p class="q">Un rêve choisit-il sa voie, ou nourrit-il les deux ?</p><p class="r"><b>Il choisit.</b> Sinon les deux fins avancent ensemble et ne sont plus deux stratégies.</p></div></li>
+    <li><div><p class="q">Seuil du Cercle</p><p class="r"><b>Trois cases par joueur</b>, à vérifier en simulation contre la vitesse du sommeil.</p></div></li>
+    <li><div><p class="q">Le bonus de fin disparaît-il ?</p><p class="r"><b>Oui, à zéro</b>, comme tu l’as formulé. Cela remplace la décision A3 ; les tests de robustesse à 10 et 25 % restent possibles.</p></div></li>
+    <li><div><p class="q">La communication : les traces ou le partage ?</p><p class="r"><b>Les traces</b> comme socle, deux par joueur et numérotées. <b>Le partage</b> à tester avec les lunes, surtout à quatre joueurs et plus.</p></div></li>
+    <li><div><p class="q">La limite des rêves</p><p class="r"><b>Un par joueur jusqu’à trois joueurs, les lunes au-delà.</b> C’est la réponse au constat du 11 octobre sur les grandes tables.</p></div></li>
+  </ol>
+</section>
+
+<footer class="foot">
+  <p>Sources : Règles de la maquette v1 (43 règles), livret HTML v1, « Objectifs, invariants et catalogue » (phase 0), « Synthèse des idées », « Moteur de règles v1 - conformité et campagne de référence ». Calculs de dés et de menace faits le 12 octobre sur le plateau v1.</p>
+  <p>Les réglages choisis ici restent dans ce navigateur. Pour partager une variante, copiez son code.</p>
+</footer>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+/* ---------- Données de l'arbre ----------
+   kind : branche | socle | choix | option | module
+   status : propose, atester, v1, idee, temoin, retire, alt
+   rules : [{ch, o, t:(H)=>html}] ; H.v(param) code, H.L(param) libellé, H.on(nœud) actif
+   locked : module non activable (idée non rédigée, ou retiré)
+*/
+const CHAPTERS = [
+  ['but','Le but du jeu'],['materiel','Le matériel'],['mise','La mise en place'],['tour','Le tour de jeu'],
+  ['conseil','Le conseil'],['actions','Les actions'],['mechant','Le Méchant et ses Machines'],
+  ['reves','Le moteur des rêves'],['fins','Fins et bilan'],['peuples','Les peuples']
+];
+
+const TILE = {cup:['Cupidité','cup'],opp:['Opportu­nisme','opp'],rep:['Repré­sailles','rep'],per:['Percée','per'],ren:['Renfort','ch'],repa:['Réparer','ch']};
+const DISPO2 = {2:'per',3:'rep',4:'per',5:'rep',6:'opp',7:'cup',8:'opp',9:'rep',10:'per',11:'cup',12:'cup'};
+const DISPO1 = {2:'ren',3:'repa',4:'per',5:'rep',6:'opp',7:'cup',8:'opp',9:'rep',10:'per',11:'cup',12:'cup'};
+const MACH_TRACK = {1:['Grosse Gueule','sur la Lisière'],2:['Rapiat','sur la Clairière'],3:['Mâchoire','sur la Várzea'],4:['Tonton Débard','au chantier'],5:['Ripaille','au chantier']};
+const MANOEUVRES = {0:['Encercler','toutes font un pas'],1:['Avancer','un pas, puis abattre'],2:['Foncer','deux pas, puis abattre'],3:['Raser','deux forêts sur place'],4:['Réparer','la plus endommagée'],5:['Renfort','une Machine entre']};
+
+const LIST = [
+/* ===== A. Le Méchant ===== */
+{id:'A',kind:'branche',letter:'A',title:'Le Méchant et ses Machines',sum:'Sa tête, ses ordres, ses engins.'},
+
+{id:'A1',parent:'A',kind:'socle',title:'La piste des pensées',status:['v1'],engine:'codé',
+ sum:'Sa tête : onze cases de 2 à 12, une tuile par case, lues avec deux dés. Ce qui réussit se rapproche du 7.',
+ params:['piste_place','esprits_depart'],
+ mat:['La piste des pensées, cases 2 à 12','Tuiles de pensée : 11 tactiques et 6 esprits','Deux dés'],
+ detail:`<p>Invariant noté 9 : la position est la probabilité, tout est public, apprendre consiste à échanger une tuile avec sa voisine. Côté éveil (2 à 6), une tuile qui échoue finit en 2 et y reste ; côté rêve (8 à 12), elle dérive vers le 12, où le prochain esprit la fait oublier.</p><p>Rien ne change ici en v2, sauf ce que la piste désigne : selon le plan choisi, elle donne l’ordre entier (v1) ou seulement le « où ».</p>`,
+ rules:[
+  {ch:'mechant',o:10,t:H=>`<p><b>La piste des pensées.</b> Onze cases de 2 à 12, une tuile par case : une tactique ou un esprit. Avec deux dés, la position est la probabilité : le 7 sort 6 fois sur 36, le 2 et le 12 une seule fois. Cases 2 à 6 : l’éveil, ce qu’il calcule. Case 7 : le centre. Cases 8 à 12 : le rêve. Tout est public.</p>`},
+  {ch:'mechant',o:70,t:H=>`<p><b>Apprendre sur la piste des pensées.</b> Après chaque ordre, la tuile qui l’a donné s’échange avec une voisine. Réussite : avec sa voisine côté 7 (au 7, elle reste). Échec : avec sa voisine côté bord (en 2 ou en 12, elle reste ; au 7, elle passe en 8).</p><p><b>Le tir à la corde.</b> Une tuile qui réussit et s’échange avec un esprit le fait reculer. Une tuile qui échoue face à un esprit reste en place : les esprits n’avancent que par vos rêves.</p>`},
+  {ch:'mise',o:30,t:H=>H.v('piste_place')==='hasard'?`<p>Mélangez les tactiques de la variante et posez-les au hasard sur les cases 2 à 12.${H.v('esprits_depart')==='1'?' Remplacez la tuile de la case 12 par un esprit.':''}</p>`:`<p>${H.v('esprits_depart')==='1'?'Posez un esprit en case 12 à la place de la troisième Cupidité.':'Aucun esprit sur la piste au départ : ils attendent à côté de la case 12.'}</p>`}
+ ]},
+
+{id:'A2',parent:'A',kind:'choix',title:'Le plan du Méchant',sum:'Comment un lancer de deux dés devient un ordre. Une seule réponse à la fois.',
+ detail:`<p>C’est le cœur de ton premier chantier. Les trois réponses partagent la piste des pensées ; elles diffèrent par ce que désigne l’écart des dés et par la façon de trouver la Machine qui agit.</p><ul><li><b>Qui et où</b> (proposé) : l’écart nomme la Machine, la tactique cherche dans son rayon.</li><li><b>Où et comment</b> : l’écart donne une manœuvre, la Machine la plus proche l’exécute.</li><li><b>Une seule piste</b> : la v1, gardée comme référence.</li></ul>`},
+
+{id:'A2a',parent:'A2',kind:'option',title:'Deux pistes : qui et où',status:['propose','atester'],engine:'à coder',
+ sum:'L’écart des dés désigne une Machine, la somme une tactique. La Machine agit dans son rayon et abat là où elle entre.',
+ params:['portee','hs'],
+ mat:['La piste des Machines, cases 0 à 5, imprimée en pyramide sous la piste des pensées'],
+ detail:`<p>Le plan se lit comme une phrase : « Rapiat, par opportunisme ». La somme désigne la tactique, l’écart la Machine.</p><p><b>La pyramide.</b> Une Machine en case <i>d</i> ne reçoit que les tactiques des cases 7 ± (5 − <i>d</i>), de deux en deux, toutes avec la même chance. En case 5, toujours le 7 ; en case 4, le 6 ou le 8 ; en case 1, l’une des cinq cases impaires. Imprimée, la pyramide montre les 21 plans possibles.</p><p><b>Le cycle.</b> L’état de la Machine appelée remplace les tuiles Réparer et Renfort : au chantier, elle entre ; hors service, elle est remorquée ; en marche, elle exécute la tactique.</p><p><b>Au départ</b>, chaque Machine est sur la case de son numéro. Calcul exact sur le plateau v1, sans défense : 0,83 forêt abattue par plan, 6 chances sur 36 qu’une Machine entre, 53 % de la menace sur les deux zones les plus menacées (v1 : 100 %).</p>`,
+ rules:[
+  {ch:'mise',o:20,t:H=>`<p><b>Piste des pensées</b> : 2 Percée · 3 Représailles · 4 Percée · 5 Représailles · 6 Opportunisme · 7 Cupidité · 8 Opportunisme · 9 Représailles · 10 Percée · 11 Cupidité · 12 Cupidité.</p><p><b>Piste des Machines</b> : chaque Machine sur la case de son numéro. Case 1 Grosse Gueule, 2 Rapiat, 3 Mâchoire (toutes trois sur la lisière, dans leur zone d’entrée), 4 Tonton Débard et 5 Ripaille (au chantier).${H.v('m_chantier')!=='2'?' Les cases sans Machine ne donnent pas d’ordre : le plan échoue.':''}</p>`},
+  {ch:'mechant',o:20,t:H=>`<p><b>Donner l’ordre.</b> À la phase Dés, lancez les deux dés (sauf si un présage ou un oiseau les a déjà lancés pour cette étape).</p><ul><li>La <b>somme</b> désigne une tuile de la piste des pensées : ce que le Méchant veut. Si c’est un esprit, il rêve : pas d’ordre, rien n’apprend.</li><li>L’<b>écart</b>, le plus grand dé moins le plus petit, désigne une case de la piste des Machines : qui obéit.</li></ul>`},
+  {ch:'mechant',o:22,fig:'pyramide',t:H=>`<p><b>Lire les deux pistes.</b> Une Machine ne peut recevoir que les tactiques au-dessus d’elle dans la pyramide, chacune avec la même chance : en case 5 toujours le 7, en case 4 le 6 ou le 8, en case 3 le 5, le 7 ou le 9, et ainsi de suite.</p>`},
+  {ch:'mechant',o:30,t:H=>{const hs={remorquee:'elle est remorquée au chantier, remise en état : elle reviendra par sa zone d’entrée',organe:'elle est réparée d’un organe (moteur, puis chenilles, puis phares) et reste sur place',rien:'il ne se passe rien : le plan échoue'}[H.v('hs')];return `<p><b>Selon l’état de la Machine désignée :</b></p><ul><li>au chantier, elle entre sur la lisière, dans la zone d’entrée inscrite sur sa carte ;</li><li>hors service, ${hs} ;</li><li>en marche, elle exécute la tactique.</li></ul>`}},
+  {ch:'mechant',o:40,t:H=>H.v('portee')==='rayon'?`<p><b>Exécuter une tactique.</b> Le <b>rayon</b> d’une Machine, c’est sa zone et les zones voisines qui ont encore de la forêt. La tactique y choisit une zone. La Machine y entre, si ce n’est pas déjà la sienne, et y abat une forêt.</p><p>Si un barrage l’empêche de sortir, d’entrer ou d’abattre, ou si une embuscade l’immobilise, elle ne fait rien : le plan échoue. À égalité entre plusieurs zones : sa propre zone si elle en fait partie, sinon la plus boisée, puis le plus petit numéro.</p>`:`<p><b>Exécuter une tactique.</b> La tactique désigne une zone sur tout le plateau. La Machine désignée fait un pas vers elle par le plus court chemin (sauf si elle y est), puis abat une forêt là où elle se trouve. Si un barrage l’empêche de faire son pas ou d’abattre, le plan échoue.</p>`},
+  {ch:'mechant',o:72,t:H=>`<p><b>Apprendre sur la piste des Machines.</b> Le plan réussit s’il a eu un effet : forêt abattue, Machine entrée${H.v('hs')==='remorquee'?' ou remorquée':H.v('hs')==='organe'?' ou réparée':''}. Sinon il échoue. Les deux tuiles apprennent du même verdict. Sur la piste des Machines, réussite : la Machine s’échange avec sa voisine côté case 1 (en 1, elle reste) ; échec : avec sa voisine côté case 5 (en 5, elle reste).</p>`},
+  {ch:'mechant',o:90,t:H=>`<div class="ex"><b class="exh">Exemple · un plan pas à pas</b><p>Tour 1, étape 2. Les dés font 2 et 4 : somme 6, écart 2. La case 6 porte Opportunisme ; la case 2 de la piste des Machines porte Rapiat, sur la Clairière.</p><p>Son rayon : la Clairière, la Lisière, la Várzea, l’Igapó et les Sources. La moins défendue est la Várzea, où personne n’est présent. Rapiat entre dans la Várzea et y abat une forêt.</p><p>Le plan réussit : Opportunisme passe en 7 (Cupidité descend en 6) et Rapiat en case 1 (Grosse Gueule descend en 2). Si Tom avait barré la Várzea, ou la Clairière dont Rapiat ne pourrait plus sortir, le plan échouait : Opportunisme passait en 5 et Rapiat en 3.</p></div>`}
+ ]},
+
+{id:'A2a_d',parent:'A2a',kind:'choix',title:'Le doublé (écart 0)',sum:'Un double sort une fois sur six. La case 0 n’a pas de tuile : que se passe-t-il ?',
+ detail:`<p>Les cases 1 à 5 de la piste des Machines vont du plus probable (10 sur 36) au plus rare (2 sur 36) : elles apprennent comme une moitié de la piste des pensées. La case 0 (6 sur 36) rompt cet ordre, d’où ce choix à part.</p><p>Menace au départ, sans défense : le favori 0,83 forêt par plan, branle-bas 1,17, il hésite 0,67.</p>`},
+{id:'d_fav',parent:'A2a_d',kind:'option',title:'Le favori',status:['propose'],engine:'à coder',
+ sum:'Sur un doublé, la Machine de la case 1 obéit, avec une tactique paire. Menace proche de la v1.',
+ rules:[{ch:'mechant',o:21,t:H=>`<p><b>Le doublé.</b> Sur un double, l’écart vaut 0 : c’est le favori du Méchant, la Machine de la case 1, qui obéit.</p>`}]},
+{id:'d_bb',parent:'A2a_d',kind:'option',title:'Branle-bas',status:['alt'],engine:'à coder',
+ sum:'Sur un doublé, toutes les Machines en marche exécutent la tactique, de la case 1 à la case 5. Un moment fort, une menace +40 %.',
+ rules:[{ch:'mechant',o:21,t:H=>`<p><b>Branle-bas.</b> Sur un double, toutes les Machines en marche exécutent la tactique, l’une après l’autre, de la case 1 à la case 5. Seule la tactique apprend : réussite si au moins une forêt tombe.</p>`}]},
+{id:'d_hes',parent:'A2a_d',kind:'option',title:'Il hésite',status:['alt'],engine:'à coder',
+ sum:'Sur un doublé, pas d’ordre et rien n’apprend. Un répit d’une fois sur six.',
+ rules:[{ch:'mechant',o:21,t:H=>`<p><b>Le doublé.</b> Sur un double, le Méchant hésite : pas d’ordre, rien n’apprend.</p>`}]},
+{id:'d_six',parent:'A2a_d',kind:'option',title:'Une sixième Machine',status:['alt'],engine:'à coder',
+ sum:'La case 0 porte Zizanie, la scie à grappin, et apprend comme les autres. Suit la numérotation 0 à 5 à la lettre.',
+ detail:`<p>Zizanie revient dans le jeu. Sa case est la base de la pyramide : elle reçoit les six tactiques paires, une chance sur 36 chacune. Une Machine qui échoue en 0 y reste : la case est collante, avec 6 chances sur 36.</p>`,
+ mat:['Zizanie, sixième carte Machine'],
+ rules:[{ch:'mechant',o:21,t:H=>`<p><b>La case 0.</b> Elle porte une sixième Machine, Zizanie, au chantier au départ. Elle apprend comme les autres ; en 0, une Machine qui échoue reste en place.</p>`}]},
+
+{id:'A2b',parent:'A2',kind:'option',title:'Deux pistes : où et comment',status:['alt'],engine:'à coder',
+ sum:'La somme désigne une tactique sur tout le plateau, l’écart une manœuvre (avancer, foncer, raser…). La Machine la plus proche l’exécute.',
+ mat:['La piste des manœuvres, cases 0 à 5, et 6 tuiles de manœuvre'],
+ detail:`<p>Plus de variété dans ce que font les Machines, et les ordres de chantier deviennent des manœuvres qui apprennent. En revanche, le joueur cherche toujours la Machine la plus proche et compte les distances : le gain de lisibilité est faible.</p>`,
+ rules:[
+  {ch:'mise',o:20,t:H=>`<p><b>Piste des pensées</b> : 2 Percée · 3 Représailles · 4 Percée · 5 Représailles · 6 Opportunisme · 7 Cupidité · 8 Opportunisme · 9 Représailles · 10 Percée · 11 Cupidité · 12 Cupidité. <b>Piste des manœuvres</b> : 0 Encercler · 1 Avancer · 2 Foncer · 3 Raser · 4 Réparer · 5 Renfort.</p>`},
+  {ch:'mechant',o:20,fig:'pyramide',t:H=>`<p><b>Donner l’ordre.</b> La somme désigne la tactique, qui vise une zone sur tout le plateau. L’écart désigne la manœuvre. La Machine en marche la plus proche de la zone visée l’exécute :</p><ul><li>Encercler : chaque Machine en marche fait un pas vers la zone visée, puis la plus proche abat ;</li><li>Avancer : un pas, puis abattre là où elle est ;</li><li>Foncer : deux pas, puis abattre ;</li><li>Raser : abattre deux forêts là où elle est, sans bouger ;</li><li>Réparer : un organe de la Machine la plus endommagée est remis en état ;</li><li>Renfort : la première Machine du chantier entre sur la lisière.</li></ul><p>Les tuiles de manœuvre apprennent comme les tactiques : réussite vers la case 1, échec vers la case 5 ; en 0, une tuile qui échoue reste.</p>`}
+ ]},
+
+{id:'A2c',parent:'A2',kind:'option',title:'Une seule piste (v1)',status:['v1'],engine:'codé',
+ sum:'La tactique désigne une zone sur tout le plateau ; la Machine en marche la plus proche avance d’un pas et abat là où elle est.',
+ detail:`<p>Les règles R4.1 à R4.6 et R7 de la v1. Gardée pour comparer : c’est la référence publiée du moteur. Ses points ouverts restent : l’abattage en chemin, les égalités entre Machines, Réparer et Renfort à part.</p>`,
+ rules:[
+  {ch:'mise',o:20,t:H=>`<p><b>Piste des pensées</b> (v1) : 2 Renfort · 3 Réparer · 4 Percée · 5 Représailles · 6 Opportunisme · 7 Cupidité · 8 Opportunisme · 9 Représailles · 10 Percée · 11 Cupidité · 12 Cupidité. Les Machines 1 à 3 sur la lisière, les 4 et 5 au chantier.</p>`},
+  {ch:'mechant',o:20,t:H=>`<p><b>Donner l’ordre.</b> Lancez les deux dés ; la tuile de la case désignée donne l’ordre. Un esprit : le Méchant rêve. Une tactique désigne une zone sur tout le plateau. La Machine en marche la plus proche y fait un pas (sauf si elle y est déjà), puis abat une forêt là où elle se trouve. Un barrage qui bloque son pas ou son abattage fait échouer l’ordre.</p><p><b>Ordres de chantier.</b> Réparer : un organe de la Machine la plus endommagée est remis en état, même hors service. Renfort : la première Machine du chantier entre sur la lisière.</p><p><b>Égalités.</b> Entre zones : la plus boisée, puis la plus proche d’une Machine en marche, puis le plus petit numéro. Entre Machines : la plus avancée, puis le plus petit numéro.</p>`}
+ ]},
+
+{id:'A3',parent:'A',kind:'socle',title:'Les quatre tactiques',status:['atester'],engine:'partiel',
+ sum:'Cupidité, Opportunisme, Représailles, Percée. Leur sens suit la portée choisie : le rayon de la Machine ou tout le plateau.',
+ params:['represailles'],
+ detail:`<p>Dans le rayon, les tactiques forment deux paires opposées : Opportunisme va où l’on n’est pas, Représailles où l’on est le plus nombreux ; Cupidité cherche la forêt, Percée la profondeur. Se regrouper protège d’Opportunisme et nourrit Représailles : c’est la tension voulue contre le tape-taupe.</p><p>Percée suit une flèche imprimée dans chaque zone : Lisière → Igapó, Clairière → Sources, Várzea → Sources, Igapó → Colline aux aras, Sources → Samaúma. Au cœur, la Machine reste.</p>`,
+ rules:[{ch:'mechant',o:50,t:H=>{
+   const loc=H.on('A2a')&&H.v('portee')==='rayon';
+   const rep=H.v('represailles')==='defendue'
+     ?(loc?'la plus défendue : le plus de présences visibles. Elle charge ceux qui la gênent.':'la zone boisée la plus défendue : le plus de présences visibles.')
+     :(loc?'la dernière zone de son rayon où un organe a été neutralisé ; aucune : comme Cupidité.':'la dernière zone où un organe a été neutralisé ; aucune encore : comme Cupidité.');
+   if(loc) return `<p><b>Les tactiques dans le rayon.</b></p><ul><li><b>Cupidité</b> : la zone la plus boisée.</li><li><b>Opportunisme</b> : la moins défendue, le moins de présences visibles.</li><li><b>Représailles</b> : ${rep}</li><li><b>Percée</b> : la zone indiquée par la flèche de sa zone, plus profonde. Au cœur, sa propre zone.</li></ul>`;
+   return `<p><b>Les tactiques.</b></p><ul><li><b>Cupidité</b> : la zone boisée qui a le plus de forêt.</li><li><b>Opportunisme</b> : la zone boisée la moins défendue, le moins de présences visibles.</li><li><b>Représailles</b> : ${rep}</li><li><b>Percée</b> : devant la Machine en marche la plus avancée, une zone voisine plus profonde ; sinon sa propre zone.</li></ul>`;}}]},
+
+{id:'A4',parent:'A',kind:'module',title:'L’escalade du soir',status:['atester'],engine:'à coder',requires:['A2a'],
+ sum:'Aux derniers tours, un doublé fait obéir toutes les Machines en marche. La menace monte vers la nuit.',
+ params:['escalade'],
+ detail:`<p>Reprend l’idée de l’escalade de fin de partie (notée 7, « à repenser avec la piste ») en se servant du doublé : le matin il désigne le favori, le soir il déclenche un branle-bas. Une règle de plus, mais elle sert l’objectif 4 (menace croissante, dernier tiers au moins égal au premier).</p>`,
+ rules:[{ch:'mechant',o:23,t:H=>`<p><b>L’escalade du soir.</b> À partir du ${H.L('escalade')}, un double fait obéir toutes les Machines en marche, l’une après l’autre, de la case 1 à la case 5.</p>`}]},
+{id:'A5',parent:'A',kind:'module',title:'Le bruit',status:['atester'],engine:'codé (v1)',
+ sum:'Une Machine mise hors service bruyamment fait reculer le rêve. Renverser et piéger font du bruit ; enrayer et égarer, non.',
+ detail:`<p>Idée en suspens (5). Elle donne un sens au choix entre force et silence chez les peuples des Machines. Risque noté : si le silence est toujours meilleur, les mammifères deviennent un mauvais choix.</p>`,
+ rules:[{ch:'mechant',o:80,t:H=>`<p><b>Le bruit.</b> Quand une Machine est mise hors service par Renverser ou par un sabotage en alliance, l’esprit le plus proche du 7 recule d’une case.</p>`}]},
+{id:'A6',parent:'A',kind:'module',title:'Les obsessions',status:['idee'],locked:true,
+ sum:'Quand une tactique domine, une règle permanente durcit la partie. Retirées en v1 ; déclencheur à repenser.',
+ detail:`<p>Notées 7 (le déclencheur en 6-7-8 : 5). Avec deux pistes, un déclencheur possible : la même Machine et la même tactique au sommet de leur piste. À rédiger.</p>`},
+{id:'A7',parent:'A',kind:'module',title:'Les pouvoirs des peuples sur les pistes',status:['idee'],locked:true,
+ sum:'Décaler un dé, échanger deux tuiles, placer un esprit… Des prises naturelles au hasard contrôlé.',
+ detail:`<p>Notée 6. La piste des Machines ouvre de nouvelles prises : échanger deux Machines, en faire descendre une. À répartir entre les peuples du compartiment du Méchant (oiseaux, humains, entités). À rédiger.</p>`},
+
+/* ===== B. Les peuples ===== */
+{id:'B',kind:'branche',letter:'B',title:'Les peuples et leurs actions',sum:'Les personnages, la présence, les trois actions, les règles brisées.'},
+{id:'B1',parent:'B',kind:'socle',title:'Peuples, personnages, présence',status:['v1'],engine:'codé',
+ sum:'Chaque joueur a un peuple, une main de personnages pour toute la partie et des pions de présence sur le plateau.',
+ params:['main','paquet','presence'],
+ mat:['Par peuple : un plateau de peuple, un paquet de personnages, des pions de présence'],
+ detail:`<p>Le tétraèdre (invariant, 9) : quatre compartiments (le Méchant, les plans, le plateau, les Machines), six peuples, chacun sur une paire unique. Chaque carte a deux moitiés, une par compartiment du peuple.</p><p>Écart à régler, hérité de la v1 : le livret donnait 5 personnages et un 6e ★, le moteur tire 5 cartes sur 7.</p>`,
+ rules:[
+  {ch:'mise',o:40,t:H=>`<p>Chaque joueur prend un peuple. Il tire au hasard ${H.L('main')} personnages de son paquet de ${H.L('paquet')} : c’est sa main pour toute la partie, sans pioche. Puis, à tour de rôle, chacun pose ses ${H.L('presence')} pions de présence dans les zones de son choix.</p>`},
+  {ch:'actions',o:10,t:H=>`<p><b>Où agit un personnage.</b> Quand une carte est révélée, son joueur choisit, à découvert, une zone où son peuple est présent et une action. La moitié choisie au conseil active en plus la règle que son peuple brise dans ce compartiment.</p>`}
+ ]},
+{id:'B2',parent:'B',kind:'socle',title:'Trois actions et l’alliance',status:['v1'],engine:'codé',
+ sum:'Aller, Barrer, Saboter. Deux personnages de peuples différents dans la même zone à la même étape sont alliés.',
+ params:['barrage','alliance'],
+ detail:`<p>Barrer est l’arme principale en v1 (environ 8 ordres sur 17 échouent sur un barrage). Avec la piste des Machines, barrer la zone d’une Machine la paralyse pour l’étape : la force du barrage est le premier paramètre à surveiller.</p>`,
+ rules:[{ch:'actions',o:20,t:H=>{
+   const bar=H.v('barrage')==='tout'?'aucune Machine ne peut entrer dans la zone, en sortir, ni y abattre':'aucune Machine ne peut entrer dans la zone ni y abattre ; une Machine déjà là peut en sortir';
+   const al=H.v('alliance')==='presence'?'Deux personnages de peuples différents qui agissent dans la même zone, à la même étape, sont alliés, quel que soit l’ordre de leurs choix. Chacun fait sa propre action.':'Deux personnages de peuples différents qui sabotent la même Machine à la même étape sont alliés. Chacun neutralise un organe.';
+   const hs=H.on('A2a')?' Elle reste sur le plateau jusqu’à ce que le Méchant l’appelle.':' Elle reste sur le plateau, inerte.';
+   return `<ul><li><b>Aller</b> : déplacez une de vos présences vers une zone voisine. Le personnage agit dans la zone d’arrivée.</li><li><b>Barrer</b> : pendant l’étape, ${bar}.</li><li><b>Saboter</b> : neutralisez un organe intact d’une Machine de la zone. Il faut un allié, sauf pour un spécialiste des Machines. Les reptiles ne sabotent jamais.</li></ul><p><b>L’alliance.</b> ${al}</p><p><b>Hors service.</b> Une Machine dont tous les organes sont neutralisés est hors service.${hs}</p>`;}}]},
+{id:'B3',parent:'B',kind:'socle',title:'Les règles brisées',status:['v1'],engine:'codé (formes v1)',
+ sum:'Douze pouvoirs, deux par peuple. Voir, Tromper, Hanter, Attendre et Égarer s’adaptent au plan choisi.',
+ params:['voir','hanter','immob'],
+ detail:`<p>Invariant (9) : chaque peuple brise une règle de base dans chacun de ses deux compartiments. Ce qui change avec deux pistes : Voir montre qui et où ; Tromper inverse le verdict des deux tuiles ; Attendre immobilise la Machine désignée, quelle que soit la tactique ; Égarer renvoie la Machine au chantier sans attendre.</p>`,
+ rules:[{ch:'peuples',o:10,t:H=>{
+   const two=H.on('A2a');
+   const rows=[
+    ['Oiseaux','Voir · Méchant',`Avant la communication, posez face visible, moitié haute, ${H.v('voir')==='illimite'?'autant de cartes que vous voulez':'jusqu’à '+H.L('voir')+' carte(s) par tour'} ; pour chacune, on lance aussitôt les dés de son étape${two?' : tout le monde voit qui obéira et ce qu’il voudra':''}.`],
+    ['','Voler · plateau','Aller vers n’importe quelle zone.'],
+    ['Mammifères','Tenir · plateau','La carte barre toutes les zones où les mammifères sont présents, pendant son étape.'],
+    ['','Renverser · Machines','Ils sabotent seuls n’importe quel organe.'],
+    ['Reptiles','Attendre · plans',`Embuscade : la carte reste cachée, puis agit après les dés, avant la Machine. Elle peut Aller, Barrer, ou immobiliser la Machine désignée si elle est dans une zone des reptiles ou va y entrer, jusqu’à la fin du tour (${H.L('immob')} par tour).`],
+    ['','Se fondre · plateau','Leur présence est invisible aux tactiques. Aller le long d’une rivière, aussi loin que voulu. Les reptiles ne sabotent jamais.'],
+    ['Insectes','S’unir · plans','Glissez la carte sous l’étape d’un autre joueur : elle agit dans sa zone, et vous êtes alliés.'],
+    ['','Enrayer · Machines','Ils sabotent seuls le moteur.'],
+    ['Humains','Tromper · Méchant',`Au moment où le Méchant apprend, à l’étape de la carte, inversez le verdict${two?' pour les deux tuiles':''}.`],
+    ['','Parler · plans','Quand la carte agit, déplacez une carte encore cachée d’une étape suivante vers une autre étape suivante.'],
+    ['Entités','Hanter · Méchant',`Quand la carte agit, annulez le plan de l’étape : on ne lance pas les dés (${H.L('hanter')} fois par tour).`],
+    ['','Égarer · Machines',`Elles sabotent seules les phares. Une Machine mise hors service alors que ses phares sont égarés ${two?'rentre aussitôt au chantier, remise en état,':'quitte le plateau'} et fait rêver le Méchant : un rêve gratuit, voie au choix, hors limite.`]
+   ];
+   return `<div class="tabwrap"><table class="ptab"><thead><tr><th>Peuple</th><th>Règle brisée</th><th>Effet</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</tbody></table></div>`;}}]},
+{id:'B4',parent:'B',kind:'module',title:'Les peuples des plans au conseil',status:['idee','atester'],engine:'à coder',requires:['C2a'],
+ sum:'Humains, insectes et reptiles brisent les règles des traces : poser après « prêt », suivre une trace, cacher son numéro.',
+ detail:`<p>Le compartiment des plans parle de coordination ; avec une communication réglée, ses trois peuples ont une prise naturelle sur le conseil. Proposition à discuter, compatible avec leurs pouvoirs actuels (Parler, S’unir, Attendre restent joués en résolution).</p>`,
+ rules:[{ch:'conseil',o:12,t:H=>`<p><b>Les peuples des plans au conseil.</b> Humains : ils peuvent encore poser ou déplacer une trace après que tous ont dit « prêt ». Insectes : une trace d’insecte peut se poser sur la trace d’un autre joueur ; elle la suit si elle bouge. Reptiles : leurs traces se posent face cachée et ne se retournent qu’à la révélation de leur étape.</p>`}]},
+{id:'B5',parent:'B',kind:'module',title:'Les effets propres des personnages',status:['idee'],locked:true,
+ sum:'Porter, semer, les 36 effets imprimés sur les cartes. Attend ton travail en cours sur les peuples.',
+ detail:`<p>Hors recherche tant que le travail sur les peuples n’est pas terminé (catalogue 5.9).</p>`},
+
+/* ===== C. Le tour et le conseil ===== */
+{id:'C',kind:'branche',letter:'C',title:'Le tour et le conseil',sum:'Le rythme d’une journée, et ce que les joueurs peuvent se dire.'},
+{id:'C1',parent:'C',kind:'socle',title:'Le tour de jeu',status:['v1'],engine:'codé',
+ sum:'Une journée de tours. Chaque tour : le conseil, puis la résolution des étapes une à une, puis la fin du tour.',
+ params:['tours','etapes'],
+ mat:['Le marqueur du jour, la piste du jour'],
+ detail:`<p>Le déroulé de la v1, avec un conseil désormais réglé (choix suivant). Le nombre de tours sert aussi la difficulté ; la durée n’est jamais un filtre (catalogue, objectif de durée).</p>`,
+ rules:[
+  {ch:'tour',o:10,t:H=>`<p>Une partie dure ${H.L('tours')} tours, de l’aube au crépuscule. Chaque tour a ${H.L('etapes')} étapes et se joue ainsi : le conseil, puis la résolution des étapes une à une, puis la fin du tour.</p>`},
+  {ch:'tour',o:20,t:H=>`<p><b>Résoudre une étape</b>, dans cet ordre :</p><ol><li>Révéler les cartes de l’étape (les embuscades restent cachées).</li><li>Aller : les déplacements, dans l’ordre des joueurs.</li><li>Rêves : chaque carte en travers part en rêve et choisit sa voie.</li><li>Autres actions, dans l’ordre des joueurs, puis barrages et sabotages.</li><li>Dés : le plan du Méchant.</li><li>Embuscades.</li><li>Exécution, puis apprentissage.</li></ol><p>La partie s’arrête dès qu’une fin est atteinte, même au milieu d’une étape.</p>`},
+  {ch:'tour',o:30,t:H=>`<p><b>Fin du tour.</b> Reprenez en main vos cartes jouées, sauf celles parties en rêve. Retirez barrages${H.on('C2a')?', traces':''}${H.on('C2b')?', jetons du partage':''}${H.on('D5')?', lunes':''} et immobilisations. Le rôle de premier joueur passe au suivant. Avancez le marqueur du jour.</p>`},
+  {ch:'conseil',o:5,t:H=>{
+    const st=[];
+    if(!H.on('C2c')) st.push('Le conseil se joue sans parole : seuls les jetons parlent.');
+    else st.push('Le conseil commence par une discussion réglée.');
+    const seq=['Voir (oiseaux)'];
+    if(H.on('C2a')) seq.push('les traces'+(H.on('D5')?' et les lunes':''));
+    else if(H.on('C2b')) seq.push('le partage'+(H.on('D5')?' et les lunes':''));
+    else if(H.on('C2c')) seq.push('la discussion'+(H.on('D5')?' et les lunes':''));
+    else if(H.on('D5')) seq.push('les lunes');
+    if(H.on('C3')) seq.push('le présage');
+    seq.push('la programmation, en silence');
+    return `<p>${st[0]} Il suit cet ordre : ${seq.join(', puis ')}.</p>`;}},
+  {ch:'conseil',o:30,t:H=>`<p><b>Programmer.</b> En silence et tous en même temps, chacun pose au plus une carte face cachée sur chacune de ses ${H.L('etapes')} étapes : tournée dans un sens ou dans l’autre pour choisir sa moitié, ou en travers pour qu’elle parte en rêve. On peut laisser une étape vide.</p>`}
+ ]},
+{id:'C2',parent:'C',kind:'choix',title:'La communication au conseil',sum:'Ce que les joueurs peuvent se dire avant de programmer. Une seule forme à la fois.',
+ detail:`<p>Ton troisième chantier : des règles qui encadrent l’échange, jouables sur BGA comme à table. Les deux premières réponses sont des phases simultanées sans ordre de tour ; la troisième est le conseil parlé de la v1, pour la table seulement ; les deux dernières servent de témoins aux mesures de l’objectif 3.</p>`},
+{id:'C2a',parent:'C2',kind:'option',title:'Les traces',status:['propose','atester'],engine:'à coder',
+ sum:'Des jetons numérotés par étape, posés sur les zones sans ordre de tour. Une trace dit où et quand, jamais quoi.',
+ params:['traces_n','traces_datees','traces_eng'],
+ mat:['Traces : 3 par peuple, numérotées 1, 2, 3'],
+ detail:`<p>Ce qu’une trace transmet : une zone et une étape. Ce qu’elle tait : l’action, la moitié, le personnage, et l’étape qu’on garde secrète. Deux traces de même numéro dans une zone annoncent une alliance.</p><p>Sur BGA : une phase où tous les joueurs sont actifs en même temps, chaque pose s’affiche chez les autres, un bouton « prêt » qui se relâche si quelqu’un bouge encore une trace.</p>`,
+ rules:[{ch:'conseil',o:10,t:H=>{
+   const d=H.v('traces_datees')==='oui';
+   const eng=H.v('traces_eng')==='oui'?'Une trace engage : à cette étape, votre carte doit agir dans cette zone (ou rêver, si la trace est sur le Cercle).':'Les traces n’engagent à rien : vous pouvez programmer autre chose.';
+   return `<p><b>Les traces.</b> Chaque joueur a 3 traces à sa couleur${d?', numérotées 1, 2 et 3':''}. Sans parler et sans ordre de tour, chacun peut poser jusqu’à ${H.L('traces_n')} de ses traces sur des zones du plateau ou sur le Cercle, les reprendre ou les déplacer. ${d?'Une trace dit : « à cette étape, j’agirai ici » ; sur le Cercle : « à cette étape, je rêve ».':'Une trace dit : « ce tour, j’agirai ici », sans dire quand.'} Quand chacun a dit « prêt » et que plus rien ne bouge, les traces sont figées.</p><p>${eng} Les traces ne comptent pas comme des présences.</p>`;}}]},
+{id:'C2b',parent:'C2',kind:'option',title:'Le partage (façon The Gang)',status:['alt','atester'],engine:'à coder',requires:['A2a'],
+ sum:'Deux jetons par Machine en marche, pris et repris sans ordre de tour. Tenir une Machine, c’est annoncer qu’on s’en occupe.',
+ params:['partage_max'],
+ mat:['Jetons du partage : 2 par Machine'],
+ detail:`<p>Comme les jetons de The Gang, l’information passe par ce qu’on prend et ce qu’on prend aux autres. Prendre le jeton d’un joueur, c’est lui dire « laisse, je m’en charge ». Il demande la piste des Machines : l’unité de la menace devient la Machine.</p>`,
+ rules:[{ch:'conseil',o:10,t:H=>`<p><b>Le partage.</b> Au centre, deux jetons par Machine en marche. Sans parler et sans ordre de tour, chacun prend des jetons au centre ou devant un autre joueur, au plus ${H.L('partage_max')} devant soi, et peut en rendre. Un jeton devant vous dit : « ce tour, je m’occupe de cette Machine ». Deux joueurs qui tiennent la même Machine annoncent une alliance contre elle. Quand plus personne ne prend ni ne rend, le partage est fini.</p>`}]},
+{id:'C2c',parent:'C2',kind:'option',title:'Le conseil parlé (v1)',status:['v1'],engine:'non modélisé',
+ sum:'On parle des zones, des tactiques et des intentions, sans montrer sa main ni dire quelle étape. Pour la table, pas pour BGA.',
+ detail:`<p>Le conseil du livret v1. Gardé pour les tests à table. Le moteur ne le modélise pas : ses joueurs virtuels jouent à information complète.</p>`,
+ rules:[{ch:'conseil',o:10,t:H=>`<p><b>Parler, sans dévoiler ses cartes.</b> Vous pouvez parler des zones, des tactiques, des Machines et de vos intentions (« je m’occupe de la Clairière »). Vous ne pouvez pas montrer votre main, nommer un personnage, ni dire quelle moitié ou quelle étape vous jouerez.</p>`}]},
+{id:'C2d',parent:'C2',kind:'option',title:'Aucun signe',status:['temoin'],engine:'à coder',
+ sum:'Chacun programme seul. Témoin de mesure : le bas de l’échelle de coordination.',
+ rules:[{ch:'conseil',o:10,t:H=>`<p><b>Aucun signe.</b> Personne ne communique pendant le conseil.</p>`}]},
+{id:'C2e',parent:'C2',kind:'option',title:'Tout dire',status:['temoin'],engine:'codé (de fait)',
+ sum:'Les mains sont ouvertes et l’on décide ensemble. Témoin de mesure : le haut de l’échelle.',
+ rules:[{ch:'conseil',o:10,t:H=>`<p><b>Tout dire.</b> Les mains sont ouvertes ; l’équipe décide ensemble.</p>`}]},
+{id:'C3',parent:'C',kind:'module',title:'Le présage',status:['propose'],engine:'à coder',
+ sum:'Quand la communication est close, on lance les dés de l’étape 1. Le plan tient-il face au premier ordre ?',
+ detail:`<p>Décision A2 du 11 octobre : le silence n’a de sens que si une information nouvelle arrive après les échanges. Avec deux pistes, le présage montre la Machine et la tactique de l’étape 1.</p>`,
+ mat:['La case Présage'],
+ rules:[{ch:'conseil',o:20,t:H=>`<p><b>Le présage.</b> Quand la communication est close, lancez les dés de l’étape 1 et posez-les sur la case Présage : tout le monde voit le premier plan du Méchant. Ils serviront à l’étape 1. S’ils y sont déjà (un oiseau les a lancés), ne relancez pas.</p>`}]},
+
+/* ===== D. Les rêves et les fins ===== */
+{id:'D',kind:'branche',letter:'D',title:'Le moteur des rêves et les fins',sum:'Deux voies pour rêver, trois fins, un seul résultat : la forêt qui reste.'},
+{id:'D1',parent:'D',kind:'socle',title:'Rêver',status:['v1'],engine:'codé',
+ sum:'Une carte posée en travers part en rêve et quitte la main pour toute la partie.',
+ params:['reves_limite'],
+ detail:`<p>Défendre ou rêver (invariant, 9) : plus la forêt rêve, moins elle a de bras. La limite existe (décision 3) ; sa valeur est libre. Constat du 11 octobre : à six peuples, la limite d’un rêve par joueur endort le Méchant dès le tour 1.</p>`,
+ rules:[{ch:'reves',o:10,t:H=>`<p><b>Rêver.</b> Une carte posée en travers part en rêve à la phase Rêves de son étape. Elle quitte la main pour toute la partie : glissez-la sous la piste${H.on('D2v_choix')||H.on('D2v_deux')?' ou au Cercle, selon sa voie':''}. ${H.on('D5')?'Seul un joueur qui tient une lune peut rêver ce tour (voir les lunes).':'Limite : '+H.L('reves_limite')+'.'}</p>`}]},
+{id:'D2',parent:'D',kind:'socle',title:'Les deux voies du rêve',status:['propose','atester'],engine:'à coder',
+ sum:'La voie du sommeil dans sa tête, la voie du réveil dans la forêt. L’une est contestée mais protège, l’autre est sûre mais lente.',
+ params:['seuil'],
+ mat:['Le Cercle : la piste du réveil, cases selon le nombre de joueurs'],
+ detail:`<p>La voie du sommeil reprend la règle v1 : un esprit entre en 12 ou avance d’une case. Il faut au moins six rêves sur le même esprit, et chaque tactique qui réussit à côté de lui le repousse. En échange, un esprit tiré annule le plan, et celui qui entre fait oublier la tactique de la case 12.</p><p>La voie du réveil ne se dispute pas, mais elle ne protège rien avant d’être pleine.</p>`,
+ rules:[
+  {ch:'reves',o:20,t:H=>`<p><b>La voie du sommeil.</b> Un esprit entre en case 12 (la tuile qui s’y trouvait est oubliée : retirez-la de la partie) ou un esprit déjà sur la piste avance d’une case vers le 7, en s’échangeant avec sa voisine. Un esprit n’avance pas sur un autre esprit ; si la case 12 est déjà un esprit, il faut en faire avancer un.</p>`},
+  {ch:'reves',o:30,t:H=>`<p><b>La voie du réveil.</b> La carte rejoint le Cercle, sur la première case libre. Le Cercle compte ${H.L('seuil')} cases par joueur. Rien ne fait reculer le Cercle.</p>`}
+ ]},
+{id:'D2v',parent:'D2',kind:'choix',title:'Comment un rêve nourrit les voies',sum:'Le joueur choisit la voie de chaque rêve, ou chaque rêve fait avancer les deux.'},
+{id:'D2v_choix',parent:'D2v',kind:'option',title:'Au choix',status:['propose'],engine:'à coder',
+ sum:'Chaque carte qui part en rêve choisit sa voie. Deux stratégies distinctes.',
+ rules:[{ch:'reves',o:15,t:H=>`<p><b>Choisir sa voie.</b> Quand une carte part en rêve, son joueur choisit : la voie du sommeil ou la voie du réveil.</p>`}]},
+{id:'D2v_deux',parent:'D2v',kind:'option',title:'Les deux à la fois',status:['alt'],engine:'à coder',
+ sum:'Chaque rêve fait entrer ou avancer un esprit, et la carte rejoint le Cercle. Les deux fins avancent ensemble.',
+ detail:`<p>Plus simple et plus puissant ; les deux fins ne sont plus deux stratégies. Le seuil du Cercle devient le vrai réglage de la durée.</p>`,
+ rules:[{ch:'reves',o:15,t:H=>`<p><b>Les deux voies à la fois.</b> Chaque carte qui part en rêve fait les deux : un esprit entre ou avance, et la carte rejoint le Cercle.</p>`}]},
+{id:'D3',parent:'D',kind:'socle',title:'Les trois fins',status:['propose'],engine:'partiel',
+ sum:'Le long sommeil et le réveil de la forêt, provoqués par les rêves ; la nuit, à la fin de la journée. La partie s’arrête aussitôt.',
+ detail:`<p>Deux fins viennent des joueurs, par le moteur des rêves ; une vient du temps. Le silence du chantier est retiré : les Machines se recyclent.</p>`,
+ rules:[
+  {ch:'but',o:10,t:H=>`<p>Ensemble, défendez la forêt pendant une journée de ${H.L('tours')} tours. La partie s’arrête quand le Méchant s’endort, quand la forêt se réveille, ou à la nuit. Votre résultat, c’est la forêt qui reste.</p>`},
+  {ch:'fins',o:10,t:H=>`<p>La partie s’arrête aussitôt, même au milieu d’une étape, dès qu’une fin est atteinte :</p><ul><li><b>Le long sommeil</b> : un esprit atteint la case 7. Le Méchant s’endort.</li><li><b>Le réveil de la forêt</b> : le Cercle est plein. Les peuples arrivent en masse et les Machines s’arrêtent.</li><li><b>La nuit</b> : le ${H.L('tours')}e tour s’achève. Le Méchant rentre chez lui ; il reviendra.</li></ul>`}
+ ]},
+{id:'D4',parent:'D',kind:'socle',title:'Le bilan',status:['propose'],engine:'à coder (bonus)',
+ sum:'On compte les forêts restantes, quelle que soit la fin. L’épilogue croise la forêt (aujourd’hui) et la fin (demain).',
+ params:['bonus'],
+ detail:`<p>Tu as écrit que le niveau de réussite vient toujours des arbres sauvés : le bonus de fin passe à zéro, ce qui remplace la décision A3 (+10 %). Une fin précoce rapporte déjà les arbres qu’elle protège.</p>`,
+ rules:[{ch:'fins',o:20,t:H=>`<p><b>Le bilan.</b> Comptez les forêts restantes : c’est votre résultat${H.v('bonus')==='0'?', quelle que soit la fin':'. Ajoutez '+H.L('bonus')}. Cherchez dans le carnet la ligne de votre forêt et la colonne de votre fin, puis lisez l’épilogue à voix haute.</p>`}]},
+{id:'D5',parent:'D',kind:'module',title:'Les lunes',status:['propose','atester'],engine:'à coder',
+ sum:'Un nombre fixe de rêves pour toute la table, à se disputer au conseil comme les jetons de The Gang.',
+ params:['lunes'],
+ mat:['Lunes : 3 jetons'],
+ detail:`<p>Répond au constat des grandes tables : la limite ne grandit plus avec le nombre de joueurs. Et le dilemme défendre ou rêver devient une affaire d’équipe, réglée sans parole : qui prend la lune ?</p>`,
+ rules:[{ch:'conseil',o:15,t:H=>`<p><b>Les lunes.</b> Au début du conseil, posez ${H.L('lunes')} lune(s) au centre. En même temps que la communication, chacun peut prendre une lune au centre ou devant un autre joueur, une au plus devant soi, ou la rendre. Seul un joueur qui tient une lune peut poser une carte en travers ce tour.</p>`}]},
+{id:'D6',parent:'D',kind:'module',title:'Le dernier sursaut',status:['atester'],engine:'codé (v1)',
+ sum:'Quand le Méchant s’endort, il se débat : ses derniers plans s’exécutent encore.',
+ params:['sursaut'],
+ detail:`<p>Idée notée 6, réponse possible à la réserve sur le dénouement. Mise de côté en v1 au profit de la fin immédiate.</p>`,
+ rules:[{ch:'fins',o:15,t:H=>`<p><b>Le dernier sursaut.</b> Quand un esprit atteint le 7, le Méchant se débat : lancez encore les dés, jusqu’à ${H.L('sursaut')} fois, et exécutez ces plans, jusqu’à ce qu’un esprit soit tiré. Puis il s’endort.</p>`}]},
+{id:'D7',parent:'D',kind:'module',title:'Le silence du chantier',status:['retire'],locked:true,
+ sum:'Plus aucune Machine ne tourne : la partie s’arrête. Retiré le 12 octobre.',
+ detail:`<p>Retiré : les Machines se recyclent (remorquées au chantier, elles reviennent par la lisière) et la troisième fin passe au réveil de la forêt. Le module reste visible pour mémoire.</p>`},
+
+/* ===== E. Plateau et matériel ===== */
+{id:'E',kind:'branche',letter:'E',title:'Le plateau et les Machines',sum:'Les zones, la forêt, les engins.'},
+{id:'E1',parent:'E',kind:'socle',title:'Le plateau',status:['v1'],engine:'codé',
+ sum:'Sept zones sur trois profondeurs, 21 forêts, une rivière. Avec le rayon : une flèche de percée par zone.',
+ params:['plateau'],
+ mat:['Le plateau de la forêt : 7 zones, 21 jetons Forêt'],
+ detail:`<p>Lisière : la Lisière (2 forêts), la Clairière (1), la Várzea (2). Milieu : l’Igapó (3), les Sources (4). Cœur : la Colline aux aras (4), le Samaúma (5). La rivière relie Várzea, Sources, Samaúma, Colline aux aras et Igapó.</p>`,
+ rules:[{ch:'mise',o:10,t:H=>`<p>Posez le plateau et ses 21 forêts : Lisière 2, Clairière 1, Várzea 2, Igapó 3, Sources 4, Colline aux aras 4, Samaúma 5.${H.on('A2a')&&H.v('portee')==='rayon'?' Chaque zone porte une flèche de percée vers une voisine plus profonde.':''}</p>`}]},
+{id:'E2',parent:'E',kind:'socle',title:'Les Machines',status:['v1'],engine:'codé',
+ sum:'Cinq cartes Machine avec leurs organes. Trois sur la lisière, les autres au chantier.',
+ params:['m_chantier'],
+ mat:['Cartes Machine et leurs pions, jetons Panne'],
+ detail:`<p>Organes (alignés sur le moteur) : Grosse Gueule, moteur et chenilles ; Rapiat, moteur, chenilles et phares ; Mâchoire, moteur et phares ; Tonton Débard, moteur et chenilles ; Ripaille, moteur, chenilles et phares.</p><p>Avec la piste des Machines, chaque carte porte une zone d’entrée : Lisière pour Grosse Gueule et Tonton Débard, Clairière pour Rapiat, Várzea pour Mâchoire et Ripaille.</p>`,
+ rules:[{ch:'mise',o:25,t:H=>`<p><b>Les Machines.</b> Grosse Gueule sur la Lisière, Rapiat sur la Clairière, Mâchoire sur la Várzea. ${H.v('m_chantier')==='0'?'Le chantier reste vide.':H.v('m_chantier')==='1'?'Tonton Débard attend au chantier.':'Tonton Débard et Ripaille attendent au chantier.'} Une Machine est hors service quand tous ses organes sont neutralisés.</p>`}]}
+];
+
+/* ---------- Paramètres ---------- */
+const PARAMS = {
+ piste_place:{label:'Placement de la piste',node:'A1',d:'fixe',vals:[['fixe','fixe'],['hasard','au hasard']],st:'libre'},
+ esprits_depart:{label:'Esprits au départ',node:'A1',d:'0',vals:[['0','aucun'],['1','un en case 12']],st:'difficulté'},
+ portee:{label:'Portée des tactiques',node:'A2a',d:'rayon',vals:[['rayon','le rayon de la Machine'],['plateau','tout le plateau']],st:'libre'},
+ hs:{label:'Machine hors service désignée',node:'A2a',d:'remorquee',vals:[['remorquee','remorquée au chantier'],['organe','réparée d’un organe'],['rien','rien, le plan échoue']],st:'libre'},
+ represailles:{label:'Représailles vise',node:'A3',d:'defendue',vals:[['defendue','la zone la plus défendue'],['attaque','la dernière zone attaquée (v1)']],st:'libre, prioritaire'},
+ escalade:{label:'Début de l’escalade',node:'A4',d:'5',vals:[['4','tour 4'],['5','tour 5']],st:'libre'},
+ main:{label:'Cartes en main',node:'B1',d:'5',vals:[['4','4'],['5','5'],['6','6']],st:'libre'},
+ paquet:{label:'Personnages par paquet',node:'B1',d:'7',vals:[['5','5'],['6','6'],['7','7']],st:'libre'},
+ presence:{label:'Pions de présence',node:'B1',d:'3',vals:[['2','2'],['3','3'],['4','4']],st:'libre'},
+ barrage:{label:'Ce que bloque un barrage',node:'B2',d:'tout',vals:[['tout','entrer, sortir, abattre'],['entree','entrer et abattre']],st:'libre, à surveiller'},
+ alliance:{label:'Condition de l’alliance',node:'B2',d:'presence',vals:[['presence','même zone, même étape'],['conjointe','saboter ensemble']],st:'libre'},
+ voir:{label:'Voir : cartes par tour',node:'B3',d:'illimite',vals:[['illimite','sans limite'],['1','1'],['2','2']],st:'libre'},
+ hanter:{label:'Hanter : fois par tour',node:'B3',d:'1',vals:[['1','1'],['2','2']],st:'libre (la limite est invariante)'},
+ immob:{label:'Immobilisations par tour',node:'B3',d:'1',vals:[['1','1'],['2','2']],st:'libre (la limite est invariante)'},
+ tours:{label:'Tours par partie',node:'C1',d:'6',vals:[['4','4'],['5','5'],['6','6'],['7','7'],['8','8']],st:'libre, difficulté'},
+ etapes:{label:'Étapes par tour',node:'C1',d:'3',vals:[['2','2'],['3','3'],['4','4']],st:'libre'},
+ traces_n:{label:'Traces posées par joueur',node:'C2a',d:'2',vals:[['1','1'],['2','2'],['3','3']],st:'libre'},
+ traces_datees:{label:'Traces numérotées par étape',node:'C2a',d:'oui',vals:[['oui','oui'],['non','non']],st:'libre'},
+ traces_eng:{label:'Une trace engage',node:'C2a',d:'non',vals:[['non','non'],['oui','oui']],st:'libre'},
+ partage_max:{label:'Jetons du partage par joueur',node:'C2b',d:'2',vals:[['1','1'],['2','2']],st:'libre'},
+ reves_limite:{label:'Limite des rêves',node:'D1',d:'joueur',vals:[['joueur','un par joueur et par tour'],['table2','deux par tour pour la table'],['table3','trois par tour pour la table']],st:'libre (la limite est invariante)'},
+ seuil:{label:'Cases du Cercle par joueur',node:'D2',d:'3',vals:[['2','2'],['3','3'],['4','4']],st:'libre'},
+ bonus:{label:'Bonus selon la fin',node:'D4',d:'0',vals:[['0','aucun'],['10','10 % de la forêt initiale pour le sommeil ou le réveil'],['25','25 % de la forêt initiale pour le sommeil ou le réveil']],st:'robustesse'},
+ lunes:{label:'Lunes par tour',node:'D5',d:'2',vals:[['1','1'],['2','2'],['3','3']],st:'libre'},
+ sursaut:{label:'Plans du dernier sursaut',node:'D6',d:'3',vals:[['1','1'],['2','2'],['3','3']],st:'libre'},
+ plateau:{label:'Plateau',node:'E1',d:'v1',vals:[['v1','v1, 7 zones'],['g1','gabarit à dessiner']],st:'libre par gabarits'},
+ m_chantier:{label:'Machines au chantier au départ',node:'E2',d:'2',vals:[['0','0'],['1','1'],['2','2']],st:'difficulté'}
+};
+
+/* ---------- Préréglages ---------- */
+const BASE_CHOICES = {A2:'A2a',A2a_d:'d_fav',C2:'C2a',D2v:'D2v_choix'};
+const PRESETS = [
+ {id:'coeur',label:'Le cœur seul',desc:'Le socle et les réponses proposées aux choix, sans aucun module.',choices:{...BASE_CHOICES},modules:{},params:{}},
+ {id:'v2',label:'V2 proposée',desc:'Le cœur, plus le présage.',choices:{...BASE_CHOICES},modules:{C3:true},params:{}},
+ {id:'gang',label:'Façon The Gang',desc:'Le partage des Machines et les lunes, avec le présage. Pensée pour 4 joueurs et plus.',choices:{...BASE_CHOICES,C2:'C2b'},modules:{C3:true,D5:true},params:{}},
+ {id:'v1',label:'Héritage v1',desc:'Le plan et le conseil de la v1, avec les nouvelles fins.',choices:{...BASE_CHOICES,A2:'A2c',C2:'C2c'},modules:{C3:true},params:{represailles:'attaque',bonus:'10'}}
+];
+
+(function(){
+'use strict';
+const N={};
+LIST.forEach(n=>{N[n.id]=n;n.children=[];});
+LIST.forEach(n=>{if(n.parent) N[n.parent].children.push(n.id);});
+const STORE='atelier-foret-v2';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const typo=s=>String(s).replace(/ ([:;!?»%])/g,'\u00a0$1').replace(/« /g,'«\u00a0');
+
+function fresh(p){
+  const s={choices:{},modules:{},params:{}};
+  for(const k in PARAMS) s.params[k]=PARAMS[k].d;
+  Object.assign(s.choices,p.choices);Object.assign(s.modules,p.modules);Object.assign(s.params,p.params);
+  return s;
+}
+let S=fresh(PRESETS.find(p=>p.id==='v2'));
+let sel='A2a';
+
+function nodeOn(n){
+  if(n.kind==='option') return S.choices[n.parent]===n.id;
+  if(n.kind==='module') return !n.locked&&!!S.modules[n.id];
+  return true;
+}
+function isActive(id){const n=N[id];if(!n||!nodeOn(n))return false;return n.parent?isActive(n.parent):true;}
+const H={
+  v:id=>S.params[id],
+  L:id=>{const p=PARAMS[id];const x=p.vals.find(a=>a[0]===S.params[id]);return x?x[1]:S.params[id];},
+  on:isActive
+};
+function branchOf(id){let n=N[id];while(n.parent)n=N[n.parent];return n;}
+function unmet(n){return (n.requires||[]).filter(r=>!isActive(r));}
+
+/* ---------- code de variante ---------- */
+function encode(){
+  const c=Object.keys(S.choices).sort().map(k=>S.choices[k]);
+  const m=Object.keys(S.modules).filter(k=>S.modules[k]&&N[k]&&!N[k].locked).sort();
+  const p=Object.keys(PARAMS).filter(k=>S.params[k]!==PARAMS[k].d).map(k=>k+'='+S.params[k]);
+  return 'c:'+c.join(',')+'|m:'+m.join(',')+'|p:'+p.join(',');
+}
+function decode(code){
+  const s=fresh({choices:{...BASE_CHOICES},modules:{},params:{}});
+  const parts={};
+  String(code).trim().split('|').forEach(seg=>{const i=seg.indexOf(':');if(i>0)parts[seg.slice(0,i)]=seg.slice(i+1);});
+  if(!('c' in parts)) throw new Error('format');
+  parts.c.split(',').filter(Boolean).forEach(o=>{const n=N[o];if(!n||n.kind!=='option')throw new Error('option '+o);s.choices[n.parent]=o;});
+  (parts.m||'').split(',').filter(Boolean).forEach(m=>{const n=N[m];if(!n||n.kind!=='module')throw new Error('module '+m);if(!n.locked)s.modules[m]=true;});
+  (parts.p||'').split(',').filter(Boolean).forEach(kv=>{const [k,v]=kv.split('=');const p=PARAMS[k];if(!p||!p.vals.some(a=>a[0]===v))throw new Error('réglage '+kv);s.params[k]=v;});
+  return s;
+}
+function save(){try{localStorage.setItem(STORE,encode());}catch(e){}}
+function load(){try{const c=localStorage.getItem(STORE);if(c)S=decode(c);}catch(e){}}
+
+function samePreset(p){const f=fresh(p);
+  const keys=new Set([...Object.keys(f.choices),...Object.keys(S.choices)]);
+  for(const k of keys) if(f.choices[k]!==S.choices[k]) return false;
+  const mk=new Set([...Object.keys(f.modules),...Object.keys(S.modules)]);
+  for(const k of mk) if(!!f.modules[k]!==!!S.modules[k]) return false;
+  for(const k in PARAMS) if(f.params[k]!==S.params[k]) return false;
+  return true;}
+function currentPreset(){return PRESETS.find(samePreset)||null;}
+
+/* ---------- pyramide ---------- */
+function J(s,d){let c=0;for(let a=1;a<=6;a++)for(let b=1;b<=6;b++)if(a+b===s&&Math.abs(a-b)===d)c++;return c;}
+const DCOUNT=[6,10,8,6,4,2];
+function pyramid(mode,dbl){
+  const dispo=mode==='v1'?DISPO1:DISPO2;
+  let h='<div class="pyr-wrap"><div class="pyr" role="table" aria-label="Pyramide des plans : pour chaque case de la seconde piste, les cases de la piste des pensées qu’elle peut recevoir">';
+  h+='<div class="hd" role="columnheader"><span class="eyebrow">Pensées</span></div>';
+  for(let s=2;s<=12;s++){const t=TILE[dispo[s]];h+=`<div class="hd" role="columnheader"><span class="n">${s}</span><span class="tl ${t[1]}">${t[0]}</span></div>`;}
+  for(let d=5;d>=0;d--){
+    let name,state,cls='';
+    if(mode==='manoeuvres'){[name,state]=MANOEUVRES[d];}
+    else if(d===0){
+      const map={d_fav:['Doublé','le favori obéit (case 1)'],d_bb:['Doublé','branle-bas : toutes'],d_hes:['Doublé','il hésite : pas d’ordre'],d_six:['Zizanie','au chantier']};
+      [name,state]=map[dbl]||map.d_fav; if(dbl!=='d_six') cls=' fixed';
+    } else {[name,state]=MACH_TRACK[d]; if(d>=4) cls=' ch';}
+    h+=`<div class="lab${cls}" role="rowheader"><b>case ${d} · ${esc(name)}</b><span>${esc(state)} · ${DCOUNT[d]}/36</span></div>`;
+    for(let s=2;s<=12;s++){const c=J(s,d);
+      h+= c?`<div class="pc ${TILE[dispo[s]][1]}" role="cell" aria-label="somme ${s}, écart ${d}, ${c} chance(s) sur 36">${'<i></i>'.repeat(c)}</div>`:'<div role="cell"></div>';}
+  }
+  return h+'</div></div>';
+}
+function bookPyramid(){
+  if(isActive('A2a')) return pyramid('machines',S.choices.A2a_d);
+  if(isActive('A2b')) return pyramid('manoeuvres');
+  return '';
+}
+
+/* ---------- rendu de l'arbre ---------- */
+function chipsFor(n){return (n.status||[]).map(s=>{
+  const L={propose:'proposé',atester:'à tester',v1:'v1',idee:'idée',temoin:'témoin',retire:'retiré',alt:'alternative'}[s];
+  return `<span class="chip c-${s}">${L}</span>`;}).join('');}
+const KIND={socle:'Socle',choix:'Choix',option:'Option',module:'Module'};
+function renderNode(n){
+  const act=isActive(n.id);const pAct=n.parent?isActive(n.parent):true;
+  const w=document.createElement('div');
+  w.className='node k-is-'+n.kind+(act?'':((n.status||[]).includes('retire')?' dead':' off'))+(sel===n.id?' sel':'');
+  w.dataset.id=n.id;
+  let ctl;
+  if(n.kind==='option') ctl=`<input type="radio" name="r-${n.parent}" id="r-${n.id}" data-opt="${n.id}" ${S.choices[n.parent]===n.id?'checked':''} ${pAct?'':'disabled'} aria-label="Choisir ${esc(n.title)}">`;
+  else if(n.kind==='module') ctl=`<span class="sw"><input type="checkbox" id="m-${n.id}" data-mod="${n.id}" ${act?'checked':''} ${(n.locked||!pAct)?'disabled':''} aria-label="Ajouter le module ${esc(n.title)}"><i></i></span>`;
+  else ctl=`<span class="dot ${n.kind}" aria-hidden="true"></span>`;
+  const pchips=(n.params||[]).map(p=>{const P=PARAMS[p];const mod=S.params[p]!==P.d;
+    return `<button type="button" class="pchip${mod?' mod':''}" data-param="${p}" data-node="${n.id}">${esc(P.label)} : <b>${esc(H.L(p))}</b></button>`;}).join('');
+  const um=act?unmet(n):[];
+  const warn=um.length?`<span class="warn">Demande : ${um.map(r=>esc(N[r].title)).join(', ')}</span>`:'';
+  w.innerHTML=`<div class="row"><div class="ctl">${ctl}</div><div class="body"><div class="l1"><span class="kind k-${n.kind}">${KIND[n.kind]}</span><span class="ttl">${esc(n.title)}</span>${chipsFor(n)}</div><p class="sum">${typo(n.sum||'')}</p>${pchips?`<div class="pchips">${pchips}</div>`:''}${warn}</div></div>`;
+  if(n.children.length){
+    const showKids=n.kind==='option'||n.kind==='module'?act:true;
+    if(showKids){const k=document.createElement('div');k.className='kids';n.children.forEach(c=>k.appendChild(renderNode(N[c])));w.appendChild(k);}
+    else{const k=document.createElement('div');k.className='kids';k.innerHTML=`<p class="sum">${n.children.length} nœud(s) visibles quand cette ${n.kind==='option'?'option est choisie':'branche est ajoutée'}.</p>`;w.appendChild(k);}
+  }
+  return w;
+}
+function renderTree(){
+  const root=$('tree');root.innerHTML='';
+  LIST.filter(n=>n.kind==='branche').forEach(b=>{
+    const sec=document.createElement('div');sec.className='branch';
+    sec.innerHTML=`<div class="branch-h"><span class="letter">${b.letter}</span><h3>${esc(b.title)}</h3><p>${esc(b.sum)}</p></div>`;
+    const k=document.createElement('div');k.className='kids';b.children.forEach(c=>k.appendChild(renderNode(N[c])));sec.appendChild(k);root.appendChild(sec);
+  });
+}
+
+/* ---------- fiche ---------- */
+const CHNAME=Object.fromEntries(CHAPTERS);
+function paramSelect(p,idp){
+  const P=PARAMS[p];
+  return `<select id="${idp}${p}" data-param="${p}">${P.vals.map(a=>`<option value="${esc(a[0])}" ${S.params[p]===a[0]?'selected':''}>${esc(a[1])}${a[0]===P.d?' (proposé)':''}</option>`).join('')}</select>`;
+}
+function renderFiche(){
+  const n=N[sel];const f=$('fiche');if(!n){f.innerHTML='';return;}
+  const act=isActive(n.id);
+  let why='';
+  if(!act){
+    if(n.locked) why=(n.status||[]).includes('retire')?'Retiré : il reste visible pour mémoire.':'Idée non rédigée : le module ne peut pas encore être ajouté.';
+    else if(n.kind==='option') why=n.parent&&isActive(n.parent)?'Pas dans la variante : une autre option est choisie.':'Pas dans la variante : sa branche n’est pas choisie.';
+    else if(n.kind==='module') why=n.parent&&!isActive(n.parent)?'Pas dans la variante : sa branche n’est pas choisie.':'Pas dans la variante : le module n’est pas ajouté.';
+    else why='Pas dans la variante : sa branche n’est pas choisie.';
+  }
+  let h=`<div class="meta"><span class="kind k-${n.kind}">${KIND[n.kind]||'Branche'}</span>${chipsFor(n)}</div><h3>${esc(n.title)}</h3><p class="sum">${typo(n.sum||'')}</p>`;
+  h+=`<p class="eng">${act?'<b>Dans la variante.</b>':esc(why)}${n.engine?` · Moteur de simulation : <b>${esc(n.engine)}</b>`:''}</p>`;
+  const um=unmet(n);
+  if(um.length) h+=`<p class="warn">Demande ${um.map(r=>`« ${esc(N[r].title)} »`).join(', ')}, absent de la variante.</p>`;
+  if(n.kind==='option'&&!act&&N[n.parent]&&isActive(n.parent)) h+=`<p><button class="btn" type="button" data-pick="${n.id}">Choisir cette option</button></p>`;
+  if(n.kind==='module'&&!n.locked&&(!n.parent||isActive(n.parent))) h+=`<p><button class="btn" type="button" data-toggle="${n.id}">${S.modules[n.id]?'Retirer ce module':'Ajouter ce module'}</button></p>`;
+  if(n.detail) h+=`<div class="fsec"><h4>Pourquoi, comment</h4><div class="prose">${typo(n.detail)}</div></div>`;
+  if(n.kind==='choix'){
+    h+=`<div class="fsec"><h4>Les options</h4><div class="preview">${n.children.map(c=>{const o=N[c];return `<div class="pv"><small>${S.choices[n.id]===c?'choisie':'possible'}</small><button type="button" class="pchip" data-goto="${c}">${esc(o.title)}</button> ${typo(esc(o.sum||''))}</div>`;}).join('')}</div></div>`;
+  }
+  if(n.params&&n.params.length){
+    h+=`<div class="fsec"><h4>Paramètres</h4>${n.params.map(p=>`<div class="prow"><label for="f-${p}">${esc(PARAMS[p].label)}</label>${paramSelect(p,'f-')}</div>`).join('')}</div>`;
+  }
+  if(n.rules&&n.rules.length){
+    h+=`<div class="fsec"><h4>${act?'Dans le livret':'Dans le livret, si on le choisit'}</h4><div class="preview">${n.rules.map(r=>`<div class="pv"><small>${esc(CHNAME[r.ch])}</small>${typo(r.t(H))}</div>`).join('')}</div></div>`;
+  }
+  if(n.mat&&n.mat.length) h+=`<div class="fsec"><h4>Matériel</h4><ul class="matlist">${n.mat.map(m=>`<li>${esc(m)}</li>`).join('')}</ul></div>`;
+  f.innerHTML=h;
+}
+
+/* ---------- paramètres ---------- */
+function renderParams(){
+  const rows=[];
+  rows.push('<thead><tr><th>Paramètre</th><th>Valeur</th><th>Proposé</th><th>Statut</th><th>Nœud</th></tr></thead><tbody>');
+  LIST.filter(n=>n.kind==='branche').forEach(b=>{
+    const ps=Object.keys(PARAMS).filter(p=>branchOf(PARAMS[p].node).id===b.id);
+    if(!ps.length) return;
+    rows.push(`<tr class="grp"><td colspan="5">${b.letter} · ${esc(b.title)}</td></tr>`);
+    ps.forEach(p=>{const P=PARAMS[p];const act=isActive(P.node);const ch=S.params[p]!==P.d;
+      const dl=P.vals.find(a=>a[0]===P.d)[1];
+      rows.push(`<tr class="${act?'':'inactive'}${ch?' changed':''}"><td><label for="pt-${p}">${esc(P.label)}</label></td><td>${paramSelect(p,'pt-')}</td><td class="def">${esc(dl)}</td><td>${esc(P.st)}</td><td><button type="button" class="node-link" data-goto="${P.node}">${esc(N[P.node].title)}</button>${act?'':' <span class="def">(absent)</span>'}</td></tr>`);
+    });
+  });
+  rows.push('</tbody>');
+  $('ptable').innerHTML=rows.join('');
+}
+
+/* ---------- livret ---------- */
+function renderBook(){
+  const active=LIST.filter(n=>n.kind!=='branche'&&isActive(n.id));
+  const by={};
+  active.forEach(n=>(n.rules||[]).forEach(r=>{(by[r.ch]=by[r.ch]||[]).push({n,r});}));
+  const pr=currentPreset();
+  const plan=N[S.choices.A2],comm=N[S.choices.C2];
+  const mods=active.filter(n=>n.kind==='module').map(n=>n.title);
+  const warns=active.filter(n=>unmet(n).length).map(n=>`« ${esc(n.title)} » demande ${unmet(n).map(r=>`« ${esc(N[r].title)} »`).join(', ')}.`);
+  let h=`<div class="vt"><p class="eyebrow">Livret · ${pr?esc(pr.label):'variante personnalisée'}</p><h3>La Forêt qui rêve</h3><p>Plan : ${esc(plan.title)} · Conseil : ${esc(comm.title)} · Modules : ${mods.length?esc(mods.join(', ')):'aucun'} · Code ${esc(encode())}</p>${warns.length?`<p class="warn">Incohérence : ${warns.join(' ')}</p>`:''}</div>`;
+  let ci=0;
+  CHAPTERS.forEach(([ch,title])=>{
+    let items=[];
+    if(ch==='materiel'){
+      const mats=[];active.forEach(n=>(n.mat||[]).forEach(m=>mats.push(m)));
+      if(mats.length) items.push({html:`<ul class="matlist">${mats.map(m=>`<li>${esc(m)}</li>`).join('')}</ul>`});
+    }
+    (by[ch]||[]).sort((a,b)=>a.r.o-b.r.o).forEach(({n,r})=>{
+      let html=typo(r.t(H));
+      if(n.kind==='option'||n.kind==='module'){
+        const tag=`<span class="src ${n.kind}">${esc(n.title)}</span>`;
+        const i=html.indexOf('</p>');
+        html=i>=0?html.slice(0,i)+tag+html.slice(i):html+tag;
+      }
+      if(r.fig==='pyramide') html+=bookPyramid();
+      items.push({html});
+    });
+    if(!items.length) return;
+    ci++;
+    h+=`<section class="chap"><h4><span class="cn">${ci}</span>${esc(title)}</h4>${items.map((it,k)=>`<div class="rule"><span class="rn">${ci}.${k+1}</span><div class="rt">${it.html}</div></div>`).join('')}</section>`;
+  });
+  $('book').innerHTML=h;
+}
+
+/* ---------- en-tête ---------- */
+function renderHead(){
+  const pr=currentPreset();
+  $('presets').innerHTML=PRESETS.map(p=>`<button type="button" data-preset="${p.id}" aria-pressed="${pr&&pr.id===p.id?'true':'false'}" title="${esc(p.desc)}">${esc(p.label)}</button>`).join('');
+  const nMods=LIST.filter(n=>n.kind==='module'&&isActive(n.id)).length;
+  const nCh=Object.keys(PARAMS).filter(k=>S.params[k]!==PARAMS[k].d).length;
+  $('statusline').innerHTML=`<span>Variante : <b>${pr?esc(pr.label):'personnalisée'}</b></span><span>Plan : <b>${esc(N[S.choices.A2].title)}</b></span><span>Conseil : <b>${esc(N[S.choices.C2].title)}</b></span><span><b>${nMods}</b> module${nMods>1?'s':''}</span><span><b>${nCh}</b> réglage${nCh>1?'s':''} modifié${nCh>1?'s':''}</span>`;
+  $('vcode').textContent=encode();
+}
+
+/* ---------- placement de la fiche ---------- */
+const narrow=window.matchMedia('(max-width:980px)');
+function placeFiche(){
+  const f=$('fiche');
+  if(narrow.matches){const w=document.querySelector(`#tree .node[data-id="${sel}"]`);if(w){const row=w.querySelector(':scope > .row');row.after(f);return;}}
+  const board=document.querySelector('.board');if(f.parentElement!==board) board.appendChild(f);
+}
+
+function renderAll(focusId){
+  const f=$('fiche');document.querySelector('.board').appendChild(f);
+  renderHead();renderTree();renderFiche();renderParams();renderBook();placeFiche();save();
+  if(focusId){const e=$(focusId);if(e)e.focus({preventScroll:true});}
+}
+
+/* ---------- interactions ---------- */
+function setChoice(opt){const n=N[opt];S.choices[n.parent]=opt;}
+function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>{t.hidden=true;},1800);}
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.opt){setChoice(t.dataset.opt);sel=t.dataset.opt;renderAll(t.id);}
+  else if(t.dataset.mod){S.modules[t.dataset.mod]=t.checked;sel=t.dataset.mod;renderAll(t.id);}
+  else if(t.tagName==='SELECT'&&t.dataset.param){S.params[t.dataset.param]=t.value;renderAll(t.id);}
+});
+document.addEventListener('click',e=>{
+  const t=e.target;
+  const pre=t.closest('[data-preset]');
+  if(pre){const p=PRESETS.find(x=>x.id===pre.dataset.preset);S=fresh(p);renderAll();toast('Préréglage : '+p.label);return;}
+  const pc=t.closest('.pchip[data-param]');
+  if(pc){sel=pc.dataset.node;renderAll();const s=$('f-'+pc.dataset.param);if(s){s.focus({preventScroll:false});s.classList.add('flash');setTimeout(()=>s.classList.remove('flash'),1300);}return;}
+  const go=t.closest('[data-goto]');
+  if(go){sel=go.dataset.goto;renderAll();const w=document.querySelector(`#tree .node[data-id="${sel}"]`);if(w)w.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});return;}
+  const pk=t.closest('[data-pick]');
+  if(pk){setChoice(pk.dataset.pick);renderAll();return;}
+  const tg=t.closest('[data-toggle]');
+  if(tg){S.modules[tg.dataset.toggle]=!S.modules[tg.dataset.toggle];renderAll();return;}
+  if(t.closest('input,select,label,button,a')) return;
+  const row=t.closest('#tree .row');
+  if(row){const id=row.parentElement.dataset.id;if(id!==sel){sel=id;renderAll();}}
+});
+$('copy-code').addEventListener('click',()=>{
+  const code=encode();
+  const fall=()=>{const r=document.createRange();r.selectNodeContents($('vcode'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Code sélectionné : copiez-le');};
+  try{navigator.clipboard.writeText(code).then(()=>toast('Code copié'),fall);}catch(err){fall();}
+});
+$('apply-code').addEventListener('click',()=>{
+  const v=$('load-code').value;
+  try{S=decode(v);$('code-msg').textContent='';renderAll();toast('Variante chargée');}
+  catch(err){$('code-msg').textContent='Code illisible ('+err.message+'). Il doit commencer par « c: ».';}
+});
+narrow.addEventListener?narrow.addEventListener('change',placeFiche):narrow.addListener(placeFiche);
+
+/* ---------- typographie des parties fixes ---------- */
+['chantiers','decisions'].forEach(id=>{const w=document.createTreeWalker($(id),NodeFilter.SHOW_TEXT);let t;while((t=w.nextNode()))t.nodeValue=typo(t.nodeValue);});
+document.querySelectorAll('.mast p,.blk-head p,.foot p').forEach(p=>{const w=document.createTreeWalker(p,NodeFilter.SHOW_TEXT);let t;while((t=w.nextNode()))t.nodeValue=typo(t.nodeValue);});
+/* ---------- figures fixes ---------- */
+$('pyr-static').innerHTML=pyramid('machines','d_fav');
+
+load();
+renderAll();
+})();
+</script>
+</body></html>

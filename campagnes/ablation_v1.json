@@ -1,0 +1,56 @@
+{
+  "nom": "ablation_v1",
+  "description": "Effet de chaque décision du 11 oct. : la maquette v1 avec une seule décision ramenée à v0. Bots gloutons sur les duos, sans rêve et avec un rêve par tour.",
+  "maquette": "v1",
+  "blocs": [
+    {
+      "nom": "ablation",
+      "variantes": [
+        "defaut",
+        "retour_v0_barrage",
+        "retour_v0_echec_esprit",
+        "retour_v0_reves_illimites",
+        "un_esprit_depart",
+        "chantier_litteral",
+        "retour_v0_limites_pouvoirs",
+        "retour_v0_plateau",
+        "retour_v0_mise_en_place",
+        "retour_v0_piste",
+        "retour_v0_presence",
+        "fin_de_tour",
+        "retour_v0_tenir",
+        "retour_v0_renverser",
+        "retour_v0_reptiles",
+        "retour_v0_soutenir"
+      ],
+      "bots": [
+        {
+          "type": "glouton",
+          "params": {
+            "reves_par_tour": 0.0
+          }
+        },
+        {
+          "type": "glouton",
+          "params": {
+            "reves_par_tour": 1.0
+          }
+        },
+        {
+          "type": "glouton",
+          "params": {
+            "reves_par_tour": 3.0
+          }
+        }
+      ],
+      "tables": [
+        {
+          "tailles": [
+            2
+          ]
+        }
+      ],
+      "parties": 100
+    }
+  ]
+}

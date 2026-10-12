@@ -1,0 +1,373 @@
+<title>Batterie de la Forêt qui rêve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Mise en page : une colonne de lecture large ; le résumé d'abord, la matrice des verdicts, puis les témoins, les graphiques et les questions. */
+:root {
+  --bg: #f3f5f0;
+  --surface: #fbfcf9;
+  --ink: #17201a;
+  --ink-2: #485349;
+  --muted: #7a847c;
+  --rule: #dde3da;
+  --rule-2: #c7cfc4;
+  --accent: #3e4ca3;
+  --s-v1: #2a78d6;
+  --s-v2: #eb6834;
+  --ok: #1d7a37;   --ok-bg: #e2f1e5;
+  --warn: #9a5a00; --warn-bg: #fbedd2;
+  --bad: #b3261e;  --bad-bg: #f9e0dc;
+  --wait: #5d6670; --wait-bg: #e7eaec;
+  --band: rgba(29,122,55,0.10);
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1210; --surface: #171a18; --ink: #e6ebe5; --ink-2: #b3bcb4; --muted: #86908a;
+    --rule: #272d29; --rule-2: #353d38; --accent: #a3adf2; --s-v1: #3987e5; --s-v2: #d95926;
+    --ok: #58c27a; --ok-bg: #16301f; --warn: #e6a33e; --warn-bg: #352710; --bad: #f07c70; --bad-bg: #3a1916;
+    --wait: #a6b0b9; --wait-bg: #232a2f; --band: rgba(88,194,122,0.12); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1210; --surface: #171a18; --ink: #e6ebe5; --ink-2: #b3bcb4; --muted: #86908a;
+  --rule: #272d29; --rule-2: #353d38; --accent: #a3adf2; --s-v1: #3987e5; --s-v2: #d95926;
+  --ok: #58c27a; --ok-bg: #16301f; --warn: #e6a33e; --warn-bg: #352710; --bad: #f07c70; --bad-bg: #3a1916;
+  --wait: #a6b0b9; --wait-bg: #232a2f; --band: rgba(88,194,122,0.12); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.page { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px; display: grid; gap: 36px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; }
+h2 { font-size: 22px; font-weight: 700; }
+h3 { font-size: 16px; font-weight: 700; }
+p { margin: 0; max-width: 72ch; }
+.eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+header { display: grid; gap: 12px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--ink-2); font-size: 13px; }
+.meta span b { color: var(--ink); font-weight: 700; }
+.avert { border-left: 3px solid var(--warn); background: var(--warn-bg); padding: 10px 14px; border-radius: 0 6px 6px 0; color: var(--ink); max-width: 90ch; }
+section { display: grid; gap: 16px; }
+.intro { color: var(--ink-2); }
+
+/* Constats */
+.constats { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.constat { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0; }
+.constat h3 { font-size: 15px; }
+.constat p { color: var(--ink-2); font-size: 14px; }
+
+/* Matrice */
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; }
+table.matrice { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 980px; font-size: 13.5px; }
+.matrice th, .matrice td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--rule); }
+.matrice thead th { position: sticky; top: 0; background: var(--surface); font-weight: 700; z-index: 2; }
+.matrice thead tr:first-child th { font-family: var(--f-display); font-size: 15px; border-bottom: none; padding-bottom: 0; }
+.matrice thead tr:nth-child(2) th { font-size: 12px; color: var(--ink-2); font-weight: 400; }
+.matrice .colv1 { box-shadow: inset 0 3px 0 var(--s-v1); }
+.matrice .colv2 { box-shadow: inset 0 3px 0 var(--s-v2); }
+.matrice th.rowh { position: sticky; left: 0; background: var(--surface); z-index: 1; width: 260px; min-width: 220px; font-weight: 400; }
+.matrice thead th.rowh { z-index: 3; }
+.matrice tr.groupe th { background: var(--bg); font-family: var(--f-display); font-size: 14px; color: var(--ink); padding-block: 8px; position: static; }
+.rowname { font-weight: 700; display: block; }
+.rowband { color: var(--muted); font-size: 12px; display: block; }
+.chip { display: inline-block; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid var(--rule-2); color: var(--ink-2); border-radius: 4px; padding: 0 5px; margin-left: 4px; vertical-align: 1px; }
+.cell { display: grid; gap: 3px; min-width: 150px; }
+.cell .val { font-family: var(--f-num); font-variant-numeric: tabular-nums; font-size: 13px; }
+.cell .det { color: var(--muted); font-size: 12px; }
+.note { color: var(--ink-2); font-size: 12.5px; padding-top: 0; }
+.pill { display: inline-flex; align-items: center; gap: 5px; width: fit-content; font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 1px 8px 1px 6px; }
+.pill i { font-style: normal; font-size: 11px; }
+.p-vert { color: var(--ok); background: var(--ok-bg); }
+.p-orange { color: var(--warn); background: var(--warn-bg); }
+.p-rouge { color: var(--bad); background: var(--bad-bg); }
+.p-attente, .p-nonmes { color: var(--wait); background: var(--wait-bg); }
+.matrice td.attente { color: var(--muted); }
+
+/* Témoins */
+.bilan-t { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 20px; }
+.bilan-t .gros { font-family: var(--f-display); font-size: 34px; font-weight: 700; line-height: 1; }
+.temoins { display: grid; gap: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; }
+.temoin { display: grid; grid-template-columns: 28px minmax(0, 1.1fr) minmax(0, 1.3fr) minmax(0, 1.2fr); gap: 4px 14px; padding: 10px 14px; border-bottom: 1px solid var(--rule); align-items: start; }
+.temoin:last-child { border-bottom: none; }
+.temoin .marque { font-weight: 700; font-size: 15px; line-height: 1.3; }
+.temoin.ok .marque { color: var(--ok); }
+.temoin.non .marque { color: var(--bad); }
+.temoin .t-m { font-weight: 700; }
+.temoin .t-a { color: var(--ink-2); }
+.temoin .t-e { grid-column: 2 / -1; color: var(--ink-2); font-size: 13px; background: var(--bad-bg); border-radius: 6px; padding: 6px 10px; }
+.filtre { display: flex; gap: 6px; flex-wrap: wrap; }
+.filtre button { font: inherit; font-size: 13px; border: 1px solid var(--rule-2); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.filtre button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.filtre button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Graphiques */
+.graphes { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px 12px; display: grid; gap: 8px; min-width: 0; }
+figcaption { color: var(--ink-2); font-size: 13px; }
+.legende { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--ink-2); }
+.legende span { display: inline-flex; align-items: center; gap: 6px; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { fill: var(--muted); font-family: var(--f-body); font-size: 11px; }
+svg .grid { stroke: var(--rule); stroke-width: 1; }
+svg .axe { stroke: var(--rule-2); stroke-width: 1; }
+svg .lab { fill: var(--ink-2); font-size: 11.5px; }
+details { font-size: 13px; color: var(--ink-2); }
+details table { border-collapse: collapse; margin-top: 6px; font-size: 12.5px; }
+details td, details th { padding: 3px 10px 3px 0; text-align: left; border-bottom: 1px solid var(--rule); }
+summary { cursor: pointer; color: var(--accent); }
+.tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 12px; padding: 5px 8px; border-radius: 5px; z-index: 10; max-width: 260px; }
+
+/* Questions */
+.questions { display: grid; gap: 10px; counter-reset: q; }
+.question { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 16px; display: grid; gap: 4px; }
+.question h3 { font-size: 15px; }
+.question p { color: var(--ink-2); font-size: 14px; }
+footer { color: var(--muted); font-size: 12.5px; display: grid; gap: 4px; }
+@media (max-width: 640px) {
+  .page { padding-inline: 16px; }
+  .temoin { grid-template-columns: 24px minmax(0, 1fr); }
+  .temoin .t-a, .temoin .t-t { grid-column: 2; }
+}
+@media (prefers-reduced-motion: no-preference) { .filtre button { transition: background .15s, color .15s; } }
+</style>
+
+<div class="page">
+  <header>
+    <span class="eyebrow">Le Méchant qui rêve · phase 1 du plan de simulation</span>
+    <h1>Batterie de la Forêt qui rêve</h1>
+    <p class="intro">Les mesures de la batterie, jouées sur la maquette v1 et sur le préréglage « V2 proposée » de l'atelier, avec leurs bandes (vert, orange, rouge), gelées par l'auteur à la fin de la phase 1, et les témoins qui servent à les valider.</p>
+    <div class="meta" id="meta"></div>
+    <p class="avert"><b>Tout est joué par le glouton.</b> Une mesure qui dépend du jeu des joueurs décrit donc aussi le glouton : ces verdicts sont des indices sur le jeu, pas des conclusions. Le bot fort de la phase 2 les refera. Deux styles de glouton sont montrés : celui qui envoie une carte en rêve par tour (le meilleur taux fixe dans les deux maquettes) et celui qui ne rêve jamais et ne fait que défendre.</p>
+  </header>
+
+  <section>
+    <h2>Ce que montrent les chiffres</h2>
+    <div class="constats">
+      <div class="constat"><h3>Le rêve écrase encore la partie</h3><p>Dans les deux maquettes, le meilleur taux de rêve est le maximum permis : une carte par tour. La forêt passe de 69 à 88 % en v1 et de 77 à 90 % en V2, et la partie finit entre les tours 2 et 3. À la fin du tour 2, l'issue est déjà jouée.</p></div>
+      <div class="constat"><h3>La V2 est plus douce et plus lisible</h3><p>Sans rêve, la V2 garde 77 % de forêt contre 69 % en v1. La menace se concentre moins (82 à 84 % sur les k zones les plus menacées, contre 95 à 98 % en v1) : c'est mieux, mais pas encore dans la bande verte. Elle demande environ quinze fois moins de départages par partie.</p></div>
+      <div class="constat"><h3>Un peuple seul garde presque tout</h3><p>Le jeu s'adapte au nombre de joueurs : seul, un peuple sauve déjà 40 à 88 % de la forêt selon le peuple et le bot, contre 23 % si personne ne joue. La synergie additive de la phase 0 était donc négative par construction : elle est redéfinie (B2). Les reptiles pèsent le plus, les insectes le moins.</p></div>
+      <div class="constat"><h3>21 témoins sur 26 tombent juste</h3><p>Les cinq ratés viennent surtout du glouton, qui n'exploite pas les pouvoirs cassés exprès. La communication ne se mesure pas encore : le glouton ne se sert pas des signes des autres.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Verdicts par mesure</h2>
+    <p class="intro">Duos et trios des six peuples, 60 parties par équipe. Une ligne grisée attend le bot fort. Survolez un graphique pour les valeurs ; les détails de chaque mesure sont dans <span class="num">docs/mesures.md</span>.</p>
+    <div class="tablewrap"><table class="matrice" id="matrice"></table></div>
+  </section>
+
+  <section id="temoins-section">
+    <h2>Les témoins</h2>
+    <div class="bilan-t"><span class="gros" id="t-score"></span><p class="intro">Un témoin est une variante cassée exprès. Une mesure qui ne le voit pas est à revoir, ou bien le bot ne sait pas exploiter le défaut. On ne déplace pas un seuil pour le rattraper (décision A5).</p></div>
+    <div class="filtre" role="group" aria-label="Filtrer les témoins">
+      <button type="button" id="f-tous" aria-pressed="true">Tous</button>
+      <button type="button" id="f-non" aria-pressed="false">Ratés seulement</button>
+    </div>
+    <div class="temoins" id="temoins"></div>
+  </section>
+
+  <section>
+    <h2>Trois lectures</h2>
+    <div class="graphes">
+      <figure>
+        <h3>Forêt gardée selon le nombre de peuples</h3>
+        <div class="legende" id="leg-tailles"></div>
+        <div id="g-tailles"></div>
+        <figcaption>Moyenne de toutes les équipes de chaque taille. « 0 » : un peuple qui ne fait rien (la valeur de l'équipe vide). Le premier peuple apporte presque tout.</figcaption>
+        <details><summary>Voir les valeurs</summary><div id="t-tailles"></div></details>
+      </figure>
+      <figure>
+        <h3>Forêt selon le taux de rêve fixe</h3>
+        <div class="legende" id="leg-reves"></div>
+        <div id="g-reves"></div>
+        <figcaption>Glouton qui rêve un nombre fixe de cartes par tour, duos et trios. Le maximum permis (1) gagne toujours. En V2, la voie du sommeil seule donne <span id="voie-s"></span> % et la voie du réveil seule <span id="voie-r"></span> %.</figcaption>
+        <details><summary>Voir les valeurs</summary><div id="t-reves"></div></details>
+      </figure>
+      <figure>
+        <h3>Shapley : part de chaque peuple</h3>
+        <div class="legende" id="leg-shapley"></div>
+        <div id="g-shapley"></div>
+        <figcaption>Rapport à la moyenne des six peuples, avec l'intervalle à 95 %. La bande pâle marque le vert (0,7 à 1,3).</figcaption>
+        <details><summary>Voir les valeurs</summary><div id="t-shapley"></div></details>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Décisions de fin de phase 1</h2>
+    <div class="questions">
+      <div class="question"><h3>B1 · Les bandes sont gelées</h3><p>Les bandes provisoires deviennent définitives pour tout le cycle, telles quelles, sauf la synergie. Aucun témoin raté ne demandait de déplacer un seuil.</p></div>
+      <div class="question"><h3>B2 · La synergie est redéfinie</h3><p>Un duo compte s'il garde plus de forêt que son meilleur peuple joué seul (vert : au moins 12 duos sur 15 ; rouge : moins de 8). Le tétraèdre se teste par la synergie relative entre duos : les trois duos complets doivent être dans le premier tiers.</p></div>
+      <div class="question"><h3>B3 · Le siège spectateur ne fait rien</h3><p>L'impact d'un peuple se mesure en remplaçant son siège par un bot qui ne joue rien, et non par le bot aléatoire, qui rêve.</p></div>
+      <div class="question"><h3>B4 · Deux cas deviennent permis</h3><p>Un rêve peut changer la tuile vue par un oiseau (R6.2), et une Machine encore à deux pas peut abattre en chemin quand sa cible est barrée (R4.3). Ils sont comptés à part, comme le présage détourné. Moteur 1.5.</p></div>
+    </div>
+  </section>
+
+  <footer id="pied"></footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const DATA = __DONNEES__;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const fr = (x, d = 1) => x == null ? "–" : x.toFixed(d).replace(".", ",");
+const PILL = { vert: ["✓", "vert"], orange: ["!", "orange"], rouge: ["✕", "rouge"], attente: ["…", "bot fort"], nonmes: ["–", "non mesurable"] };
+
+// En-tête
+$("meta").innerHTML = [
+  `<span>Moteur <b class="num">${esc(DATA.moteur)}</b></span>`,
+  `<span><b class="num">${DATA.parties.toLocaleString("fr-FR")}</b> parties jouées</span>`,
+  `<span>Rapport du <b>${esc(DATA.date.split(" ")[0].split("-").reverse().join("/"))}</b></span>`,
+  `<span>Bot : <b>glouton</b> (phase 1)</span>`].join("");
+
+// Matrice
+(function matrice() {
+  const cols = DATA.cols;
+  let h = "<thead><tr><th class='rowh' rowspan='2'>Mesure</th>";
+  const maquettes = [...new Set(cols.map(c => c.maquette))];
+  for (const m of maquettes) {
+    const n = cols.filter(c => c.maquette === m).length;
+    h += `<th colspan="${n}" class="${m === "v1" ? "colv1" : "colv2"}">${esc(m)}</th>`;
+  }
+  h += "</tr><tr>" + cols.map(c => `<th>glouton ${esc(c.bot)}</th>`).join("") + "</tr></thead><tbody>";
+  let groupe = null;
+  for (const r of DATA.rows) {
+    if (r.groupe !== groupe) {
+      groupe = r.groupe;
+      h += `<tr class="groupe"><th colspan="${cols.length + 1}">${esc(groupe)}</th></tr>`;
+    }
+    h += `<tr><th class="rowh" scope="row"><span class="rowname">${esc(r.nom)}<span class="chip">${esc(r.etiquette)}</span></span><span class="rowband">${esc(r.bande)}</span></th>`;
+    for (const c of cols) {
+      const x = r.cells[c.key];
+      if (x.v === "attente") { h += `<td class="attente"><span class="pill p-attente"><i>…</i>bot fort</span></td>`; continue; }
+      const p = x.v ? `<span class="pill p-${x.v}"><i>${PILL[x.v][0]}</i>${PILL[x.v][1]}</span>` : "";
+      h += `<td><div class="cell">${p}<span class="val">${esc(x.t)}</span>${x.d ? `<span class="det">${esc(x.d)}</span>` : ""}</div></td>`;
+    }
+    h += "</tr>";
+    if (r.note) h += `<tr><td></td><td colspan="${cols.length}" class="note">${esc(r.note)}</td></tr>`;
+  }
+  $("matrice").innerHTML = h + "</tbody>";
+})();
+
+// Témoins
+function temoins(seulementRates) {
+  const T = DATA.temoins;
+  const ok = T.filter(t => t.ok).length;
+  $("t-score").textContent = `${ok} / ${T.length}`;
+  $("temoins").innerHTML = T.filter(t => !seulementRates || !t.ok).map(t => `
+    <div class="temoin ${t.ok ? "ok" : "non"}">
+      <span class="marque" aria-label="${t.ok ? "réussi" : "raté"}">${t.ok ? "✓" : "✕"}</span>
+      <span class="t-m">${esc(t.mesure)}</span>
+      <span class="t-t">${esc(t.temoin)}</span>
+      <span class="t-a">attendu : ${esc(t.attendu)}</span>
+      ${t.explication ? `<span class="t-e">${esc(t.explication)}</span>` : ""}
+    </div>`).join("");
+}
+temoins(false);
+for (const [id, v] of [["f-tous", false], ["f-non", true]]) {
+  $(id).addEventListener("click", () => {
+    $("f-tous").setAttribute("aria-pressed", String(!v));
+    $("f-non").setAttribute("aria-pressed", String(v));
+    temoins(v);
+  });
+}
+
+// Infobulle
+const tip = $("tip");
+document.addEventListener("pointermove", (e) => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (!t) { tip.hidden = true; return; }
+  tip.textContent = t.getAttribute("data-tip");
+  tip.hidden = false;
+  const x = Math.min(e.clientX + 12, window.innerWidth - tip.offsetWidth - 8);
+  tip.style.left = x + "px";
+  tip.style.top = (e.clientY + 14) + "px";
+});
+
+// Graphiques (SVG à l'échelle)
+const NS = "http://www.w3.org/2000/svg";
+const SERIES = {
+  v1_g1: { nom: "v1 · rêve 1/tour", c: "var(--s-v1)", plein: true },
+  v1_g0: { nom: "v1 · sans rêve", c: "var(--s-v1)", plein: false },
+  v2_g1: { nom: "V2 · rêve 1/tour", c: "var(--s-v2)", plein: true },
+  v2_g0: { nom: "V2 · sans rêve", c: "var(--s-v2)", plein: false },
+};
+function marque(s, plein) {
+  return `<svg width="26" height="10" viewBox="0 0 26 10" aria-hidden="true"><line x1="1" y1="5" x2="25" y2="5" stroke="${s}" stroke-width="2" ${plein ? "" : "stroke-dasharray='4 3'"}/><circle cx="13" cy="5" r="3.5" fill="${plein ? s : "var(--surface)"}" stroke="${s}" stroke-width="2"/></svg>`;
+}
+function legende(id, cles) {
+  $(id).innerHTML = cles.map(k => `<span>${marque(SERIES[k].c, SERIES[k].plein)}${esc(SERIES[k].nom)}</span>`).join("");
+}
+function lignes(el, series, opts) {
+  const W = 420, H = 250, m = { l: 38, r: 14, t: 18, b: 30 };
+  const sx = v => m.l + (v - opts.x0) / (opts.x1 - opts.x0) * (W - m.l - m.r);
+  const sy = v => H - m.b - (v - opts.y0) / (opts.y1 - opts.y0) * (H - m.t - m.b);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.titre)}">`;
+  for (const y of opts.yt) s += `<line class="grid" x1="${m.l}" x2="${W - m.r}" y1="${sy(y)}" y2="${sy(y)}"/><text x="${m.l - 6}" y="${sy(y) + 4}" text-anchor="end">${y}</text>`;
+  s += `<line class="axe" x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}"/>`;
+  for (const x of opts.xt) s += `<text x="${sx(x)}" y="${H - m.b + 16}" text-anchor="middle">${opts.fx ? opts.fx(x) : x}</text>`;
+  s += `<text x="${W - m.r}" y="${H - 2}" text-anchor="end">${esc(opts.xlab)}</text>`;
+  s += `<text x="${m.l + 4}" y="${m.t + 10}" text-anchor="start">forêt gardée (%)</text>`;
+  for (const [k, pts] of Object.entries(series)) {
+    const S = SERIES[k];
+    s += `<polyline fill="none" stroke="${S.c}" stroke-width="2" ${S.plein ? "" : "stroke-dasharray='5 4'"} points="${pts.map(p => sx(p[0]) + "," + sy(p[1])).join(" ")}"/>`;
+    for (const p of pts) {
+      s += `<circle cx="${sx(p[0])}" cy="${sy(p[1])}" r="4" fill="${S.plein ? S.c : "var(--surface)"}" stroke="${S.c}" stroke-width="2"/>`;
+      s += `<circle cx="${sx(p[0])}" cy="${sy(p[1])}" r="11" fill="transparent" data-tip="${esc(S.nom)} · ${opts.fx ? opts.fx(p[0]) : p[0]} → ${fr(p[1])} %"/>`;
+    }
+  }
+  el.innerHTML = s + "</svg>";
+}
+function tableau(el, entetes, lignes_) {
+  el.innerHTML = `<table><thead><tr>${entetes.map(x => `<th>${esc(x)}</th>`).join("")}</tr></thead><tbody>${lignes_.map(l => `<tr>${l.map(x => `<td class="num">${esc(x)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+
+legende("leg-tailles", ["v1_g1", "v1_g0", "v2_g1", "v2_g0"]);
+lignes($("g-tailles"), DATA.tailles, { x0: 0, x1: 6, y0: 0, y1: 100, xt: [0, 1, 2, 3, 4, 5, 6], yt: [0, 25, 50, 75, 100], xlab: "peuples à la table", titre: "Forêt gardée selon le nombre de peuples" });
+tableau($("t-tailles"), ["peuples", ...Object.keys(DATA.tailles).map(k => SERIES[k].nom)],
+  [0, 1, 2, 3, 4, 5, 6].map(i => [i, ...Object.values(DATA.tailles).map(p => fr(p[i][1]))]));
+
+legende("leg-reves", ["v1_g1", "v2_g1"]);
+const fx = x => fr(x, 2);
+lignes($("g-reves"), DATA.reves, { x0: 0, x1: 1, y0: 60, y1: 100, xt: [0, 0.25, 0.5, 0.75, 1], yt: [60, 70, 80, 90, 100], xlab: "cartes en rêve par tour", fx, titre: "Forêt selon le taux de rêve fixe" });
+$("leg-reves").querySelectorAll("span").forEach((s, i) => { s.lastChild.textContent = i ? "V2 proposée" : "v1"; });
+tableau($("t-reves"), ["cartes par tour", "v1", "V2 proposée"], DATA.reves.v1_g1.map((p, i) => [fr(p[0], 2), fr(p[1]), fr(DATA.reves.v2_g1[i][1])]));
+if (DATA.voies) { $("voie-s").textContent = fr(DATA.voies.sommeil); $("voie-r").textContent = fr(DATA.voies.reveil); }
+
+(function shapley() {
+  legende("leg-shapley", ["v1_g1", "v1_g0", "v2_g1", "v2_g0"]);
+  const P = Object.keys(DATA.peuples);
+  const W = 420, H = 270, m = { l: 86, r: 14, t: 8, b: 30 };
+  const x0 = 0.25, x1 = 1.85;
+  const sx = v => m.l + (v - x0) / (x1 - x0) * (W - m.l - m.r);
+  const band = (H - m.t - m.b) / P.length;
+  const off = { v1_g1: -0.3, v1_g0: -0.1, v2_g1: 0.1, v2_g0: 0.3 };
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Shapley des six peuples">`;
+  s += `<rect x="${sx(0.7)}" y="${m.t}" width="${sx(1.3) - sx(0.7)}" height="${H - m.t - m.b}" fill="var(--band)"/>`;
+  for (const t of [0.5, 1, 1.5]) s += `<line class="${t === 1 ? "axe" : "grid"}" x1="${sx(t)}" x2="${sx(t)}" y1="${m.t}" y2="${H - m.b}"/><text x="${sx(t)}" y="${H - m.b + 16}" text-anchor="middle">${fr(t, 1)}</text>`;
+  s += `<text x="${W - m.r}" y="${H - 2}" text-anchor="end">× la moyenne</text>`;
+  P.forEach((p, i) => {
+    const yc = m.t + band * (i + 0.5);
+    s += `<text class="lab" x="${m.l - 8}" y="${yc + 4}" text-anchor="end">${esc(DATA.peuples[p])}</text>`;
+    if (i) s += `<line class="grid" x1="${m.l}" x2="${W - m.r}" y1="${m.t + band * i}" y2="${m.t + band * i}"/>`;
+    for (const [k, S] of Object.entries(SERIES)) {
+      const [v, lo, hi] = DATA.shapley[k][p];
+      const y = yc + off[k] * band;
+      s += `<line x1="${sx(lo)}" x2="${sx(hi)}" y1="${y}" y2="${y}" stroke="${S.c}" stroke-width="2" opacity=".55"/>`;
+      s += `<circle cx="${sx(v)}" cy="${y}" r="4" fill="${S.plein ? S.c : "var(--surface)"}" stroke="${S.c}" stroke-width="2"/>`;
+      s += `<circle cx="${sx(v)}" cy="${y}" r="9" fill="transparent" data-tip="${esc(DATA.peuples[p])} · ${esc(S.nom)} : ${fr(v, 2)} (${fr(lo, 2)} à ${fr(hi, 2)})"/>`;
+    }
+  });
+  $("g-shapley").innerHTML = s + "</svg>";
+  tableau($("t-shapley"), ["peuple", ...Object.values(SERIES).map(S => S.nom)],
+    P.map(p => [DATA.peuples[p], ...Object.keys(SERIES).map(k => fr(DATA.shapley[k][p][0], 2))]));
+})();
+
+$("pied").innerHTML = `<span>Source : <span class="num">foret/batterie.py</span>, moteur ${esc(DATA.moteur)} ; rapport complet dans <span class="num">resultats/batterie/rapport.json</span>. Bandes : « Objectifs, invariants et catalogue », section 2.</span><span>Les durées viennent d'un modèle de temps (15 s par décision) à recaler sur les premiers tests humains.</span>`;
+</script>

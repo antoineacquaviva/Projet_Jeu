@@ -1,0 +1,150 @@
+name: Campagne
+
+# Lancement manuel : onglet Actions -> Campagne -> Run workflow.
+# Une campagne est découpée en N lots joués en parallèle (un exécuteur par lot),
+# puis fusionnée en une synthèse (artefact « synthese-… »).
+
+on:
+  workflow_dispatch:
+    inputs:
+      campagne:
+        description: "Campagne (nom du fichier dans campagnes/, sans .json)"
+        default: "reference"
+        required: true
+      maquette:
+        description: "Maquette (vide = celle de la campagne)"
+        default: ""
+        required: false
+      echelle:
+        description: "Échelle : 0.05 = 5 % des parties, 1 = la campagne entière"
+        default: "0.05"
+        required: true
+      lots:
+        description: "Nombre de lots en parallèle (1 à 256)"
+        default: "4"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  preparer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      lots: ${{ steps.matrice.outputs.lots }}
+    steps:
+      - name: Contrôler les paramètres et préparer la matrice
+        id: matrice
+        env:
+          CAMPAGNE: ${{ inputs.campagne }}
+          ECHELLE: ${{ inputs.echelle }}
+          LOTS: ${{ inputs.lots }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, re, sys
+          campagne, echelle, lots = os.environ["CAMPAGNE"], os.environ["ECHELLE"], os.environ["LOTS"]
+          if not re.fullmatch(r"[A-Za-z0-9_\-]+", campagne):
+              sys.exit(f"nom de campagne invalide : {campagne!r}")
+          try:
+              if float(echelle) <= 0:
+                  raise ValueError
+          except ValueError:
+              sys.exit(f"échelle invalide : {echelle!r}")
+          if not re.fullmatch(r"[0-9]+", lots) or not 1 <= int(lots) <= 256:
+              sys.exit(f"nombre de lots invalide (1 à 256) : {lots!r}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("lots=" + json.dumps(list(range(int(lots)))) + "\n")
+          EOF
+
+  lot:
+    needs: preparer
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        lot: ${{ fromJSON(needs.preparer.outputs.lots) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Jouer le lot
+        env:
+          CAMPAGNE: ${{ inputs.campagne }}
+          MAQUETTE: ${{ inputs.maquette }}
+          ECHELLE: ${{ inputs.echelle }}
+          LOTS: ${{ inputs.lots }}
+          LOT: ${{ matrix.lot }}
+        run: |
+          ARGS=(--echelle "$ECHELLE" --lot "$LOT/$LOTS" --sortie lots)
+          if [ -n "$MAQUETTE" ]; then ARGS+=(--maquette "$MAQUETTE"); fi
+          python -m foret.sim "$CAMPAGNE" "${ARGS[@]}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lot-${{ matrix.lot }}
+          path: lots/
+          retention-days: 1
+          if-no-files-found: error
+
+  fusion:
+    needs: lot
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write        # pour publier la synthèse sur la branche « resultats »
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: lot-*
+          path: lots
+          merge-multiple: true
+      - name: Fusionner les lots
+        env:
+          CAMPAGNE: ${{ inputs.campagne }}
+          MAQUETTE: ${{ inputs.maquette }}
+          ECHELLE: ${{ inputs.echelle }}
+        run: |
+          ARGS=(--echelle "$ECHELLE" --fusionner lots --sortie resultats/fusion)
+          if [ -n "$MAQUETTE" ]; then ARGS+=(--maquette "$MAQUETTE"); fi
+          python -m foret.sim "$CAMPAGNE" "${ARGS[@]}"
+      - name: Résumé
+        run: python scripts/resume_campagne.py resultats/fusion >> "$GITHUB_STEP_SUMMARY"
+      - name: Publier la synthèse sur la branche « resultats »
+        env:
+          CAMPAGNE: ${{ inputs.campagne }}
+          ECHELLE: ${{ inputs.echelle }}
+          LOTS: ${{ inputs.lots }}
+          RUN: ${{ github.run_number }}
+        run: |
+          DEST="campagnes/${CAMPAGNE}_run${RUN}"
+          mkdir -p "/tmp/publie/$DEST"
+          cp resultats/fusion/synthese.json "/tmp/publie/$DEST/"
+          if [ -s resultats/fusion/erreurs.jsonl ]; then cp resultats/fusion/erreurs.jsonl "/tmp/publie/$DEST/"; fi
+          python scripts/resume_campagne.py resultats/fusion > "/tmp/publie/$DEST/resume.md"
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin resultats >/dev/null 2>&1; then
+            git fetch --depth=1 origin resultats
+            git checkout -q -B resultats FETCH_HEAD
+          else
+            git checkout -q --orphan resultats
+            git rm -rq --cached . ; git clean -fdq -e lots -e resultats
+          fi
+          mkdir -p "$DEST"
+          cp -r "/tmp/publie/$DEST/." "$DEST/"
+          git add "$DEST"
+          git commit -q -m "Campagne ${CAMPAGNE} (échelle ${ECHELLE}, ${LOTS} lots), run ${RUN}"
+          git push origin resultats
+      - uses: actions/upload-artifact@v4
+        with:
+          name: synthese-${{ inputs.campagne }}-${{ github.run_number }}
+          path: |
+            resultats/fusion/synthese.json
+            resultats/fusion/erreurs.jsonl
+          retention-days: 30

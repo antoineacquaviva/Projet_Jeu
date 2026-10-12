@@ -1,0 +1,45 @@
+{
+  "nom": "reference",
+  "description": "Campagne de référence, identique à celle du moteur v0 (112 350 parties) : bots aléatoires sur toutes les tables et 13 variantes, bots gloutons sur les duos et les trios. Sert à comparer deux maquettes.",
+  "maquette": "v1",
+  "blocs": [
+    {
+      "nom": "fuzz",
+      "variantes": ["defaut"],
+      "bots": [{"type": "aleatoire"}],
+      "tables": [{"tailles": [1, 2, 3, 4, 5, 6]}],
+      "parties": 300
+    },
+    {
+      "nom": "variantes",
+      "variantes": ["sans_pouvoirs", "fin_de_tour", "alliance_conjointe", "tenir_passive", "effets_organes",
+                    "chantier_litteral", "reparer_sans_hs", "silence_reserve_vide", "hanter_off",
+                    "sursaut_et_bruit", "paquet_repioche", "zones_rasees_visees",
+                    "sans_esprit_depart", "un_esprit_depart"],
+      "bots": [{"type": "aleatoire"}],
+      "tables": [{"tailles": [1, 2]}],
+      "parties": 150
+    },
+    {
+      "nom": "glouton",
+      "variantes": ["defaut"],
+      "bots": [
+        {"type": "glouton", "params": {"reves_par_tour": 0.0}},
+        {"type": "glouton", "params": {"reves_par_tour": 0.5}},
+        {"type": "glouton", "params": {"reves_par_tour": 1.0}},
+        {"type": "glouton", "params": {"reves_par_tour": 3.0}}
+      ],
+      "tables": [{"tailles": [2], "parties": 300}, {"tailles": [3], "parties": 150}]
+    },
+    {
+      "nom": "glouton_variantes",
+      "variantes": ["fin_de_tour", "alliance_conjointe", "effets_organes", "chantier_litteral", "hanter_off"],
+      "bots": [
+        {"type": "glouton", "params": {"reves_par_tour": 0.0}},
+        {"type": "glouton", "params": {"reves_par_tour": 1.0}}
+      ],
+      "tables": [{"tailles": [2]}],
+      "parties": 150
+    }
+  ]
+}

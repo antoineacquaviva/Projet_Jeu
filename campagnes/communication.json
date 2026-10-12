@@ -1,0 +1,15 @@
+{
+  "nom": "communication",
+  "description": "Phase 1b (12 oct. 2026) : formes de communication et présage (R2.5, R2.6) avec le glouton à trois niveaux de communication (non, annonce, complet). Premier essai : le glouton n'est pas le bot fort ; les écarts disent ce que des règles simples tirent de chaque forme, pas la valeur de la communication.",
+  "maquette": "v1",
+  "blocs": [
+    {"nom": "formes",
+     "variantes": ["reference_1_0", "sans_presage", "comm_aucun_signe", "defaut", "comm_traces", "comm_traces_engagent", "comm_partage", "comm_tout_dire"],
+     "bots": [{"type": "glouton", "params": {"reves_par_tour": 0.0}},
+              {"type": "glouton", "params": {"reves_par_tour": 0.0, "communique": "complet"}},
+              {"type": "glouton", "params": {"reves_par_tour": 1.0}},
+              {"type": "glouton", "params": {"reves_par_tour": 1.0, "communique": "complet"}},
+              {"type": "glouton", "params": {"reves_par_tour": 0.0, "communique": "non", "des_connus": false}}],
+     "tables": [{"tailles": [2], "parties": 40}, {"tailles": [3], "parties": 20}]}
+  ]
+}
