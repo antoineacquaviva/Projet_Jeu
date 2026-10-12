@@ -246,6 +246,26 @@ Le workflow **Batterie** (`.github/workflows/batterie.yml`) joue les lots en par
 calcule le rapport et le tableau de bord, et les publie sur la branche `resultats` (`batterie/run<n>/`,
 avec un `resume.md` écrit par `scripts/resume_batterie.py`).
 
+## Les bots de la phase 2 (moteur 1.7)
+
+| Bot | Rôle |
+|---|---|
+| `mc` (`foret/bots/mc.py`) | Le bot fort. Pour chaque décision, il copie la partie, impose une option, joue la suite avec un autre hasard (déterminisation des dés) et une politique (le glouton à tous les sièges), et garde l'option qui laisse le plus de forêt. Budget (suites par décision) réparti par *sequential halving* sur des hasards communs. Il ne connaît aucune règle : il joue v1, v2 et toute variante. |
+| `bruite` (`foret/bots/bruite.py`) | Un bot de base qui choisit parfois au hasard (la novice du panel) |
+| table mixte | `{"type": "table", "params": {"sieges": [spec, …]}}` : un bot par siège (`fabriquer_table`) |
+
+Paramètres du bot `mc` :
+- `budget` (32) : suites par décision ; au moins une par option au premier tour. C'est le curseur de force (échelle : MC 8, 32, 64, 128).
+- `politique` ({"type": "glouton"}) : le bot qui joue les suites. Le bot est au moins aussi bon que sa politique, au bruit près (amélioration de politique en un coup) ; il ne découvre pas seul une stratégie que sa politique ne joue jamais (un rêve qui ne paie qu'après six rêves, par exemple).
+- `savoir` : `"tout"` (mode central : il voit les programmes cachés des partenaires, un seul cerveau pour l'équipe) ou `"soi"` (chacun pour soi : dans chaque suite, `Partie.brouiller` défait et refait au sort, par la politique, les programmes encore cachés des autres joueurs). Rien n'est caché en « tout dire ».
+- `devin` (false) : les suites gardent les vrais dés à venir (valeur de l'information).
+- `reves_par_tour` (null) : taux de rêve imposé, comme le glouton (garde 2 cartes) ; le bot choisit les étapes.
+- `max_options` (24), `ignorer` ([]) : au-delà de 24 options, le choix de la politique et un tirage ; types de décision laissés à la politique.
+
+Coût mesuré (un cœur) : une suite coûte 5 à 15 ms ; une partie de duo demande 100 à 150 recherches. Ordres de grandeur avec le moteur 1.7 : MC 32 environ 30 s (v1) à 1 min 30 (v2) par partie de duo, MC 128 environ 2 min (v1) à 6 min (v2). La batterie complète (96 200 parties) est hors de portée du bot fort : la phase 3 utilise un plan réduit.
+
+Le moteur : `Partie.copie(..., brouiller=siège)` et `Partie.brouiller(siège)` (information cachée) ; une partie dont un bot copie la partie (`reprises = True`) prend une photo à chaque segment ; la prévision est gardée pendant les rondes de traces et la défense par zone pendant une prévision (deux fois plus rapide, mêmes résultats).
+
 ## Faire évoluer
 
 **Une nouvelle itération des règles.** Créer `maquettes/v3.json` avec `"base": "v2"` et

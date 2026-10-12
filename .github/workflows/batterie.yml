@@ -27,13 +27,13 @@ permissions:
 
 jobs:
   preparer:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       lots: ${{ steps.matrice.outputs.lots }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Contrôler les paramètres et préparer la matrice
@@ -71,15 +71,15 @@ jobs:
 
   lot:
     needs: preparer
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 340
     strategy:
       fail-fast: false
       matrix:
         lot: ${{ fromJSON(needs.preparer.outputs.lots) }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Jouer le lot
@@ -92,7 +92,7 @@ jobs:
           ARGS=(--echelle "$ECHELLE" --lot "$LOT/$LOTS" --sortie lots)
           if [ -n "$SEULEMENT" ]; then ARGS+=(--seulement $SEULEMENT); fi
           python -m foret.batterie phase1 "${ARGS[@]}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: batterie-lot-${{ matrix.lot }}
           path: lots/
@@ -101,7 +101,7 @@ jobs:
 
   fusion:
     needs: lot
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     concurrency:
       group: publication-resultats
@@ -109,11 +109,11 @@ jobs:
     permissions:
       contents: write        # pour publier le rapport sur la branche « resultats »
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: batterie-lot-*
           path: lots
@@ -159,7 +159,7 @@ jobs:
           git add "$DEST"
           git commit -q -m "Batterie (échelle ${ECHELLE}, ${LOTS} lots), run ${RUN}"
           git push origin resultats
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: batterie-rapport-${{ github.run_number }}
           path: |

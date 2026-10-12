@@ -6,7 +6,7 @@ Ce dépôt réunit deux choses :
 - **les documents de conception** : les idées, les maquettes de règles, le plan de travail et les bilans ;
 - **le moteur de simulation** `foret` : il joue les règles sans interface, avec des joueurs virtuels, pour trouver les failles des règles et mesurer les variantes.
 
-Où en est le projet (12 oct. 2026) : la phase 1 du plan d'action est terminée (moteur 1.5, batterie d'évaluation validée ; moteur 1.6 : la batterie tourne par lots sur GitHub). La phase 2 commence : un joueur virtuel fort, avec les grosses campagnes jouées sur GitHub Actions.
+Où en est le projet (13 oct. 2026) : les phases 1 (mesures) et 2 (le bot fort, moteur 1.7) sont faites. La phase 3 (diagnostic de la v1 et options de la v2) attend la validation du bot fort par l'auteur. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
 
 ## Carte du dépôt
 
@@ -49,6 +49,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Moteur v1 : conformité et campagne de référence](projet/4-bilans/moteur-v1-conformite.md) | L'audit règle par règle, v0 contre v1 |
 | | [Phase 1 : avancement](projet/4-bilans/phase1-avancement.md) | Copie d'état, communication, v2 dans le moteur |
 | | [Batterie d'évaluation (phase 1)](projet/4-bilans/batterie-evaluation-phase1.md) | **Le livrable de la phase 1** : les mesures, les témoins, les verdicts |
+| | [Bots : échelle et validation (phase 2)](projet/4-bilans/bots-echelle-validation.md) | **Le livrable de la phase 2** : le bot fort, l'échelle des bots, défendre ou rêver, le devin, le chef unique |
 
 Les fichiers HTML s'ouvrent dans un navigateur, après téléchargement. Les documents citent parfois des chemins `claude/moteur-v1/…` : ce sont ceux de l'espace de travail d'origine, qui correspondent ici à la racine du dépôt.
 
