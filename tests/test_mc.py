@@ -46,3 +46,37 @@ def test_le_halving_compare_les_options_sur_les_memes_des(monkeypatch):
 def test_savoir_autre_que_tout_refuse_pour_l_instant():
     with pytest.raises(ValueError):
         MonteCarlo(0, savoir="soi")
+
+
+@pytest.mark.parametrize("taux, attendu", [(0.0, 0), (1.0, 1)])
+def test_taux_de_reve_impose(taux, attendu):
+    """Comme le glouton à taux fixe (mesure reve_fixe) : 0 ou 1 carte en rêve par tour et par joueur,
+    en gardant 2 cartes en main (paramètre garde du glouton) : au plus 3 rêves avec une main de 5."""
+    peuples = ("mammiferes", "humains")
+    bots = [fabriquer({"type": "mc", "params": {"budget": 2, "reves_par_tour": taux}}, 40 + i) for i in range(2)]
+    b = Partie(charger("v1", "defaut"), list(peuples), bots, graine=4).jouer()
+    tours = b["tour"]
+    for n in b["cartes_en_reve_par_siege"]:
+        assert n <= min(attendu * tours, 3)
+        if attendu:
+            assert n >= min(tours, 3) - 1   # au plus un rêve manqué (étape laissée vide, fin en cours de tour)
+        else:
+            assert n == 0
+
+
+def test_le_devin_joue_les_suites_avec_les_vrais_des(monkeypatch):
+    vus = []
+    bot = MonteCarlo(0, budget=2, devin=True)
+
+    class Copie:
+        def jouer(self):
+            return {"resultat": 1, "foret_initiale": 2}
+
+    class Faux:
+        sieges = [0, 1]
+
+        def copie(self, bots, hasard, imposer):
+            vus.append(hasard)
+            return Copie()
+    assert bot._suite(Faux(), 0, 123) == 0.5
+    assert vus == [None]

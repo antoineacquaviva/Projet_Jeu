@@ -45,38 +45,77 @@ class MonteCarlo(Bot):
         "politique": {"type": "glouton"},  # bot qui joue les suites, à tous les sièges
         "savoir": "tout",                 # "tout" = mode central (voir plus haut)
         "ignorer": [],                    # types de décision laissés à la politique (sans recherche)
-        "max_options": 24,                # au-delà, on ne garde que les options préférées de la politique… et des tirages
+        "max_options": 24,                # au-delà : le choix de la politique et des options tirées au sort
+        "devin": False,                   # True : les suites gardent les vrais dés à venir (valeur de l'information)
+        "reves_par_tour": None,           # None = libre ; un nombre = taux de rêve imposé (comme le glouton)
     }
 
     def __init__(self, graine=0, **params):
         super().__init__(graine, **params)
         if self.p["savoir"] != "tout":
             raise ValueError("savoir : seul « tout » (mode central) est codé pour l'instant")
-        self._politique = fabriquer(self.p["politique"], graine)
+        pol = dict(self.p["politique"])
+        if self.p["reves_par_tour"] is not None and pol.get("type") == "glouton":
+            pol["params"] = dict(pol.get("params", {}), reves_par_tour=self.p["reves_par_tour"])
+        self._spec_politique = pol
+        self._politique = fabriquer(pol, graine)
+        self._quota = {}                  # (lignée, tour, siège) -> [rêves à faire, rêves faits]
         self.stats = {"recherches": 0, "suites": 0}
 
     # ------------------------------------------------------------------ décision
     def decider(self, partie, siege, type_, options, ctx):
-        if len(options) == 1:
-            return options[0]
-        if type_ in self.p["ignorer"]:
-            return self._politique.decider(partie, siege, type_, options, ctx)
-        cands = list(range(len(options)))
-        if len(cands) > self.p["max_options"]:
-            cands = self._preselection(partie, siege, type_, options, ctx)
-        return options[self._halving(partie, cands)]
+        permis = list(range(len(options)))
+        if type_ == "programmer_mode" and self.p["reves_par_tour"] is not None:
+            permis = self._taux_impose(partie, siege, options, ctx["etape"])
+        choix = options[self._chercher(partie, siege, type_, options, ctx, permis)]
+        if type_ == "programmer_mode" and choix == "reve" and self.p["reves_par_tour"] is not None:
+            self._quota[(partie.lignee, partie.tour, siege.idx)][1] += 1
+        return choix
 
-    def _preselection(self, partie, siege, type_, options, ctx):
-        """Trop d'options pour le budget : le choix de la politique, plus des options tirées au sort."""
+    def _taux_impose(self, partie, siege, options, etape):
+        """Taux de rêve imposé : k rêves ce tour (k tiré comme le glouton), aux étapes que le bot choisit."""
+        cle = (partie.lignee, partie.tour, siege.idx)
+        if cle not in self._quota:
+            r = self.p["reves_par_tour"]
+            k = int(r) + (1 if self.rng.random() < r - int(r) else 0)
+            garde = self._spec_politique.get("params", {}).get("garde", 2)
+            k = max(0, min(k, len(siege.main) - garde))        # comme le glouton : garder des cartes
+            self._quota = {cle: [k, 0]}
+        k, faits = self._quota[cle]
+        tous = list(range(len(options)))
+        if "reve" not in options:
+            return tous
+        reve = options.index("reve")
+        reste = k - faits
+        etapes_restantes = sum(1 for e in partie.etapes if e >= etape)
+        if reste <= 0:
+            return [i for i in tous if i != reve] or tous
+        if reste >= etapes_restantes:
+            return [reve]
+        return tous
+
+    def _chercher(self, partie, siege, type_, options, ctx, permis):
+        """Rend l'indice (dans options, la liste du moteur) de l'option retenue parmi permis."""
+        if len(permis) == 1:
+            return permis[0]
+        if type_ in self.p["ignorer"] or len(permis) > self.p["max_options"]:
+            prefere = self._prefere(partie, siege, type_, options, ctx, permis)
+            if type_ in self.p["ignorer"]:
+                return prefere
+            autres = [i for i in permis if i != prefere]
+            self.rng.shuffle(autres)
+            permis = [prefere] + autres[:self.p["max_options"] - 1]
+        return self._halving(partie, permis)
+
+    def _prefere(self, partie, siege, type_, options, ctx, permis):
+        """Le choix de la politique (sans effet sur les compteurs), s'il est permis ; sinon le premier permis."""
         with partie.muet():
-            prefere = _indice(options, self._politique.decider(partie, siege, type_, options, ctx)) or 0
-        autres = [i for i in range(len(options)) if i != prefere]
-        self.rng.shuffle(autres)
-        return [prefere] + autres[:self.p["max_options"] - 1]
+            i = _indice(options, self._politique.decider(partie, siege, type_, options, ctx))
+        return i if i in permis else permis[0]
 
     def _suite(self, partie, i, hasard):
-        bots = [fabriquer(self.p["politique"], hasard + k) for k in range(len(partie.sieges))]
-        c = partie.copie(bots=bots, hasard=hasard, imposer=[i])
+        bots = [fabriquer(self._spec_politique, hasard + k) for k in range(len(partie.sieges))]
+        c = partie.copie(bots=bots, hasard=None if self.p["devin"] else hasard, imposer=[i])
         b = c.jouer()
         self.stats["suites"] += 1
         return b["resultat"] / b["foret_initiale"]
