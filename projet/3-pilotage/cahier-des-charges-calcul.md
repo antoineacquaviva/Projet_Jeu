@@ -1,6 +1,6 @@
 # Cahier des charges : environnement de calcul pour les campagnes de simulation
 
-*11 oct. 2026, mis à jour le 12 oct. (banc d'essai de la famille A, section 9 ; **décision de l'auteur, section 10 : la famille A, les exécuteurs de GitHub**). Document de travail pour choisir où faire tourner les campagnes du plan d'action (décision 5 : « développement dans l'environnement d'analyse, grosses campagnes hébergées ailleurs, solution cloud de capacité adaptée et de faible coût »).*
+*11 oct. 2026, mis à jour le 12 oct. (dépôt réorganisé et moteur 1.5 sur GitHub, section 10 ; banc d'essai de la famille A, section 9 ; **décision de l'auteur, section 10 : la famille A, les exécuteurs de GitHub**). Document de travail pour choisir où faire tourner les campagnes du plan d'action (décision 5 : « développement dans l'environnement d'analyse, grosses campagnes hébergées ailleurs, solution cloud de capacité adaptée et de faible coût »).*
 *Voir aussi : « Plan d'action - évaluer et explorer les variantes par la simulation » (sections 4.5, 5 et 6).*
 
 ## En bref
@@ -146,7 +146,7 @@ Parades retenues :
 Le code du moteur, les règles et les résultats sont visibles de tous. C'était déjà le cas depuis le banc d'essai du 12 oct.
 
 ### Reste à faire
-1. **Mettre le dépôt à jour.** Il contient le moteur 1.0, avec les lots ; il faut y porter le moteur 1.5 sans perdre les lots, et vérifier les deux workflows.
+1. ~~**Mettre le dépôt à jour.**~~ *Fait le 12 oct. au soir* : le dépôt, recréé par l'auteur, contient le moteur 1.5 avec les lots, les documents de conception (`projet/`) et une carte du dépôt (README). Workflow Tests au vert ; une campagne d'essai (« reference » sur la v2, échelle 0,05, 4 lots : 2 485 parties, 0 erreur, 33 parties par seconde et par cœur) a publié sa synthèse sur la branche `resultats`.
 2. **Découper la batterie en lots** (`python -m foret.batterie` par lots, puis fusion), pour qu'elle tourne sur GitHub.
 3. **Ajouter la reprise** : ne relancer que les lots manquants.
 4. **Mesurer une campagne complète sur GitHub**, puis, en phase 2, la vitesse du bot fort. Cela fixe la taille des lots (moins de 6 heures chacun).
