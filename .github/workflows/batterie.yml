@@ -1,0 +1,169 @@
+name: Batterie
+
+# Lancement manuel : onglet Actions -> Batterie -> Run workflow.
+# La batterie d'évaluation (foret.batterie) est découpée en N lots joués en parallèle
+# (un exécuteur de 4 cœurs par lot), puis fusionnée en un rapport. Le rapport, le
+# tableau de bord et un résumé sont publiés sur la branche « resultats »,
+# dans batterie/run<n>/.
+
+on:
+  workflow_dispatch:
+    inputs:
+      echelle:
+        description: "Échelle : 0.05 = 5 % des parties, 1 = la batterie entière (environ 96 000 parties)"
+        default: "1"
+        required: true
+      lots:
+        description: "Nombre de lots en parallèle (1 à 256)"
+        default: "8"
+        required: true
+      seulement:
+        description: "Configurations à jouer, séparées par des espaces (vide = tout le plan)"
+        default: ""
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  preparer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      lots: ${{ steps.matrice.outputs.lots }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Contrôler les paramètres et préparer la matrice
+        id: matrice
+        env:
+          ECHELLE: ${{ inputs.echelle }}
+          LOTS: ${{ inputs.lots }}
+          SEULEMENT: ${{ inputs.seulement }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, re, sys
+          from foret.batterie import PLAN
+          echelle, lots, seulement = os.environ["ECHELLE"], os.environ["LOTS"], os.environ["SEULEMENT"].split()
+          try:
+              if float(echelle) <= 0:
+                  raise ValueError
+          except ValueError:
+              sys.exit(f"échelle invalide : {echelle!r}")
+          if not re.fullmatch(r"[0-9]+", lots) or not 1 <= int(lots) <= 256:
+              sys.exit(f"nombre de lots invalide (1 à 256) : {lots!r}")
+          inconnues = [s for s in seulement if s not in PLAN]
+          if inconnues:
+              sys.exit(f"configuration(s) inconnue(s) : {inconnues} ; connues : {list(PLAN)}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("lots=" + json.dumps(list(range(int(lots)))) + "\n")
+          EOF
+      - name: Taille du plan
+        env:
+          ECHELLE: ${{ inputs.echelle }}
+          SEULEMENT: ${{ inputs.seulement }}
+        run: |
+          ARGS=(--echelle "$ECHELLE")
+          if [ -n "$SEULEMENT" ]; then ARGS+=(--seulement $SEULEMENT); fi
+          python -m foret.batterie plan "${ARGS[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  lot:
+    needs: preparer
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        lot: ${{ fromJSON(needs.preparer.outputs.lots) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Jouer le lot
+        env:
+          ECHELLE: ${{ inputs.echelle }}
+          LOTS: ${{ inputs.lots }}
+          SEULEMENT: ${{ inputs.seulement }}
+          LOT: ${{ matrix.lot }}
+        run: |
+          ARGS=(--echelle "$ECHELLE" --lot "$LOT/$LOTS" --sortie lots)
+          if [ -n "$SEULEMENT" ]; then ARGS+=(--seulement $SEULEMENT); fi
+          python -m foret.batterie phase1 "${ARGS[@]}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: batterie-lot-${{ matrix.lot }}
+          path: lots/
+          retention-days: 3
+          if-no-files-found: error
+
+  fusion:
+    needs: lot
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: publication-resultats
+      cancel-in-progress: false
+    permissions:
+      contents: write        # pour publier le rapport sur la branche « resultats »
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: batterie-lot-*
+          path: lots
+          merge-multiple: true
+      - name: Fusionner les lots et calculer le rapport
+        env:
+          ECHELLE: ${{ inputs.echelle }}
+          SEULEMENT: ${{ inputs.seulement }}
+        run: |
+          ARGS=(--echelle "$ECHELLE" --fusionner lots)
+          if [ -n "$SEULEMENT" ]; then ARGS+=(--seulement $SEULEMENT); fi
+          python -m foret.batterie phase1 "${ARGS[@]}"
+      - name: Tableau de bord
+        # Il demande les quatre configurations principales (v1_g1, v1_g0, v2_g1, v2_g0).
+        continue-on-error: true
+        run: |
+          python outils/tableau/construire.py resultats/batterie/rapport.json /tmp/donnees.json
+          python -c "g=open('outils/tableau/gabarit.html',encoding='utf-8').read();d=open('/tmp/donnees.json',encoding='utf-8').read();open('resultats/batterie/tableau.html','w',encoding='utf-8').write(g.replace('__DONNEES__',d))"
+      - name: Résumé
+        run: python scripts/resume_batterie.py resultats/batterie >> "$GITHUB_STEP_SUMMARY"
+      - name: Publier le rapport sur la branche « resultats »
+        env:
+          RUN: ${{ github.run_number }}
+          ECHELLE: ${{ inputs.echelle }}
+          LOTS: ${{ inputs.lots }}
+        run: |
+          DEST="batterie/run${RUN}"
+          mkdir -p "/tmp/publie/$DEST"
+          cp resultats/batterie/rapport.json resultats/batterie/fusion.json "/tmp/publie/$DEST/"
+          if [ -f resultats/batterie/tableau.html ]; then cp resultats/batterie/tableau.html "/tmp/publie/$DEST/"; fi
+          python scripts/resume_batterie.py resultats/batterie > "/tmp/publie/$DEST/resume.md"
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin resultats >/dev/null 2>&1; then
+            git fetch --depth=1 origin resultats
+            git checkout -q -B resultats FETCH_HEAD
+          else
+            git checkout -q --orphan resultats
+            git rm -rq --cached . ; git clean -fdq -e lots -e resultats
+          fi
+          mkdir -p "$DEST"
+          cp -r "/tmp/publie/$DEST/." "$DEST/"
+          git add "$DEST"
+          git commit -q -m "Batterie (échelle ${ECHELLE}, ${LOTS} lots), run ${RUN}"
+          git push origin resultats
+      - uses: actions/upload-artifact@v4
+        with:
+          name: batterie-rapport-${{ github.run_number }}
+          path: |
+            resultats/batterie/rapport.json
+            resultats/batterie/fusion.json
+            resultats/batterie/tableau.html
+          retention-days: 30

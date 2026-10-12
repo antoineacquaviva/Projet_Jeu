@@ -75,8 +75,8 @@ Cette liste décrit des familles, pas des fournisseurs recommandés.
 ## 5. Ce qu'il faudra adapter côté code (indépendamment du fournisseur)
 *État au 12 oct. 2026.*
 - **Écriture au fil de l'eau** : *partiel.* Chaque lot écrit ses résultats dans un fichier compressé, mais garde les parties de son lot en mémoire jusqu'à la fin. Suffisant tant qu'un lot reste de quelques dizaines de milliers de parties ; à reprendre si les lots grossissent.
-- **Découpage en lots** reproductibles : *fait dans le dépôt GitHub (moteur 1.0).* `--lot i/n` joue les parties d'indice i, i+n, i+2n… ; les lots ont la même taille à une partie près. **À reporter dans le moteur 1.5 et à étendre à la batterie (`foret.batterie`).**
-- **Reprise** : au redémarrage, ne rejouer que les lots absents : *à faire.*
+- **Découpage en lots** reproductibles : *fait dans le dépôt GitHub (moteur 1.0).* `--lot i/n` joue les parties d'indice i, i+n, i+2n… ; les lots ont la même taille à une partie près. Reporté dans le moteur 1.5 et étendu à la batterie le 12 oct. au soir (moteur 1.6 : `python -m foret.batterie phase1 --lot i/n`, puis `--fusionner`, et le workflow **Batterie**).
+- **Reprise** : *fait pour la batterie (moteur 1.6).* Un lot déjà écrit pour le même plan n'est pas rejoué ; la fusion nomme les lots manquants. Sur GitHub, « Re-run failed jobs » ne rejoue que les lots en échec et la fusion. Pour les campagnes de `foret.sim`, la fusion nomme aussi les lots manquants.
 - **Un lanceur unique**, identique en local et dans le cloud : *fait pour GitHub* (`python -m foret.sim`, mêmes options en local et dans le workflow).
 - **Agrégation** des lots en une synthèse : *fait* (`--fusionner`).
 
@@ -147,6 +147,6 @@ Le code du moteur, les règles et les résultats sont visibles de tous. C'était
 
 ### Reste à faire
 1. ~~**Mettre le dépôt à jour.**~~ *Fait le 12 oct. au soir* : le dépôt, recréé par l'auteur, contient le moteur 1.5 avec les lots, les documents de conception (`projet/`) et une carte du dépôt (README). Workflow Tests au vert ; une campagne d'essai (« reference » sur la v2, échelle 0,05, 4 lots : 2 485 parties, 0 erreur, 33 parties par seconde et par cœur) a publié sa synthèse sur la branche `resultats`.
-2. **Découper la batterie en lots** (`python -m foret.batterie` par lots, puis fusion), pour qu'elle tourne sur GitHub.
-3. **Ajouter la reprise** : ne relancer que les lots manquants.
+2. ~~**Découper la batterie en lots**~~ *Fait le 12 oct. au soir (moteur 1.6)* : `python -m foret.batterie phase1 --lot i/n`, `--fusionner`, et le workflow **Batterie**. Les lots fusionnés donnent exactement le rapport d'un calcul d'un seul tenant.
+3. ~~**Ajouter la reprise**~~ *Fait pour la batterie* : un lot déjà fait n'est pas rejoué ; sur GitHub, « Re-run failed jobs ».
 4. **Mesurer une campagne complète sur GitHub**, puis, en phase 2, la vitesse du bot fort. Cela fixe la taille des lots (moins de 6 heures chacun).

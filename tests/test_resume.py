@@ -36,3 +36,18 @@ def test_le_resume_affiche_le_reveil():
                                 capture_output=True, text=True, check=True).stdout
     assert "Réveil %" in sortie
     assert "40,0" in sortie
+
+
+def test_le_resume_de_batterie_lit_le_rapport_publie():
+    """scripts/resume_batterie.py (workflow Batterie) sur le rapport de la phase 1 conservé dans resultats/."""
+    import shutil
+    with tempfile.TemporaryDirectory() as d:
+        shutil.copy(os.path.join(RACINE, "resultats", "batterie_phase1_rapport.json"), os.path.join(d, "rapport.json"))
+        with open(os.path.join(d, "fusion.json"), "w", encoding="utf-8") as f:
+            json.dump({"lots": 8, "echelle": 1.0, "duree_max_s": 300, "duree_cumulee_coeurs_s": 9000,
+                       "parties_par_s_par_coeur": 10.7}, f)
+        sortie = subprocess.run([sys.executable, os.path.join(RACINE, "scripts", "resume_batterie.py"), d],
+                                capture_output=True, text=True, check=True).stdout
+    assert "**Lots** : 8" in sortie
+    assert "Témoins réussis** : 21 sur 26" in sortie
+    assert "| V2, sans rêve |" in sortie and "0,03" in sortie

@@ -39,7 +39,7 @@ from .decisions import DECISIONS
 from .observateurs import Compteur, Journal
 from .plans import Plans
 
-VERSION = "1.5"
+VERSION = "1.6"
 CENTRE = 7                      # R5.1 : 2-6 éveil, 7 centre, 8-12 rêve
 CASES = tuple(range(2, 13))
 PROBA = {c: (6 - abs(c - CENTRE)) / 36 for c in CASES}

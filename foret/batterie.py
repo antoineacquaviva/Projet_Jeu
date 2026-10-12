@@ -4,6 +4,8 @@
     python -m foret.batterie phase1 --echelle 0.2    # essai rapide (20 % des parties)
     python -m foret.batterie phase1 --seulement v2_g1   # une seule configuration du plan
     python -m foret.batterie rapport                 # recalcule rapport.json depuis les parties enregistrées
+    python -m foret.batterie phase1 --lot 3/8 --sortie lots/   # le lot 3 sur 8 (machines différentes)
+    python -m foret.batterie phase1 --fusionner lots/          # rassemble les lots, puis le rapport
 
 Une *configuration* = une maquette, une variante, un bot. Pour chacune, les
 expériences du plan :
@@ -18,10 +20,18 @@ expériences du plan :
 Les parties brutes vont dans resultats/batterie/<config>/<expérience>.jsonl ;
 le rapport (mesures, bandes, témoins) dans resultats/batterie/rapport.json.
 
+Par lots (moteur 1.6) : toutes les parties du plan sont numérotées dans un ordre
+fixe ; le lot i sur n joue les parties i, i+n, i+2n… La fusion vérifie que les
+lots viennent du même plan (même empreinte) et qu'aucune partie ne manque ni
+n'est en double, puis écrit exactement les fichiers qu'aurait écrits un calcul
+d'un seul tenant : le rapport est le même.
+
 Toutes les mesures faites avec le glouton sont des *indices* sur le jeu : elles
 décrivent aussi le glouton. Le plan les refera avec le bot fort (phase 2).
 """
 import argparse
+import glob
+import gzip
 import itertools
 import json
 import os
@@ -182,6 +192,25 @@ def _signature(taches_exp):
     return h.hexdigest()[:16]
 
 
+def _ordre(t):
+    """Les parties les plus longues d'abord (plus de peuples, sondes), pour répartir la charge."""
+    return -len(t["peuples"]) - (8 if t.get("sondes") else 0)
+
+
+def _ecrire_experience(dossier, nom, exp, liste, res, echelle, duree, **extra):
+    """Écrit <exp>.jsonl (une ligne par partie, dans l'ordre de _ordre) et <exp>.meta.json.
+    liste : les tâches dans l'ordre du plan (pour l'empreinte) ; res : les résultats dans l'ordre trié."""
+    with open(os.path.join(dossier, f"{exp}.jsonl"), "w", encoding="utf-8") as f:
+        for r in res:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    maquette, variante, bot, exps, n = PLAN[nom]
+    with open(os.path.join(dossier, f"{exp}.meta.json"), "w", encoding="utf-8") as f:
+        json.dump(dict({"nom": nom, "experience": exp, "maquette": maquette, "variante": variante, "bot": bot,
+                        "echelle": echelle, "parties": len(liste), "erreurs": sum("erreur" in r for r in res),
+                        "duree_s": round(duree), "moteur": VERSION, "signature": _signature(liste)}, **extra),
+                  f, ensure_ascii=False, indent=1)
+
+
 def executer(nom, echelle=1.0, processus=None, bavard=True):
     """Joue les parties d'une configuration, expérience par expérience, et les
     enregistre (resultats/batterie/<config>/<expérience>.jsonl, une ligne par
@@ -205,24 +234,138 @@ def executer(nom, echelle=1.0, processus=None, bavard=True):
                 if bavard:
                     print(f"{nom}/{exp} : déjà fait ({len(liste)} parties)", flush=True)
                 continue
-        liste = sorted(liste, key=lambda t: (-len(t["peuples"]) - (8 if t.get("sondes") else 0)))
+        triee = sorted(liste, key=_ordre)
         t0 = time.time()
         if bavard:
             print(f"{nom}/{exp} : {len(liste)} parties…", flush=True)
         with Pool(processus or os.cpu_count()) as pool:
-            res = pool.map(jouer, liste, chunksize=8)
-        with open(chemin, "w", encoding="utf-8") as f:
-            for r in res:
-                f.write(json.dumps(r, ensure_ascii=False) + "\n")
-        maquette, variante, bot, exps, n = PLAN[nom]
-        with open(meta, "w", encoding="utf-8") as f:
-            json.dump({"nom": nom, "experience": exp, "maquette": maquette, "variante": variante, "bot": bot,
-                       "echelle": echelle, "parties": len(liste), "erreurs": sum("erreur" in r for r in res),
-                       "duree_s": round(time.time() - t0), "moteur": VERSION, "signature": sig},
-                      f, ensure_ascii=False, indent=1)
+            res = pool.map(jouer, triee, chunksize=8)
+        _ecrire_experience(dossier, nom, exp, liste, res, echelle, time.time() - t0)
         if bavard:
             print(f"{nom}/{exp} : {len(liste)} parties en {time.time() - t0:.0f} s, "
                   f"{sum('erreur' in r for r in res)} erreurs", flush=True)
+
+
+# --------------------------------------------------------------------------- par lots
+def plan_complet(noms, echelle=1.0):
+    """Toutes les parties du plan, dans un ordre fixe : [(configuration, tâche)]."""
+    return [(nom, t) for nom in noms for t in taches(nom, echelle)]
+
+
+def empreinte_plan(noms, echelle=1.0):
+    """Empreinte du plan complet et du moteur : deux lots ne se fusionnent que si elle est la même."""
+    import hashlib
+    h = hashlib.sha256(VERSION.encode())
+    for nom, t in plan_complet(noms, echelle):
+        h.update(nom.encode())
+        h.update(json.dumps(t, sort_keys=True, ensure_ascii=False).encode())
+    return h.hexdigest()[:16]
+
+
+def nom_lot(i, n):
+    return f"batterie_lot_{i:04d}_sur_{n:04d}"
+
+
+def jouer_lot(i, n, noms=None, echelle=1.0, sortie="lots", processus=None, bavard=True):
+    """Joue le lot i (de 0 à n-1) sur n : les parties d'indice i, i+n, i+2n… du plan.
+    Écrit <sortie>/batterie_lot_XXXX_sur_YYYY.jsonl.gz (une ligne {"n": indice, "r": résultat})
+    et .meta.json. Un lot déjà écrit pour le même plan n'est pas rejoué."""
+    if not 0 <= i < n:
+        raise SystemExit(f"lot {i}/{n} invalide : il faut 0 <= i < n")
+    noms = list(noms or PLAN)
+    tout = plan_complet(noms, echelle)
+    emp = empreinte_plan(noms, echelle)
+    base = os.path.join(sortie, nom_lot(i, n))
+    if os.path.exists(base + ".meta.json") and os.path.exists(base + ".jsonl.gz"):
+        with open(base + ".meta.json", encoding="utf-8") as f:
+            if json.load(f).get("empreinte") == emp:
+                if bavard:
+                    print(f"lot {i}/{n} : déjà fait ({base}.jsonl.gz)", flush=True)
+                return None
+    indices = sorted(range(i, len(tout), n), key=lambda k: _ordre(tout[k][1]))
+    if bavard:
+        print(f"batterie, lot {i}/{n} : {len(indices)} parties sur {len(tout)} ({len(noms)} configurations)",
+              flush=True)
+    t0 = time.time()
+    with Pool(processus or os.cpu_count()) as pool:
+        res = pool.map(jouer, [tout[k][1] for k in indices], chunksize=4)
+    duree = time.time() - t0
+    os.makedirs(sortie, exist_ok=True)
+    with gzip.open(base + ".jsonl.gz", "wt", encoding="utf-8", compresslevel=6) as f:
+        for k, r in zip(indices, res):
+            f.write(json.dumps({"n": k, "r": r}, ensure_ascii=False, separators=(",", ":")) + "\n")
+    meta = {"lot": i, "sur": n, "parties": len(indices), "total": len(tout), "noms": noms, "echelle": echelle,
+            "moteur": VERSION, "empreinte": emp, "duree_s": round(duree, 2), "coeurs": processus or os.cpu_count(),
+            "erreurs": sum("erreur" in r for r in res)}
+    with open(base + ".meta.json", "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False)
+    if bavard:
+        cps = len(indices) / duree / meta["coeurs"] if duree else 0
+        print(f"lot {i}/{n} terminé en {duree:.0f} s ({cps:.1f} parties/s/cœur), {meta['erreurs']} erreurs ; "
+              f"{base}.jsonl.gz", flush=True)
+    return meta
+
+
+def fusionner(dossier, noms=None, echelle=1.0, bavard=True):
+    """Rassemble les lots de <dossier> dans resultats/batterie/<config>/<expérience>.jsonl,
+    comme un calcul d'un seul tenant. Refuse des lots d'un autre plan, un lot manquant
+    ou en double, une partie manquante ou en double. Rend le résumé de la fusion."""
+    noms = list(noms or PLAN)
+    tout = plan_complet(noms, echelle)
+    emp = empreinte_plan(noms, echelle)
+    metas = []
+    for chemin in sorted(glob.glob(os.path.join(dossier, "**", "batterie_lot_*.meta.json"), recursive=True)):
+        with open(chemin, encoding="utf-8") as f:
+            metas.append(json.load(f))
+    if not metas:
+        raise SystemExit(f"aucun lot de batterie dans {dossier}")
+    autres = [m for m in metas if m.get("empreinte") != emp]
+    if autres:
+        raise SystemExit(f"{len(autres)} lot(s) d'un autre plan (configurations, échelle ou moteur différents) : "
+                         f"empreinte {autres[0].get('empreinte')} au lieu de {emp}")
+    sur = {m["sur"] for m in metas}
+    if len(sur) > 1:
+        raise SystemExit(f"lots de découpages différents : {sorted(sur)}")
+    n = sur.pop()
+    vus = Counter(m["lot"] for m in metas)
+    doubles = sorted(k for k, c in vus.items() if c > 1)
+    manquants = [k for k in range(n) if k not in vus]
+    if doubles or manquants:
+        raise SystemExit(f"fusion impossible : lots manquants {manquants or 'aucun'}, en double {doubles or 'aucun'} "
+                         f"(sur {n}). Rejouer seulement les lots manquants : --lot <i>/{n}")
+    par_indice = {}
+    for chemin in sorted(glob.glob(os.path.join(dossier, "**", "batterie_lot_*.jsonl.gz"), recursive=True)):
+        with gzip.open(chemin, "rt", encoding="utf-8") as f:
+            for ligne in f:
+                d = json.loads(ligne)
+                if d["n"] in par_indice:
+                    raise SystemExit(f"partie {d['n']} présente deux fois : {chemin}")
+                par_indice[d["n"]] = d["r"]
+    absentes = [k for k in range(len(tout)) if k not in par_indice]
+    if absentes or len(par_indice) != len(tout):
+        raise SystemExit(f"fusion impossible : {len(absentes)} partie(s) manquante(s) sur {len(tout)}, "
+                         f"{len(par_indice) - len(tout) + len(absentes)} en trop")
+    groupes = defaultdict(list)
+    for k, (nom, t) in enumerate(tout):
+        groupes[(nom, t["exp"])].append(k)
+    duree_cum = sum(m["duree_s"] * m["coeurs"] for m in metas)
+    for (nom, exp), ks in groupes.items():
+        dossier_c = os.path.join(DOSSIER, nom)
+        os.makedirs(dossier_c, exist_ok=True)
+        liste = [tout[k][1] for k in ks]
+        triee = sorted(ks, key=lambda k: _ordre(tout[k][1]))
+        _ecrire_experience(dossier_c, nom, exp, liste, [par_indice[k] for k in triee], echelle, 0, lots=n)
+    resume = {"lots": n, "parties": len(tout), "erreurs": sum("erreur" in r for r in par_indice.values()),
+              "duree_max_s": round(max(m["duree_s"] for m in metas)), "duree_cumulee_coeurs_s": round(duree_cum),
+              "parties_par_s_par_coeur": round(len(tout) / duree_cum, 1) if duree_cum else None,
+              "configurations": noms, "echelle": echelle, "empreinte": emp, "moteur": VERSION}
+    os.makedirs(DOSSIER, exist_ok=True)
+    with open(os.path.join(DOSSIER, "fusion.json"), "w", encoding="utf-8") as f:
+        json.dump(resume, f, ensure_ascii=False, indent=1)
+    if bavard:
+        print(f"{n} lots fusionnés : {len(tout)} parties, {resume['erreurs']} en erreur, "
+              f"{resume['parties_par_s_par_coeur']} parties/s/cœur ; {DOSSIER}", flush=True)
+    return resume
 
 
 def _migrer(dossier, echelle=1.0):
@@ -745,19 +888,43 @@ def rapport(noms=None):
     return rap
 
 
+def _lot(texte):
+    try:
+        i, n = (int(x) for x in texte.split("/"))
+    except ValueError:
+        raise argparse.ArgumentTypeError("format attendu : i/n (par exemple 3/8)")
+    return i, n
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("quoi", choices=["phase1", "rapport", "plan"])
     ap.add_argument("--echelle", type=float, default=1.0)
     ap.add_argument("--seulement", nargs="+")
     ap.add_argument("--processus", type=int)
+    ap.add_argument("--lot", type=_lot, help="phase1 : ne jouer que le lot i/n et l'écrire dans --sortie")
+    ap.add_argument("--fusionner", metavar="DOSSIER", help="phase1 : rassembler les lots de ce dossier, puis le rapport")
+    ap.add_argument("--sortie", default="lots", help="dossier des lots (avec --lot)")
     a = ap.parse_args()
     noms = a.seulement or list(PLAN)
+    inconnus = [x for x in noms if x not in PLAN]
+    if inconnus:
+        ap.error(f"configuration(s) inconnue(s) : {', '.join(inconnus)}")
+    if (a.lot or a.fusionner) and a.quoi != "phase1":
+        ap.error("--lot et --fusionner vont avec phase1")
+    if a.lot and a.fusionner:
+        ap.error("--lot et --fusionner s'excluent")
     if a.quoi == "plan":
         for nom in noms:
             print(f"{nom:28s} {len(taches(nom, a.echelle)):6d} parties")
+        print(f"{'total':28s} {len(plan_complet(noms, a.echelle)):6d} parties")
         return
-    if a.quoi == "phase1":
+    if a.lot:
+        jouer_lot(a.lot[0], a.lot[1], noms, a.echelle, a.sortie, a.processus)
+        return
+    if a.fusionner:
+        fusionner(a.fusionner, noms, a.echelle)
+    elif a.quoi == "phase1":
         for nom in noms:
             executer(nom, a.echelle, a.processus)
     r = rapport()

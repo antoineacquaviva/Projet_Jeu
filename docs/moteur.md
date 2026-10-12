@@ -204,6 +204,8 @@ python -m foret.batterie plan                 # parties par configuration
 python -m foret.batterie phase1               # tout le plan (une expérience déjà faite n'est pas rejouée)
 python -m foret.batterie phase1 --echelle 0.2 # essai
 python -m foret.batterie rapport              # resultats/batterie/rapport.json
+python -m foret.batterie phase1 --lot 3/8 --sortie lots/   # le lot 3 sur 8 (une machine par lot)
+python -m foret.batterie phase1 --fusionner lots/          # rassemble les lots, puis le rapport
 python -m foret.conformite --mesures          # chaque mesure : code, test, témoin
 ```
 
@@ -231,6 +233,18 @@ Nouveautés du moteur, sans effet sur les règles (référence publiée rejouée
 - B2 : synergie = duos qui battent leur meilleur peuple seul (vert ≥ 12 sur 15) ; tétraèdre par la
   synergie relative entre duos (`duo_contre_meilleur_seul`, `synergies_relatives`).
 - B3 : siège spectateur tenu par le bot inerte. B1 : bandes gelées (`MESURES`).
+
+### Moteur 1.6 : la batterie par lots (12 oct.)
+Aucune règle ne change. Toutes les parties du plan sont numérotées dans un ordre fixe ; le lot i sur n
+joue les parties i, i+n, i+2n… et les écrit, compressées, dans `<sortie>/batterie_lot_XXXX_sur_YYYY.jsonl.gz`
+(avec un `.meta.json`). La fusion vérifie que tous les lots viennent du même plan (même empreinte :
+configurations, échelle, moteur), qu'aucun lot ni aucune partie ne manque ou n'est en double, puis écrit
+exactement les fichiers d'un calcul d'un seul tenant : le rapport est identique (vérifié sur le petit
+plan de `tests/test_batterie_lots.py`, et à la main sur v1_g1 et v2_g0 à l'échelle 0,05). Un lot déjà
+écrit pour le même plan n'est pas rejoué : relancer la même commande ne refait que les lots manquants.
+Le workflow **Batterie** (`.github/workflows/batterie.yml`) joue les lots en parallèle sur GitHub, fusionne,
+calcule le rapport et le tableau de bord, et les publie sur la branche `resultats` (`batterie/run<n>/`,
+avec un `resume.md` écrit par `scripts/resume_batterie.py`).
 
 ## Faire évoluer
 

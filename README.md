@@ -6,7 +6,7 @@ Ce dépôt réunit deux choses :
 - **les documents de conception** : les idées, les maquettes de règles, le plan de travail et les bilans ;
 - **le moteur de simulation** `foret` : il joue les règles sans interface, avec des joueurs virtuels, pour trouver les failles des règles et mesurer les variantes.
 
-Où en est le projet (12 oct. 2026) : la phase 1 du plan d'action est terminée (moteur 1.5, batterie d'évaluation validée). La phase 2 commence : un joueur virtuel fort, avec les grosses campagnes jouées sur GitHub Actions.
+Où en est le projet (12 oct. 2026) : la phase 1 du plan d'action est terminée (moteur 1.5, batterie d'évaluation validée ; moteur 1.6 : la batterie tourne par lots sur GitHub). La phase 2 commence : un joueur virtuel fort, avec les grosses campagnes jouées sur GitHub Actions.
 
 ## Carte du dépôt
 
@@ -70,6 +70,10 @@ python -m foret.sim reference --echelle 0.05
 python -m foret.batterie phase1
 python -m foret.batterie rapport
 
+# La même batterie par lots (une machine par lot), puis la fusion
+python -m foret.batterie phase1 --lot 0/8 --sortie lots/
+python -m foret.batterie phase1 --fusionner lots/
+
 # Contrôles : conformité règles, nœuds et mesures ↔ code ↔ tests
 python -m foret.conformite
 python -m foret.conformite --v2
@@ -82,9 +86,10 @@ La documentation complète (architecture, maquettes, communication, v2, batterie
 ## Les campagnes sur GitHub Actions
 
 - **Tests** (`tests.yml`) : à chaque envoi, la conformité et les tests tournent sous Python 3.10 et 3.12.
+- **Batterie** (`batterie.yml`) : onglet **Actions** → **Batterie** → **Run workflow**. On choisit l'échelle, le nombre de lots et, si on veut, quelques configurations. Les lots sont joués en parallèle, fusionnés, puis le rapport, le tableau de bord et un résumé sont publiés sur la branche `resultats`, dans `batterie/run<n>/`. Si un lot échoue, « Re-run failed jobs » ne rejoue que lui et la fusion.
 - **Campagne** (`campagne.yml`) : onglet **Actions** → **Campagne** → **Run workflow**. On choisit la campagne (un fichier de `campagnes/`), la maquette, l'échelle et le nombre de lots. Les lots sont joués en parallèle, puis fusionnés. La synthèse est publiée sur la branche [`resultats`](https://github.com/antoineacquaviva/Projet_Jeu/tree/resultats), dans `campagnes/<campagne>_run<n>/`.
 
-Les résultats bruts de la batterie (`resultats/batterie/`, environ 280 Mo) ne sont pas versionnés : `python -m foret.batterie phase1` les régénère à l'identique (graines reproductibles). Le rapport et le tableau de bord qui en sont tirés sont dans `resultats/`.
+Les résultats bruts de la batterie (`resultats/batterie/`, environ 280 Mo) ne sont pas versionnés : `python -m foret.batterie phase1`, ou le workflow Batterie, les régénère à l'identique (graines reproductibles). Le rapport et le tableau de bord qui en sont tirés sont dans `resultats/`.
 
 ## Méthode
 

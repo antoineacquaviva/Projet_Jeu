@@ -92,6 +92,9 @@ jobs:
     needs: lot
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    concurrency:
+      group: publication-resultats
+      cancel-in-progress: false
     permissions:
       contents: write        # pour publier la synthèse sur la branche « resultats »
     steps:

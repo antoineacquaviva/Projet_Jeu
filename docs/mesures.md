@@ -1,4 +1,4 @@
-# Batterie d'évaluation : les mesures (moteur 1.5)
+# Batterie d'évaluation : les mesures (moteur 1.6)
 
 *Bandes définitives depuis le 12 oct. (décisions B1 à B4 de l'auteur, fin de la phase 1) : les bandes provisoires de la phase 0 sont gelées, sauf la synergie, redéfinie (B2).*
 
@@ -86,4 +86,7 @@ python -m foret.batterie plan                      # nombre de parties par confi
 python -m foret.batterie phase1                    # tout (reprend les configurations déjà faites)
 python -m foret.batterie phase1 --echelle 0.2      # essai
 python -m foret.batterie rapport                   # resultats/batterie/rapport.json
+python -m foret.batterie phase1 --lot 3/8 --sortie lots/   # le lot 3 sur 8 (une machine par lot)
+python -m foret.batterie phase1 --fusionner lots/          # rassemble les lots, puis le rapport
 ```
+Sur GitHub : onglet **Actions** → **Batterie** → **Run workflow** (échelle, nombre de lots, configurations).
