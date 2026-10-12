@@ -228,6 +228,8 @@ class Partie(Plans):
         self.jetons = {}                  # uid Machine -> [siège ou None, siège ou None] (R2.5, partage)
         self.programmes_vus = {}          # tout dire : siège -> [(étape, carte, mode)] déjà programmés
         self._provisoire = None           # programmes faits pendant le conseil, avant leur dépôt
+        self._memo_prevision = None       # prévision gardée pendant les rondes de traces
+        self._memo_defense = None         # défense par zone, gardée pendant une prévision
         self.plateau = Plateau(M["plateau"])
         self._init_machines()
         self._init_piste()
@@ -598,6 +600,11 @@ class Partie(Plans):
 
     def defense(self, z):
         """R4.2 Opportunisme : pions de présence visibles."""
+        memo = self._memo_defense
+        if memo is not None:
+            if z not in memo:
+                memo[z] = sum(c[z] for p, c in self.presence.items() if not self.invisible(p))
+            return memo[z]
         return sum(c[z] for p, c in self.presence.items() if not self.invisible(p))
 
     def zones_presence(self, peuple):
@@ -1095,7 +1102,13 @@ class Partie(Plans):
         [v2:C2b] partage, [v2:C2c] parle, [v2:C2d] aucun_signe, [v2:C2e] tout_dire."""
         c = self.R["communication"]
         if c in ("traces", "parle", "tout_dire"):
-            self._poser_traces(c)
+            # Les traces ne changent ni le plateau ni la piste (elles ne comptent pas comme
+            # des présences) : la prévision est la même pendant toutes les rondes (calcul gardé).
+            self._memo_prevision = {}
+            try:
+                self._poser_traces(c)
+            finally:
+                self._memo_prevision = None
         elif c == "partage":
             self._partager()
 
@@ -1823,6 +1836,22 @@ class Partie(Plans):
     def prevision(self):
         """Probabilité qu'un ordre abatte dans chaque zone à la prochaine étape,
         sans tenir compte des barrages. Lecture sans effet de bord."""
+        memo = getattr(self, "_memo_prevision", None)
+        if memo is not None:
+            if "p" not in memo:
+                memo["p"] = self._prevision()
+            return Counter(memo["p"])
+        return self._prevision()
+
+    def _prevision(self):
+        # pendant une prévision (lecture sans effet de bord), la présence ne bouge pas
+        self._memo_defense = {}
+        try:
+            return self._prevision_brute()
+        finally:
+            self._memo_defense = None
+
+    def _prevision_brute(self):
         if self.R["plan"] != "une_piste":
             return self.prevision_v2()
         menace = Counter()
