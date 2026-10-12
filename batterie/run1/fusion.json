@@ -1,0 +1,33 @@
+{
+ "lots": 16,
+ "parties": 96200,
+ "erreurs": 0,
+ "duree_max_s": 95,
+ "duree_cumulee_coeurs_s": 5364,
+ "parties_par_s_par_coeur": 17.9,
+ "configurations": [
+  "v1_g1",
+  "v1_g0",
+  "v2_g1",
+  "v2_g0",
+  "v1_une_tactique",
+  "v2_une_tactique",
+  "v1_des_fixes",
+  "v2_des_fixes",
+  "v1_sans_apprentissage",
+  "v2_sans_apprentissage",
+  "v1_essoufflement",
+  "v2_essoufflement",
+  "v1_assaut",
+  "v1_hanter_illimite",
+  "v2_hanter_illimite",
+  "v1_mammiferes_sans_pouvoir",
+  "v1_spectateur",
+  "v1_sans_pouvoirs",
+  "v1_barrage_v0",
+  "v1_reves_illimites"
+ ],
+ "echelle": 1.0,
+ "empreinte": "3d0d976afafe13f1",
+ "moteur": "1.6"
+}

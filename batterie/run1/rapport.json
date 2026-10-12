@@ -1,0 +1,9601 @@
+{
+ "moteur": "1.6",
+ "date": "2026-10-12 20:09",
+ "mesures": {
+  "robustesse": {
+   "niveau": 1,
+   "objectif": "filtre",
+   "nom": "Robustesse : parties plantées et incohérences",
+   "etiquette": "mesure",
+   "unite": "par partie",
+   "bot": "tous",
+   "vert": [
+    0,
+    0
+   ],
+   "rouge": [
+    [
+     1e-09,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "retour_v0_barrage",
+     "glouton",
+     "incoherences > 0 (barrage contourné)"
+    ]
+   ]
+  },
+  "lacunes": {
+   "niveau": 1,
+   "objectif": "filtre",
+   "nom": "Lacunes : questions que la table se posera",
+   "etiquette": "mesure",
+   "unite": "par partie",
+   "bot": "tous",
+   "descriptive": true,
+   "temoins": []
+  },
+  "couverture": {
+   "niveau": 1,
+   "objectif": "filtre",
+   "nom": "Couverture : part des parties où chaque règle s'applique",
+   "etiquette": "indice",
+   "unite": "% des parties",
+   "bot": "glouton",
+   "descriptive": true,
+   "temoins": [
+    [
+     "v1",
+     "sans_pouvoirs",
+     "glouton",
+     "aucun pouvoir appliqué"
+    ]
+   ]
+  },
+  "charge": {
+   "niveau": 1,
+   "objectif": "filtre",
+   "nom": "Charge de règles : départages et cas particuliers",
+   "etiquette": "mesure",
+   "unite": "par partie",
+   "bot": "tous",
+   "descriptive": true,
+   "temoins": []
+  },
+  "duree": {
+   "niveau": 1,
+   "objectif": "lecture",
+   "nom": "Durée estimée",
+   "etiquette": "indice",
+   "unite": "min",
+   "bot": "glouton",
+   "descriptive": true,
+   "temoins": []
+  },
+  "attente": {
+   "niveau": 1,
+   "objectif": "lecture",
+   "nom": "Attente et densité",
+   "etiquette": "indice",
+   "unite": "% du temps ; décisions par heure",
+   "bot": "glouton",
+   "descriptive": true,
+   "temoins": []
+  },
+  "forcees": {
+   "niveau": 1,
+   "objectif": "lecture",
+   "nom": "Choix forcés",
+   "etiquette": "indice",
+   "unite": "% des décisions",
+   "bot": "glouton",
+   "descriptive": true,
+   "temoins": []
+  },
+  "concentration": {
+   "niveau": 2,
+   "objectif": "1",
+   "nom": "Concentration de la menace sur les k zones les plus menacées",
+   "etiquette": "mesure",
+   "unite": "%",
+   "bot": "tous",
+   "vert": [
+    50,
+    80
+   ],
+   "rouge": [
+    [
+     null,
+     34.999999999
+    ],
+    [
+     90.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_une_tactique",
+     "glouton",
+     "rouge (résolue)"
+    ],
+    [
+     "v2",
+     "temoin_une_tactique",
+     "glouton",
+     "rouge (résolue)"
+    ]
+   ]
+  },
+  "surprise": {
+   "niveau": 2,
+   "objectif": "1",
+   "nom": "Surprise : ordres hors des deux tactiques les plus probables",
+   "etiquette": "mesure",
+   "unite": "%",
+   "bot": "tous",
+   "vert": [
+    20,
+    45
+   ],
+   "rouge": [
+    [
+     null,
+     9.999999999
+    ],
+    [
+     60.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_une_tactique",
+     "glouton",
+     "rouge (aucune surprise)"
+    ],
+    [
+     "v2",
+     "temoin_une_tactique",
+     "glouton",
+     "rouge (aucune surprise)"
+    ]
+   ]
+  },
+  "tape_taupe": {
+   "niveau": 3,
+   "objectif": "1",
+   "nom": "Tape-taupe : écart entre parer la menace la plus probable et le bot fort",
+   "etiquette": "indice",
+   "unite": "points de forêt",
+   "bot": "fort",
+   "temoins": []
+  },
+  "reve_fixe": {
+   "niveau": 2,
+   "objectif": "2",
+   "nom": "Meilleur taux de rêve fixe",
+   "etiquette": "indice",
+   "unite": "cartes par tour",
+   "bot": "glouton (puis fort)",
+   "categorique": true,
+   "temoins": [
+    [
+     "v1",
+     "retour_v0_reves_illimites",
+     "glouton",
+     "rouge (le maximum)"
+    ]
+   ]
+  },
+  "gain_libre": {
+   "niveau": 2,
+   "objectif": "2",
+   "nom": "Gain du bot libre sur le meilleur taux fixe",
+   "etiquette": "indice",
+   "unite": "%",
+   "bot": "fort",
+   "temoins": []
+  },
+  "dilemmes": {
+   "niveau": 3,
+   "objectif": "2",
+   "nom": "Dilemmes parmi les décisions non forcées",
+   "etiquette": "indice",
+   "unite": "%",
+   "bot": "fort",
+   "temoins": []
+  },
+  "shapley": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Contributions de Shapley des six peuples (rapport à la moyenne)",
+   "etiquette": "mesure",
+   "unite": "× la moyenne",
+   "bot": "glouton (puis fort)",
+   "temoins": [
+    [
+     "v1",
+     "temoin_hanter_illimite",
+     "glouton",
+     "rouge (les entités gagnent seules)"
+    ],
+    [
+     "v2",
+     "temoin_hanter_illimite",
+     "glouton",
+     "rouge (les entités gagnent seules)"
+    ],
+    [
+     "v1",
+     "temoin_mammiferes_sans_pouvoir",
+     "glouton",
+     "mammifères sous la moyenne"
+    ]
+   ]
+  },
+  "synergies": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Synergies : duos qui battent leur meilleur peuple seul (décision B2)",
+   "etiquette": "mesure",
+   "unite": "duos sur 15",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    12,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     7.999999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_hanter_illimite",
+     "glouton",
+     "rouge (un peuple suffit : saturation)"
+    ]
+   ]
+  },
+  "pire_table": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Pire table / meilleure table (duos et trios)",
+   "etiquette": "mesure",
+   "unite": "%",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    70,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     49.999999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_hanter_illimite",
+     "glouton",
+     "hors du vert"
+    ]
+   ]
+  },
+  "spectateur": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Aucun spectateur : perte quand un peuple ne fait rien",
+   "etiquette": "indice",
+   "unite": "× l'impact moyen",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    0.5,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     0.249999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_spectateur",
+     "glouton",
+     "rouge (les humains ne font rien)"
+    ]
+   ]
+  },
+  "coordination": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Coordination : part de l'écart « aucun signe → tout dire » récupérée",
+   "etiquette": "indice",
+   "unite": "%",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    40,
+    80
+   ],
+   "rouge": [
+    [
+     null,
+     19.999999999
+    ],
+    [
+     95.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "comm_aucun_signe",
+     "glouton",
+     "0 % par définition"
+    ],
+    [
+     "v1",
+     "comm_tout_dire",
+     "glouton",
+     "100 % par définition"
+    ]
+   ]
+  },
+  "chef": {
+   "niveau": 3,
+   "objectif": "3",
+   "nom": "Gain d'un chef unique sur « chacun pour soi »",
+   "etiquette": "indice",
+   "unite": "%",
+   "bot": "fort",
+   "temoins": []
+  },
+  "fins": {
+   "niveau": 2,
+   "objectif": "lecture",
+   "nom": "Équilibre des fins",
+   "etiquette": "indice",
+   "unite": "% des parties",
+   "bot": "glouton (puis fort)",
+   "descriptive": true,
+   "temoins": [
+    [
+     "v1",
+     "retour_v0_reves_illimites",
+     "glouton rêve 3",
+     "la nuit disparaît"
+    ]
+   ]
+  },
+  "tactiques": {
+   "niveau": 2,
+   "objectif": "lecture",
+   "nom": "Tactiques et Machines du Méchant : réussite et dégâts",
+   "etiquette": "indice",
+   "unite": "% réussis ; forêts par ordre",
+   "bot": "glouton (puis fort)",
+   "descriptive": true,
+   "temoins": [
+    [
+     "v1",
+     "temoin_une_tactique",
+     "glouton",
+     "une seule tactique tirée"
+    ]
+   ]
+  },
+  "predictibilite": {
+   "niveau": 2,
+   "objectif": "4",
+   "nom": "Partie jouée d'avance : issue prédite à la fin du tour 2",
+   "etiquette": "mesure",
+   "unite": "% (exactitude équilibrée)",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    null,
+    65
+   ],
+   "rouge": [
+    [
+     80.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_des_fixes",
+     "glouton",
+     "rouge (tout est joué)"
+    ],
+    [
+     "v2",
+     "temoin_des_fixes",
+     "glouton",
+     "rouge (tout est joué)"
+    ]
+   ]
+  },
+  "incertitude": {
+   "niveau": 2,
+   "objectif": "4",
+   "nom": "Incertitude restante au début du dernier tiers",
+   "etiquette": "mesure",
+   "unite": "part de l'incertitude initiale",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    0.5,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     0.249999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_des_fixes",
+     "glouton",
+     "rouge (plus rien à décider)"
+    ],
+    [
+     "v2",
+     "temoin_des_fixes",
+     "glouton",
+     "rouge (plus rien à décider)"
+    ]
+   ]
+  },
+  "fins_precoces": {
+   "niveau": 2,
+   "objectif": "4",
+   "nom": "Fins avant la mi-partie (tours 1 à 3)",
+   "etiquette": "mesure",
+   "unite": "% des parties",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    null,
+    20
+   ],
+   "rouge": [
+    [
+     40.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "retour_v0_reves_illimites",
+     "glouton rêve 3",
+     "rouge"
+    ]
+   ]
+  },
+  "menace_croissante": {
+   "niveau": 2,
+   "objectif": "4",
+   "nom": "Menace croissante : dernier tiers / premier tiers",
+   "etiquette": "mesure",
+   "unite": "rapport",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    1,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     0.6666666656666667
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_essoufflement",
+     "glouton",
+     "rouge (le Méchant s'essouffle)"
+    ],
+    [
+     "v2",
+     "temoin_essoufflement",
+     "glouton",
+     "rouge (le Méchant s'essouffle)"
+    ]
+   ]
+  },
+  "plancher": {
+   "niveau": 2,
+   "objectif": "garde-fou",
+   "nom": "Plancher : forêt gardée par le pire décile",
+   "etiquette": "mesure",
+   "unite": "%",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    40,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     24.999999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_assaut",
+     "glouton",
+     "plus bas que la v1"
+    ]
+   ]
+  },
+  "echelle_bots": {
+   "niveau": 2,
+   "objectif": "garde-fou",
+   "nom": "Échelle des bots : aléatoire < glouton (< MCTS en phase 2)",
+   "etiquette": "mesure",
+   "unite": "points de forêt",
+   "bot": "aléatoire, glouton",
+   "categorique": true,
+   "phase2": true,
+   "temoins": []
+  },
+  "apprentissage": {
+   "niveau": 3,
+   "objectif": "lecture",
+   "nom": "Le Méchant apprend-il cette équipe ? (pistes finales)",
+   "etiquette": "indice",
+   "unite": "cases",
+   "bot": "glouton (puis fort)",
+   "descriptive": true,
+   "temoins": [
+    [
+     "v1",
+     "temoin_sans_apprentissage",
+     "glouton",
+     "distance nulle"
+    ],
+    [
+     "v2",
+     "temoin_sans_apprentissage",
+     "glouton",
+     "distance nulle"
+    ]
+   ]
+  }
+ },
+ "configs": {
+  "v1_g1": {
+   "config": "v1_g1",
+   "maquette": "v1",
+   "variante": "defaut",
+   "bot": "glouton reves_par_tour=1.0",
+   "parties_jouees": 21440,
+   "erreurs": 0,
+   "parties": 2100,
+   "foret_pct": 88.2,
+   "foret_ic95": 0.51,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 6.3,
+    "principales": {
+     "egalite_machine": 2.83,
+     "egalite_critere": 1.82,
+     "represailles_sans_attaque": 0.64,
+     "ordre_contre_immobile": 0.5,
+     "percee_au_bout": 0.23,
+     "represailles_ancienne": 0.14
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "oubli_tactique": 100.0,
+    "esprits_carte": 100.0,
+    "ordres": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_echoues": 83.3,
+    "ordres_reussis": 80.7,
+    "presages": 73.9,
+    "coupe_hors_cible": 66.8,
+    "bloquee_par_barrage": 63.1,
+    "organes_neutralises": 52.9,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "apprentissage_sans_mouvement": 40.2,
+    "reves_tires": 33.8,
+    "tromperies": 27.8,
+    "sabotage_sans_effet": 25.4,
+    "echec_bloque_par_esprit": 24.2,
+    "immobilisations": 22.6,
+    "presage_detourne": 18.8,
+    "renforts": 16.5,
+    "reparer_sans_cible": 15.0,
+    "tir_a_la_corde": 12.6,
+    "voir_detourne": 11.4,
+    "reparations": 11.2,
+    "machines_hs": 9.3,
+    "zones_rasees": 5.6,
+    "machines_egarees": 3.1,
+    "esprits_egarer": 3.1,
+    "abattage_zone_rasee": 1.7,
+    "pouvoir_hanter": 1.3,
+    "ordres_hantes": 1.3,
+    "renfort_sans_reserve": 0.7,
+    "coupe_en_chemin_cible_barree": 0.6,
+    "machine_hs_avant_ordre": 0.0,
+    "tenir_zones": 0.0
+   },
+   "charge": {
+    "par_partie": 5.78
+   },
+   "duree": {
+    "minutes": 24.3,
+    "minutes_q90": 28.0,
+    "tours": 2.65,
+    "decisions_non_forcees_par_joueur": 38.4
+   },
+   "attente": {
+    "attente_pct": 10.5,
+    "decisions_par_heure": 93.4
+   },
+   "forcees": {
+    "total_pct": 5.5,
+    "par_type": {
+     "action": 57.8,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 33.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 97.5,
+    "ic95": 0.21,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 39.5,
+    "ordres": 10394,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "sommeil": 94.9,
+    "nuit": 5.0,
+    "silence": 0.2,
+    "tour_moyen": 2.65
+   },
+   "fins_precoces": {
+    "valeur": 94.1,
+    "verdict": "rouge"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.82,
+    "machines_actives": 0.95,
+    "valeur": 0.82,
+    "parties_au_tour_5_pct": 5.5,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 61.9,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 30.8,
+      "reussis_pct": 56.1,
+      "forets_par_ordre": 0.56
+     },
+     "Cupidite": {
+      "tires_pct": 22.0,
+      "reussis_pct": 46.9,
+      "forets_par_ordre": 0.47
+     },
+     "Represailles": {
+      "tires_pct": 20.9,
+      "reussis_pct": 43.2,
+      "forets_par_ordre": 0.43
+     },
+     "Percee": {
+      "tires_pct": 16.1,
+      "reussis_pct": 84.1,
+      "forets_par_ordre": 0.84
+     },
+     "Reparer": {
+      "tires_pct": 6.0,
+      "reussis_pct": 47.4,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 4.2,
+      "reussis_pct": 96.5,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Abatteuse": {
+      "tires_pct": 66.0,
+      "reussis_pct": 40.5,
+      "forets_par_ordre": 0.41
+     },
+     "Bouteur": {
+      "tires_pct": 30.2,
+      "reussis_pct": 86.9,
+      "forets_par_ordre": 0.87
+     },
+     "Pelleteuse": {
+      "tires_pct": 3.6,
+      "reussis_pct": 75.4,
+      "forets_par_ordre": 0.75
+     },
+     "Debardeuse": {
+      "tires_pct": 0.1,
+      "reussis_pct": 76.9,
+      "forets_par_ordre": 0.77
+     },
+     "Broyeuse": {
+      "tires_pct": 0.0,
+      "reussis_pct": 100.0,
+      "forets_par_ordre": 1.0
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 6.52,
+    "entre_equipes": 5.71,
+    "meme_equipe": 5.75,
+    "propre_a_l_equipe": -0.04
+   },
+   "predictibilite": {
+    "valeur": 99.0,
+    "auc": 0.98,
+    "fin_avant_tour_3_pct": 1.7,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.03,
+    "variance_initiale": 170.5,
+    "variance_tour_5": 4.6,
+    "finies_avant_tour_5_pct": 81.7,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 78.5,
+     "pire": [
+      [
+       "insectes",
+       "mammiferes"
+      ],
+      70.6
+     ],
+     "meilleure": [
+      [
+       "oiseaux",
+       "reptiles"
+      ],
+      89.8
+     ]
+    },
+    "trios": {
+     "rapport": 92.3,
+     "pire": [
+      [
+       "entites",
+       "insectes",
+       "mammiferes"
+      ],
+      87.5
+     ],
+     "meilleure": [
+      [
+       "humains",
+       "oiseaux",
+       "reptiles"
+      ],
+      94.8
+     ]
+    },
+    "valeur": 78.5,
+    "verdict": "vert"
+   },
+   "shapley": {
+    "rapports": {
+     "oiseaux": 1.24,
+     "mammiferes": 0.69,
+     "reptiles": 1.36,
+     "insectes": 0.82,
+     "humains": 1.04,
+     "entites": 0.86
+    },
+    "ic95": {
+     "oiseaux": [
+      1.19,
+      1.29
+     ],
+     "mammiferes": [
+      0.65,
+      0.73
+     ],
+     "reptiles": [
+      1.31,
+      1.41
+     ],
+     "insectes": [
+      0.77,
+      0.87
+     ],
+     "humains": [
+      1.0,
+      1.08
+     ],
+     "entites": [
+      0.81,
+      0.9
+     ]
+    },
+    "points": {
+     "oiseaux": 15.66,
+     "mammiferes": 8.71,
+     "reptiles": 17.15,
+     "insectes": 10.32,
+     "humains": 13.19,
+     "entites": 10.87
+    },
+    "v_vide": 23.3,
+    "v_tous": 99.2,
+    "ecart_max": 0.36,
+    "verdict": "orange",
+    "effet_par_taille": {
+     "2": {
+      "oiseaux": 8.4,
+      "mammiferes": -6.4,
+      "reptiles": 4.2,
+      "insectes": -4.4,
+      "humains": 0.7,
+      "entites": -2.5
+     },
+     "3": {
+      "oiseaux": 3.2,
+      "mammiferes": -1.5,
+      "reptiles": 1.4,
+      "insectes": -1.3,
+      "humains": -0.6,
+      "entites": -1.3
+     }
+    }
+   },
+   "synergies": {
+    "valeur": 15,
+    "verdict": "vert",
+    "duo_bat_son_meilleur_seul": {
+     "nombre": 15,
+     "detail": [
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       33.9
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       32.5
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       32.5
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       32.0
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       27.9
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       27.1
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       25.0
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       23.9
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       23.0
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       21.2
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       20.2
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       16.3
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       14.2
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       14.2
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       10.7
+      ]
+     ]
+    },
+    "tetraedre": {
+     "complets_dans_le_premier_tiers": 2,
+     "duos_complets": [
+      [
+       "entites",
+       "reptiles"
+      ],
+      [
+       "humains",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "oiseaux"
+      ]
+     ],
+     "classement": [
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       2.5
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       2.0
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       1.7
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       1.6
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       0.7
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       0.7
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       0.4
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       0.0
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -0.1
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -0.6
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.7
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -1.2
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -1.2
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -1.7
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -4.3
+      ]
+     ],
+     "verdict": "orange"
+    },
+    "additive": {
+     "positives": 9,
+     "classement": [
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       14.9
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       10.1
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       9.1
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       8.1
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       6.8
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       4.6
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       4.1
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       3.3
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       0.5
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.3
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -6.4
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -9.1
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -10.3
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -10.4
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -16.2
+      ]
+     ]
+    },
+    "solo": {
+     "oiseaux": 53.9,
+     "mammiferes": 40.4,
+     "reptiles": 69.7,
+     "insectes": 46.7,
+     "humains": 55.9,
+     "entites": 47.8
+    }
+   },
+   "valeurs_equipes": {
+    "entites": 47.8,
+    "humains": 55.9,
+    "insectes": 46.7,
+    "mammiferes": 40.4,
+    "oiseaux": 53.9,
+    "reptiles": 69.7,
+    "entites/humains": 80.9,
+    "entites/insectes": 75.7,
+    "entites/mammiferes": 74.9,
+    "entites/oiseaux": 86.4,
+    "entites/reptiles": 83.9,
+    "humains/insectes": 78.9,
+    "humains/mammiferes": 77.1,
+    "humains/oiseaux": 89.8,
+    "humains/reptiles": 86.0,
+    "insectes/mammiferes": 70.6,
+    "insectes/oiseaux": 86.3,
+    "insectes/reptiles": 83.9,
+    "mammiferes/oiseaux": 85.9,
+    "mammiferes/reptiles": 80.4,
+    "oiseaux/reptiles": 89.8,
+    "entites/humains/insectes": 89.5,
+    "entites/humains/mammiferes": 88.7,
+    "entites/humains/oiseaux": 94.8,
+    "entites/humains/reptiles": 93.1,
+    "entites/insectes/mammiferes": 87.5,
+    "entites/insectes/oiseaux": 94.1,
+    "entites/insectes/reptiles": 92.8,
+    "entites/mammiferes/oiseaux": 94.1,
+    "entites/mammiferes/reptiles": 92.8,
+    "entites/oiseaux/reptiles": 94.3,
+    "humains/insectes/mammiferes": 88.5,
+    "humains/insectes/oiseaux": 94.8,
+    "humains/insectes/reptiles": 93.1,
+    "humains/mammiferes/oiseaux": 94.7,
+    "humains/mammiferes/reptiles": 93.1,
+    "humains/oiseaux/reptiles": 94.8,
+    "insectes/mammiferes/oiseaux": 94.1,
+    "insectes/mammiferes/reptiles": 92.9,
+    "insectes/oiseaux/reptiles": 94.1,
+    "mammiferes/oiseaux/reptiles": 94.1,
+    "entites/humains/insectes/mammiferes": 90.1,
+    "entites/humains/insectes/oiseaux": 96.6,
+    "entites/humains/insectes/reptiles": 94.2,
+    "entites/humains/mammiferes/oiseaux": 96.6,
+    "entites/humains/mammiferes/reptiles": 94.2,
+    "entites/humains/oiseaux/reptiles": 96.6,
+    "entites/insectes/mammiferes/oiseaux": 96.6,
+    "entites/insectes/mammiferes/reptiles": 94.2,
+    "entites/insectes/oiseaux/reptiles": 96.6,
+    "entites/mammiferes/oiseaux/reptiles": 96.6,
+    "humains/insectes/mammiferes/oiseaux": 96.6,
+    "humains/insectes/mammiferes/reptiles": 94.2,
+    "humains/insectes/oiseaux/reptiles": 96.6,
+    "humains/mammiferes/oiseaux/reptiles": 96.6,
+    "insectes/mammiferes/oiseaux/reptiles": 96.6,
+    "entites/humains/insectes/mammiferes/oiseaux": 96.4,
+    "entites/humains/insectes/mammiferes/reptiles": 95.5,
+    "entites/humains/insectes/oiseaux/reptiles": 97.1,
+    "entites/humains/mammiferes/oiseaux/reptiles": 97.1,
+    "entites/insectes/mammiferes/oiseaux/reptiles": 96.8,
+    "humains/insectes/mammiferes/oiseaux/reptiles": 97.1,
+    "entites/humains/insectes/mammiferes/oiseaux/reptiles": 99.2
+   },
+   "spectateur": {
+    "impact_points": {
+     "oiseaux": 21.4,
+     "mammiferes": 13.0,
+     "reptiles": 20.3,
+     "insectes": 14.1,
+     "humains": 17.3,
+     "entites": 14.9
+    },
+    "rapports": {
+     "oiseaux": 1.27,
+     "mammiferes": 0.77,
+     "reptiles": 1.21,
+     "insectes": 0.84,
+     "humains": 1.03,
+     "entites": 0.88
+    },
+    "valeur": 0.77,
+    "verdict": "vert",
+    "au_hasard": {
+     "impact_points": {
+      "oiseaux": 19.0,
+      "mammiferes": 6.9,
+      "reptiles": 15.8,
+      "insectes": 11.5,
+      "humains": 14.1,
+      "entites": 9.8
+     },
+     "rapports": {
+      "oiseaux": 1.48,
+      "mammiferes": 0.53,
+      "reptiles": 1.23,
+      "insectes": 0.9,
+      "humains": 1.1,
+      "entites": 0.76
+     },
+     "valeur": 0.53,
+     "verdict": "vert"
+    }
+   },
+   "reve_fixe": {
+    "par_taux": {
+     "0.0": 67.7,
+     "0.25": 67.7,
+     "0.5": 77.0,
+     "0.75": 82.9,
+     "1.0": 87.5
+    },
+    "ic95": 1.0,
+    "meilleur": 1.0,
+    "maximum_teste": 1.0,
+    "extremes_aussi_bons": [],
+    "verdict": "rouge"
+   },
+   "coordination": {
+    "annonce": {
+     "aucun_signe": 87.9,
+     "forme": 87.9,
+     "tout_dire": 87.9,
+     "ecart": 0.0,
+     "marge": 1.02,
+     "part": null,
+     "verdict": "non mesurable"
+    },
+    "complet": {
+     "aucun_signe": 87.9,
+     "forme": 87.9,
+     "tout_dire": 87.4,
+     "ecart": -0.56,
+     "marge": 1.03,
+     "part": null,
+     "verdict": "non mesurable"
+    }
+   },
+   "echelle_bots": {
+    "aleatoire": 49.3,
+    "glouton": 87.9,
+    "marche": 38.6,
+    "marge": 1.03,
+    "verdict": "vert"
+   }
+  },
+  "v1_g0": {
+   "config": "v1_g0",
+   "maquette": "v1",
+   "variante": "defaut",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 11640,
+   "erreurs": 0,
+   "parties": 2100,
+   "foret_pct": 68.7,
+   "foret_ic95": 0.5,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 18.6,
+    "principales": {
+     "egalite_machine": 8.39,
+     "egalite_critere": 5.12,
+     "represailles_sans_attaque": 1.45,
+     "percee_au_bout": 1.16,
+     "ordre_contre_immobile": 0.64,
+     "egalite_arbitraire": 0.62
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_reussis": 99.7,
+    "ordres_echoues": 99.2,
+    "bloquee_par_barrage": 98.0,
+    "organes_neutralises": 90.8,
+    "coupe_hors_cible": 83.1,
+    "machines_hs": 75.4,
+    "apprentissage_sans_mouvement": 69.8,
+    "zones_rasees": 63.1,
+    "presages": 57.1,
+    "renforts": 49.5,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "tromperies": 42.7,
+    "reparer_sans_cible": 38.0,
+    "sabotage_sans_effet": 37.7,
+    "reparations": 35.5,
+    "pouvoir_hanter": 34.3,
+    "ordres_hantes": 33.1,
+    "machines_egarees": 27.4,
+    "oubli_tactique": 27.4,
+    "esprits_egarer": 27.4,
+    "abattage_zone_rasee": 26.3,
+    "immobilisations": 23.9,
+    "renfort_sans_reserve": 6.2,
+    "coupe_en_chemin_cible_barree": 5.7,
+    "echec_bloque_par_esprit": 5.6,
+    "reves_tires": 3.5,
+    "tenir_zones": 0.8,
+    "tir_a_la_corde": 0.3,
+    "presage_detourne": 0.1,
+    "voir_detourne": 0.0
+   },
+   "charge": {
+    "par_partie": 17.48
+   },
+   "duree": {
+    "minutes": 51.7,
+    "minutes_q90": 59.8,
+    "tours": 5.77,
+    "decisions_non_forcees_par_joueur": 85.3
+   },
+   "attente": {
+    "attente_pct": 20.6,
+    "decisions_par_heure": 99.5
+   },
+   "forcees": {
+    "total_pct": 5.2,
+    "par_type": {
+     "action": 37.7,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 98.9,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 94.7,
+    "ic95": 0.27,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 39.3,
+    "ordres": 33829,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 80.2,
+    "silence": 19.8,
+    "tour_moyen": 5.77
+   },
+   "fins_precoces": {
+    "valeur": 2.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 1.06,
+    "machines_actives": 0.87,
+    "valeur": 0.87,
+    "parties_au_tour_5_pct": 93.7,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 49.5,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 26.7,
+      "reussis_pct": 53.5,
+      "forets_par_ordre": 0.54
+     },
+     "Cupidite": {
+      "tires_pct": 23.5,
+      "reussis_pct": 24.8,
+      "forets_par_ordre": 0.25
+     },
+     "Represailles": {
+      "tires_pct": 21.0,
+      "reussis_pct": 36.0,
+      "forets_par_ordre": 0.36
+     },
+     "Percee": {
+      "tires_pct": 18.2,
+      "reussis_pct": 72.4,
+      "forets_par_ordre": 0.72
+     },
+     "Reparer": {
+      "tires_pct": 6.0,
+      "reussis_pct": 54.9,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 4.6,
+      "reussis_pct": 91.2,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Bouteur": {
+      "tires_pct": 43.6,
+      "reussis_pct": 66.3,
+      "forets_par_ordre": 0.66
+     },
+     "Abatteuse": {
+      "tires_pct": 42.6,
+      "reussis_pct": 23.2,
+      "forets_par_ordre": 0.23
+     },
+     "Pelleteuse": {
+      "tires_pct": 11.5,
+      "reussis_pct": 46.9,
+      "forets_par_ordre": 0.47
+     },
+     "Debardeuse": {
+      "tires_pct": 1.9,
+      "reussis_pct": 62.8,
+      "forets_par_ordre": 0.63
+     },
+     "Broyeuse": {
+      "tires_pct": 0.5,
+      "reussis_pct": 73.2,
+      "forets_par_ordre": 0.73
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 6.99,
+    "entre_equipes": 7.7,
+    "meme_equipe": 7.53,
+    "propre_a_l_equipe": 0.17
+   },
+   "predictibilite": {
+    "valeur": 70.6,
+    "auc": 0.81,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "orange"
+   },
+   "incertitude": {
+    "valeur": 0.21,
+    "variance_initiale": 125.7,
+    "variance_tour_5": 26.3,
+    "finies_avant_tour_5_pct": 5.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 76.9,
+     "pire": [
+      [
+       "insectes",
+       "mammiferes"
+      ],
+      58.4
+     ],
+     "meilleure": [
+      [
+       "oiseaux",
+       "reptiles"
+      ],
+      76.0
+     ]
+    },
+    "trios": {
+     "rapport": 87.2,
+     "pire": [
+      [
+       "humains",
+       "insectes",
+       "oiseaux"
+      ],
+      64.6
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "mammiferes",
+       "oiseaux"
+      ],
+      74.1
+     ]
+    },
+    "valeur": 76.9,
+    "verdict": "vert"
+   },
+   "shapley": {
+    "rapports": {
+     "oiseaux": 1.05,
+     "mammiferes": 0.83,
+     "reptiles": 1.38,
+     "insectes": 0.51,
+     "humains": 1.17,
+     "entites": 1.05
+    },
+    "ic95": {
+     "oiseaux": [
+      0.96,
+      1.14
+     ],
+     "mammiferes": [
+      0.75,
+      0.91
+     ],
+     "reptiles": [
+      1.31,
+      1.46
+     ],
+     "insectes": [
+      0.45,
+      0.61
+     ],
+     "humains": [
+      1.08,
+      1.25
+     ],
+     "entites": [
+      0.96,
+      1.14
+     ]
+    },
+    "points": {
+     "oiseaux": 9.36,
+     "mammiferes": 7.36,
+     "reptiles": 12.31,
+     "insectes": 4.56,
+     "humains": 10.4,
+     "entites": 9.36
+    },
+    "v_vide": 23.3,
+    "v_tous": 76.7,
+    "ecart_max": 0.49,
+    "verdict": "orange",
+    "effet_par_taille": {
+     "2": {
+      "oiseaux": 0.8,
+      "mammiferes": -1.9,
+      "reptiles": 5.6,
+      "insectes": -7.3,
+      "humains": 1.9,
+      "entites": 1.0
+     },
+     "3": {
+      "oiseaux": 0.0,
+      "mammiferes": 2.0,
+      "reptiles": 0.1,
+      "insectes": -2.7,
+      "humains": -1.3,
+      "entites": 1.8
+     }
+    }
+   },
+   "synergies": {
+    "valeur": 4,
+    "verdict": "rouge",
+    "duo_bat_son_meilleur_seul": {
+     "nombre": 4,
+     "detail": [
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       6.3
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       3.3
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       2.7
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       0.6
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -2.9
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -3.1
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -3.9
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -4.8
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -6.2
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -6.7
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -7.0
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -8.4
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -9.8
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -12.5
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -14.8
+      ]
+     ]
+    },
+    "tetraedre": {
+     "complets_dans_le_premier_tiers": 0,
+     "duos_complets": [
+      [
+       "entites",
+       "reptiles"
+      ],
+      [
+       "humains",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "oiseaux"
+      ]
+     ],
+     "classement": [
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       4.7
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       3.1
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       2.5
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       1.6
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       1.4
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       1.3
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       1.2
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.2
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -0.8
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -1.7
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -1.9
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -1.9
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -2.0
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -2.5
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -4.9
+      ]
+     ],
+     "verdict": "orange"
+    },
+    "additive": {
+     "positives": 0,
+     "classement": [
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -22.8
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -25.8
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -29.1
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -33.8
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -35.8
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -36.0
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       -37.6
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -40.3
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -41.0
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -41.7
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -46.7
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -49.0
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -50.6
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -52.1
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -53.6
+      ]
+     ]
+    },
+    "solo": {
+     "oiseaux": 69.2,
+     "mammiferes": 52.4,
+     "reptiles": 79.0,
+     "insectes": 55.2,
+     "humains": 73.0,
+     "entites": 61.5
+    }
+   },
+   "valeurs_equipes": {
+    "entites": 61.5,
+    "humains": 73.0,
+    "insectes": 55.2,
+    "mammiferes": 52.4,
+    "oiseaux": 69.2,
+    "reptiles": 79.0,
+    "entites/humains": 70.2,
+    "entites/insectes": 64.2,
+    "entites/mammiferes": 67.8,
+    "entites/oiseaux": 69.8,
+    "entites/reptiles": 66.6,
+    "humains/insectes": 63.2,
+    "humains/mammiferes": 66.3,
+    "humains/oiseaux": 66.8,
+    "humains/reptiles": 75.2,
+    "insectes/mammiferes": 58.4,
+    "insectes/oiseaux": 60.8,
+    "insectes/reptiles": 64.2,
+    "mammiferes/oiseaux": 64.4,
+    "mammiferes/reptiles": 72.1,
+    "oiseaux/reptiles": 76.0,
+    "entites/humains/insectes": 70.0,
+    "entites/humains/mammiferes": 72.7,
+    "entites/humains/oiseaux": 67.9,
+    "entites/humains/reptiles": 70.6,
+    "entites/insectes/mammiferes": 69.0,
+    "entites/insectes/oiseaux": 71.3,
+    "entites/insectes/reptiles": 67.7,
+    "entites/mammiferes/oiseaux": 74.1,
+    "entites/mammiferes/reptiles": 71.6,
+    "entites/oiseaux/reptiles": 72.5,
+    "humains/insectes/mammiferes": 69.8,
+    "humains/insectes/oiseaux": 64.6,
+    "humains/insectes/reptiles": 66.3,
+    "humains/mammiferes/oiseaux": 67.9,
+    "humains/mammiferes/reptiles": 71.0,
+    "humains/oiseaux/reptiles": 71.2,
+    "insectes/mammiferes/oiseaux": 70.6,
+    "insectes/mammiferes/reptiles": 69.6,
+    "insectes/oiseaux/reptiles": 66.2,
+    "mammiferes/oiseaux/reptiles": 72.2,
+    "entites/humains/insectes/mammiferes": 72.1,
+    "entites/humains/insectes/oiseaux": 70.6,
+    "entites/humains/insectes/reptiles": 71.6,
+    "entites/humains/mammiferes/oiseaux": 72.6,
+    "entites/humains/mammiferes/reptiles": 75.8,
+    "entites/humains/oiseaux/reptiles": 71.4,
+    "entites/insectes/mammiferes/oiseaux": 71.2,
+    "entites/insectes/mammiferes/reptiles": 72.9,
+    "entites/insectes/oiseaux/reptiles": 71.7,
+    "entites/mammiferes/oiseaux/reptiles": 73.5,
+    "humains/insectes/mammiferes/oiseaux": 70.5,
+    "humains/insectes/mammiferes/reptiles": 70.3,
+    "humains/insectes/oiseaux/reptiles": 64.1,
+    "humains/mammiferes/oiseaux/reptiles": 70.6,
+    "insectes/mammiferes/oiseaux/reptiles": 70.5,
+    "entites/humains/insectes/mammiferes/oiseaux": 75.0,
+    "entites/humains/insectes/mammiferes/reptiles": 74.4,
+    "entites/humains/insectes/oiseaux/reptiles": 70.3,
+    "entites/humains/mammiferes/oiseaux/reptiles": 75.0,
+    "entites/insectes/mammiferes/oiseaux/reptiles": 73.6,
+    "humains/insectes/mammiferes/oiseaux/reptiles": 72.5,
+    "entites/humains/insectes/mammiferes/oiseaux/reptiles": 76.7
+   },
+   "spectateur": {
+    "impact_points": {
+     "oiseaux": 3.1,
+     "mammiferes": 0.2,
+     "reptiles": 5.1,
+     "insectes": -3.3,
+     "humains": 2.4,
+     "entites": 2.0
+    },
+    "rapports": {
+     "oiseaux": 1.98,
+     "mammiferes": 0.11,
+     "reptiles": 3.23,
+     "insectes": -2.11,
+     "humains": 1.54,
+     "entites": 1.25
+    },
+    "valeur": -2.11,
+    "verdict": "rouge",
+    "au_hasard": {
+     "impact_points": {
+      "oiseaux": 0.8,
+      "mammiferes": -5.8,
+      "reptiles": 0.9,
+      "insectes": -3.9,
+      "humains": 0.2,
+      "entites": -2.7
+     },
+     "rapports": {
+      "oiseaux": null,
+      "mammiferes": null,
+      "reptiles": null,
+      "insectes": null,
+      "humains": null,
+      "entites": null
+     },
+     "valeur": null,
+     "verdict": "non mesurable"
+    }
+   },
+   "echelle_bots": {
+    "aleatoire": 49.3,
+    "glouton": 69.1,
+    "marche": 19.8,
+    "marge": 1.05,
+    "verdict": "vert"
+   }
+  },
+  "v2_g1": {
+   "config": "v2_g1",
+   "maquette": "v2",
+   "variante": "defaut",
+   "bot": "glouton reves_par_tour=1.0",
+   "parties_jouees": 22840,
+   "erreurs": 0,
+   "parties": 2100,
+   "foret_pct": 89.5,
+   "foret_ic95": 0.29,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 0.9,
+    "principales": {
+     "ordre_contre_immobile": 0.51,
+     "egalite_rayon": 0.39,
+     "unir_sans_hote": 0.0
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste": 100.0,
+    "echanges_piste_machines": 99.5,
+    "ordres_reussis": 96.7,
+    "organes_neutralises": 80.3,
+    "ordres_echoues": 75.1,
+    "presages": 73.7,
+    "entrees": 59.0,
+    "oubli_tactique": 57.1,
+    "esprits_carte": 57.1,
+    "apprentissage_machines_sans_mouvement": 54.8,
+    "bloquee_par_barrage": 52.8,
+    "apprentissage_sans_mouvement": 49.5,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "cercle_carte": 42.9,
+    "embuscades": 42.9,
+    "machines_hs": 38.7,
+    "tromperies": 37.8,
+    "immobilisations": 34.7,
+    "zones_rasees": 21.0,
+    "remorquages": 17.8,
+    "sabotage_sans_effet": 17.2,
+    "reves_tires": 16.7,
+    "echec_bloque_par_esprit": 11.6,
+    "voir_detourne": 9.0,
+    "presage_detourne": 7.8,
+    "tir_a_la_corde": 6.0,
+    "machines_egarees": 2.2,
+    "pouvoir_hanter": 1.4,
+    "ordres_hantes": 1.4,
+    "cercle_egarer": 1.4,
+    "tenir_zones": 1.1,
+    "esprits_egarer": 0.9
+   },
+   "charge": {
+    "par_partie": 0.39
+   },
+   "duree": {
+    "minutes": 23.2,
+    "minutes_q90": 26.6,
+    "tours": 2.48,
+    "decisions_non_forcees_par_joueur": 33.9
+   },
+   "attente": {
+    "attente_pct": 13.5,
+    "decisions_par_heure": 86.8
+   },
+   "forcees": {
+    "total_pct": 0.0,
+    "par_type": {
+     "action": 0.2,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 81.8,
+    "ic95": 0.48,
+    "verdict": "orange"
+   },
+   "surprise": {
+    "valeur": 37.9,
+    "ordres": 9528,
+    "machines": 36.3,
+    "verdict": "vert"
+   },
+   "fins": {
+    "sommeil": 57.1,
+    "reveil": 42.9,
+    "tour_moyen": 2.48
+   },
+   "fins_precoces": {
+    "valeur": 100.0,
+    "verdict": "rouge"
+   },
+   "menace_croissante": {
+    "ordres_reussis": null,
+    "machines_actives": null,
+    "valeur": null,
+    "parties_au_tour_5_pct": 0.0,
+    "verdict": null
+   },
+   "plancher": {
+    "valeur": 76.7,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 29.3,
+      "reussis_pct": 81.0,
+      "forets_par_ordre": 0.52
+     },
+     "Represailles": {
+      "tires_pct": 27.2,
+      "reussis_pct": 49.6,
+      "forets_par_ordre": 0.38
+     },
+     "Cupidite": {
+      "tires_pct": 23.9,
+      "reussis_pct": 71.2,
+      "forets_par_ordre": 0.44
+     },
+     "Percee": {
+      "tires_pct": 19.6,
+      "reussis_pct": 71.0,
+      "forets_par_ordre": 0.63
+     }
+    },
+    "machines": {
+     "Grosse Gueule": {
+      "tires_pct": 30.2,
+      "reussis_pct": 51.6,
+      "forets_par_ordre": 0.36
+     },
+     "Rapiat": {
+      "tires_pct": 29.7,
+      "reussis_pct": 69.2,
+      "forets_par_ordre": 0.68
+     },
+     "Mâchoire": {
+      "tires_pct": 19.2,
+      "reussis_pct": 81.5,
+      "forets_par_ordre": 0.81
+     },
+     "Tonton Débard": {
+      "tires_pct": 13.9,
+      "reussis_pct": 68.3,
+      "forets_par_ordre": 0.09
+     },
+     "Ripaille": {
+      "tires_pct": 7.0,
+      "reussis_pct": 98.1,
+      "forets_par_ordre": 0.12
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 5.64,
+    "entre_equipes": 5.93,
+    "meme_equipe": 5.32,
+    "propre_a_l_equipe": 0.61
+   },
+   "predictibilite": {
+    "valeur": 100.0,
+    "auc": 1.0,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.0,
+    "variance_initiale": 31.4,
+    "variance_tour_5": 0.0,
+    "finies_avant_tour_5_pct": 100.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 85.7,
+     "pire": [
+      [
+       "entites",
+       "insectes"
+      ],
+      80.1
+     ],
+     "meilleure": [
+      [
+       "oiseaux",
+       "reptiles"
+      ],
+      93.4
+     ]
+    },
+    "trios": {
+     "rapport": 95.3,
+     "pire": [
+      [
+       "entites",
+       "insectes",
+       "mammiferes"
+      ],
+      90.5
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "oiseaux",
+       "reptiles"
+      ],
+      94.9
+     ]
+    },
+    "valeur": 85.7,
+    "verdict": "vert"
+   },
+   "shapley": {
+    "rapports": {
+     "oiseaux": 1.12,
+     "mammiferes": 0.94,
+     "reptiles": 1.23,
+     "insectes": 0.84,
+     "humains": 0.97,
+     "entites": 0.89
+    },
+    "ic95": {
+     "oiseaux": [
+      1.1,
+      1.15
+     ],
+     "mammiferes": [
+      0.92,
+      0.97
+     ],
+     "reptiles": [
+      1.2,
+      1.26
+     ],
+     "insectes": [
+      0.83,
+      0.87
+     ],
+     "humains": [
+      0.94,
+      1.0
+     ],
+     "entites": [
+      0.86,
+      0.91
+     ]
+    },
+    "points": {
+     "oiseaux": 13.99,
+     "mammiferes": 11.75,
+     "reptiles": 15.27,
+     "insectes": 10.51,
+     "humains": 12.06,
+     "entites": 11.09
+    },
+    "v_vide": 23.4,
+    "v_tous": 98.1,
+    "ecart_max": 0.23,
+    "verdict": "vert",
+    "effet_par_taille": {
+     "2": {
+      "oiseaux": 2.0,
+      "mammiferes": -0.8,
+      "reptiles": 5.7,
+      "insectes": -3.4,
+      "humains": -0.6,
+      "entites": -2.9
+     },
+     "3": {
+      "oiseaux": 0.4,
+      "mammiferes": 0.1,
+      "reptiles": 1.5,
+      "insectes": -1.1,
+      "humains": -0.0,
+      "entites": -0.9
+     }
+    }
+   },
+   "synergies": {
+    "valeur": 11,
+    "verdict": "orange",
+    "duo_bat_son_meilleur_seul": {
+     "nombre": 11,
+     "detail": [
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       5.6
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       3.6
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       2.7
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       2.0
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       1.7
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       1.7
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       1.4
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       0.3
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       0.2
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       0.1
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       0.1
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       0.0
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -0.5
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -1.3
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -1.5
+      ]
+     ]
+    },
+    "tetraedre": {
+     "complets_dans_le_premier_tiers": 1,
+     "duos_complets": [
+      [
+       "entites",
+       "reptiles"
+      ],
+      [
+       "humains",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "oiseaux"
+      ]
+     ],
+     "classement": [
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       3.1
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       2.9
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       0.8
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       0.6
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -0.2
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.2
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -0.3
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -0.4
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       -0.5
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -0.6
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -0.6
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -0.8
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -0.9
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -1.2
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -1.8
+      ]
+     ],
+     "verdict": "orange"
+    },
+    "additive": {
+     "positives": 0,
+     "classement": [
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -52.5
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -53.0
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -54.0
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -54.2
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -54.3
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -54.4
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -54.8
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -54.9
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -55.1
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -55.8
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -56.1
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       -56.3
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -56.4
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -57.7
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -59.3
+      ]
+     ]
+    },
+    "solo": {
+     "oiseaux": 84.0,
+     "mammiferes": 80.0,
+     "reptiles": 87.9,
+     "insectes": 77.7,
+     "humains": 82.2,
+     "entites": 79.8
+    }
+   },
+   "valeurs_equipes": {
+    "entites": 79.8,
+    "humains": 82.2,
+    "insectes": 77.7,
+    "mammiferes": 80.0,
+    "oiseaux": 84.0,
+    "reptiles": 87.9,
+    "entites/humains": 83.7,
+    "entites/insectes": 80.1,
+    "entites/mammiferes": 82.0,
+    "entites/oiseaux": 84.1,
+    "entites/reptiles": 86.5,
+    "humains/insectes": 82.3,
+    "humains/mammiferes": 84.0,
+    "humains/oiseaux": 86.7,
+    "humains/reptiles": 87.4,
+    "insectes/mammiferes": 81.7,
+    "insectes/oiseaux": 84.0,
+    "insectes/reptiles": 86.3,
+    "mammiferes/oiseaux": 84.2,
+    "mammiferes/reptiles": 91.4,
+    "oiseaux/reptiles": 93.4,
+    "entites/humains/insectes": 91.5,
+    "entites/humains/mammiferes": 92.4,
+    "entites/humains/oiseaux": 92.8,
+    "entites/humains/reptiles": 92.6,
+    "entites/insectes/mammiferes": 90.5,
+    "entites/insectes/oiseaux": 91.9,
+    "entites/insectes/reptiles": 92.1,
+    "entites/mammiferes/oiseaux": 91.9,
+    "entites/mammiferes/reptiles": 93.9,
+    "entites/oiseaux/reptiles": 93.4,
+    "humains/insectes/mammiferes": 91.9,
+    "humains/insectes/oiseaux": 92.5,
+    "humains/insectes/reptiles": 92.5,
+    "humains/mammiferes/oiseaux": 92.6,
+    "humains/mammiferes/reptiles": 94.4,
+    "humains/oiseaux/reptiles": 93.8,
+    "insectes/mammiferes/oiseaux": 91.7,
+    "insectes/mammiferes/reptiles": 93.7,
+    "insectes/oiseaux/reptiles": 93.4,
+    "mammiferes/oiseaux/reptiles": 94.9,
+    "entites/humains/insectes/mammiferes": 92.4,
+    "entites/humains/insectes/oiseaux": 95.2,
+    "entites/humains/insectes/reptiles": 93.7,
+    "entites/humains/mammiferes/oiseaux": 95.2,
+    "entites/humains/mammiferes/reptiles": 94.0,
+    "entites/humains/oiseaux/reptiles": 96.6,
+    "entites/insectes/mammiferes/oiseaux": 95.1,
+    "entites/insectes/mammiferes/reptiles": 93.8,
+    "entites/insectes/oiseaux/reptiles": 96.3,
+    "entites/mammiferes/oiseaux/reptiles": 97.1,
+    "humains/insectes/mammiferes/oiseaux": 94.7,
+    "humains/insectes/mammiferes/reptiles": 94.0,
+    "humains/insectes/oiseaux/reptiles": 96.3,
+    "humains/mammiferes/oiseaux/reptiles": 96.7,
+    "insectes/mammiferes/oiseaux/reptiles": 97.1,
+    "entites/humains/insectes/mammiferes/oiseaux": 94.3,
+    "entites/humains/insectes/mammiferes/reptiles": 93.9,
+    "entites/humains/insectes/oiseaux/reptiles": 96.0,
+    "entites/humains/mammiferes/oiseaux/reptiles": 96.3,
+    "entites/insectes/mammiferes/oiseaux/reptiles": 96.4,
+    "humains/insectes/mammiferes/oiseaux/reptiles": 96.3,
+    "entites/humains/insectes/mammiferes/oiseaux/reptiles": 98.1
+   },
+   "spectateur": {
+    "impact_points": {
+     "oiseaux": 17.3,
+     "mammiferes": 15.2,
+     "reptiles": 22.1,
+     "insectes": 12.6,
+     "humains": 16.2,
+     "entites": 15.2
+    },
+    "rapports": {
+     "oiseaux": 1.05,
+     "mammiferes": 0.93,
+     "reptiles": 1.35,
+     "insectes": 0.77,
+     "humains": 0.99,
+     "entites": 0.92
+    },
+    "valeur": 0.77,
+    "verdict": "vert",
+    "au_hasard": {
+     "impact_points": {
+      "oiseaux": 15.4,
+      "mammiferes": 8.0,
+      "reptiles": 19.1,
+      "insectes": 11.6,
+      "humains": 13.9,
+      "entites": 8.5
+     },
+     "rapports": {
+      "oiseaux": 1.21,
+      "mammiferes": 0.63,
+      "reptiles": 1.5,
+      "insectes": 0.91,
+      "humains": 1.09,
+      "entites": 0.67
+     },
+     "valeur": 0.63,
+     "verdict": "vert"
+    }
+   },
+   "reve_fixe": {
+    "par_taux": {
+     "0.0": 77.8,
+     "0.25": 76.7,
+     "0.5": 80.8,
+     "0.75": 84.9,
+     "1.0": 89.8
+    },
+    "ic95": 0.96,
+    "meilleur": 1.0,
+    "maximum_teste": 1.0,
+    "extremes_aussi_bons": [],
+    "verdict": "rouge",
+    "par_voie": {
+     "sommeil": 89.0,
+     "reveil": 86.8
+    },
+    "fins_par_voie": {
+     "sommeil": {
+      "sommeil": 95.7,
+      "nuit": 4.3
+     },
+     "reveil": {
+      "reveil": 100.0
+     }
+    }
+   },
+   "coordination": {
+    "annonce": {
+     "aucun_signe": 89.7,
+     "forme": 89.7,
+     "tout_dire": 89.7,
+     "ecart": 0.0,
+     "marge": 0.56,
+     "part": null,
+     "verdict": "non mesurable"
+    },
+    "complet": {
+     "aucun_signe": 89.7,
+     "forme": 89.4,
+     "tout_dire": 89.4,
+     "ecart": -0.25,
+     "marge": 0.57,
+     "part": null,
+     "verdict": "non mesurable"
+    }
+   },
+   "echelle_bots": {
+    "aleatoire": 49.9,
+    "glouton": 89.7,
+    "marche": 39.8,
+    "marge": 0.85,
+    "verdict": "vert"
+   }
+  },
+  "v2_g0": {
+   "config": "v2_g0",
+   "maquette": "v2",
+   "variante": "defaut",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 11640,
+   "erreurs": 0,
+   "parties": 2100,
+   "foret_pct": 76.9,
+   "foret_ic95": 0.53,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 3.44,
+    "principales": {
+     "ordre_contre_immobile": 2.42,
+     "egalite_rayon": 1.02,
+     "percee_rasee": 0.0,
+     "rayon_sans_foret": 0.0
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste_machines": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_reussis": 100.0,
+    "ordres_echoues": 99.3,
+    "entrees": 98.8,
+    "bloquee_par_barrage": 94.0,
+    "organes_neutralises": 91.9,
+    "apprentissage_machines_sans_mouvement": 85.3,
+    "apprentissage_sans_mouvement": 77.3,
+    "machines_hs": 75.3,
+    "remorquages": 60.9,
+    "zones_rasees": 58.7,
+    "presages": 57.1,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "immobilisations": 42.9,
+    "tromperies": 42.9,
+    "sabotage_sans_effet": 40.9,
+    "pouvoir_hanter": 35.7,
+    "ordres_hantes": 35.7,
+    "machines_egarees": 30.5,
+    "oubli_tactique": 22.3,
+    "esprits_egarer": 22.3,
+    "tenir_zones": 13.1,
+    "cercle_egarer": 8.2,
+    "reves_tires": 6.9,
+    "echec_bloque_par_esprit": 6.6,
+    "machine_hs_avant_ordre": 1.9,
+    "tir_a_la_corde": 1.8,
+    "presage_detourne": 0.9,
+    "abattage_zone_rasee": 0.7,
+    "voir_detourne": 0.4
+   },
+   "charge": {
+    "par_partie": 1.02
+   },
+   "duree": {
+    "minutes": 58.7,
+    "minutes_q90": 67.3,
+    "tours": 6.0,
+    "decisions_non_forcees_par_joueur": 93.8
+   },
+   "attente": {
+    "attente_pct": 21.6,
+    "decisions_par_heure": 96.6
+   },
+   "forcees": {
+    "total_pct": 0.6,
+    "par_type": {
+     "action": 4.1,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 84.0,
+    "ic95": 0.46,
+    "verdict": "orange"
+   },
+   "surprise": {
+    "valeur": 34.0,
+    "ordres": 35754,
+    "machines": 36.1,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 99.8,
+    "sommeil": 0.2,
+    "reveil": 0.0,
+    "tour_moyen": 6.0
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.94,
+    "machines_actives": 1.0,
+    "valeur": 0.94,
+    "parties_au_tour_5_pct": 100.0,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 55.1,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Represailles": {
+      "tires_pct": 27.9,
+      "reussis_pct": 45.0,
+      "forets_par_ordre": 0.17
+     },
+     "Opportunisme": {
+      "tires_pct": 27.5,
+      "reussis_pct": 77.4,
+      "forets_par_ordre": 0.43
+     },
+     "Cupidite": {
+      "tires_pct": 23.8,
+      "reussis_pct": 55.0,
+      "forets_par_ordre": 0.25
+     },
+     "Percee": {
+      "tires_pct": 20.8,
+      "reussis_pct": 55.4,
+      "forets_par_ordre": 0.29
+     }
+    },
+    "machines": {
+     "Grosse Gueule": {
+      "tires_pct": 26.7,
+      "reussis_pct": 45.4,
+      "forets_par_ordre": 0.13
+     },
+     "Rapiat": {
+      "tires_pct": 25.2,
+      "reussis_pct": 57.6,
+      "forets_par_ordre": 0.39
+     },
+     "Mâchoire": {
+      "tires_pct": 21.6,
+      "reussis_pct": 65.3,
+      "forets_par_ordre": 0.48
+     },
+     "Tonton Débard": {
+      "tires_pct": 15.5,
+      "reussis_pct": 59.0,
+      "forets_par_ordre": 0.1
+     },
+     "Ripaille": {
+      "tires_pct": 11.0,
+      "reussis_pct": 78.1,
+      "forets_par_ordre": 0.32
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 6.46,
+    "entre_equipes": 7.06,
+    "meme_equipe": 6.98,
+    "propre_a_l_equipe": 0.08
+   },
+   "predictibilite": {
+    "valeur": 81.9,
+    "auc": 0.94,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.27,
+    "variance_initiale": 81.7,
+    "variance_tour_5": 22.0,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "orange"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 66.0,
+     "pire": [
+      [
+       "entites",
+       "insectes"
+      ],
+      61.3
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      92.9
+     ]
+    },
+    "trios": {
+     "rapport": 77.2,
+     "pire": [
+      [
+       "entites",
+       "insectes",
+       "reptiles"
+      ],
+      70.9
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "oiseaux",
+       "reptiles"
+      ],
+      91.7
+     ]
+    },
+    "valeur": 66.0,
+    "verdict": "orange"
+   },
+   "shapley": {
+    "rapports": {
+     "oiseaux": 0.78,
+     "mammiferes": 1.34,
+     "reptiles": 1.74,
+     "insectes": 0.46,
+     "humains": 0.95,
+     "entites": 0.73
+    },
+    "ic95": {
+     "oiseaux": [
+      0.73,
+      0.83
+     ],
+     "mammiferes": [
+      1.29,
+      1.38
+     ],
+     "reptiles": [
+      1.69,
+      1.78
+     ],
+     "insectes": [
+      0.41,
+      0.5
+     ],
+     "humains": [
+      0.91,
+      1.0
+     ],
+     "entites": [
+      0.7,
+      0.77
+     ]
+    },
+    "points": {
+     "oiseaux": 9.27,
+     "mammiferes": 15.88,
+     "reptiles": 20.64,
+     "insectes": 5.49,
+     "humains": 11.33,
+     "entites": 8.73
+    },
+    "v_vide": 23.4,
+    "v_tous": 94.8,
+    "ecart_max": 0.74,
+    "verdict": "rouge",
+    "effet_par_taille": {
+     "2": {
+      "oiseaux": -3.0,
+      "mammiferes": 5.7,
+      "reptiles": 15.8,
+      "insectes": -11.3,
+      "humains": -1.1,
+      "entites": -6.1
+     },
+     "3": {
+      "oiseaux": -1.7,
+      "mammiferes": 11.2,
+      "reptiles": -0.6,
+      "insectes": -5.0,
+      "humains": -1.4,
+      "entites": -2.5
+     }
+    }
+   },
+   "synergies": {
+    "valeur": 11,
+    "verdict": "orange",
+    "duo_bat_son_meilleur_seul": {
+     "nombre": 11,
+     "detail": [
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       14.4
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       11.7
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       10.1
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       9.6
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       5.2
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       4.8
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       4.7
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       3.9
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       2.7
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       1.3
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       0.0
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.6
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -2.9
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -9.8
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -17.7
+      ]
+     ]
+    },
+    "tetraedre": {
+     "complets_dans_le_premier_tiers": 1,
+     "duos_complets": [
+      [
+       "entites",
+       "reptiles"
+      ],
+      [
+       "humains",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "oiseaux"
+      ]
+     ],
+     "classement": [
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       9.3
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       5.6
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       2.7
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       2.5
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       0.9
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       0.6
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -0.1
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.9
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -1.2
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       -1.2
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -1.6
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -2.4
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -2.6
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -5.6
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -5.9
+      ]
+     ],
+     "verdict": "orange"
+    },
+    "additive": {
+     "positives": 0,
+     "classement": [
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -14.8
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -20.5
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -22.4
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -23.1
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -23.9
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -25.0
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -25.1
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       -28.8
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -29.3
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -31.9
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -34.4
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -37.1
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -42.1
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -43.7
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -43.7
+      ]
+     ]
+    },
+    "solo": {
+     "oiseaux": 60.5,
+     "mammiferes": 60.2,
+     "reptiles": 88.0,
+     "insectes": 47.9,
+     "humains": 64.3,
+     "entites": 57.4
+    }
+   },
+   "valeurs_equipes": {
+    "entites": 57.4,
+    "humains": 64.3,
+    "insectes": 47.9,
+    "mammiferes": 60.2,
+    "oiseaux": 60.5,
+    "reptiles": 88.0,
+    "entites/humains": 69.0,
+    "entites/insectes": 61.3,
+    "entites/mammiferes": 70.2,
+    "entites/oiseaux": 65.6,
+    "entites/reptiles": 78.3,
+    "humains/insectes": 63.7,
+    "humains/mammiferes": 78.7,
+    "humains/oiseaux": 64.3,
+    "humains/reptiles": 85.2,
+    "insectes/mammiferes": 69.8,
+    "insectes/oiseaux": 61.8,
+    "insectes/reptiles": 70.3,
+    "mammiferes/oiseaux": 72.1,
+    "mammiferes/reptiles": 92.9,
+    "oiseaux/reptiles": 90.7,
+    "entites/humains/insectes": 74.2,
+    "entites/humains/mammiferes": 85.6,
+    "entites/humains/oiseaux": 73.9,
+    "entites/humains/reptiles": 75.6,
+    "entites/insectes/mammiferes": 81.7,
+    "entites/insectes/oiseaux": 76.4,
+    "entites/insectes/reptiles": 70.9,
+    "entites/mammiferes/oiseaux": 82.9,
+    "entites/mammiferes/reptiles": 87.4,
+    "entites/oiseaux/reptiles": 77.1,
+    "humains/insectes/mammiferes": 86.4,
+    "humains/insectes/oiseaux": 73.6,
+    "humains/insectes/reptiles": 72.9,
+    "humains/mammiferes/oiseaux": 84.2,
+    "humains/mammiferes/reptiles": 88.1,
+    "humains/oiseaux/reptiles": 76.6,
+    "insectes/mammiferes/oiseaux": 82.1,
+    "insectes/mammiferes/reptiles": 83.9,
+    "insectes/oiseaux/reptiles": 71.3,
+    "mammiferes/oiseaux/reptiles": 91.7,
+    "entites/humains/insectes/mammiferes": 89.5,
+    "entites/humains/insectes/oiseaux": 79.0,
+    "entites/humains/insectes/reptiles": 84.8,
+    "entites/humains/mammiferes/oiseaux": 87.7,
+    "entites/humains/mammiferes/reptiles": 94.6,
+    "entites/humains/oiseaux/reptiles": 86.3,
+    "entites/insectes/mammiferes/oiseaux": 85.6,
+    "entites/insectes/mammiferes/reptiles": 92.9,
+    "entites/insectes/oiseaux/reptiles": 84.9,
+    "entites/mammiferes/oiseaux/reptiles": 93.2,
+    "humains/insectes/mammiferes/oiseaux": 86.7,
+    "humains/insectes/mammiferes/reptiles": 95.2,
+    "humains/insectes/oiseaux/reptiles": 85.4,
+    "humains/mammiferes/oiseaux/reptiles": 92.4,
+    "insectes/mammiferes/oiseaux/reptiles": 93.6,
+    "entites/humains/insectes/mammiferes/oiseaux": 91.2,
+    "entites/humains/insectes/mammiferes/reptiles": 96.7,
+    "entites/humains/insectes/oiseaux/reptiles": 90.5,
+    "entites/humains/mammiferes/oiseaux/reptiles": 94.0,
+    "entites/insectes/mammiferes/oiseaux/reptiles": 93.7,
+    "humains/insectes/mammiferes/oiseaux/reptiles": 94.0,
+    "entites/humains/insectes/mammiferes/oiseaux/reptiles": 94.8
+   },
+   "spectateur": {
+    "impact_points": {
+     "oiseaux": 1.8,
+     "mammiferes": 9.6,
+     "reptiles": 17.0,
+     "insectes": -3.8,
+     "humains": 4.2,
+     "entites": 2.7
+    },
+    "rapports": {
+     "oiseaux": 0.33,
+     "mammiferes": 1.82,
+     "reptiles": 3.25,
+     "insectes": -0.73,
+     "humains": 0.8,
+     "entites": 0.52
+    },
+    "valeur": -0.73,
+    "verdict": "rouge",
+    "au_hasard": {
+     "impact_points": {
+      "oiseaux": 1.7,
+      "mammiferes": 3.3,
+      "reptiles": 12.7,
+      "insectes": -2.8,
+      "humains": 2.6,
+      "entites": -3.6
+     },
+     "rapports": {
+      "oiseaux": 0.72,
+      "mammiferes": 1.42,
+      "reptiles": 5.47,
+      "insectes": -1.2,
+      "humains": 1.14,
+      "entites": -1.55
+     },
+     "valeur": -1.55,
+     "verdict": "rouge"
+    }
+   },
+   "echelle_bots": {
+    "aleatoire": 49.9,
+    "glouton": 77.1,
+    "marche": 27.2,
+    "marge": 1.07,
+    "verdict": "vert"
+   }
+  },
+  "v1_une_tactique": {
+   "config": "v1_une_tactique",
+   "maquette": "v1",
+   "variante": "temoin_une_tactique",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 100.0,
+   "foret_ic95": 0.0,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 18.0,
+    "principales": {
+     "egalite_machine": 18.0
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "bloquee_par_barrage": 100.0,
+    "ordres_echoues": 100.0,
+    "echanges_piste": 100.0,
+    "apprentissage_sans_mouvement": 63.3,
+    "presages": 57.1,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9
+   },
+   "charge": {
+    "par_partie": 18.0
+   },
+   "duree": {
+    "minutes": 50.0,
+    "minutes_q90": 55.7,
+    "tours": 6.0,
+    "decisions_non_forcees_par_joueur": 82.0
+   },
+   "attente": {
+    "attente_pct": 17.7,
+    "decisions_par_heure": 98.9
+   },
+   "forcees": {
+    "total_pct": 15.5,
+    "par_type": {
+     "action": 100.0,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 100.0,
+    "ic95": 0.0,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 0.0,
+    "ordres": 18900,
+    "machines": null,
+    "verdict": "rouge"
+   },
+   "fins": {
+    "nuit": 100.0,
+    "tour_moyen": 6.0
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": null,
+    "machines_actives": 1.0,
+    "valeur": 1.0,
+    "parties_au_tour_5_pct": 100.0,
+    "verdict": "vert"
+   },
+   "plancher": {
+    "valeur": 100.0,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Cupidite": {
+      "tires_pct": 100.0,
+      "reussis_pct": 0.0,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Abatteuse": {
+      "tires_pct": 100.0,
+      "reussis_pct": 0.0,
+      "forets_par_ordre": 0.0
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 0.0,
+    "entre_equipes": 0.0,
+    "meme_equipe": 0.0,
+    "propre_a_l_equipe": 0.0
+   },
+   "predictibilite": {
+    "valeur": 100.0,
+    "auc": null,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.0,
+    "variance_initiale": 0.0,
+    "variance_tour_5": 0.0,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 100.0,
+     "pire": [
+      [
+       "mammiferes",
+       "oiseaux"
+      ],
+      100.0
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "oiseaux"
+      ],
+      100.0
+     ]
+    },
+    "trios": {
+     "rapport": 100.0,
+     "pire": [
+      [
+       "mammiferes",
+       "oiseaux",
+       "reptiles"
+      ],
+      100.0
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "oiseaux",
+       "reptiles"
+      ],
+      100.0
+     ]
+    },
+    "valeur": 100.0,
+    "verdict": "vert"
+   }
+  },
+  "v2_une_tactique": {
+   "config": "v2_une_tactique",
+   "maquette": "v2",
+   "variante": "temoin_une_tactique",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 88.4,
+   "foret_ic95": 0.78,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 4.07,
+    "principales": {
+     "ordre_contre_immobile": 3.42,
+     "egalite_rayon": 0.65
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste": 100.0,
+    "echanges_piste_machines": 100.0,
+    "entrees": 100.0,
+    "ordres_reussis": 100.0,
+    "ordres_echoues": 99.6,
+    "bloquee_par_barrage": 99.5,
+    "apprentissage_sans_mouvement": 77.4,
+    "apprentissage_machines_sans_mouvement": 77.0,
+    "organes_neutralises": 73.6,
+    "presages": 57.1,
+    "machines_hs": 51.0,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "immobilisations": 42.9,
+    "tromperies": 42.9,
+    "remorquages": 41.0,
+    "sabotage_sans_effet": 39.0,
+    "machines_egarees": 19.1,
+    "pouvoir_hanter": 15.4,
+    "ordres_hantes": 15.4,
+    "oubli_tactique": 12.7,
+    "esprits_egarer": 12.7,
+    "cercle_egarer": 6.5,
+    "reves_tires": 3.6,
+    "echec_bloque_par_esprit": 3.1,
+    "tenir_zones": 3.0,
+    "zones_rasees": 2.0,
+    "tir_a_la_corde": 0.6,
+    "presage_detourne": 0.4,
+    "voir_detourne": 0.1
+   },
+   "charge": {
+    "par_partie": 0.65
+   },
+   "duree": {
+    "minutes": 60.2,
+    "minutes_q90": 68.8,
+    "tours": 6.0,
+    "decisions_non_forcees_par_joueur": 95.8
+   },
+   "attente": {
+    "attente_pct": 22.2,
+    "decisions_par_heure": 96.4
+   },
+   "forcees": {
+    "total_pct": 0.1,
+    "par_type": {
+     "action": 0.7,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 99.0,
+    "ic95": 0.15,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 0.0,
+    "ordres": 18521,
+    "machines": 37.2,
+    "verdict": "rouge"
+   },
+   "fins": {
+    "nuit": 99.8,
+    "sommeil": 0.2,
+    "tour_moyen": 6.0
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.99,
+    "machines_actives": 1.15,
+    "valeur": 0.99,
+    "parties_au_tour_5_pct": 100.0,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 63.3,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Cupidite": {
+      "tires_pct": 100.0,
+      "reussis_pct": 35.0,
+      "forets_par_ordre": 0.14
+     }
+    },
+    "machines": {
+     "Grosse Gueule": {
+      "tires_pct": 28.2,
+      "reussis_pct": 30.8,
+      "forets_par_ordre": 0.14
+     },
+     "Rapiat": {
+      "tires_pct": 23.4,
+      "reussis_pct": 24.2,
+      "forets_par_ordre": 0.14
+     },
+     "Mâchoire": {
+      "tires_pct": 19.6,
+      "reussis_pct": 24.3,
+      "forets_par_ordre": 0.16
+     },
+     "Tonton Débard": {
+      "tires_pct": 18.3,
+      "reussis_pct": 56.7,
+      "forets_par_ordre": 0.14
+     },
+     "Ripaille": {
+      "tires_pct": 10.6,
+      "reussis_pct": 52.3,
+      "forets_par_ordre": 0.09
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 0.13,
+    "entre_equipes": 0.25,
+    "meme_equipe": 0.22,
+    "propre_a_l_equipe": 0.03
+   },
+   "predictibilite": {
+    "valeur": 80.1,
+    "auc": 0.93,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.22,
+    "variance_initiale": 62.4,
+    "variance_tour_5": 14.0,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 68.9,
+     "pire": [
+      [
+       "entites",
+       "insectes"
+      ],
+      68.9
+     ],
+     "meilleure": [
+      [
+       "oiseaux",
+       "reptiles"
+      ],
+      100.0
+     ]
+    },
+    "trios": {
+     "rapport": 76.5,
+     "pire": [
+      [
+       "entites",
+       "insectes",
+       "mammiferes"
+      ],
+      76.5
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "oiseaux",
+       "reptiles"
+      ],
+      100.0
+     ]
+    },
+    "valeur": 68.9,
+    "verdict": "orange"
+   }
+  },
+  "v1_des_fixes": {
+   "config": "v1_des_fixes",
+   "maquette": "v1",
+   "variante": "temoin_des_fixes",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 100.0,
+   "foret_ic95": 0.0,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 27.0,
+    "principales": {
+     "egalite_machine": 18.0,
+     "egalite_critere": 9.0
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "bloquee_par_barrage": 100.0,
+    "ordres_echoues": 100.0,
+    "echanges_piste": 100.0,
+    "presages": 57.1,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9
+   },
+   "charge": {
+    "par_partie": 27.0
+   },
+   "duree": {
+    "minutes": 50.0,
+    "minutes_q90": 55.7,
+    "tours": 6.0,
+    "decisions_non_forcees_par_joueur": 82.0
+   },
+   "attente": {
+    "attente_pct": 17.7,
+    "decisions_par_heure": 98.9
+   },
+   "forcees": {
+    "total_pct": 15.5,
+    "par_type": {
+     "action": 100.0,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 100.0,
+    "ic95": 0.0,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 0.0,
+    "ordres": 18900,
+    "machines": null,
+    "verdict": "rouge"
+   },
+   "fins": {
+    "nuit": 100.0,
+    "tour_moyen": 6.0
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": null,
+    "machines_actives": 1.0,
+    "valeur": 1.0,
+    "parties_au_tour_5_pct": 100.0,
+    "verdict": "vert"
+   },
+   "plancher": {
+    "valeur": 100.0,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Cupidite": {
+      "tires_pct": 50.0,
+      "reussis_pct": 0.0,
+      "forets_par_ordre": 0.0
+     },
+     "Opportunisme": {
+      "tires_pct": 50.0,
+      "reussis_pct": 0.0,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Abatteuse": {
+      "tires_pct": 100.0,
+      "reussis_pct": 0.0,
+      "forets_par_ordre": 0.0
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 0.0,
+    "entre_equipes": 0.0,
+    "meme_equipe": 0.0,
+    "propre_a_l_equipe": 0.0
+   },
+   "predictibilite": {
+    "valeur": 100.0,
+    "auc": null,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.0,
+    "variance_initiale": 0.0,
+    "variance_tour_5": 0.0,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 100.0,
+     "pire": [
+      [
+       "mammiferes",
+       "oiseaux"
+      ],
+      100.0
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "oiseaux"
+      ],
+      100.0
+     ]
+    },
+    "trios": {
+     "rapport": 100.0,
+     "pire": [
+      [
+       "mammiferes",
+       "oiseaux",
+       "reptiles"
+      ],
+      100.0
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "oiseaux",
+       "reptiles"
+      ],
+      100.0
+     ]
+    },
+    "valeur": 100.0,
+    "verdict": "vert"
+   }
+  },
+  "v2_des_fixes": {
+   "config": "v2_des_fixes",
+   "maquette": "v2",
+   "variante": "temoin_des_fixes",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 66.4,
+   "foret_ic95": 1.18,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 5.63,
+    "principales": {
+     "egalite_rayon": 2.83,
+     "ordre_contre_immobile": 2.8
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "ordres_echoues": 100.0,
+    "echanges_piste": 100.0,
+    "echanges_piste_machines": 100.0,
+    "ordres_reussis": 94.3,
+    "bloquee_par_barrage": 91.4,
+    "organes_neutralises": 88.6,
+    "zones_rasees": 68.6,
+    "machines_hs": 65.7,
+    "remorquages": 57.1,
+    "presages": 57.1,
+    "apprentissage_sans_mouvement": 54.3,
+    "apprentissage_machines_sans_mouvement": 54.3,
+    "entrees": 54.3,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "immobilisations": 42.9,
+    "tromperies": 40.0,
+    "pouvoir_hanter": 31.4,
+    "ordres_hantes": 31.4,
+    "machines_egarees": 25.7,
+    "tenir_zones": 22.9,
+    "sabotage_sans_effet": 22.9,
+    "oubli_tactique": 17.1,
+    "esprits_egarer": 17.1,
+    "cercle_egarer": 8.6,
+    "machine_hs_avant_ordre": 2.9
+   },
+   "charge": {
+    "par_partie": 2.83
+   },
+   "duree": {
+    "minutes": 58.1,
+    "minutes_q90": 66.2,
+    "tours": 6.0,
+    "decisions_non_forcees_par_joueur": 93.0
+   },
+   "attente": {
+    "attente_pct": 21.3,
+    "decisions_par_heure": 96.6
+   },
+   "forcees": {
+    "total_pct": 0.8,
+    "par_type": {
+     "action": 5.9,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 82.9,
+    "ic95": 0.72,
+    "verdict": "orange"
+   },
+   "surprise": {
+    "valeur": 40.5,
+    "ordres": 17790,
+    "machines": 0.0,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 100.0,
+    "tour_moyen": 6.0
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.75,
+    "machines_actives": 0.78,
+    "valeur": 0.75,
+    "parties_au_tour_5_pct": 100.0,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 34.0,
+    "verdict": "orange"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 59.5,
+      "reussis_pct": 75.4,
+      "forets_par_ordre": 0.66
+     },
+     "Cupidite": {
+      "tires_pct": 40.5,
+      "reussis_pct": 28.8,
+      "forets_par_ordre": 0.05
+     }
+    },
+    "machines": {
+     "Rapiat": {
+      "tires_pct": 59.5,
+      "reussis_pct": 75.4,
+      "forets_par_ordre": 0.66
+     },
+     "Grosse Gueule": {
+      "tires_pct": 40.5,
+      "reussis_pct": 28.8,
+      "forets_par_ordre": 0.05
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 0.91,
+    "entre_equipes": 1.31,
+    "meme_equipe": 0.0,
+    "propre_a_l_equipe": 1.31
+   },
+   "predictibilite": {
+    "valeur": 100.0,
+    "auc": 1.0,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.0,
+    "variance_initiale": 0.0,
+    "variance_tour_5": 0.0,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 33.3,
+     "pire": [
+      [
+       "entites",
+       "mammiferes"
+      ],
+      33.3
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      100.0
+     ]
+    },
+    "trios": {
+     "rapport": 33.3,
+     "pire": [
+      [
+       "entites",
+       "mammiferes",
+       "oiseaux"
+      ],
+      28.6
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "oiseaux",
+       "reptiles"
+      ],
+      85.7
+     ]
+    },
+    "valeur": 33.3,
+    "verdict": "rouge"
+   }
+  },
+  "v1_sans_apprentissage": {
+   "config": "v1_sans_apprentissage",
+   "maquette": "v1",
+   "variante": "temoin_sans_apprentissage",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 71.2,
+   "foret_ic95": 0.89,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 18.92,
+    "principales": {
+     "egalite_machine": 8.99,
+     "egalite_critere": 5.14,
+     "represailles_sans_attaque": 1.61,
+     "percee_au_bout": 1.01,
+     "ordre_contre_immobile": 0.62,
+     "egalite_arbitraire": 0.57
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "apprentissage_coupe": 100.0,
+    "ordres_echoues": 99.4,
+    "bloquee_par_barrage": 98.6,
+    "ordres_reussis": 98.1,
+    "organes_neutralises": 81.5,
+    "coupe_hors_cible": 70.8,
+    "machines_hs": 66.9,
+    "zones_rasees": 61.1,
+    "presages": 57.1,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "tromperies": 41.9,
+    "renforts": 38.9,
+    "sabotage_sans_effet": 37.3,
+    "reparer_sans_cible": 33.0,
+    "pouvoir_hanter": 30.2,
+    "ordres_hantes": 29.0,
+    "reparations": 25.0,
+    "machines_egarees": 23.7,
+    "oubli_tactique": 23.7,
+    "esprits_egarer": 23.7,
+    "abattage_zone_rasee": 23.2,
+    "immobilisations": 22.4,
+    "echanges_piste": 10.4,
+    "coupe_en_chemin_cible_barree": 6.2,
+    "reves_tires": 3.6,
+    "tenir_zones": 1.1
+   },
+   "charge": {
+    "par_partie": 17.98
+   },
+   "duree": {
+    "minutes": 51.0,
+    "minutes_q90": 59.8,
+    "tours": 5.73,
+    "decisions_non_forcees_par_joueur": 84.1
+   },
+   "attente": {
+    "attente_pct": 20.4,
+    "decisions_par_heure": 99.2
+   },
+   "forcees": {
+    "total_pct": 6.0,
+    "par_type": {
+     "action": 43.3,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 100.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 95.6,
+    "ic95": 0.37,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 43.5,
+    "ordres": 16843,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 79.7,
+    "silence": 20.3,
+    "tour_moyen": 5.73
+   },
+   "fins_precoces": {
+    "valeur": 3.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.84,
+    "machines_actives": 0.85,
+    "valeur": 0.84,
+    "parties_au_tour_5_pct": 91.6,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 49.3,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Cupidite": {
+      "tires_pct": 28.4,
+      "reussis_pct": 23.4,
+      "forets_par_ordre": 0.23
+     },
+     "Opportunisme": {
+      "tires_pct": 26.9,
+      "reussis_pct": 44.7,
+      "forets_par_ordre": 0.45
+     },
+     "Represailles": {
+      "tires_pct": 20.8,
+      "reussis_pct": 34.0,
+      "forets_par_ordre": 0.34
+     },
+     "Percee": {
+      "tires_pct": 16.6,
+      "reussis_pct": 72.1,
+      "forets_par_ordre": 0.72
+     },
+     "Reparer": {
+      "tires_pct": 4.7,
+      "reussis_pct": 36.5,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 2.7,
+      "reussis_pct": 100.0,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Abatteuse": {
+      "tires_pct": 47.9,
+      "reussis_pct": 18.4,
+      "forets_par_ordre": 0.18
+     },
+     "Bouteur": {
+      "tires_pct": 38.1,
+      "reussis_pct": 66.3,
+      "forets_par_ordre": 0.66
+     },
+     "Pelleteuse": {
+      "tires_pct": 12.2,
+      "reussis_pct": 45.6,
+      "forets_par_ordre": 0.46
+     },
+     "Debardeuse": {
+      "tires_pct": 1.7,
+      "reussis_pct": 58.6,
+      "forets_par_ordre": 0.59
+     },
+     "Broyeuse": {
+      "tires_pct": 0.1,
+      "reussis_pct": 54.5,
+      "forets_par_ordre": 0.55
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 0.24,
+    "entre_equipes": 0.46,
+    "meme_equipe": 0.29,
+    "propre_a_l_equipe": 0.17
+   },
+   "predictibilite": {
+    "valeur": 81.6,
+    "auc": 0.87,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.16,
+    "variance_initiale": 229.9,
+    "variance_tour_5": 35.9,
+    "finies_avant_tour_5_pct": 3.3,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 81.8,
+     "pire": [
+      [
+       "insectes",
+       "mammiferes"
+      ],
+      63.5
+     ],
+     "meilleure": [
+      [
+       "oiseaux",
+       "reptiles"
+      ],
+      77.6
+     ]
+    },
+    "trios": {
+     "rapport": 86.3,
+     "pire": [
+      [
+       "humains",
+       "insectes",
+       "oiseaux"
+      ],
+      64.9
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "mammiferes",
+       "reptiles"
+      ],
+      75.2
+     ]
+    },
+    "valeur": 81.8,
+    "verdict": "vert"
+   }
+  },
+  "v2_sans_apprentissage": {
+   "config": "v2_sans_apprentissage",
+   "maquette": "v2",
+   "variante": "temoin_sans_apprentissage",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 78.5,
+   "foret_ic95": 0.74,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 3.71,
+    "principales": {
+     "ordre_contre_immobile": 3.0,
+     "egalite_rayon": 0.71,
+     "percee_rasee": 0.0
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "apprentissage_coupe": 100.0,
+    "ordres_reussis": 99.6,
+    "ordres_echoues": 99.3,
+    "bloquee_par_barrage": 92.8,
+    "organes_neutralises": 92.0,
+    "entrees": 91.8,
+    "machines_hs": 71.7,
+    "remorquages": 60.9,
+    "presages": 57.1,
+    "zones_rasees": 52.0,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "immobilisations": 42.9,
+    "tromperies": 42.7,
+    "sabotage_sans_effet": 41.8,
+    "pouvoir_hanter": 38.1,
+    "ordres_hantes": 38.1,
+    "machines_egarees": 28.1,
+    "oubli_tactique": 21.2,
+    "esprits_egarer": 21.2,
+    "tenir_zones": 16.7,
+    "echanges_piste": 14.6,
+    "reves_tires": 7.1,
+    "cercle_egarer": 6.9,
+    "machine_hs_avant_ordre": 3.1,
+    "abattage_zone_rasee": 1.5,
+    "presage_detourne": 0.6,
+    "voir_detourne": 0.3
+   },
+   "charge": {
+    "par_partie": 0.71
+   },
+   "duree": {
+    "minutes": 58.8,
+    "minutes_q90": 67.0,
+    "tours": 6.0,
+    "decisions_non_forcees_par_joueur": 93.9
+   },
+   "attente": {
+    "attente_pct": 21.7,
+    "decisions_par_heure": 96.5
+   },
+   "forcees": {
+    "total_pct": 0.6,
+    "par_type": {
+     "action": 4.0,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 85.6,
+    "ic95": 0.72,
+    "verdict": "orange"
+   },
+   "surprise": {
+    "valeur": 47.7,
+    "ordres": 17784,
+    "machines": 37.5,
+    "verdict": "orange"
+   },
+   "fins": {
+    "nuit": 99.6,
+    "reveil": 0.3,
+    "sommeil": 0.1,
+    "tour_moyen": 6.0
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.89,
+    "machines_actives": 0.95,
+    "valeur": 0.89,
+    "parties_au_tour_5_pct": 100.0,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 56.9,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Cupidite": {
+      "tires_pct": 28.3,
+      "reussis_pct": 56.4,
+      "forets_par_ordre": 0.25
+     },
+     "Opportunisme": {
+      "tires_pct": 26.9,
+      "reussis_pct": 68.9,
+      "forets_par_ordre": 0.35
+     },
+     "Represailles": {
+      "tires_pct": 25.4,
+      "reussis_pct": 38.6,
+      "forets_par_ordre": 0.16
+     },
+     "Percee": {
+      "tires_pct": 19.4,
+      "reussis_pct": 51.8,
+      "forets_par_ordre": 0.31
+     }
+    },
+    "machines": {
+     "Grosse Gueule": {
+      "tires_pct": 42.0,
+      "reussis_pct": 33.8,
+      "forets_par_ordre": 0.09
+     },
+     "Rapiat": {
+      "tires_pct": 20.5,
+      "reussis_pct": 70.6,
+      "forets_par_ordre": 0.52
+     },
+     "Mâchoire": {
+      "tires_pct": 18.8,
+      "reussis_pct": 61.2,
+      "forets_par_ordre": 0.44
+     },
+     "Tonton Débard": {
+      "tires_pct": 11.6,
+      "reussis_pct": 68.6,
+      "forets_par_ordre": 0.17
+     },
+     "Ripaille": {
+      "tires_pct": 7.1,
+      "reussis_pct": 87.1,
+      "forets_par_ordre": 0.26
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 0.34,
+    "entre_equipes": 0.67,
+    "meme_equipe": 0.44,
+    "propre_a_l_equipe": 0.23
+   },
+   "predictibilite": {
+    "valeur": 69.8,
+    "auc": 0.86,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "orange"
+   },
+   "incertitude": {
+    "valeur": 0.22,
+    "variance_initiale": 90.4,
+    "variance_tour_5": 20.2,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 67.7,
+     "pire": [
+      [
+       "humains",
+       "oiseaux"
+      ],
+      64.4
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      95.2
+     ]
+    },
+    "trios": {
+     "rapport": 72.9,
+     "pire": [
+      [
+       "humains",
+       "insectes",
+       "oiseaux"
+      ],
+      67.8
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "mammiferes",
+       "reptiles"
+      ],
+      93.0
+     ]
+    },
+    "valeur": 67.7,
+    "verdict": "orange"
+   }
+  },
+  "v1_essoufflement": {
+   "config": "v1_essoufflement",
+   "maquette": "v1",
+   "variante": "temoin_essoufflement",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 67.3,
+   "foret_ic95": 0.81,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 20.6,
+    "principales": {
+     "egalite_machine": 9.2,
+     "egalite_critere": 6.09,
+     "represailles_sans_attaque": 1.72,
+     "percee_au_bout": 1.22,
+     "egalite_arbitraire": 0.78,
+     "represailles_ancienne": 0.67
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_echoues": 98.8,
+    "bloquee_par_barrage": 97.7,
+    "ordres_reussis": 95.7,
+    "organes_neutralises": 85.5,
+    "coupe_hors_cible": 82.3,
+    "machines_hs": 73.5,
+    "apprentissage_sans_mouvement": 71.2,
+    "zones_rasees": 60.7,
+    "presages": 57.1,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "tromperies": 41.4,
+    "sabotage_sans_effet": 34.0,
+    "pouvoir_hanter": 30.6,
+    "ordres_hantes": 29.0,
+    "machines_egarees": 24.9,
+    "oubli_tactique": 24.9,
+    "esprits_egarer": 24.9,
+    "abattage_zone_rasee": 24.8,
+    "immobilisations": 24.2,
+    "coupe_en_chemin_cible_barree": 7.0,
+    "echec_bloque_par_esprit": 5.4,
+    "reves_tires": 3.0,
+    "tenir_zones": 1.7,
+    "tir_a_la_corde": 0.5,
+    "presage_detourne": 0.2
+   },
+   "charge": {
+    "par_partie": 19.81
+   },
+   "duree": {
+    "minutes": 51.0,
+    "minutes_q90": 59.5,
+    "tours": 5.74,
+    "decisions_non_forcees_par_joueur": 84.1
+   },
+   "attente": {
+    "attente_pct": 20.3,
+    "decisions_par_heure": 99.3
+   },
+   "forcees": {
+    "total_pct": 6.0,
+    "par_type": {
+     "action": 43.4,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 100.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 95.7,
+    "ic95": 0.34,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 34.5,
+    "ordres": 16881,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 79.7,
+    "silence": 20.3,
+    "tour_moyen": 5.74
+   },
+   "fins_precoces": {
+    "valeur": 3.2,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 1.01,
+    "machines_actives": 0.74,
+    "valeur": 0.74,
+    "parties_au_tour_5_pct": 91.8,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 47.1,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 31.8,
+      "reussis_pct": 49.8,
+      "forets_par_ordre": 0.5
+     },
+     "Cupidite": {
+      "tires_pct": 29.0,
+      "reussis_pct": 21.4,
+      "forets_par_ordre": 0.21
+     },
+     "Represailles": {
+      "tires_pct": 20.7,
+      "reussis_pct": 34.8,
+      "forets_par_ordre": 0.35
+     },
+     "Percee": {
+      "tires_pct": 18.5,
+      "reussis_pct": 72.8,
+      "forets_par_ordre": 0.73
+     }
+    },
+    "machines": {
+     "Abatteuse": {
+      "tires_pct": 46.4,
+      "reussis_pct": 20.8,
+      "forets_par_ordre": 0.21
+     },
+     "Bouteur": {
+      "tires_pct": 42.2,
+      "reussis_pct": 65.5,
+      "forets_par_ordre": 0.66
+     },
+     "Pelleteuse": {
+      "tires_pct": 11.4,
+      "reussis_pct": 47.7,
+      "forets_par_ordre": 0.48
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 6.49,
+    "entre_equipes": 7.18,
+    "meme_equipe": 7.07,
+    "propre_a_l_equipe": 0.11
+   },
+   "predictibilite": {
+    "valeur": 68.3,
+    "auc": 0.81,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "orange"
+   },
+   "incertitude": {
+    "valeur": 0.12,
+    "variance_initiale": 215.8,
+    "variance_tour_5": 25.8,
+    "finies_avant_tour_5_pct": 5.8,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 82.8,
+     "pire": [
+      [
+       "insectes",
+       "mammiferes"
+      ],
+      62.9
+     ],
+     "meilleure": [
+      [
+       "humains",
+       "reptiles"
+      ],
+      75.9
+     ]
+    },
+    "trios": {
+     "rapport": 84.2,
+     "pire": [
+      [
+       "insectes",
+       "oiseaux",
+       "reptiles"
+      ],
+      61.0
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "oiseaux",
+       "reptiles"
+      ],
+      72.4
+     ]
+    },
+    "valeur": 82.8,
+    "verdict": "vert"
+   }
+  },
+  "v2_essoufflement": {
+   "config": "v2_essoufflement",
+   "maquette": "v2",
+   "variante": "temoin_essoufflement",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 84.6,
+   "foret_ic95": 0.7,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 2.43,
+    "principales": {
+     "ordre_contre_immobile": 1.71,
+     "egalite_rayon": 0.72,
+     "percee_rasee": 0.0
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste_machines": 100.0,
+    "ordres_echoues": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_sans_machine": 99.4,
+    "organes_neutralises": 92.3,
+    "ordres_reussis": 88.9,
+    "bloquee_par_barrage": 81.0,
+    "machines_hs": 76.0,
+    "apprentissage_sans_mouvement": 66.9,
+    "apprentissage_machines_sans_mouvement": 61.2,
+    "machine_hs_laissee": 61.1,
+    "presages": 57.1,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "immobilisations": 42.4,
+    "tenir_zones": 41.4,
+    "pouvoir_hanter": 39.5,
+    "ordres_hantes": 39.5,
+    "tromperies": 38.5,
+    "zones_rasees": 35.4,
+    "sabotage_sans_effet": 34.1,
+    "machines_egarees": 30.1,
+    "entrees": 23.2,
+    "oubli_tactique": 21.7,
+    "esprits_egarer": 21.7,
+    "echec_bloque_par_esprit": 8.5,
+    "cercle_egarer": 8.4,
+    "reves_tires": 5.9,
+    "machine_hs_avant_ordre": 2.1,
+    "tir_a_la_corde": 1.0,
+    "presage_detourne": 0.6,
+    "voir_detourne": 0.3,
+    "abattage_zone_rasee": 0.2
+   },
+   "charge": {
+    "par_partie": 0.72
+   },
+   "duree": {
+    "minutes": 56.8,
+    "minutes_q90": 65.0,
+    "tours": 6.0,
+    "decisions_non_forcees_par_joueur": 90.4
+   },
+   "attente": {
+    "attente_pct": 21.7,
+    "decisions_par_heure": 96.2
+   },
+   "forcees": {
+    "total_pct": 1.4,
+    "par_type": {
+     "action": 9.5,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 86.7,
+    "ic95": 0.62,
+    "verdict": "orange"
+   },
+   "surprise": {
+    "valeur": 33.8,
+    "ordres": 17616,
+    "machines": 18.9,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 99.8,
+    "sommeil": 0.2,
+    "tour_moyen": 6.0
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.44,
+    "machines_actives": 0.55,
+    "valeur": 0.44,
+    "parties_au_tour_5_pct": 100.0,
+    "verdict": "rouge"
+   },
+   "plancher": {
+    "valeur": 62.7,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Represailles": {
+      "tires_pct": 27.4,
+      "reussis_pct": 12.8,
+      "forets_par_ordre": 0.1
+     },
+     "Opportunisme": {
+      "tires_pct": 26.8,
+      "reussis_pct": 31.6,
+      "forets_par_ordre": 0.29
+     },
+     "Cupidite": {
+      "tires_pct": 25.3,
+      "reussis_pct": 18.7,
+      "forets_par_ordre": 0.17
+     },
+     "Percee": {
+      "tires_pct": 20.5,
+      "reussis_pct": 23.8,
+      "forets_par_ordre": 0.21
+     }
+    },
+    "machines": {
+     "Rapiat": {
+      "tires_pct": 34.4,
+      "reussis_pct": 36.5,
+      "forets_par_ordre": 0.33
+     },
+     "Grosse Gueule": {
+      "tires_pct": 34.0,
+      "reussis_pct": 11.0,
+      "forets_par_ordre": 0.11
+     },
+     "Mâchoire": {
+      "tires_pct": 31.5,
+      "reussis_pct": 46.8,
+      "forets_par_ordre": 0.4
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 6.29,
+    "entre_equipes": 6.99,
+    "meme_equipe": 6.92,
+    "propre_a_l_equipe": 0.07
+   },
+   "predictibilite": {
+    "valeur": 88.3,
+    "auc": 0.95,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.2,
+    "variance_initiale": 73.1,
+    "variance_tour_5": 14.3,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 70.1,
+     "pire": [
+      [
+       "insectes",
+       "oiseaux"
+      ],
+      68.9
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      98.3
+     ]
+    },
+    "trios": {
+     "rapport": 79.9,
+     "pire": [
+      [
+       "insectes",
+       "oiseaux",
+       "reptiles"
+      ],
+      76.8
+     ],
+     "meilleure": [
+      [
+       "humains",
+       "insectes",
+       "mammiferes"
+      ],
+      96.2
+     ]
+    },
+    "valeur": 70.1,
+    "verdict": "vert"
+   }
+  },
+  "v1_assaut": {
+   "config": "v1_assaut",
+   "maquette": "v1",
+   "variante": "temoin_assaut",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 66.1,
+   "foret_ic95": 0.81,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 20.74,
+    "principales": {
+     "egalite_machine": 10.22,
+     "egalite_critere": 5.3,
+     "represailles_sans_attaque": 1.52,
+     "percee_au_bout": 1.34,
+     "egalite_arbitraire": 0.68,
+     "ordre_contre_immobile": 0.68
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "ordres_echoues": 100.0,
+    "echanges_piste": 100.0,
+    "bloquee_par_barrage": 99.2,
+    "ordres_reussis": 98.3,
+    "organes_neutralises": 88.6,
+    "coupe_hors_cible": 80.1,
+    "apprentissage_sans_mouvement": 74.6,
+    "machines_hs": 73.1,
+    "zones_rasees": 61.0,
+    "presages": 57.1,
+    "renfort_sans_reserve": 46.7,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "tromperies": 42.0,
+    "reparations": 41.3,
+    "sabotage_sans_effet": 39.4,
+    "reparer_sans_cible": 34.3,
+    "pouvoir_hanter": 33.1,
+    "ordres_hantes": 33.0,
+    "abattage_zone_rasee": 26.6,
+    "immobilisations": 26.6,
+    "machines_egarees": 24.7,
+    "oubli_tactique": 24.7,
+    "esprits_egarer": 24.7,
+    "coupe_en_chemin_cible_barree": 7.7,
+    "echec_bloque_par_esprit": 6.5,
+    "reves_tires": 5.9,
+    "tir_a_la_corde": 1.0,
+    "tenir_zones": 0.6,
+    "presage_detourne": 0.2,
+    "voir_detourne": 0.1
+   },
+   "charge": {
+    "par_partie": 19.72
+   },
+   "duree": {
+    "minutes": 53.9,
+    "minutes_q90": 61.3,
+    "tours": 5.98,
+    "decisions_non_forcees_par_joueur": 88.9
+   },
+   "attente": {
+    "attente_pct": 21.1,
+    "decisions_par_heure": 99.6
+   },
+   "forcees": {
+    "total_pct": 5.1,
+    "par_type": {
+     "action": 36.2,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 85.3,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 94.6,
+    "ic95": 0.39,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 38.3,
+    "ordres": 17817,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 93.5,
+    "silence": 6.5,
+    "tour_moyen": 5.98
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 1.06,
+    "machines_actives": 0.76,
+    "valeur": 0.76,
+    "parties_au_tour_5_pct": 99.6,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 44.9,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 25.8,
+      "reussis_pct": 53.8,
+      "forets_par_ordre": 0.54
+     },
+     "Cupidite": {
+      "tires_pct": 25.6,
+      "reussis_pct": 25.0,
+      "forets_par_ordre": 0.25
+     },
+     "Represailles": {
+      "tires_pct": 20.4,
+      "reussis_pct": 39.0,
+      "forets_par_ordre": 0.39
+     },
+     "Percee": {
+      "tires_pct": 19.0,
+      "reussis_pct": 72.2,
+      "forets_par_ordre": 0.72
+     },
+     "Reparer": {
+      "tires_pct": 5.9,
+      "reussis_pct": 57.6,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 3.4,
+      "reussis_pct": 0.0,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Bouteur": {
+      "tires_pct": 40.6,
+      "reussis_pct": 68.1,
+      "forets_par_ordre": 0.68
+     },
+     "Abatteuse": {
+      "tires_pct": 38.7,
+      "reussis_pct": 15.5,
+      "forets_par_ordre": 0.15
+     },
+     "Pelleteuse": {
+      "tires_pct": 9.7,
+      "reussis_pct": 47.9,
+      "forets_par_ordre": 0.48
+     },
+     "Debardeuse": {
+      "tires_pct": 8.0,
+      "reussis_pct": 79.7,
+      "forets_par_ordre": 0.8
+     },
+     "Broyeuse": {
+      "tires_pct": 3.0,
+      "reussis_pct": 52.8,
+      "forets_par_ordre": 0.53
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 6.62,
+    "entre_equipes": 7.4,
+    "meme_equipe": 7.4,
+    "propre_a_l_equipe": 0.0
+   },
+   "predictibilite": {
+    "valeur": 87.2,
+    "auc": 0.95,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.17,
+    "variance_initiale": 162.6,
+    "variance_tour_5": 27.7,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 65.5,
+     "pire": [
+      [
+       "insectes",
+       "mammiferes"
+      ],
+      50.6
+     ],
+     "meilleure": [
+      [
+       "humains",
+       "reptiles"
+      ],
+      77.3
+     ]
+    },
+    "trios": {
+     "rapport": 81.9,
+     "pire": [
+      [
+       "humains",
+       "mammiferes",
+       "oiseaux"
+      ],
+      60.5
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "oiseaux",
+       "reptiles"
+      ],
+      73.8
+     ]
+    },
+    "valeur": 65.5,
+    "verdict": "orange"
+   }
+  },
+  "v1_hanter_illimite": {
+   "config": "v1_hanter_illimite",
+   "maquette": "v1",
+   "variante": "temoin_hanter_illimite",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 2760,
+   "erreurs": 0,
+   "parties": 1400,
+   "foret_pct": 71.7,
+   "foret_ic95": 0.61,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 17.46,
+    "principales": {
+     "egalite_machine": 8.13,
+     "egalite_critere": 4.73,
+     "represailles_sans_attaque": 1.5,
+     "percee_au_bout": 1.04,
+     "ordre_contre_immobile": 0.58,
+     "egalite_arbitraire": 0.53
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_reussis": 99.6,
+    "ordres_echoues": 97.4,
+    "bloquee_par_barrage": 95.4,
+    "organes_neutralises": 90.2,
+    "coupe_hors_cible": 81.7,
+    "machines_hs": 75.6,
+    "apprentissage_sans_mouvement": 65.4,
+    "presages": 57.1,
+    "zones_rasees": 51.9,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "tromperies": 42.6,
+    "renforts": 41.5,
+    "sabotage_sans_effet": 37.4,
+    "reparer_sans_cible": 36.1,
+    "pouvoir_hanter": 34.1,
+    "ordres_hantes": 33.0,
+    "reparations": 29.1,
+    "machines_egarees": 27.3,
+    "oubli_tactique": 27.3,
+    "esprits_egarer": 27.3,
+    "immobilisations": 21.6,
+    "abattage_zone_rasee": 19.9,
+    "coupe_en_chemin_cible_barree": 4.7,
+    "renfort_sans_reserve": 4.2,
+    "reves_tires": 2.6,
+    "echec_bloque_par_esprit": 2.4,
+    "tenir_zones": 0.6,
+    "tir_a_la_corde": 0.2,
+    "presage_detourne": 0.1
+   },
+   "charge": {
+    "par_partie": 16.45
+   },
+   "duree": {
+    "minutes": 51.8,
+    "minutes_q90": 60.2,
+    "tours": 5.77,
+    "decisions_non_forcees_par_joueur": 85.6
+   },
+   "attente": {
+    "attente_pct": 20.8,
+    "decisions_par_heure": 99.4
+   },
+   "forcees": {
+    "total_pct": 5.3,
+    "par_type": {
+     "action": 38.1,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 99.1,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 94.9,
+    "ic95": 0.33,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 38.6,
+    "ordres": 20436,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 79.7,
+    "silence": 20.3,
+    "tour_moyen": 5.77
+   },
+   "fins_precoces": {
+    "valeur": 2.4,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.8,
+    "machines_actives": 0.84,
+    "valeur": 0.8,
+    "parties_au_tour_5_pct": 93.3,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 50.4,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 26.7,
+      "reussis_pct": 49.4,
+      "forets_par_ordre": 0.49
+     },
+     "Cupidite": {
+      "tires_pct": 24.8,
+      "reussis_pct": 24.8,
+      "forets_par_ordre": 0.25
+     },
+     "Represailles": {
+      "tires_pct": 20.8,
+      "reussis_pct": 36.8,
+      "forets_par_ordre": 0.37
+     },
+     "Percee": {
+      "tires_pct": 18.2,
+      "reussis_pct": 75.3,
+      "forets_par_ordre": 0.75
+     },
+     "Reparer": {
+      "tires_pct": 5.6,
+      "reussis_pct": 47.8,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 3.9,
+      "reussis_pct": 92.4,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Bouteur": {
+      "tires_pct": 43.8,
+      "reussis_pct": 68.6,
+      "forets_par_ordre": 0.69
+     },
+     "Abatteuse": {
+      "tires_pct": 43.7,
+      "reussis_pct": 19.2,
+      "forets_par_ordre": 0.19
+     },
+     "Pelleteuse": {
+      "tires_pct": 10.9,
+      "reussis_pct": 48.9,
+      "forets_par_ordre": 0.49
+     },
+     "Debardeuse": {
+      "tires_pct": 1.5,
+      "reussis_pct": 73.2,
+      "forets_par_ordre": 0.73
+     },
+     "Broyeuse": {
+      "tires_pct": 0.2,
+      "reussis_pct": 82.9,
+      "forets_par_ordre": 0.83
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 6.81,
+    "entre_equipes": 7.56,
+    "meme_equipe": 7.42,
+    "propre_a_l_equipe": 0.14
+   },
+   "predictibilite": {
+    "valeur": 78.4,
+    "auc": 0.88,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "orange"
+   },
+   "incertitude": {
+    "valeur": 0.19,
+    "variance_initiale": 118.5,
+    "variance_tour_5": 22.2,
+    "finies_avant_tour_5_pct": 5.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 72.3,
+     "pire": [
+      [
+       "insectes",
+       "mammiferes"
+      ],
+      58.1
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "oiseaux"
+      ],
+      80.4
+     ]
+    },
+    "trios": {
+     "rapport": 79.0,
+     "pire": [
+      [
+       "humains",
+       "insectes",
+       "oiseaux"
+      ],
+      64.8
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "oiseaux",
+       "reptiles"
+      ],
+      82.0
+     ]
+    },
+    "valeur": 72.3,
+    "verdict": "vert"
+   },
+   "shapley": {
+    "rapports": {
+     "oiseaux": 1.02,
+     "mammiferes": 0.54,
+     "reptiles": 1.34,
+     "insectes": 0.37,
+     "humains": 1.14,
+     "entites": 1.6
+    },
+    "ic95": {
+     "oiseaux": [
+      0.92,
+      1.13
+     ],
+     "mammiferes": [
+      0.43,
+      0.64
+     ],
+     "reptiles": [
+      1.25,
+      1.43
+     ],
+     "insectes": [
+      0.27,
+      0.48
+     ],
+     "humains": [
+      1.04,
+      1.21
+     ],
+     "entites": [
+      1.52,
+      1.68
+     ]
+    },
+    "points": {
+     "oiseaux": 9.63,
+     "mammiferes": 5.05,
+     "reptiles": 12.64,
+     "insectes": 3.47,
+     "humains": 10.7,
+     "entites": 15.07
+    },
+    "v_vide": 22.7,
+    "v_tous": 79.3,
+    "ecart_max": 0.63,
+    "verdict": "rouge",
+    "effet_par_taille": {
+     "2": {
+      "oiseaux": 0.6,
+      "mammiferes": -4.9,
+      "reptiles": 3.8,
+      "insectes": -8.9,
+      "humains": 0.9,
+      "entites": 8.5
+     },
+     "3": {
+      "oiseaux": -0.0,
+      "mammiferes": -1.3,
+      "reptiles": -0.4,
+      "insectes": -4.7,
+      "humains": -1.3,
+      "entites": 7.8
+     }
+    }
+   },
+   "synergies": {
+    "valeur": 4,
+    "verdict": "rouge",
+    "duo_bat_son_meilleur_seul": {
+     "nombre": 4,
+     "detail": [
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       7.7
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       6.5
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       4.2
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       0.2
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -0.7
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -3.1
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -3.6
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -3.8
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -5.7
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -6.5
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -7.5
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -7.5
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -7.6
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -9.0
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -16.4
+      ]
+     ]
+    },
+    "tetraedre": {
+     "complets_dans_le_premier_tiers": 0,
+     "duos_complets": [
+      [
+       "entites",
+       "reptiles"
+      ],
+      [
+       "humains",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "oiseaux"
+      ]
+     ],
+     "classement": [
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       4.3
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       4.0
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       3.4
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       3.2
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       3.2
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       3.1
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -0.5
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.6
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -1.6
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -1.8
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -2.7
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -2.8
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -3.0
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -3.5
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -4.8
+      ]
+     ],
+     "verdict": "orange"
+    },
+    "additive": {
+     "positives": 0,
+     "classement": [
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -24.6
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -29.5
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -31.0
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -32.4
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -36.3
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -36.4
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       -38.6
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -38.7
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -40.2
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -43.3
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -47.6
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -49.4
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -52.0
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -54.2
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -56.4
+      ]
+     ]
+    },
+    "solo": {
+     "oiseaux": 69.0,
+     "mammiferes": 51.5,
+     "reptiles": 80.0,
+     "insectes": 53.9,
+     "humains": 73.1,
+     "entites": 72.6
+    }
+   },
+   "valeurs_equipes": {
+    "entites": 72.6,
+    "humains": 73.1,
+    "insectes": 53.9,
+    "mammiferes": 51.5,
+    "oiseaux": 69.0,
+    "reptiles": 80.0,
+    "entites/humains": 79.6,
+    "entites/insectes": 72.9,
+    "entites/mammiferes": 71.9,
+    "entites/oiseaux": 80.4,
+    "entites/reptiles": 73.5,
+    "humains/insectes": 64.0,
+    "humains/mammiferes": 65.5,
+    "humains/oiseaux": 67.4,
+    "humains/reptiles": 76.2,
+    "insectes/mammiferes": 58.1,
+    "insectes/oiseaux": 61.5,
+    "insectes/reptiles": 63.6,
+    "mammiferes/oiseaux": 65.5,
+    "mammiferes/reptiles": 72.5,
+    "oiseaux/reptiles": 76.9,
+    "entites/humains/insectes": 76.5,
+    "entites/humains/mammiferes": 76.9,
+    "entites/humains/oiseaux": 78.9,
+    "entites/humains/reptiles": 78.8,
+    "entites/insectes/mammiferes": 71.3,
+    "entites/insectes/oiseaux": 77.1,
+    "entites/insectes/reptiles": 75.0,
+    "entites/mammiferes/oiseaux": 76.8,
+    "entites/mammiferes/reptiles": 75.7,
+    "entites/oiseaux/reptiles": 82.0,
+    "humains/insectes/mammiferes": 69.3,
+    "humains/insectes/oiseaux": 64.8,
+    "humains/insectes/reptiles": 66.3,
+    "humains/mammiferes/oiseaux": 69.2,
+    "humains/mammiferes/reptiles": 71.2,
+    "humains/oiseaux/reptiles": 71.8,
+    "insectes/mammiferes/oiseaux": 71.4,
+    "insectes/mammiferes/reptiles": 69.5,
+    "insectes/oiseaux/reptiles": 65.5,
+    "mammiferes/oiseaux/reptiles": 72.6,
+    "entites/humains/insectes/mammiferes": 73.8,
+    "entites/humains/insectes/oiseaux": 74.9,
+    "entites/humains/insectes/reptiles": 76.9,
+    "entites/humains/mammiferes/oiseaux": 75.7,
+    "entites/humains/mammiferes/reptiles": 78.3,
+    "entites/humains/oiseaux/reptiles": 79.5,
+    "entites/insectes/mammiferes/oiseaux": 71.8,
+    "entites/insectes/mammiferes/reptiles": 75.0,
+    "entites/insectes/oiseaux/reptiles": 76.7,
+    "entites/mammiferes/oiseaux/reptiles": 76.7,
+    "humains/insectes/mammiferes/oiseaux": 70.4,
+    "humains/insectes/mammiferes/reptiles": 70.5,
+    "humains/insectes/oiseaux/reptiles": 64.4,
+    "humains/mammiferes/oiseaux/reptiles": 69.9,
+    "insectes/mammiferes/oiseaux/reptiles": 68.8,
+    "entites/humains/insectes/mammiferes/oiseaux": 77.5,
+    "entites/humains/insectes/mammiferes/reptiles": 77.1,
+    "entites/humains/insectes/oiseaux/reptiles": 77.5,
+    "entites/humains/mammiferes/oiseaux/reptiles": 79.6,
+    "entites/insectes/mammiferes/oiseaux/reptiles": 76.4,
+    "humains/insectes/mammiferes/oiseaux/reptiles": 74.3,
+    "entites/humains/insectes/mammiferes/oiseaux/reptiles": 79.3
+   }
+  },
+  "v2_hanter_illimite": {
+   "config": "v2_hanter_illimite",
+   "maquette": "v2",
+   "variante": "temoin_hanter_illimite",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 2760,
+   "erreurs": 0,
+   "parties": 1400,
+   "foret_pct": 80.6,
+   "foret_ic95": 0.63,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 2.98,
+    "principales": {
+     "ordre_contre_immobile": 2.11,
+     "egalite_rayon": 0.86,
+     "percee_rasee": 0.0,
+     "rayon_sans_foret": 0.0
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste_machines": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_reussis": 99.9,
+    "ordres_echoues": 96.7,
+    "organes_neutralises": 91.9,
+    "entrees": 91.9,
+    "bloquee_par_barrage": 87.1,
+    "apprentissage_machines_sans_mouvement": 79.2,
+    "machines_hs": 73.3,
+    "apprentissage_sans_mouvement": 71.1,
+    "presages": 57.1,
+    "remorquages": 56.1,
+    "zones_rasees": 51.3,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "tromperies": 42.9,
+    "immobilisations": 42.6,
+    "sabotage_sans_effet": 38.7,
+    "pouvoir_hanter": 35.4,
+    "ordres_hantes": 35.4,
+    "machines_egarees": 27.9,
+    "oubli_tactique": 20.2,
+    "esprits_egarer": 20.2,
+    "tenir_zones": 17.4,
+    "cercle_egarer": 7.6,
+    "reves_tires": 3.2,
+    "echec_bloque_par_esprit": 2.9,
+    "machine_hs_avant_ordre": 1.8,
+    "tir_a_la_corde": 0.8,
+    "presage_detourne": 0.7,
+    "abattage_zone_rasee": 0.4,
+    "voir_detourne": 0.1
+   },
+   "charge": {
+    "par_partie": 0.86
+   },
+   "duree": {
+    "minutes": 59.0,
+    "minutes_q90": 67.0,
+    "tours": 6.0,
+    "decisions_non_forcees_par_joueur": 94.2
+   },
+   "attente": {
+    "attente_pct": 21.9,
+    "decisions_par_heure": 96.6
+   },
+   "forcees": {
+    "total_pct": 0.7,
+    "par_type": {
+     "action": 4.8,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 84.3,
+    "ic95": 0.58,
+    "verdict": "orange"
+   },
+   "surprise": {
+    "valeur": 33.8,
+    "ordres": 20389,
+    "machines": 36.8,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 99.9,
+    "sommeil": 0.1,
+    "tour_moyen": 6.0
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.68,
+    "machines_actives": 0.92,
+    "valeur": 0.68,
+    "parties_au_tour_5_pct": 100.0,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 57.3,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Represailles": {
+      "tires_pct": 27.8,
+      "reussis_pct": 45.5,
+      "forets_par_ordre": 0.17
+     },
+     "Opportunisme": {
+      "tires_pct": 27.3,
+      "reussis_pct": 77.5,
+      "forets_par_ordre": 0.43
+     },
+     "Cupidite": {
+      "tires_pct": 24.9,
+      "reussis_pct": 53.3,
+      "forets_par_ordre": 0.24
+     },
+     "Percee": {
+      "tires_pct": 20.0,
+      "reussis_pct": 54.0,
+      "forets_par_ordre": 0.28
+     }
+    },
+    "machines": {
+     "Grosse Gueule": {
+      "tires_pct": 27.5,
+      "reussis_pct": 45.7,
+      "forets_par_ordre": 0.13
+     },
+     "Rapiat": {
+      "tires_pct": 25.0,
+      "reussis_pct": 56.7,
+      "forets_par_ordre": 0.37
+     },
+     "Mâchoire": {
+      "tires_pct": 21.6,
+      "reussis_pct": 63.5,
+      "forets_par_ordre": 0.49
+     },
+     "Tonton Débard": {
+      "tires_pct": 15.2,
+      "reussis_pct": 60.3,
+      "forets_par_ordre": 0.09
+     },
+     "Ripaille": {
+      "tires_pct": 10.8,
+      "reussis_pct": 77.5,
+      "forets_par_ordre": 0.3
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 6.03,
+    "entre_equipes": 6.9,
+    "meme_equipe": 6.78,
+    "propre_a_l_equipe": 0.12
+   },
+   "predictibilite": {
+    "valeur": 84.4,
+    "auc": 0.95,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.19,
+    "variance_initiale": 87.4,
+    "variance_tour_5": 16.5,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 66.0,
+     "pire": [
+      [
+       "insectes",
+       "oiseaux"
+      ],
+      62.0
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      93.9
+     ]
+    },
+    "trios": {
+     "rapport": 76.2,
+     "pire": [
+      [
+       "insectes",
+       "oiseaux",
+       "reptiles"
+      ],
+      71.0
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "mammiferes",
+       "reptiles"
+      ],
+      93.1
+     ]
+    },
+    "valeur": 66.0,
+    "verdict": "orange"
+   },
+   "shapley": {
+    "rapports": {
+     "oiseaux": 0.7,
+     "mammiferes": 1.18,
+     "reptiles": 1.61,
+     "insectes": 0.38,
+     "humains": 0.84,
+     "entites": 1.29
+    },
+    "ic95": {
+     "oiseaux": [
+      0.64,
+      0.75
+     ],
+     "mammiferes": [
+      1.13,
+      1.24
+     ],
+     "reptiles": [
+      1.57,
+      1.66
+     ],
+     "insectes": [
+      0.32,
+      0.43
+     ],
+     "humains": [
+      0.79,
+      0.9
+     ],
+     "entites": [
+      1.21,
+      1.34
+     ]
+    },
+    "points": {
+     "oiseaux": 8.38,
+     "mammiferes": 14.16,
+     "reptiles": 19.23,
+     "insectes": 4.5,
+     "humains": 10.11,
+     "entites": 15.39
+    },
+    "v_vide": 23.7,
+    "v_tous": 95.5,
+    "ecart_max": 0.62,
+    "verdict": "rouge",
+    "effet_par_taille": {
+     "2": {
+      "oiseaux": -5.6,
+      "mammiferes": 3.0,
+      "reptiles": 11.7,
+      "insectes": -12.9,
+      "humains": -3.7,
+      "entites": 7.5
+     },
+     "3": {
+      "oiseaux": -2.4,
+      "mammiferes": 8.5,
+      "reptiles": -0.1,
+      "insectes": -6.2,
+      "humains": -3.2,
+      "entites": 3.4
+     }
+    }
+   },
+   "synergies": {
+    "valeur": 10,
+    "verdict": "orange",
+    "duo_bat_son_meilleur_seul": {
+     "nombre": 10,
+     "detail": [
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       14.8
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       11.3
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       10.7
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       9.8
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       8.2
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       7.6
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       5.7
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       4.9
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       2.0
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       1.7
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -0.1
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.2
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -0.5
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -3.1
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -19.6
+      ]
+     ]
+    },
+    "tetraedre": {
+     "complets_dans_le_premier_tiers": 0,
+     "duos_complets": [
+      [
+       "entites",
+       "reptiles"
+      ],
+      [
+       "humains",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "oiseaux"
+      ]
+     ],
+     "classement": [
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       8.8
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       6.8
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       4.5
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       3.2
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       2.5
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       2.4
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       1.8
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       0.6
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -2.4
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -2.6
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -2.7
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -3.0
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -4.5
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -7.4
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -8.0
+      ]
+     ],
+     "verdict": "orange"
+    },
+    "additive": {
+     "positives": 0,
+     "classement": [
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -13.1
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -19.5
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -21.5
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -22.7
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -24.6
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -25.6
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -28.1
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       -29.0
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -30.5
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -30.6
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -34.6
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -36.8
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -43.3
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -44.0
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -50.1
+      ]
+     ]
+    },
+    "solo": {
+     "oiseaux": 60.4,
+     "mammiferes": 60.0,
+     "reptiles": 88.2,
+     "insectes": 48.1,
+     "humains": 63.9,
+     "entites": 73.3
+    }
+   },
+   "valeurs_equipes": {
+    "entites": 73.3,
+    "humains": 63.9,
+    "insectes": 48.1,
+    "mammiferes": 60.0,
+    "oiseaux": 60.4,
+    "reptiles": 88.2,
+    "entites/humains": 83.1,
+    "entites/insectes": 78.2,
+    "entites/mammiferes": 81.5,
+    "entites/oiseaux": 81.0,
+    "entites/reptiles": 87.7,
+    "humains/insectes": 63.7,
+    "humains/mammiferes": 78.7,
+    "humains/oiseaux": 63.8,
+    "humains/reptiles": 85.1,
+    "insectes/mammiferes": 71.3,
+    "insectes/oiseaux": 62.0,
+    "insectes/reptiles": 68.6,
+    "mammiferes/oiseaux": 71.1,
+    "mammiferes/reptiles": 93.9,
+    "oiseaux/reptiles": 90.2,
+    "entites/humains/insectes": 79.6,
+    "entites/humains/mammiferes": 87.3,
+    "entites/humains/oiseaux": 80.8,
+    "entites/humains/reptiles": 84.3,
+    "entites/insectes/mammiferes": 86.8,
+    "entites/insectes/oiseaux": 80.5,
+    "entites/insectes/reptiles": 81.0,
+    "entites/mammiferes/oiseaux": 86.7,
+    "entites/mammiferes/reptiles": 93.1,
+    "entites/oiseaux/reptiles": 87.9,
+    "humains/insectes/mammiferes": 85.8,
+    "humains/insectes/oiseaux": 75.6,
+    "humains/insectes/reptiles": 72.3,
+    "humains/mammiferes/oiseaux": 85.6,
+    "humains/mammiferes/reptiles": 87.9,
+    "humains/oiseaux/reptiles": 76.0,
+    "insectes/mammiferes/oiseaux": 82.7,
+    "insectes/mammiferes/reptiles": 84.9,
+    "insectes/oiseaux/reptiles": 71.0,
+    "mammiferes/oiseaux/reptiles": 92.6,
+    "entites/humains/insectes/mammiferes": 91.1,
+    "entites/humains/insectes/oiseaux": 84.2,
+    "entites/humains/insectes/reptiles": 88.2,
+    "entites/humains/mammiferes/oiseaux": 91.5,
+    "entites/humains/mammiferes/reptiles": 94.8,
+    "entites/humains/oiseaux/reptiles": 89.2,
+    "entites/insectes/mammiferes/oiseaux": 86.9,
+    "entites/insectes/mammiferes/reptiles": 95.0,
+    "entites/insectes/oiseaux/reptiles": 87.6,
+    "entites/mammiferes/oiseaux/reptiles": 95.0,
+    "humains/insectes/mammiferes/oiseaux": 86.2,
+    "humains/insectes/mammiferes/reptiles": 94.5,
+    "humains/insectes/oiseaux/reptiles": 85.2,
+    "humains/mammiferes/oiseaux/reptiles": 92.3,
+    "insectes/mammiferes/oiseaux/reptiles": 92.9,
+    "entites/humains/insectes/mammiferes/oiseaux": 92.7,
+    "entites/humains/insectes/mammiferes/reptiles": 96.9,
+    "entites/humains/insectes/oiseaux/reptiles": 91.1,
+    "entites/humains/mammiferes/oiseaux/reptiles": 95.0,
+    "entites/insectes/mammiferes/oiseaux/reptiles": 94.3,
+    "humains/insectes/mammiferes/oiseaux/reptiles": 93.6,
+    "entites/humains/insectes/mammiferes/oiseaux/reptiles": 95.5
+   }
+  },
+  "v1_mammiferes_sans_pouvoir": {
+   "config": "v1_mammiferes_sans_pouvoir",
+   "maquette": "v1",
+   "variante": "temoin_mammiferes_sans_pouvoir",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 2760,
+   "erreurs": 0,
+   "parties": 1400,
+   "foret_pct": 68.4,
+   "foret_ic95": 0.63,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 19.96,
+    "principales": {
+     "egalite_machine": 8.98,
+     "egalite_critere": 5.59,
+     "represailles_sans_attaque": 1.7,
+     "percee_au_bout": 1.28,
+     "represailles_ancienne": 0.75,
+     "egalite_arbitraire": 0.69
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_echoues": 99.9,
+    "bloquee_par_barrage": 99.6,
+    "ordres_reussis": 99.1,
+    "coupe_hors_cible": 84.9,
+    "organes_neutralises": 83.4,
+    "apprentissage_sans_mouvement": 71.9,
+    "machines_hs": 65.1,
+    "zones_rasees": 59.0,
+    "presages": 57.1,
+    "renforts": 46.8,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "tromperies": 42.4,
+    "reparer_sans_cible": 38.9,
+    "reparations": 35.5,
+    "pouvoir_hanter": 35.4,
+    "ordres_hantes": 35.1,
+    "sabotage_sans_effet": 24.1,
+    "immobilisations": 23.1,
+    "abattage_zone_rasee": 20.9,
+    "machines_egarees": 20.4,
+    "oubli_tactique": 20.4,
+    "esprits_egarer": 20.4,
+    "coupe_en_chemin_cible_barree": 8.2,
+    "echec_bloque_par_esprit": 5.8,
+    "renfort_sans_reserve": 5.1,
+    "reves_tires": 2.8,
+    "tir_a_la_corde": 0.1,
+    "presage_detourne": 0.1
+   },
+   "charge": {
+    "par_partie": 19.09
+   },
+   "duree": {
+    "minutes": 53.5,
+    "minutes_q90": 60.9,
+    "tours": 5.97,
+    "decisions_non_forcees_par_joueur": 88.2
+   },
+   "attente": {
+    "attente_pct": 20.9,
+    "decisions_par_heure": 99.5
+   },
+   "forcees": {
+    "total_pct": 5.3,
+    "par_type": {
+     "action": 37.8,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 99.2,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 95.0,
+    "ic95": 0.33,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 38.5,
+    "ordres": 23660,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 96.9,
+    "silence": 3.1,
+    "tour_moyen": 5.97
+   },
+   "fins_precoces": {
+    "valeur": 0.1,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 1.0,
+    "machines_actives": 0.93,
+    "valeur": 0.93,
+    "parties_au_tour_5_pct": 99.0,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 48.8,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 26.6,
+      "reussis_pct": 54.2,
+      "forets_par_ordre": 0.54
+     },
+     "Cupidite": {
+      "tires_pct": 24.6,
+      "reussis_pct": 21.7,
+      "forets_par_ordre": 0.22
+     },
+     "Represailles": {
+      "tires_pct": 21.0,
+      "reussis_pct": 34.2,
+      "forets_par_ordre": 0.34
+     },
+     "Percee": {
+      "tires_pct": 18.2,
+      "reussis_pct": 67.8,
+      "forets_par_ordre": 0.68
+     },
+     "Reparer": {
+      "tires_pct": 5.7,
+      "reussis_pct": 51.2,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 3.9,
+      "reussis_pct": 91.5,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Abatteuse": {
+      "tires_pct": 48.9,
+      "reussis_pct": 25.5,
+      "forets_par_ordre": 0.26
+     },
+     "Bouteur": {
+      "tires_pct": 40.7,
+      "reussis_pct": 61.6,
+      "forets_par_ordre": 0.62
+     },
+     "Pelleteuse": {
+      "tires_pct": 9.1,
+      "reussis_pct": 53.8,
+      "forets_par_ordre": 0.54
+     },
+     "Debardeuse": {
+      "tires_pct": 1.2,
+      "reussis_pct": 75.6,
+      "forets_par_ordre": 0.76
+     },
+     "Broyeuse": {
+      "tires_pct": 0.1,
+      "reussis_pct": 87.0,
+      "forets_par_ordre": 0.87
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 7.01,
+    "entre_equipes": 7.64,
+    "meme_equipe": 7.66,
+    "propre_a_l_equipe": -0.02
+   },
+   "predictibilite": {
+    "valeur": 75.8,
+    "auc": 0.87,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "orange"
+   },
+   "incertitude": {
+    "valeur": 0.22,
+    "variance_initiale": 132.2,
+    "variance_tour_5": 29.0,
+    "finies_avant_tour_5_pct": 0.8,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 78.5,
+     "pire": [
+      [
+       "insectes",
+       "mammiferes"
+      ],
+      61.2
+     ],
+     "meilleure": [
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      78.0
+     ]
+    },
+    "trios": {
+     "rapport": 85.2,
+     "pire": [
+      [
+       "insectes",
+       "mammiferes",
+       "oiseaux"
+      ],
+      63.0
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "mammiferes",
+       "reptiles"
+      ],
+      73.9
+     ]
+    },
+    "valeur": 78.5,
+    "verdict": "vert"
+   },
+   "shapley": {
+    "rapports": {
+     "oiseaux": 0.98,
+     "mammiferes": 1.02,
+     "reptiles": 1.52,
+     "insectes": 0.4,
+     "humains": 1.04,
+     "entites": 1.05
+    },
+    "ic95": {
+     "oiseaux": [
+      0.84,
+      1.13
+     ],
+     "mammiferes": [
+      0.88,
+      1.13
+     ],
+     "reptiles": [
+      1.41,
+      1.64
+     ],
+     "insectes": [
+      0.29,
+      0.53
+     ],
+     "humains": [
+      0.92,
+      1.14
+     ],
+     "entites": [
+      0.94,
+      1.16
+     ]
+    },
+    "points": {
+     "oiseaux": 8.0,
+     "mammiferes": 8.33,
+     "reptiles": 12.47,
+     "insectes": 3.29,
+     "humains": 8.5,
+     "entites": 8.58
+    },
+    "v_vide": 22.7,
+    "v_tous": 71.9,
+    "ecart_max": 0.6,
+    "verdict": "rouge",
+    "effet_par_taille": {
+     "2": {
+      "oiseaux": 0.0,
+      "mammiferes": 0.2,
+      "reptiles": 6.1,
+      "insectes": -8.3,
+      "humains": 1.3,
+      "entites": 0.7
+     },
+     "3": {
+      "oiseaux": -0.6,
+      "mammiferes": -0.6,
+      "reptiles": 2.1,
+      "insectes": -3.1,
+      "humains": -0.7,
+      "entites": 3.0
+     }
+    }
+   },
+   "synergies": {
+    "valeur": 3,
+    "verdict": "rouge",
+    "duo_bat_son_meilleur_seul": {
+     "nombre": 3,
+     "detail": [
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       2.5
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       2.1
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       2.1
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -2.0
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -2.6
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -3.1
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -3.8
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -5.5
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -5.7
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -5.7
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -7.5
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -8.2
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -9.0
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -13.1
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -16.4
+      ]
+     ]
+    },
+    "tetraedre": {
+     "complets_dans_le_premier_tiers": 0,
+     "duos_complets": [
+      [
+       "entites",
+       "reptiles"
+      ],
+      [
+       "humains",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "oiseaux"
+      ]
+     ],
+     "classement": [
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       5.5
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       4.6
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       3.0
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       2.8
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       2.7
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       0.9
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       0.5
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       0.0
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -1.2
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -1.7
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -1.7
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -1.9
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -3.2
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -4.5
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -5.9
+      ]
+     ],
+     "verdict": "orange"
+    },
+    "additive": {
+     "positives": 0,
+     "classement": [
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -29.0
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       -35.8
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -36.2
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -38.7
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -39.4
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -40.2
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -41.0
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -47.6
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -48.7
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -49.4
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -51.4
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -51.8
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       -52.0
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -52.4
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -54.2
+      ]
+     ]
+    },
+    "solo": {
+     "oiseaux": 69.0,
+     "mammiferes": 69.4,
+     "reptiles": 80.0,
+     "insectes": 53.9,
+     "humains": 73.1,
+     "entites": 61.1
+    }
+   },
+   "valeurs_equipes": {
+    "entites": 61.1,
+    "humains": 73.1,
+    "insectes": 53.9,
+    "mammiferes": 69.4,
+    "oiseaux": 69.0,
+    "reptiles": 80.0,
+    "entites/humains": 70.5,
+    "entites/insectes": 63.2,
+    "entites/mammiferes": 71.5,
+    "entites/oiseaux": 71.5,
+    "entites/reptiles": 66.9,
+    "humains/insectes": 64.0,
+    "humains/mammiferes": 67.4,
+    "humains/oiseaux": 67.4,
+    "humains/reptiles": 76.2,
+    "insectes/mammiferes": 61.2,
+    "insectes/oiseaux": 61.5,
+    "insectes/reptiles": 63.6,
+    "mammiferes/oiseaux": 63.9,
+    "mammiferes/reptiles": 78.0,
+    "oiseaux/reptiles": 76.9,
+    "entites/humains/insectes": 70.2,
+    "entites/humains/mammiferes": 66.7,
+    "entites/humains/oiseaux": 67.0,
+    "entites/humains/reptiles": 71.0,
+    "entites/insectes/mammiferes": 71.4,
+    "entites/insectes/oiseaux": 71.1,
+    "entites/insectes/reptiles": 66.3,
+    "entites/mammiferes/oiseaux": 68.2,
+    "entites/mammiferes/reptiles": 73.9,
+    "entites/oiseaux/reptiles": 73.7,
+    "humains/insectes/mammiferes": 64.8,
+    "humains/insectes/oiseaux": 64.8,
+    "humains/insectes/reptiles": 66.3,
+    "humains/mammiferes/oiseaux": 67.0,
+    "humains/mammiferes/reptiles": 71.5,
+    "humains/oiseaux/reptiles": 71.8,
+    "insectes/mammiferes/oiseaux": 63.0,
+    "insectes/mammiferes/reptiles": 65.7,
+    "insectes/oiseaux/reptiles": 65.5,
+    "mammiferes/oiseaux/reptiles": 69.4,
+    "entites/humains/insectes/mammiferes": 70.8,
+    "entites/humains/insectes/oiseaux": 70.8,
+    "entites/humains/insectes/reptiles": 72.0,
+    "entites/humains/mammiferes/oiseaux": 68.0,
+    "entites/humains/mammiferes/reptiles": 71.7,
+    "entites/humains/oiseaux/reptiles": 71.5,
+    "entites/insectes/mammiferes/oiseaux": 70.8,
+    "entites/insectes/mammiferes/reptiles": 71.2,
+    "entites/insectes/oiseaux/reptiles": 70.8,
+    "entites/mammiferes/oiseaux/reptiles": 70.8,
+    "humains/insectes/mammiferes/oiseaux": 63.0,
+    "humains/insectes/mammiferes/reptiles": 66.3,
+    "humains/insectes/oiseaux/reptiles": 64.4,
+    "humains/mammiferes/oiseaux/reptiles": 71.0,
+    "insectes/mammiferes/oiseaux/reptiles": 69.8,
+    "entites/humains/insectes/mammiferes/oiseaux": 70.2,
+    "entites/humains/insectes/mammiferes/reptiles": 72.1,
+    "entites/humains/insectes/oiseaux/reptiles": 71.7,
+    "entites/humains/mammiferes/oiseaux/reptiles": 71.3,
+    "entites/insectes/mammiferes/oiseaux/reptiles": 74.3,
+    "humains/insectes/mammiferes/oiseaux/reptiles": 69.3,
+    "entites/humains/insectes/mammiferes/oiseaux/reptiles": 71.9
+   }
+  },
+  "v1_spectateur": {
+   "config": "v1_spectateur",
+   "maquette": "v1",
+   "variante": "temoin_spectateur",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 6360,
+   "erreurs": 0,
+   "parties": 1400,
+   "foret_pct": 67.0,
+   "foret_ic95": 0.71,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 19.62,
+    "principales": {
+     "egalite_machine": 8.36,
+     "egalite_critere": 5.48,
+     "represailles_sans_attaque": 1.51,
+     "percee_au_bout": 1.48,
+     "ordre_contre_immobile": 1.0,
+     "egalite_arbitraire": 0.69
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_reussis": 99.6,
+    "ordres_echoues": 98.9,
+    "bloquee_par_barrage": 93.8,
+    "organes_neutralises": 87.3,
+    "apprentissage_sans_mouvement": 82.7,
+    "coupe_hors_cible": 77.1,
+    "machines_hs": 65.1,
+    "zones_rasees": 58.8,
+    "presages": 57.1,
+    "renforts": 44.3,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "reparer_sans_cible": 34.9,
+    "pouvoir_hanter": 34.2,
+    "ordres_hantes": 33.2,
+    "sabotage_sans_effet": 31.4,
+    "immobilisations": 27.7,
+    "reparations": 26.9,
+    "machines_egarees": 25.5,
+    "oubli_tactique": 25.5,
+    "esprits_egarer": 25.5,
+    "abattage_zone_rasee": 23.0,
+    "renfort_sans_reserve": 6.3,
+    "echec_bloque_par_esprit": 4.6,
+    "reves_tires": 3.9,
+    "coupe_en_chemin_cible_barree": 3.6,
+    "tenir_zones": 0.9,
+    "tir_a_la_corde": 0.4,
+    "presage_detourne": 0.1
+   },
+   "charge": {
+    "par_partie": 18.23
+   },
+   "duree": {
+    "minutes": 47.3,
+    "minutes_q90": 54.9,
+    "tours": 5.78,
+    "decisions_non_forcees_par_joueur": 77.9
+   },
+   "attente": {
+    "attente_pct": 17.0,
+    "decisions_par_heure": 99.2
+   },
+   "forcees": {
+    "total_pct": 7.9,
+    "par_type": {
+     "action": 52.2,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 99.0,
+     "trace": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 95.2,
+    "ic95": 0.32,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 38.3,
+    "ordres": 22630,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 80.9,
+    "silence": 19.1,
+    "tour_moyen": 5.78
+   },
+   "fins_precoces": {
+    "valeur": 1.6,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 1.06,
+    "machines_actives": 0.89,
+    "valeur": 0.89,
+    "parties_au_tour_5_pct": 93.9,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 44.4,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 27.4,
+      "reussis_pct": 52.8,
+      "forets_par_ordre": 0.53
+     },
+     "Cupidite": {
+      "tires_pct": 24.6,
+      "reussis_pct": 27.5,
+      "forets_par_ordre": 0.28
+     },
+     "Percee": {
+      "tires_pct": 19.9,
+      "reussis_pct": 72.8,
+      "forets_par_ordre": 0.73
+     },
+     "Represailles": {
+      "tires_pct": 19.1,
+      "reussis_pct": 37.2,
+      "forets_par_ordre": 0.37
+     },
+     "Reparer": {
+      "tires_pct": 5.1,
+      "reussis_pct": 50.4,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 3.9,
+      "reussis_pct": 89.4,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Bouteur": {
+      "tires_pct": 48.9,
+      "reussis_pct": 65.2,
+      "forets_par_ordre": 0.65
+     },
+     "Abatteuse": {
+      "tires_pct": 39.0,
+      "reussis_pct": 22.4,
+      "forets_par_ordre": 0.22
+     },
+     "Pelleteuse": {
+      "tires_pct": 10.5,
+      "reussis_pct": 51.1,
+      "forets_par_ordre": 0.51
+     },
+     "Debardeuse": {
+      "tires_pct": 1.4,
+      "reussis_pct": 64.1,
+      "forets_par_ordre": 0.64
+     },
+     "Broyeuse": {
+      "tires_pct": 0.2,
+      "reussis_pct": 88.6,
+      "forets_par_ordre": 0.89
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 7.14,
+    "entre_equipes": 7.42,
+    "meme_equipe": 7.36,
+    "propre_a_l_equipe": 0.06
+   },
+   "predictibilite": {
+    "valeur": 70.4,
+    "auc": 0.85,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "orange"
+   },
+   "incertitude": {
+    "valeur": 0.2,
+    "variance_initiale": 149.7,
+    "variance_tour_5": 29.8,
+    "finies_avant_tour_5_pct": 5.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 66.3,
+     "pire": [
+      [
+       "humains",
+       "mammiferes"
+      ],
+      51.4
+     ],
+     "meilleure": [
+      [
+       "humains",
+       "reptiles"
+      ],
+      77.6
+     ]
+    },
+    "trios": {
+     "rapport": 78.4,
+     "pire": [
+      [
+       "humains",
+       "insectes",
+       "mammiferes"
+      ],
+      58.2
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "mammiferes",
+       "oiseaux"
+      ],
+      74.3
+     ]
+    },
+    "valeur": 66.3,
+    "verdict": "orange"
+   },
+   "shapley": {
+    "rapports": {
+     "oiseaux": 1.56,
+     "mammiferes": 0.86,
+     "reptiles": 1.75,
+     "insectes": 0.58,
+     "humains": -0.02,
+     "entites": 1.28
+    },
+    "ic95": {
+     "oiseaux": [
+      1.42,
+      1.67
+     ],
+     "mammiferes": [
+      0.75,
+      0.98
+     ],
+     "reptiles": [
+      1.64,
+      1.85
+     ],
+     "insectes": [
+      0.47,
+      0.7
+     ],
+     "humains": [
+      -0.13,
+      0.09
+     ],
+     "entites": [
+      1.18,
+      1.37
+     ]
+    },
+    "points": {
+     "oiseaux": 13.73,
+     "mammiferes": 7.57,
+     "reptiles": 15.44,
+     "insectes": 5.13,
+     "humains": -0.16,
+     "entites": 11.27
+    },
+    "v_vide": 22.7,
+    "v_tous": 75.7,
+    "ecart_max": 1.02,
+    "verdict": "rouge",
+    "effet_par_taille": {
+     "2": {
+      "oiseaux": 6.6,
+      "mammiferes": -3.9,
+      "reptiles": 8.8,
+      "insectes": -8.6,
+      "humains": -3.3,
+      "entites": 0.4
+     },
+     "3": {
+      "oiseaux": 4.5,
+      "mammiferes": 1.0,
+      "reptiles": 1.2,
+      "insectes": -4.3,
+      "humains": -4.5,
+      "entites": 2.1
+     }
+    }
+   },
+   "synergies": {
+    "valeur": 5,
+    "verdict": "rouge",
+    "duo_bat_son_meilleur_seul": {
+     "nombre": 5,
+     "detail": [
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       6.5
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       5.7
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       4.2
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       2.5
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       2.1
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -0.1
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.7
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -0.7
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -2.4
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -3.1
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -3.6
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -7.5
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -7.5
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -13.1
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -16.4
+      ]
+     ]
+    },
+    "tetraedre": {
+     "complets_dans_le_premier_tiers": 0,
+     "duos_complets": [
+      [
+       "entites",
+       "reptiles"
+      ],
+      [
+       "humains",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "oiseaux"
+      ]
+     ],
+     "classement": [
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       8.3
+      ],
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       6.9
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       4.3
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       3.6
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       3.0
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       1.2
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       1.0
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       0.8
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -1.9
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -2.2
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -2.8
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -3.4
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -4.5
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -4.9
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       -9.4
+      ]
+     ],
+     "verdict": "orange"
+    },
+    "additive": {
+     "positives": 2,
+     "classement": [
+      [
+       [
+        "humains",
+        "oiseaux"
+       ],
+       6.0
+      ],
+      [
+       [
+        "humains",
+        "mammiferes"
+       ],
+       0.1
+      ],
+      [
+       [
+        "humains",
+        "insectes"
+       ],
+       -0.5
+      ],
+      [
+       [
+        "entites",
+        "humains"
+       ],
+       -0.5
+      ],
+      [
+       [
+        "humains",
+        "reptiles"
+       ],
+       -2.1
+      ],
+      [
+       [
+        "entites",
+        "mammiferes"
+       ],
+       -22.3
+      ],
+      [
+       [
+        "insectes",
+        "mammiferes"
+       ],
+       -24.6
+      ],
+      [
+       [
+        "entites",
+        "insectes"
+       ],
+       -29.0
+      ],
+      [
+       [
+        "mammiferes",
+        "oiseaux"
+       ],
+       -32.4
+      ],
+      [
+       [
+        "entites",
+        "oiseaux"
+       ],
+       -35.8
+      ],
+      [
+       [
+        "mammiferes",
+        "reptiles"
+       ],
+       -36.3
+      ],
+      [
+       [
+        "insectes",
+        "oiseaux"
+       ],
+       -38.7
+      ],
+      [
+       [
+        "insectes",
+        "reptiles"
+       ],
+       -47.6
+      ],
+      [
+       [
+        "oiseaux",
+        "reptiles"
+       ],
+       -49.4
+      ],
+      [
+       [
+        "entites",
+        "reptiles"
+       ],
+       -51.4
+      ]
+     ]
+    },
+    "solo": {
+     "oiseaux": 69.0,
+     "mammiferes": 51.5,
+     "reptiles": 80.0,
+     "insectes": 53.9,
+     "humains": 22.5,
+     "entites": 61.1
+    }
+   },
+   "valeurs_equipes": {
+    "entites": 61.1,
+    "humains": 22.5,
+    "insectes": 53.9,
+    "mammiferes": 51.5,
+    "oiseaux": 69.0,
+    "reptiles": 80.0,
+    "entites/humains": 60.4,
+    "entites/insectes": 63.2,
+    "entites/mammiferes": 67.6,
+    "entites/oiseaux": 71.5,
+    "entites/reptiles": 66.9,
+    "humains/insectes": 53.2,
+    "humains/mammiferes": 51.4,
+    "humains/oiseaux": 74.8,
+    "humains/reptiles": 77.6,
+    "insectes/mammiferes": 58.1,
+    "insectes/oiseaux": 61.5,
+    "insectes/reptiles": 63.6,
+    "mammiferes/oiseaux": 65.5,
+    "mammiferes/reptiles": 72.5,
+    "oiseaux/reptiles": 76.9,
+    "entites/humains/insectes": 65.4,
+    "entites/humains/mammiferes": 65.8,
+    "entites/humains/oiseaux": 71.2,
+    "entites/humains/reptiles": 64.8,
+    "entites/insectes/mammiferes": 67.9,
+    "entites/insectes/oiseaux": 71.1,
+    "entites/insectes/reptiles": 66.3,
+    "entites/mammiferes/oiseaux": 74.3,
+    "entites/mammiferes/reptiles": 70.6,
+    "entites/oiseaux/reptiles": 73.7,
+    "humains/insectes/mammiferes": 58.2,
+    "humains/insectes/oiseaux": 61.1,
+    "humains/insectes/reptiles": 62.5,
+    "humains/mammiferes/oiseaux": 68.2,
+    "humains/mammiferes/reptiles": 66.7,
+    "humains/oiseaux/reptiles": 74.0,
+    "insectes/mammiferes/oiseaux": 71.4,
+    "insectes/mammiferes/reptiles": 69.5,
+    "insectes/oiseaux/reptiles": 65.5,
+    "mammiferes/oiseaux/reptiles": 72.6,
+    "entites/humains/insectes/mammiferes": 66.0,
+    "entites/humains/insectes/oiseaux": 69.0,
+    "entites/humains/insectes/reptiles": 63.9,
+    "entites/humains/mammiferes/oiseaux": 69.8,
+    "entites/humains/mammiferes/reptiles": 71.9,
+    "entites/humains/oiseaux/reptiles": 71.1,
+    "entites/insectes/mammiferes/oiseaux": 69.9,
+    "entites/insectes/mammiferes/reptiles": 71.7,
+    "entites/insectes/oiseaux/reptiles": 70.8,
+    "entites/mammiferes/oiseaux/reptiles": 72.7,
+    "humains/insectes/mammiferes/oiseaux": 64.4,
+    "humains/insectes/mammiferes/reptiles": 68.5,
+    "humains/insectes/oiseaux/reptiles": 64.3,
+    "humains/mammiferes/oiseaux/reptiles": 68.5,
+    "insectes/mammiferes/oiseaux/reptiles": 68.8,
+    "entites/humains/insectes/mammiferes/oiseaux": 71.8,
+    "entites/humains/insectes/mammiferes/reptiles": 69.6,
+    "entites/humains/insectes/oiseaux/reptiles": 71.9,
+    "entites/humains/mammiferes/oiseaux/reptiles": 74.5,
+    "entites/insectes/mammiferes/oiseaux/reptiles": 73.8,
+    "humains/insectes/mammiferes/oiseaux/reptiles": 68.7,
+    "entites/humains/insectes/mammiferes/oiseaux/reptiles": 75.7
+   },
+   "spectateur": {
+    "impact_points": {
+     "oiseaux": 11.5,
+     "mammiferes": 3.1,
+     "reptiles": 11.1,
+     "insectes": 0.1,
+     "humains": 0.3,
+     "entites": 6.3
+    },
+    "rapports": {
+     "oiseaux": 2.13,
+     "mammiferes": 0.57,
+     "reptiles": 2.05,
+     "insectes": 0.03,
+     "humains": 0.06,
+     "entites": 1.16
+    },
+    "valeur": 0.03,
+    "verdict": "rouge",
+    "au_hasard": {
+     "impact_points": {
+      "oiseaux": 8.1,
+      "mammiferes": -3.1,
+      "reptiles": 6.3,
+      "insectes": -1.2,
+      "humains": -1.3,
+      "entites": -2.6
+     },
+     "rapports": {
+      "oiseaux": 8.04,
+      "mammiferes": -3.09,
+      "reptiles": 6.18,
+      "insectes": -1.2,
+      "humains": -1.32,
+      "entites": -2.61
+     },
+     "valeur": -3.09,
+     "verdict": "rouge"
+    }
+   }
+  },
+  "v1_sans_pouvoirs": {
+   "config": "v1_sans_pouvoirs",
+   "maquette": "v1",
+   "variante": "sans_pouvoirs",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 65.1,
+   "foret_ic95": 0.86,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 21.07,
+    "principales": {
+     "egalite_machine": 9.88,
+     "egalite_critere": 6.14,
+     "represailles_sans_attaque": 1.79,
+     "percee_au_bout": 1.09,
+     "represailles_ancienne": 0.96,
+     "egalite_arbitraire": 0.67
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "presages": 100.0,
+    "ordres": 100.0,
+    "bloquee_par_barrage": 100.0,
+    "ordres_echoues": 100.0,
+    "echanges_piste": 100.0,
+    "ordres_reussis": 97.1,
+    "coupe_hors_cible": 88.6,
+    "apprentissage_sans_mouvement": 82.9,
+    "organes_neutralises": 79.3,
+    "machines_hs": 79.3,
+    "zones_rasees": 57.8,
+    "renforts": 54.1,
+    "reparer_sans_cible": 36.3,
+    "sabotage_sans_effet": 35.5,
+    "coupe_en_chemin_cible_barree": 25.6,
+    "reparations": 23.1,
+    "renfort_sans_reserve": 8.4,
+    "abattage_zone_rasee": 6.7
+   },
+   "charge": {
+    "par_partie": 20.75
+   },
+   "duree": {
+    "minutes": 52.4,
+    "minutes_q90": 58.4,
+    "tours": 6.0,
+    "decisions_non_forcees_par_joueur": 86.5
+   },
+   "attente": {
+    "attente_pct": 20.8,
+    "decisions_par_heure": 99.6
+   },
+   "forcees": {
+    "total_pct": 6.4,
+    "par_type": {
+     "action": 38.0,
+     "aller": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "trace": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 97.2,
+    "ic95": 0.3,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 39.5,
+    "ordres": 18900,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 100.0,
+    "tour_moyen": 6.0
+   },
+   "fins_precoces": {
+    "valeur": 0.0,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 1.17,
+    "machines_actives": 0.91,
+    "valeur": 0.91,
+    "parties_au_tour_5_pct": 100.0,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 47.6,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 28.5,
+      "reussis_pct": 60.5,
+      "forets_par_ordre": 0.61
+     },
+     "Cupidite": {
+      "tires_pct": 24.4,
+      "reussis_pct": 25.2,
+      "forets_par_ordre": 0.25
+     },
+     "Percee": {
+      "tires_pct": 19.3,
+      "reussis_pct": 64.0,
+      "forets_par_ordre": 0.64
+     },
+     "Represailles": {
+      "tires_pct": 19.2,
+      "reussis_pct": 25.8,
+      "forets_par_ordre": 0.26
+     },
+     "Reparer": {
+      "tires_pct": 4.4,
+      "reussis_pct": 42.0,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 4.2,
+      "reussis_pct": 89.0,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Abatteuse": {
+      "tires_pct": 59.7,
+      "reussis_pct": 28.6,
+      "forets_par_ordre": 0.29
+     },
+     "Bouteur": {
+      "tires_pct": 26.7,
+      "reussis_pct": 70.5,
+      "forets_par_ordre": 0.7
+     },
+     "Pelleteuse": {
+      "tires_pct": 12.2,
+      "reussis_pct": 61.9,
+      "forets_par_ordre": 0.62
+     },
+     "Debardeuse": {
+      "tires_pct": 1.2,
+      "reussis_pct": 76.3,
+      "forets_par_ordre": 0.76
+     },
+     "Broyeuse": {
+      "tires_pct": 0.2,
+      "reussis_pct": 100.0,
+      "forets_par_ordre": 1.0
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 7.31,
+    "entre_equipes": 7.03,
+    "meme_equipe": 6.87,
+    "propre_a_l_equipe": 0.16
+   },
+   "predictibilite": {
+    "valeur": 65.9,
+    "auc": 0.81,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "orange"
+   },
+   "incertitude": {
+    "valeur": 0.14,
+    "variance_initiale": 216.6,
+    "variance_tour_5": 29.5,
+    "finies_avant_tour_5_pct": 0.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 94.1,
+     "pire": [
+      [
+       "mammiferes",
+       "oiseaux"
+      ],
+      65.9
+     ],
+     "meilleure": [
+      [
+       "insectes",
+       "reptiles"
+      ],
+      70.0
+     ]
+    },
+    "trios": {
+     "rapport": 97.3,
+     "pire": [
+      [
+       "insectes",
+       "mammiferes",
+       "oiseaux"
+      ],
+      63.0
+     ],
+     "meilleure": [
+      [
+       "insectes",
+       "oiseaux",
+       "reptiles"
+      ],
+      64.8
+     ]
+    },
+    "valeur": 94.1,
+    "verdict": "vert"
+   }
+  },
+  "v1_barrage_v0": {
+   "config": "v1_barrage_v0",
+   "maquette": "v1",
+   "variante": "retour_v0_barrage",
+   "bot": "glouton reves_par_tour=0.0",
+   "parties_jouees": 1050,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 62.3,
+   "foret_ic95": 0.85,
+   "robustesse": {
+    "incoherences_par_partie": 0.884,
+    "incoherences": {
+     "barrage_contourne": 928
+    },
+    "verdict": "rouge"
+   },
+   "lacunes": {
+    "par_partie": 18.69,
+    "principales": {
+     "egalite_machine": 8.61,
+     "egalite_critere": 5.06,
+     "represailles_sans_attaque": 1.39,
+     "percee_au_bout": 1.23,
+     "egalite_arbitraire": 0.68,
+     "represailles_ancienne": 0.58
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "ordres_reussis": 100.0,
+    "echanges_piste": 100.0,
+    "coupe_hors_cible": 98.7,
+    "zones_rasees": 98.4,
+    "ordres_echoues": 97.3,
+    "bloquee_par_barrage": 96.0,
+    "abattage_zone_rasee": 92.4,
+    "organes_neutralises": 88.5,
+    "apprentissage_sans_mouvement": 73.6,
+    "machines_hs": 71.2,
+    "presages": 57.1,
+    "renforts": 45.0,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "embuscades": 42.9,
+    "tromperies": 42.9,
+    "sabotage_sans_effet": 36.9,
+    "reparer_sans_cible": 34.5,
+    "pouvoir_hanter": 33.2,
+    "ordres_hantes": 31.9,
+    "reparations": 31.5,
+    "machines_egarees": 26.3,
+    "oubli_tactique": 26.3,
+    "esprits_egarer": 26.3,
+    "immobilisations": 22.1,
+    "echec_bloque_par_esprit": 5.9,
+    "renfort_sans_reserve": 5.3,
+    "reves_tires": 3.9,
+    "tenir_zones": 0.8,
+    "tir_a_la_corde": 0.2
+   },
+   "charge": {
+    "par_partie": 17.69
+   },
+   "duree": {
+    "minutes": 51.1,
+    "minutes_q90": 59.8,
+    "tours": 5.73,
+    "decisions_non_forcees_par_joueur": 84.3
+   },
+   "attente": {
+    "attente_pct": 20.4,
+    "decisions_par_heure": 99.4
+   },
+   "forcees": {
+    "total_pct": 5.7,
+    "par_type": {
+     "action": 41.1,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 99.5,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 96.3,
+    "ic95": 0.31,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 38.3,
+    "ordres": 16782,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "nuit": 79.5,
+    "silence": 20.5,
+    "tour_moyen": 5.73
+   },
+   "fins_precoces": {
+    "valeur": 2.9,
+    "verdict": "vert"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.81,
+    "machines_actives": 0.88,
+    "valeur": 0.81,
+    "parties_au_tour_5_pct": 91.6,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 39.6,
+    "verdict": "orange"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 27.3,
+      "reussis_pct": 60.4,
+      "forets_par_ordre": 0.6
+     },
+     "Cupidite": {
+      "tires_pct": 25.6,
+      "reussis_pct": 44.1,
+      "forets_par_ordre": 0.44
+     },
+     "Represailles": {
+      "tires_pct": 19.3,
+      "reussis_pct": 40.9,
+      "forets_par_ordre": 0.41
+     },
+     "Percee": {
+      "tires_pct": 18.6,
+      "reussis_pct": 74.5,
+      "forets_par_ordre": 0.74
+     },
+     "Reparer": {
+      "tires_pct": 5.2,
+      "reussis_pct": 49.9,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 3.9,
+      "reussis_pct": 91.5,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Abatteuse": {
+      "tires_pct": 43.9,
+      "reussis_pct": 34.0,
+      "forets_par_ordre": 0.34
+     },
+     "Bouteur": {
+      "tires_pct": 43.5,
+      "reussis_pct": 74.1,
+      "forets_par_ordre": 0.74
+     },
+     "Pelleteuse": {
+      "tires_pct": 10.7,
+      "reussis_pct": 56.3,
+      "forets_par_ordre": 0.56
+     },
+     "Debardeuse": {
+      "tires_pct": 1.7,
+      "reussis_pct": 67.3,
+      "forets_par_ordre": 0.67
+     },
+     "Broyeuse": {
+      "tires_pct": 0.2,
+      "reussis_pct": 96.3,
+      "forets_par_ordre": 0.96
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 6.83,
+    "entre_equipes": 7.69,
+    "meme_equipe": 7.58,
+    "propre_a_l_equipe": 0.11
+   },
+   "predictibilite": {
+    "valeur": 63.7,
+    "auc": 0.74,
+    "fin_avant_tour_3_pct": 0.0,
+    "parties": 120,
+    "verdict": "vert"
+   },
+   "incertitude": {
+    "valeur": 0.11,
+    "variance_initiale": 250.1,
+    "variance_tour_5": 26.6,
+    "finies_avant_tour_5_pct": 5.8,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 79.8,
+     "pire": [
+      [
+       "humains",
+       "insectes"
+      ],
+      53.8
+     ],
+     "meilleure": [
+      [
+       "humains",
+       "reptiles"
+      ],
+      67.5
+     ]
+    },
+    "trios": {
+     "rapport": 80.6,
+     "pire": [
+      [
+       "humains",
+       "insectes",
+       "oiseaux"
+      ],
+      54.6
+     ],
+     "meilleure": [
+      [
+       "entites",
+       "mammiferes",
+       "oiseaux"
+      ],
+      67.8
+     ]
+    },
+    "valeur": 79.8,
+    "verdict": "vert"
+   }
+  },
+  "v1_reves_illimites": {
+   "config": "v1_reves_illimites",
+   "maquette": "v1",
+   "variante": "retour_v0_reves_illimites",
+   "bot": "glouton reves_par_tour=3.0",
+   "parties_jouees": 2450,
+   "erreurs": 0,
+   "parties": 1050,
+   "foret_pct": 92.0,
+   "foret_ic95": 0.59,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 3.18,
+    "principales": {
+     "egalite_machine": 1.62,
+     "egalite_critere": 0.86,
+     "represailles_sans_attaque": 0.38,
+     "chemin_multiple": 0.13,
+     "egalite_arbitraire": 0.08,
+     "percee_au_bout": 0.04
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "oubli_tactique": 100.0,
+    "esprits_carte": 100.0,
+    "echanges_piste": 100.0,
+    "ordres": 94.3,
+    "ordres_reussis": 89.5,
+    "coupe_hors_cible": 75.7,
+    "presages": 71.4,
+    "voir": 42.9,
+    "presage_deja_vu": 42.9,
+    "ordres_echoues": 37.6,
+    "bloquee_par_barrage": 31.2,
+    "apprentissage_sans_mouvement": 29.8,
+    "reves_tires": 19.8,
+    "reparer_sans_cible": 10.8,
+    "presage_detourne": 10.0,
+    "tir_a_la_corde": 8.6,
+    "renforts": 6.4,
+    "organes_neutralises": 4.0,
+    "voir_detourne": 3.8,
+    "echec_bloque_par_esprit": 3.3,
+    "machines_hs": 3.0,
+    "zones_rasees": 3.0,
+    "embuscades": 1.5,
+    "tromperies": 1.5,
+    "reparations": 1.3,
+    "pouvoir_hanter": 1.0,
+    "immobilisations": 1.0,
+    "ordres_hantes": 1.0,
+    "abattage_zone_rasee": 0.9,
+    "machines_egarees": 0.9,
+    "esprits_egarer": 0.9,
+    "sabotage_sans_effet": 0.8,
+    "renfort_sans_reserve": 0.4,
+    "coupe_en_chemin_cible_barree": 0.2
+   },
+   "charge": {
+    "par_partie": 3.13
+   },
+   "duree": {
+    "minutes": 13.2,
+    "minutes_q90": 16.6,
+    "tours": 1.35,
+    "decisions_non_forcees_par_joueur": 16.0
+   },
+   "attente": {
+    "attente_pct": 6.5,
+    "decisions_par_heure": 68.1
+   },
+   "forcees": {
+    "total_pct": 5.8,
+    "par_type": {
+     "action": 43.2,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 33.1,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 99.5,
+    "ic95": 0.15,
+    "verdict": "rouge"
+   },
+   "surprise": {
+    "valeur": 42.1,
+    "ordres": 2425,
+    "machines": null,
+    "verdict": "vert"
+   },
+   "fins": {
+    "sommeil": 95.6,
+    "nuit": 4.3,
+    "silence": 0.1,
+    "tour_moyen": 1.35
+   },
+   "fins_precoces": {
+    "valeur": 95.4,
+    "verdict": "rouge"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.73,
+    "machines_actives": 0.94,
+    "valeur": 0.73,
+    "parties_au_tour_5_pct": 4.6,
+    "verdict": "orange"
+   },
+   "plancher": {
+    "valeur": 72.3,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 32.2,
+      "reussis_pct": 80.3,
+      "forets_par_ordre": 0.8
+     },
+     "Cupidite": {
+      "tires_pct": 21.0,
+      "reussis_pct": 70.5,
+      "forets_par_ordre": 0.71
+     },
+     "Represailles": {
+      "tires_pct": 20.7,
+      "reussis_pct": 75.5,
+      "forets_par_ordre": 0.76
+     },
+     "Percee": {
+      "tires_pct": 17.3,
+      "reussis_pct": 92.4,
+      "forets_par_ordre": 0.92
+     },
+     "Reparer": {
+      "tires_pct": 5.6,
+      "reussis_pct": 13.1,
+      "forets_par_ordre": 0.0
+     },
+     "Renfort": {
+      "tires_pct": 3.1,
+      "reussis_pct": 94.7,
+      "forets_par_ordre": 0.0
+     }
+    },
+    "machines": {
+     "Abatteuse": {
+      "tires_pct": 72.3,
+      "reussis_pct": 73.5,
+      "forets_par_ordre": 0.74
+     },
+     "Bouteur": {
+      "tires_pct": 24.9,
+      "reussis_pct": 95.6,
+      "forets_par_ordre": 0.96
+     },
+     "Pelleteuse": {
+      "tires_pct": 2.3,
+      "reussis_pct": 82.0,
+      "forets_par_ordre": 0.82
+     },
+     "Debardeuse": {
+      "tires_pct": 0.5,
+      "reussis_pct": 75.0,
+      "forets_par_ordre": 0.75
+     },
+     "Broyeuse": {
+      "tires_pct": 0.0,
+      "reussis_pct": 100.0,
+      "forets_par_ordre": 1.0
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 5.84,
+    "entre_equipes": 3.89,
+    "meme_equipe": 3.57,
+    "propre_a_l_equipe": 0.32
+   },
+   "predictibilite": {
+    "valeur": 100.0,
+    "auc": 1.0,
+    "fin_avant_tour_3_pct": 85.0,
+    "parties": 120,
+    "verdict": "rouge"
+   },
+   "incertitude": {
+    "valeur": 0.02,
+    "variance_initiale": 175.3,
+    "variance_tour_5": 3.1,
+    "finies_avant_tour_5_pct": 85.0,
+    "verdict": "rouge"
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 96.6,
+     "pire": [
+      [
+       "insectes",
+       "oiseaux"
+      ],
+      85.9
+     ],
+     "meilleure": [
+      [
+       "oiseaux",
+       "reptiles"
+      ],
+      88.9
+     ]
+    },
+    "trios": {
+     "rapport": 99.0,
+     "pire": [
+      [
+       "mammiferes",
+       "oiseaux",
+       "reptiles"
+      ],
+      95.1
+     ],
+     "meilleure": [
+      [
+       "insectes",
+       "mammiferes",
+       "reptiles"
+      ],
+      96.0
+     ]
+    },
+    "valeur": 96.6,
+    "verdict": "vert"
+   },
+   "reve_fixe": {
+    "par_taux": {
+     "0.0": 67.0,
+     "1.0": 86.8,
+     "2.0": 91.8,
+     "3.0": 91.2
+    },
+    "ic95": 1.28,
+    "meilleur": 2.0,
+    "maximum_teste": 3.0,
+    "extremes_aussi_bons": [
+     3.0
+    ],
+    "verdict": "rouge"
+   }
+  }
+ },
+ "temoins": [
+  {
+   "mesure": "concentration",
+   "temoin": "v1_une_tactique",
+   "reference": null,
+   "attendu": "rouge (résolue)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "concentration",
+   "temoin": "v2_une_tactique",
+   "reference": null,
+   "attendu": "rouge (résolue)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "surprise",
+   "temoin": "v1_une_tactique",
+   "reference": null,
+   "attendu": "rouge (aucune surprise)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "surprise",
+   "temoin": "v2_une_tactique",
+   "reference": null,
+   "attendu": "rouge (aucune surprise)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "tactiques",
+   "temoin": "v1_une_tactique",
+   "reference": null,
+   "attendu": "une seule tactique tirée",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "predictibilite",
+   "temoin": "v1_des_fixes",
+   "reference": null,
+   "attendu": "rouge (tout est joué)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "predictibilite",
+   "temoin": "v2_des_fixes",
+   "reference": null,
+   "attendu": "rouge (tout est joué)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "incertitude",
+   "temoin": "v1_des_fixes",
+   "reference": null,
+   "attendu": "rouge (plus rien à décider)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "incertitude",
+   "temoin": "v2_des_fixes",
+   "reference": null,
+   "attendu": "rouge (plus rien à décider)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "apprentissage",
+   "temoin": "v1_sans_apprentissage",
+   "reference": "v1_g0",
+   "attendu": "la piste bouge 10 fois moins (seuls les esprits)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "apprentissage",
+   "temoin": "v2_sans_apprentissage",
+   "reference": "v2_g0",
+   "attendu": "la piste bouge 10 fois moins (seuls les esprits)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "apprentissage",
+   "temoin": "v1_sans_apprentissage",
+   "reference": "v1_g0",
+   "attendu": "« propre à l'équipe » plus bas qu'avec apprentissage",
+   "ok": false,
+   "erreur": null
+  },
+  {
+   "mesure": "menace_croissante",
+   "temoin": "v1_essoufflement",
+   "reference": "v1_g0",
+   "attendu": "rouge (le Méchant s'essouffle)",
+   "ok": false,
+   "erreur": null
+  },
+  {
+   "mesure": "menace_croissante",
+   "temoin": "v2_essoufflement",
+   "reference": "v2_g0",
+   "attendu": "rouge (le Méchant s'essouffle)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "plancher",
+   "temoin": "v1_assaut",
+   "reference": "v1_g0",
+   "attendu": "plus bas que la v1 (même bot)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "shapley",
+   "temoin": "v1_hanter_illimite",
+   "reference": "v1_g0",
+   "attendu": "rouge, entités en tête",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "shapley",
+   "temoin": "v2_hanter_illimite",
+   "reference": "v2_g0",
+   "attendu": "rouge, entités en tête",
+   "ok": false,
+   "erreur": null
+  },
+  {
+   "mesure": "shapley",
+   "temoin": "v1_mammiferes_sans_pouvoir",
+   "reference": "v1_g0",
+   "attendu": "mammifères sous la moyenne et plus bas que dans la v1",
+   "ok": false,
+   "erreur": null
+  },
+  {
+   "mesure": "synergies",
+   "temoin": "v1_hanter_illimite",
+   "reference": "v1_g0",
+   "attendu": "rouge (un peuple suffit)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "pire_table",
+   "temoin": "v1_hanter_illimite",
+   "reference": "v1_g0",
+   "attendu": "hors du vert",
+   "ok": false,
+   "erreur": null
+  },
+  {
+   "mesure": "spectateur",
+   "temoin": "v1_spectateur",
+   "reference": "v1_g0",
+   "attendu": "rouge (les humains ne font rien)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "reve_fixe",
+   "temoin": "v1_reves_illimites",
+   "reference": null,
+   "attendu": "rouge (le plus haut taux gagne)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "fins_precoces",
+   "temoin": "v1_reves_illimites",
+   "reference": null,
+   "attendu": "rouge",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "fins",
+   "temoin": "v1_reves_illimites",
+   "reference": "v1_g0",
+   "attendu": "la nuit presque disparaît (moins de 10 %)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "robustesse",
+   "temoin": "v1_barrage_v0",
+   "reference": "v1_g0",
+   "attendu": "beaucoup plus d'incohérences (barrage contourné)",
+   "ok": true,
+   "erreur": null
+  },
+  {
+   "mesure": "couverture",
+   "temoin": "v1_sans_pouvoirs",
+   "reference": "v1_g0",
+   "attendu": "aucun pouvoir appliqué",
+   "ok": true,
+   "erreur": null
+  }
+ ]
+}
