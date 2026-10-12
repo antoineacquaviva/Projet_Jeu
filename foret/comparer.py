@@ -17,6 +17,7 @@ INDICATEURS = [
     ("fin.nuit", "Nuit %", 1),
     ("fin.sommeil", "Sommeil %", 1),
     ("fin.silence", "Silence %", 1),
+    ("fin.reveil", "Réveil %", 1),
     ("tour_fin_moyen", "Tour de fin", 2),
     ("fin_tour_1_pct", "Fin au tour 1 %", 1),
     ("foret_pct", "Forêt restante %", 1),
@@ -37,7 +38,7 @@ def valeur(agg, cle):
     for k in cle.split("."):
         if not isinstance(v, dict):
             return None
-        v = v.get(k, 0 if k in ("nuit", "sommeil", "silence") else None)
+        v = v.get(k, 0 if k in ("nuit", "sommeil", "silence", "reveil") else None)
     return v
 
 
