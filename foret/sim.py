@@ -42,7 +42,7 @@ from multiprocessing import Pool
 
 from .maquette import charger, lire, resume
 from .moteur import Partie, VERSION
-from .bots import fabriquer
+from .bots import fabriquer_table
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -96,7 +96,7 @@ def jouer_une(tache):
             "bot_params": bot.get("params", {}), "peuples": list(peuples), "graine": graine}
     try:
         m = _maquette(maquette, variante)
-        bots = [fabriquer(bot, graine * 100 + i) for i in range(len(peuples))]
+        bots = fabriquer_table(bot, len(peuples), graine * 100)
         base.update(Partie(m, list(peuples), bots, graine=graine).jouer())
     except Exception as e:  # noqa: BLE001 - tout attraper : c'est le but de la campagne
         base["erreur"] = f"{type(e).__name__}: {e}"

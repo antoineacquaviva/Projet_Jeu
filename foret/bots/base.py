@@ -64,6 +64,16 @@ class Bot:
         return {"type": type(self).nom, "params": dict(self.p)}
 
 
+def fabriquer_table(spec, n, graine=0):
+    """Les bots d'une table de n sièges : le siège i reçoit la graine graine + i.
+    spec ordinaire : le même bot à tous les sièges ; {"type": "table", "params": {"sieges": [spec, …]}} :
+    une table mixte (phase 2), le siège i joue sieges[i % len(sieges)]."""
+    if isinstance(spec, dict) and spec.get("type") == "table":
+        sieges = spec["params"]["sieges"]
+        return [fabriquer(sieges[i % len(sieges)], graine + i) for i in range(n)]
+    return [fabriquer(spec, graine + i) for i in range(n)]
+
+
 def fabriquer(spec, graine=0):
     """spec : {"type": nom, "params": {...}} ou (nom, params)."""
     if isinstance(spec, (list, tuple)):
