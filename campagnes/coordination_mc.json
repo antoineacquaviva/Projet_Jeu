@@ -1,0 +1,15 @@
+{
+  "nom": "coordination_mc",
+  "description": "Phase 2c (12 oct. 2026) : le chef unique et la coordination, avec le bot fort. Les 15 duos, 4 parties chacun (graines appariées). Bot MC 64 chacun pour soi (savoir=soi) avec trois formes de communication : aucun signe, celle de la maquette (conseil parlé en v1, traces en v2), tout dire ; et le même bot en mode central (savoir=tout) avec la communication de la maquette. Chef unique = central - chacun pour soi ; part de l'écart récupérée = (maquette - aucun signe) / (tout dire - aucun signe).",
+  "maquette": "v1",
+  "blocs": [
+    {"nom": "soi",
+     "variantes": ["comm_aucun_signe", "defaut", "comm_tout_dire"],
+     "bots": [{"type": "mc", "params": {"budget": 64, "savoir": "soi"}}],
+     "tables": [{"tailles": [2], "parties": 4}]},
+    {"nom": "central",
+     "variantes": ["defaut"],
+     "bots": [{"type": "mc", "params": {"budget": 64, "savoir": "tout"}}],
+     "tables": [{"tailles": [2], "parties": 4}]}
+  ]
+}
