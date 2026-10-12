@@ -1,0 +1,17 @@
+{
+ "lots": 4,
+ "parties": 4508,
+ "erreurs": 0,
+ "duree_max_s": 8,
+ "duree_cumulee_coeurs_s": 113,
+ "parties_par_s_par_coeur": 40.0,
+ "configurations": [
+  "v1_g1",
+  "v1_g0",
+  "v2_g1",
+  "v2_g0"
+ ],
+ "echelle": 0.05,
+ "empreinte": "816cfab76bb0e74f",
+ "moteur": "1.7"
+}
