@@ -1,0 +1,17 @@
+{
+  "nom": "echelle_bots_2",
+  "description": "Phase 2b (12 oct. 2026) : défendre ou rêver avec le bot fort. Les 15 duos, graines appariées avec echelle_bots. MC 128 à taux de rêve imposé (0 et 1 carte par tour, comme le glouton) ; MC 128 libre dont les suites rêvent (politique : glouton qui rêve une carte par tour) ; MC 32 devin (les suites gardent les vrais dés : valeur de l'information), à comparer au MC 32 de echelle_bots.",
+  "maquette": "v1",
+  "blocs": [
+    {"nom": "reve_128",
+     "variantes": ["defaut"],
+     "bots": [{"type": "mc", "params": {"budget": 128, "reves_par_tour": 0.0}},
+              {"type": "mc", "params": {"budget": 128, "reves_par_tour": 1.0}},
+              {"type": "mc", "params": {"budget": 128, "politique": {"type": "glouton", "params": {"reves_par_tour": 1.0}}}}],
+     "tables": [{"tailles": [2], "parties": 2}]},
+    {"nom": "devin_32",
+     "variantes": ["defaut"],
+     "bots": [{"type": "mc", "params": {"budget": 32, "devin": true}}],
+     "tables": [{"tailles": [2], "parties": 4}]}
+  ]
+}
