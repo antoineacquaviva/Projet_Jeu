@@ -227,6 +227,7 @@ class Partie(Plans):
         self.traces = {}                  # siège -> [(étape ou None, lieu)] (R2.5)
         self.jetons = {}                  # uid Machine -> [siège ou None, siège ou None] (R2.5, partage)
         self.programmes_vus = {}          # tout dire : siège -> [(étape, carte, mode)] déjà programmés
+        self._provisoire = None           # programmes faits pendant le conseil, avant leur dépôt
         self.plateau = Plateau(M["plateau"])
         self._init_machines()
         self._init_piste()
@@ -457,6 +458,9 @@ class Partie(Plans):
         if self._hasard_a_la_main is not None:
             self.rng = random.Random(self._hasard_a_la_main)
             self._hasard_a_la_main = None
+        if getattr(self, "_brouiller", None) is not None:
+            sait, self._brouiller = self._brouiller, None
+            self.brouiller(sait)
 
     def _cloner(self):
         """Copie profonde de l'état, sans les bots, les observateurs ni la photo
@@ -482,7 +486,8 @@ class Partie(Plans):
         if self.reprises:
             self._photo = self._cloner()
 
-    def copie(self, bots=None, hasard=None, imposer=(), journal=False, observateurs=(), reprises=False):
+    def copie(self, bots=None, hasard=None, imposer=(), journal=False, observateurs=(), reprises=False,
+              brouiller=None):
         """Copie indépendante de la partie, à jouer avec copie.jouer().
 
         Quand : au début d'un segment (avant jouer(), ou depuis la méthode
@@ -496,6 +501,9 @@ class Partie(Plans):
           y compris les dés déjà vus, ne change pas).
         imposer : indices des options à prendre pour les prochaines décisions,
           à commencer par la décision en cours le cas échéant.
+        brouiller : un siège ; au point de copie, ce que ce siège ne sait pas (les
+          programmes encore cachés des autres) est retiré au sort par leurs bots
+          (Partie.brouiller). Sans effet pour une copie faite hors décision.
 
         Pendant une décision, la copie repart de la dernière photo (si la
         partie a été créée avec reprises=True) ou du début de la partie, et
@@ -535,6 +543,7 @@ class Partie(Plans):
         for s, b in zip(c.sieges, bots):
             s.bot = b
         c.reprises = reprises
+        c._brouiller = brouiller if self._en_cours is not None else None
         c._photo = None
         c.journal = Journal() if journal else None
         c.observateurs = [c.compteur] + ([c.journal] if journal else []) + list(observateurs)
@@ -928,9 +937,12 @@ class Partie(Plans):
             modes.append("reve")
         return modes
 
-    def _programmer(self, s):
-        jeux = []
-        for e in self.etapes:
+    def _programmer(self, s, etapes=None, deja=()):
+        """R2.1 ; etapes : seulement ces étapes ; deja : jeux de ce siège déjà faits ce tour
+        (pour la limite de rêves). Rend les nouveaux jeux."""
+        jeux = list(deja)
+        n0 = len(jeux)
+        for e in (self.etapes if etapes is None else etapes):
             if s.idx in self.prog[e]:          # carte de Voir
                 continue
             if not s.main:
@@ -956,7 +968,7 @@ class Partie(Plans):
                     idx = self.decider(s, "hote", [None] + opts, etape=e)
                     hote = None if idx is None else (idx, e)
             jeux.append(self.poser(s, carte, mode, e, hote=hote))
-        return jeux
+        return jeux[n0:]
 
     def conseil(self):
         """R2.1 : Voir (oiseaux), la communication (R2.5), le présage (R2.6),
@@ -990,23 +1002,92 @@ class Partie(Plans):
         # Programmation secrète et simultanée : chacun programme sans voir les
         # cartes des autres ; on ne réunit qu'à la fin. Tout dire (R2.5) : les
         # programmes déjà faits sont visibles (programmes_visibles).
-        provisoire = {}
+        provisoire = self._provisoire = {}
         for idx in self.ordre:
             provisoire[idx] = self._programmer(self.sieges[idx])
             if self.R["communication"] == "tout_dire":
                 self.programmes_vus[idx] = [(j.etape, j.carte.uid, j.mode) for j in provisoire[idx]]
+        self._provisoire = None
         for idx, jeux in provisoire.items():
-            for j in jeux:
-                if j.hote is not None:
-                    self.glisses.append(j)
-                else:
-                    self.prog[j.etape][idx] = j
-        for g in self.glisses:                       # R6.8
+            self._ranger(idx, jeux)
+        self._lier_glisses(self.glisses)
+        self.log("Programme :", {e: list(v.values()) for e, v in self.prog.items()}, "glissées :", self.glisses)
+
+    def _ranger(self, idx, jeux):
+        for j in jeux:
+            if j.hote is not None:
+                self.glisses.append(j)
+            else:
+                self.prog[j.etape][idx] = j
+
+    def _lier_glisses(self, glisses):
+        for g in glisses:                            # R6.8
             h = self.prog[g.etape].get(g.hote[0])
             if h is not None and h.mode != "reve":
                 h.attaches.append(g)
                 g.lie = True
-        self.log("Programme :", {e: list(v.values()) for e, v in self.prog.items()}, "glissées :", self.glisses)
+
+    # =================================================================== information cachée (phase 2)
+    def brouiller(self, sait):
+        """Déterminisation : ce que le siège `sait` ne peut pas savoir est retiré au sort.
+        Les programmes encore cachés des autres joueurs (cartes face cachée des étapes
+        à venir, cartes glissées) sont défaits et reprogrammés par leurs bots (dans une
+        copie : la politique de jeu). Les cartes d'un même peuple ne diffèrent que par
+        leur nom (leurs effets propres ne sont pas joués) : reste caché ce que chacun a
+        programmé, à quelle étape, sur quelle moitié, et s'il rêve.
+        À appeler au point d'une copie (Partie.copie(..., brouiller=siège)).
+        Rien n'est caché en « tout dire » (R2.5)."""
+        if self.R["communication"] == "tout_dire":
+            return
+        imposes, self._imposes = self._imposes, deque()       # les choix imposés sont pour `sait`
+        try:
+            if self.etape == 0 and self._provisoire is not None:          # pendant la programmation
+                for idx, jeux in list(self._provisoire.items()):
+                    if idx == sait or not jeux:
+                        continue
+                    s = self.sieges[idx]
+                    for j in jeux:
+                        s.joues.remove(j.carte)
+                        s.main.append(j.carte)
+                    self._provisoire[idx] = self._programmer(s)
+                    self.stat("brouillage")
+            elif self.etape > 0:                                          # pendant la résolution
+                caches = [e for e in self.etapes if e > self.etape]
+                if not caches:
+                    return
+                for s in self.sieges:
+                    if s.idx == sait:
+                        continue
+                    defaits = []
+                    for e in caches:
+                        j = self.prog[e].get(s.idx)
+                        if j is not None and not j.voir:
+                            del self.prog[e][s.idx]
+                            for a in j.attaches:                         # cartes glissées sous elle : à leur joueur
+                                a.lie = False
+                            j.attaches = []
+                            defaits.append(j)
+                    for g in [g for g in self.glisses if g.siege == s.idx and g.etape in caches]:
+                        self.glisses.remove(g)
+                        h = self.prog[g.etape].get(g.hote[0])
+                        if h is not None and g in h.attaches:
+                            h.attaches.remove(g)
+                        defaits.append(g)
+                    if not defaits:
+                        continue
+                    for j in defaits:
+                        s.joues.remove(j.carte)
+                        s.main.append(j.carte)
+                    restes = [j for v in self.prog.values() for j in v.values() if j.siege == s.idx]
+                    restes += [g for g in self.glisses if g.siege == s.idx]
+                    libres = [e for e in caches if s.idx not in self.prog[e]]
+                    nouveaux = self._programmer(s, etapes=libres, deja=restes)
+                    self._ranger(s.idx, nouveaux)
+                    self.stat("brouillage")
+                # les cartes glissées (de tous) sous une carte reprogrammée se relient
+                self._lier_glisses([g for g in self.glisses if g.etape in caches and not g.lie])
+        finally:
+            self._imposes = imposes
 
     # =================================================================== communication (R2.5)
     def communiquer(self):

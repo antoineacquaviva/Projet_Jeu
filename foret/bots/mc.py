@@ -15,11 +15,14 @@ moins bonne est écartée. Le budget est le curseur de force : il donne l'échel
 des bots du plan (MC 8, 32, 128…).
 
 Ce que le bot sait (paramètre « savoir ») :
-- "tout" : la copie voit tout, dont les mains et les cartes programmées des
-  partenaires. C'est le mode *central* du plan (un seul cerveau pour l'équipe) :
-  la borne haute, et l'image du joueur dominant.
-- les autres modes (chacun pour soi, communication partielle) demandent de
-  tirer au sort ce que le joueur ignore ; ils viendront avec 2c.
+- "tout" : la copie voit tout, dont les cartes programmées des partenaires.
+  C'est le mode *central* du plan (un seul cerveau pour l'équipe) : la borne
+  haute, et l'image du joueur dominant.
+- "soi" : chacun pour soi. Dans chaque suite, ce que le joueur ne peut pas
+  savoir (les programmes encore cachés des autres : étapes, moitiés, rêves,
+  cartes glissées) est retiré au sort par la politique (Partie.brouiller). Il
+  ne voit des autres que ce qui est public : leurs cartes révélées, leurs
+  traces ou jetons (communication partielle, R2.5), leurs actions.
 
 Une politique de jeu meilleure que le glouton rendrait le bot plus fort ; le
 bot est par construction au moins aussi bon que sa politique, à la variance des
@@ -52,18 +55,20 @@ class MonteCarlo(Bot):
 
     def __init__(self, graine=0, **params):
         super().__init__(graine, **params)
-        if self.p["savoir"] != "tout":
-            raise ValueError("savoir : seul « tout » (mode central) est codé pour l'instant")
+        if self.p["savoir"] not in ("tout", "soi"):
+            raise ValueError("savoir : « tout » (mode central) ou « soi » (chacun pour soi)")
         pol = dict(self.p["politique"])
         if self.p["reves_par_tour"] is not None and pol.get("type") == "glouton":
             pol["params"] = dict(pol.get("params", {}), reves_par_tour=self.p["reves_par_tour"])
         self._spec_politique = pol
         self._politique = fabriquer(pol, graine)
         self._quota = {}                  # (lignée, tour, siège) -> [rêves à faire, rêves faits]
+        self._siege = None
         self.stats = {"recherches": 0, "suites": 0}
 
     # ------------------------------------------------------------------ décision
     def decider(self, partie, siege, type_, options, ctx):
+        self._siege = siege.idx
         permis = list(range(len(options)))
         if type_ == "programmer_mode" and self.p["reves_par_tour"] is not None:
             permis = self._taux_impose(partie, siege, options, ctx["etape"])
@@ -115,7 +120,8 @@ class MonteCarlo(Bot):
 
     def _suite(self, partie, i, hasard):
         bots = [fabriquer(self._spec_politique, hasard + k) for k in range(len(partie.sieges))]
-        c = partie.copie(bots=bots, hasard=None if self.p["devin"] else hasard, imposer=[i])
+        c = partie.copie(bots=bots, hasard=None if self.p["devin"] else hasard, imposer=[i],
+                         brouiller=self._siege if self.p["savoir"] == "soi" else None)
         b = c.jouer()
         self.stats["suites"] += 1
         return b["resultat"] / b["foret_initiale"]

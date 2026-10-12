@@ -43,9 +43,9 @@ def test_le_halving_compare_les_options_sur_les_memes_des(monkeypatch):
     assert vus[0][:len(vus[2])] == vus[2][:len(vus[0])]    # nombres aléatoires communs, tour par tour
 
 
-def test_savoir_autre_que_tout_refuse_pour_l_instant():
+def test_savoir_inconnu_refuse():
     with pytest.raises(ValueError):
-        MonteCarlo(0, savoir="soi")
+        MonteCarlo(0, savoir="rien")
 
 
 @pytest.mark.parametrize("taux, attendu", [(0.0, 0), (1.0, 1)])
@@ -75,8 +75,31 @@ def test_le_devin_joue_les_suites_avec_les_vrais_des(monkeypatch):
     class Faux:
         sieges = [0, 1]
 
-        def copie(self, bots, hasard, imposer):
+        def copie(self, bots, hasard, imposer, brouiller=None):
             vus.append(hasard)
             return Copie()
     assert bot._suite(Faux(), 0, 123) == 0.5
     assert vus == [None]
+
+
+def test_chacun_pour_soi_retire_au_sort_les_programmes_caches(monkeypatch):
+    """Partie.brouiller (savoir="soi") : appelé au point des copies, il défait et refait les
+    programmes encore cachés des autres, sans casser les invariants (cartes, étapes, rêves)."""
+    appels = []
+    vrai = Partie.brouiller
+
+    def espion(self, sait):
+        avant = [(i, j.etape, j.mode) for i, js in (self._provisoire or {}).items() if i != sait for j in js]
+        avant += [(i, e, j.mode) for e, v in self.prog.items() for i, j in v.items() if i != sait and e > self.etape]
+        vrai(self, sait)
+        apres = [(i, j.etape, j.mode) for i, js in (self._provisoire or {}).items() if i != sait for j in js]
+        apres += [(i, e, j.mode) for e, v in self.prog.items() for i, j in v.items() if i != sait and e > self.etape]
+        appels.append((self.etape, bool(avant), sorted(avant) != sorted(apres)))
+        self.controler()
+    monkeypatch.setattr(Partie, "brouiller", espion)
+    peuples = ["insectes", "humains", "reptiles"]
+    bots = [fabriquer({"type": "mc", "params": {"budget": 2, "savoir": "soi",
+                                                "politique": {"type": "aleatoire"}}}, 60 + i) for i in range(3)]
+    Partie(charger("v1", "defaut"), peuples, bots, graine=12).jouer()
+    assert any(e == 0 for e, _, _ in appels) and any(e > 0 for e, _, _ in appels)
+    assert any(change for _, _, change in appels)
