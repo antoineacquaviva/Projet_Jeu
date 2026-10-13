@@ -18,7 +18,8 @@
 | V0.2 | v1 (livret publié) | `maquettes/v1.json` | **étalon figé** : sert de contraste, aucune nouvelle campagne |
 | V0.3 | v2 fixée (« V2 proposée » + lunes à toutes les tailles de table), décision 3.7 | `maquettes/v0.3.json` (à créer) | **point de départ** |
 | V0.3-sans-lunes | « V2 proposée » | variante nommée | comparaison |
-| V0.4, V0.5, V0.6 | – | une maquette par cycle | candidates |
+| V0.4 | variante A du cycle 1 | `maquettes/v0.4.json` | **adoptée** le 13 oct. (bilan du cycle 1) ; point de départ du cycle 2 |
+| V0.5, V0.6 | – | une maquette par cycle | candidates |
 | V1.0 | – | la candidate validée et gelée | tests humains |
 
 - La version du **moteur** (1.7.1) est distincte de la version du **jeu** : on écrira toujours « moteur 1.7.1 » et « jeu V0.3 ».
@@ -104,6 +105,10 @@ Les étapes 0.3 à 0.8 sont rejouées une fois sur la V0.3 pour former le **prot
 - le criblage ne trouve aucune variable qui le fasse bouger nettement.
 
 L'alerte nomme alors l'objectif, ce qui a été essayé et la piste de conception que Claude propose. Elle ouvre une issue « conception ». Claude la signale aussi à l'auteur dès la session suivante, sans attendre la fin du cycle.
+
+**Après le cycle 1 (13 oct., 23 h 27 ; `projet/4-bilans/cycle-1-bilan.md`, section 6)** : l'alerte A est levée pour la durée (0 % de fins avant la mi-partie de 2 à 6 joueurs avec la V0.4, sans prix supplémentaire du rêve). Deux alertes nouvelles sont à surveiller au cycle 2 :
+- **D. Difficulté pour un joueur qui adapte son rythme de rêve** : le bot de contrôle garde 93 à 95 % de la forêt à 3, 5 et 6 joueurs.
+- **E. À 2 et 3 joueurs, le rêve n'aboutit presque plus** : 96 à 100 % des parties finissent par la nuit. Le meilleur taux de rêve fixe sur la V0.4 la tranchera.
 
 **Alertes déjà levées (13 oct.)**
 

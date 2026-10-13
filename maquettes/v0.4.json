@@ -1,0 +1,21 @@
+{
+  "nom": "v0.4",
+  "base": "v0.3",
+  "description": "Jeu V0.4 : adoptée par l'auteur le 13 oct. 2026, 23 h 27 (ETAT.md, section 8), à la fin du cycle 1 (projet/4-bilans/cycle-1-bilan.md, section 7, variante A). V0.3 plus : Cercle à 4 cases par joueur à 2 et 3 joueurs (3 à partir de 4), 3 lunes, sablier des rêves (2 rêves pour un pas de l'esprit), ordres du Méchant 1 par étape à 2 et 3 joueurs (2 à partir de 4), les 5 Machines en jeu au départ, escalade du soir (module A4) dès le tour 5. Deux éléments propres au nombre de joueurs : Cercle et ordres.",
+  "document": "docs/noeuds_v2.md",
+  "atelier": "c:A2a,d_fav,C2a,D2v_choix|m:C3,D5,A4|p:escalade=5,lunes=3",
+  "variantes_heritees": true,
+
+  "regles": {
+    "lunes": 3,
+    "escalade": 5,
+    "cercle_par_joueur": {"2": 4, "4": 3},
+    "reves_par_pas": 2,
+    "ordres_par_etape": {"2": 1, "4": 2},
+    "machines_en_jeu": 5
+  },
+
+  "variantes": {
+    "sans_lunes": null
+  }
+}

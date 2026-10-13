@@ -6,7 +6,7 @@ Ce dépôt réunit deux choses :
 - **les documents de conception** : les idées, les maquettes de règles, le plan de travail et les bilans ;
 - **le moteur de simulation** `foret` : il joue les règles sans interface, avec des joueurs virtuels, pour trouver les failles des règles et mesurer les variantes.
 
-Où en est le projet (13 oct. 2026) : les phases 1 (mesures), 2 (le bot fort) et 3 (diagnostic, [projet/4-bilans/diagnostic-v1-options-v2.md](projet/4-bilans/diagnostic-v1-options-v2.md)) sont faites. Le jeu en est à la **V0.3** ; la suite suit le [plan vers la V1](projet/3-pilotage/plan-vers-v1.md) : trois cycles au plus de simulation, puis une V1.0 testée par des joueurs. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
+Où en est le projet (13 oct. 2026) : les phases 1 (mesures), 2 (le bot fort) et 3 (diagnostic, [projet/4-bilans/diagnostic-v1-options-v2.md](projet/4-bilans/diagnostic-v1-options-v2.md)) sont faites. Le jeu en est à la **V0.4** (adoptée à la fin du cycle 1, [bilan](projet/4-bilans/cycle-1-bilan.md)) ; la suite suit le [plan vers la V1](projet/3-pilotage/plan-vers-v1.md) : trois cycles au plus de simulation, puis une V1.0 testée par des joueurs. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
 
 ## Les versions du jeu
 
@@ -14,8 +14,9 @@ Où en est le projet (13 oct. 2026) : les phases 1 (mesures), 2 (le bot fort) et
 |---|---|---|---|
 | V0.1 | v0 | `v0.json` | historique |
 | V0.2 | v1 (livret publié) | `v1.json` | étalon figé, cité pour contraste |
-| **V0.3** | v2 fixée (13 oct.) : « V2 proposée » + lunes | `v0.3.json` | **point de départ** ; « V2 proposée » = `v2.json` ou `v0.3` variante `sans_lunes` |
-| V0.4 à V0.6 | – | une par cycle | à venir |
+| V0.3 | v2 fixée (13 oct.) : « V2 proposée » + lunes | `v0.3.json` | point de départ du plan, ancre du cycle 2 ; « V2 proposée » = `v2.json` ou `v0.3` variante `sans_lunes` |
+| **V0.4** | variante A du cycle 1 | `v0.4.json` | **adoptée le 13 oct.** ; point de départ du cycle 2 |
+| V0.5, V0.6 | – | une par cycle | à venir |
 | V1.0 | – | – | la version gelée pour les tests humains |
 
 La version du jeu (V0.3) et celle du moteur (1.7.1) sont deux numérotations distinctes. Les anciens fichiers et codes d'atelier restent valides : les résultats passés se relisent tels quels.
@@ -30,7 +31,7 @@ projet/                  Documents de conception et de pilotage (à lire en prem
   4-bilans/                Ce que les simulations ont montré, phase par phase
 docs/                    Documentation technique du moteur (lue en partie par le code)
 foret/                   Le moteur de simulation (Python pur)
-maquettes/               Les règles en données : v0 (V0.1), v1 (V0.2), v2, v0.3 (V0.3) ; chacune hérite de la précédente
+maquettes/               Les règles en données : v0 (V0.1), v1 (V0.2), v2, v0.3 (V0.3), v0.4 (V0.4) ; chacune hérite de la précédente
 campagnes/               Les campagnes de simulation, en JSON
 tests/                   Les tests : chaque règle, nœud ou mesure a au moins le sien
 outils/tableau/          Le générateur du tableau de bord de la batterie

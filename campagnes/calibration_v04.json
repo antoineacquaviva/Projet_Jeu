@@ -1,0 +1,238 @@
+{
+ "nom": "calibration_v04",
+ "maquette": "v0.4",
+ "description": "Cycle 2, étape a.2 (13 oct. 2026) : recalibrer le bot fort sur la V0.4 (bilan du cycle 1, section 4 ; décision technique de Claude). Quatre bots sur l'échantillon P2 (6 duos, 4 trios, 3 quatuors, 2 quintettes, la table de six ; 4 parties par table, graines appariées) : MC64R (bot fort du cycle 1), MCP64 (portefeuille, 64 suites), MC 64 dont les suites rêvent une demi-carte par tour, MC 256 à portefeuille (bot de contrôle du cycle 1). Le plus fort à coût raisonnable devient le bot fort du cycle 2 ; le coût de MC 256 est recalé sur cette campagne.",
+ "blocs": [
+  {
+   "nom": "bots",
+   "variantes": [
+    "defaut"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "portefeuille": [
+       {
+        "nom": "reve0",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.0
+        }
+       },
+       {
+        "nom": "reve05",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.5
+        }
+       },
+       {
+        "nom": "reve1",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0
+        }
+       },
+       {
+        "nom": "reve1_sommeil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "sommeil"
+        }
+       },
+       {
+        "nom": "reve1_reveil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "reveil"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 0.5
+       }
+      }
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 256,
+      "savoir": "soi",
+      "suites_choix": 16,
+      "portefeuille": [
+       {
+        "nom": "reve0",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.0
+        }
+       },
+       {
+        "nom": "reve05",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.5
+        }
+       },
+       {
+        "nom": "reve1",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0
+        }
+       },
+       {
+        "nom": "reve1_sommeil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "sommeil"
+        }
+       },
+       {
+        "nom": "reve1_reveil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "reveil"
+        }
+       },
+       {
+        "nom": "bruite",
+        "type": "bruite",
+        "params": {
+         "base": {
+          "type": "glouton",
+          "params": {
+           "reves_par_tour": 0.5
+          }
+         },
+         "bruit": 0.2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "insectes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  }
+ ]
+}
