@@ -68,144 +68,108 @@ Documents à lire avant de travailler :
 
 ## 4. Étapes restantes
 
-Une étape tient en un passage de quelques heures. Statuts : À FAIRE, EN COURS, FAIT, DÉCISION UTILISATEUR. Chaque livrable est un fichier Markdown du dépôt, commité. Les petites tables Markdown suffisent ; pas de page publiée.
+Une étape tient en un passage. Statuts : À FAIRE, EN COURS, FAIT, DÉCISION UTILISATEUR. Chaque livrable est un fichier Markdown du dépôt, commité ; pas de page publiée.
+
+**Organisation (13 oct., pour finir au plus tôt sur le forfait Pro).** Les calculs tournent sur GitHub ; la session ne fait que le code, l'analyse et la rédaction.
+- **Pas d'attente.** Un passage n'attend jamais un calcul de plus de 15 minutes : il lance la campagne, note son numéro et ce qu'il faudra en faire (section 9), vide le Verrou et s'arrête. Le passage suivant traite les résultats.
+- **Pas de temps mort.** Chaque étape commence par traiter les résultats des campagnes terminées et se termine, autant que possible, en lançant la campagne qui servira plus tard. Ainsi les calculs tournent pendant que les passages dorment.
+- **Plafond.** 12 passages qui travaillent par semaine (décision du 13 oct.).
 
 ### Phase 3 : diagnostiquer la v1 et comparer les options de la v2
+Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget": 64, "savoir": "soi"}}`), MC 128 pour les contrôles. Plan réduit : 15 duos et 5 trios, 4 parties par table (décisions du 13 oct., section 8).
 
-**3.1 Le bot qui communique** (À FAIRE)
-- **Quoi.** Le bot `mc` en mode `savoir="soi"` n'annonce rien et ne lit pas les annonces (voir `projet/4-bilans/bots-echelle-validation.md`, section 5). Il faut :
-  - (a) que ses traces et jetons du partage (décisions `trace`, `partage`) annoncent ses intentions, par exemple en les déléguant au glouton en mode « annonce » (paramètre `ignorer` du bot) et en s'y tenant en programmant ;
-  - (b) que `Partie.brouiller` ne tire au sort que des programmes compatibles avec les traces datées des autres. Une trace « (étape, rêve) » impose un rêve ; une trace « (étape, zone) » impose une carte qui ne rêve pas. On peut s'appuyer sur la logique de `trace_engageante` dans `_programmer`.
-- **Commandes.**
-  - Tests nouveaux dans `tests/test_mc.py`, puis les contrôles.
-  - Campagne `campagnes/coordination_mc_2.json` (copie de `coordination_mc.json`, avec le nouveau réglage), sur v1 puis v2.
-- **Critère de fin.** Tests verts. La campagne donne un écart entre « aucun signe » et « tout dire » plus grand que sa marge, ou on constate qu'il ne l'est pas.
-- **Livrable.** Une section « Coordination » ajoutée à `projet/4-bilans/bots-echelle-validation.md`, avec la part de l'écart récupérée par la forme de la maquette (bande verte : 40 à 80 %).
+**3.1 Le bot qui communique** (EN COURS, session interactive du 13 oct.)
+- **Quoi.** Le bot `mc` chacun pour soi annonce ses intentions et tient compte de celles des autres :
+  - (a) ses traces et jetons (décisions `trace`, `partage`) annoncent ce qu'il compte faire ;
+  - (b) `Partie.brouiller` ne tire au sort que des programmes compatibles avec les traces datées des autres. Une trace « (étape, rêve) » impose un rêve ; une trace « (étape, zone) » impose une carte qui ne rêve pas.
+- **Fin d'étape.** Tests verts ; lancer `campagnes/coordination_mc_2.json` sur v1 et v2.
+- **Livrable.** Code, tests, et la campagne lancée. Le traitement de ses résultats se fait en 3.3.
 
 **3.2 La batterie du bot fort, plan réduit** (À FAIRE)
-- **Quoi.** Ajouter à `foret/batterie.py` un plan « phase3 », à côté de `PLAN` (phase 1), avec :
-  - configurations v1 et V2 proposée, bot MC 64 chacun pour soi ;
-  - les 15 duos et 5 trios choisis (dont les 4 « triangles » et 1 « étoile » du tétraèdre), 4 parties par table ;
-  - Shapley et synergies sur une sélection d'équipes de 1 à 3 peuples : les 6 seuls, les 15 duos et les trios choisis. Approximation à documenter dans `docs/mesures.md`.
-  - Les sondes (prédictibilité, incertitude) doivent jouer leurs copies avec le glouton, pas avec le bot fort : sinon le coût explose. Ajouter un réglage au `Sondeur`.
-  - Commande : `python -m foret.batterie phase3 --lot i/n` (même mécanique que `phase1`) et le choix du plan dans le workflow Batterie (nouvelle entrée `plan`).
-  - Essai à l'échelle 0,1 sur GitHub.
-- **Critère de fin.** Tests verts. L'essai tourne sur GitHub, et l'estimation de la durée du plan complet est notée dans le tableau des campagnes.
-- **Livrable.** `docs/mesures.md` complété (le plan réduit et son coût).
+- **Quoi.** Un plan « phase3 » dans `foret/batterie.py`, à côté de `PLAN` (phase 1) :
+  - configurations v1 et V2 proposée, bot de référence ;
+  - les 15 duos et 5 trios, 4 parties par table. Les trios : les 4 « triangles » (trois peuples autour d'un même coin du tétraèdre) et une « étoile » (les trois peuples d'un même compartiment) ;
+  - Shapley et synergies sur les équipes de 1 à 3 peuples jouées (les 6 seuls, les 15 duos, les 5 trios) ; approximation à documenter dans `docs/mesures.md` ;
+  - les sondes jouent leurs copies avec le glouton (réglage du `Sondeur`) ;
+  - le choix du plan dans le workflow Batterie (nouvelle entrée `plan`).
+- **Fin d'étape.** Tests verts ; essai à l'échelle 0,1 sur GitHub (moins de 15 min) ; puis lancer le plan complet (v1 et V2), en plusieurs lancements si un lot risque de dépasser 6 h.
+- **Livrable.** `docs/mesures.md` complété ; durée estimée et réelle dans la section 9.
 
-**3.3 DÉCISION UTILISATEUR : valider le bot fort et le plan réduit**
-- Questions (détail et recommandations : `projet/4-bilans/bots-echelle-validation.md`, section 8) :
-  1. le bot de référence MC 64 chacun pour soi (MC 128 pour les contrôles) ;
-  2. le plan réduit de 3.2 et son coût estimé ;
-  3. le bot qui communique de 3.1.
-- Tant que l'auteur n'a pas répondu dans la section 8, les passages s'arrêtent ici.
-
-**3.4 Batterie du bot fort sur la v1** (À FAIRE, après 3.3)
-- **Commande.** Workflow Batterie, plan « phase3 », configurations v1, échelle 1. Si le plan dépasse 6 h par lot avec 20 lots, le découper en plusieurs lancements (par configuration).
-- **Critère de fin.** Rapport publié sur la branche `resultats` ; verdicts comparés à ceux du glouton. Une mesure qui change de verdict décrit les bots, pas le jeu.
-- **Livrable.** `projet/4-bilans/diagnostic-v1-options-v2.md`, section v1 (créer le fichier).
-
-**3.5 Batterie du bot fort sur « V2 proposée »** (À FAIRE)
-- Comme 3.4, configurations V2. Livrable : la section V2 du même document.
-
-**3.6 Les mesures qui attendaient le bot fort** (À FAIRE)
-- **Quoi.** Coder et jouer quatre mesures (définitions dans `projet/3-pilotage/objectifs-invariants-catalogue.md`, section 2 ; registre `MESURES` dans `foret/mesures.py`, aujourd'hui en attente) :
+**3.3 Les mesures qui attendaient le bot fort** (À FAIRE)
+- **Quoi.** D'abord, traiter `coordination_mc_2` : section « Coordination » de `projet/4-bilans/bots-echelle-validation.md`, avec la part de l'écart récupérée (bande verte 40 à 80 %). Ensuite, coder les quatre mesures en attente du registre `MESURES` (`foret/mesures.py` ; définitions dans `projet/3-pilotage/objectifs-invariants-catalogue.md`, section 2), chacune avec son témoin et son test :
   - tape-taupe : un bot qui pare toujours la menace la plus probable, contre le bot fort ;
   - gain du bot libre sur le meilleur taux fixe ;
-  - part de dilemmes parmi les décisions (le bot évalue chaque option sur un échantillon de décisions) ;
+  - part de dilemmes sur un échantillon de décisions ;
   - chef unique : MC tout contre MC soi.
+- **Fin d'étape.** `python -m foret.conformite --mesures` ne liste plus de mesure en attente ; lancer leur campagne (v1 et V2, duos).
 
-  Chaque mesure a son témoin et son test.
-- **Critère de fin.** `python -m foret.conformite --mesures` ne liste plus ces mesures en attente.
-- **Livrable.** Section « Objectifs 1 à 3, mesures du bot fort » du document de diagnostic.
+**3.4 Le jeu restreint et les options de la v2** (À FAIRE)
+- **Quoi.** Écrire deux campagnes :
+  - `campagnes/jeu_restreint.json` : interdire au bot une action ou un pouvoir à la fois (Saboter d'abord, puis Barrer, Aller et chaque règle brisée), avec un paramètre du bot `mc` qui retire des options ;
+  - `campagnes/v2_options_mc.json` : les variantes à une option près autour de « V2 proposée » (codes d'atelier de `campagnes/v2_options.json`), jouées par le bot de référence sur les duos.
+- **Fin d'étape.** Tests verts ; lancer les deux campagnes. Si leur durée estimée dépasse 6 h par lot, les découper.
 
-**3.7 Le jeu restreint** (À FAIRE)
-- **Quoi.** Interdire au bot fort une action ou un pouvoir à la fois, et mesurer la perte de forêt :
-  - Saboter (prioritaire en v2, où il ne mène plus à aucune fin) ;
-  - Barrer ;
-  - Aller ;
-  - chaque règle brisée.
+**3.5 Diagnostic : batterie, mesures, jeu restreint** (À FAIRE)
+- **Quoi.** Traiter les résultats de la batterie phase3 (3.2), des mesures (3.3) et du jeu restreint (3.4). Comparer chaque verdict à celui du glouton : une mesure qui change de verdict décrit les bots, pas le jeu.
+- **Fin d'étape.** Lancer la vérification de robustesse : les campagnes clés rejouées avec un bonus de fin de 10 et de 25 % (réglage `bonus` de l'atelier).
+- **Livrable.** `projet/4-bilans/diagnostic-v1-options-v2.md` (créer le fichier), sections v1, V2, mesures du bot fort, jeu restreint.
 
-  Implémentation : un paramètre du bot `mc` qui retire des options, ou une variante de maquette.
-- **Commande.** Campagne `campagnes/jeu_restreint.json`, v1 et v2, duos, MC 64.
-- **Livrable.** Section « Jeu restreint » du diagnostic. Une perte nulle signale un élément inutile ; une perte énorme, un élément dominant.
+**3.6 Les options de la v2, et le diagnostic complet** (À FAIRE)
+- **Quoi.** Traiter `v2_options_mc` et la robustesse. Pour chaque décision ouverte (D1 à D6, D8, D9), un tableau des mesures clés (forêt, concentration, meilleur taux de rêve, fins avant la mi-partie, chef unique) et la recommandation de Claude.
+- **Livrable.** Le diagnostic terminé : en bref, problèmes de la v1 classés par gravité, options de la v2, recommandations, limites. README et plan d'action à jour.
 
-**3.8 Les options de la v2** (À FAIRE ; peut demander deux passages)
-- **Quoi.** Les variantes à une option près autour de « V2 proposée », comme dans `campagnes/v2_options.json` (déjà écrites en codes d'atelier), jouées par le bot fort sur les duos. Pour chaque décision ouverte (D1 à D6, D8, D9), lire les mesures clés : forêt, concentration, meilleur taux de rêve, fins avant mi-partie, chef unique.
-- **Commande.** `campagnes/v2_options_mc.json`, environ 16 variantes × 60 parties, en plusieurs lancements si besoin (vérifier le temps estimé).
-- **Livrable.** Section « Options de la v2 » du diagnostic : un tableau par décision, avec la recommandation de Claude.
-
-**3.9 Robustesse au bonus de fin** (À FAIRE)
-- **Quoi.** Vérifier que les conclusions de 3.4 à 3.8 tiennent avec un bonus de 10 et 25 % (paramètre `bonus` de l'atelier ; `bonus_fin` des règles) ; le bonus change le résultat que maximise le bot.
-- **Livrable.** Une section du diagnostic.
-
-**3.10 Rédiger le diagnostic** (À FAIRE)
-- **Quoi.** Terminer `projet/4-bilans/diagnostic-v1-options-v2.md` :
-  - en bref ;
-  - problèmes de la v1 classés par gravité ;
-  - options de la v2 comparées ;
-  - recommandations ;
-  - limites (mesuré ou supposé).
-
-  Mettre à jour le README et le plan d'action.
-- **Critère de fin.** Document complet et poussé.
-
-**3.11 DÉCISION UTILISATEUR : fixer la v2**
-- L'auteur tranche les décisions ouvertes de la v2 à partir du diagnostic. Claude écrit ensuite `maquettes/v2.json` (ou une v3) selon ses réponses, et met à jour les documents de conception.
+**3.7 DÉCISION UTILISATEUR : fixer la v2**
+- L'auteur tranche les décisions ouvertes de la v2 à partir du diagnostic. Le passage suivant écrit `maquettes/v2.json` (ou une v3) selon ses réponses et met à jour les documents de conception.
 
 ### Phase 4 : explorer la v2 fixée
 
-**4.1 Criblage (plan de Morris)** (À FAIRE, après 3.11)
-- **Quoi.** Coder `foret/criblage.py` : quelques centaines de variantes tirées selon un plan de Morris sur les paramètres libres du catalogue (section 5), jouées par le glouton (bot rapide). Classer les variables par influence sur chaque objectif.
-- **Commande.** Un workflow ou une campagne par lots.
-- **Livrable.** `projet/4-bilans/criblage.md`, avec les 8 à 12 variables influentes.
+**4.1 Écrire la v2 fixée et le criblage** (À FAIRE, après 3.7)
+- **Quoi.** Appliquer les réponses de 3.7 (maquette, documents, tests). Coder `foret/criblage.py` : quelques centaines de variantes tirées selon un plan de Morris sur les paramètres libres du catalogue (section 5), jouées par le glouton.
+- **Fin d'étape.** Lancer le criblage par lots sur GitHub.
 
-**4.2 DÉCISION UTILISATEUR : axes de la carte MAP-Elites**
-- Claude propose deux axes (par exemple part du hasard × durée) et la liste des variables retenues ; l'auteur choisit.
+**4.2 Résultats du criblage et proposition des axes** (À FAIRE)
+- **Quoi.** Classer les variables par influence sur chaque objectif ; retenir les 8 à 12 influentes ; proposer deux axes pour la carte (par exemple part du hasard × durée).
+- **Livrable.** `projet/4-bilans/criblage.md`.
 
-**4.3 MAP-Elites et recherche au hasard** (À FAIRE)
+**4.3 DÉCISION UTILISATEUR : axes de la carte et variables retenues**
+
+**4.4 MAP-Elites et recherche au hasard** (À FAIRE)
 - **Quoi.** Coder `foret/exploration.py` : MAP-Elites sur les variables retenues.
   - Filtre : niveau 1 de la batterie.
   - Qualité : le plus faible des objectifs normalisés.
   - Course d'élimination, avec les mêmes graines pour toutes les variantes.
   - Étalon : recherche au hasard à budget égal.
-- **Livrable.** Code, tests, essai court sur GitHub.
+  - La carte est enregistrée dans le dépôt (`resultats/exploration/`) pour reprendre d'un passage à l'autre.
+- **Fin d'étape.** Tests verts ; lancer les premières générations.
 
-**4.4 Faire tourner l'exploration** (À FAIRE ; plusieurs passages)
-- **Quoi.** Générations par lots sur GitHub. L'état de la carte est enregistré dans le dépôt (`resultats/exploration/`) pour reprendre d'un passage à l'autre.
-- **Critère de fin.** La carte se stabilise, ou le budget fixé à l'étape 4.2 est atteint.
+**4.5 Faire tourner l'exploration** (À FAIRE ; un passage par vague de générations)
+- **Quoi.** Intégrer la vague terminée, puis lancer la suivante, jusqu'à ce que la carte se stabilise ou que le budget fixé en 4.3 soit atteint.
 
-**4.5 Carte des variantes et candidats** (À FAIRE)
+**4.6 Carte des variantes et candidats** (À FAIRE)
 - **Livrable.** `projet/4-bilans/carte-des-variantes.md` :
   - la carte ;
   - ce qui fait bouger chaque objectif ;
   - 3 à 5 candidats commentés, avec leur code d'atelier ;
   - candidats pour les modes famille et expert.
 
-**4.6 DÉCISION UTILISATEUR : présélectionner les finalistes**
+**4.7 DÉCISION UTILISATEUR : présélectionner les finalistes**
 
 ### Phase 5 : valider
 
-**5.1 Finalistes et bots de contrôle** (À FAIRE)
-- **Quoi.** Rejouer les finalistes :
-  - toutes compositions de tables ;
-  - plus de parties ;
-  - un bot de contrôle jamais utilisé pendant la recherche (par exemple MC dont la politique est l'aléatoire bruité, ou MC 256).
-- **Livrable.** Section « Finalistes » de `projet/4-bilans/candidats-v3.md`.
+**5.1 Finalistes, bot de contrôle et ablation** (À FAIRE)
+- **Quoi.** Écrire et lancer deux campagnes :
+  - les finalistes avec toutes les compositions de tables, plus de parties, et un bot de contrôle jamais utilisé pendant la recherche (par exemple MC 256, ou MC dont la politique est l'aléatoire bruité) ;
+  - l'ablation de chaque finaliste, en annulant ses changements un par un (comme `campagnes/ablation_v1.json`).
 
-**5.2 Ablation des finalistes** (À FAIRE)
-- **Quoi.** Pour chaque finaliste, annuler ses changements un par un (comme `campagnes/ablation_v1.json`) pour expliquer ce qui compte.
-- **Livrable.** Section du même document.
+**5.2 Lecture par profil, fiches papier et candidats v3** (À FAIRE)
+- **Quoi.** Traiter les résultats. Lire les grilles des profils (catalogue, section 6), avec des tables mixtes et le bot bruité (Nadia) et un seul bot qui pilote plusieurs peuples (Thomas). Préparer les fiches de règles à imprimer.
+- **Livrable.** `projet/4-bilans/candidats-v3.md` et `projet/2-maquettes/fiches-test-v3.md`.
 
-**5.3 Lecture par profil et fiches papier** (À FAIRE)
-- **Quoi.** Grilles des profils (catalogue, section 6), tables mixtes avec le bot bruité (Nadia), un seul bot qui pilote plusieurs peuples (Thomas) ; fiches de règles à imprimer pour les tests humains.
-- **Livrable.** `projet/4-bilans/candidats-v3.md` complété, et `projet/2-maquettes/fiches-test-v3.md`.
-
-**5.4 DÉCISION UTILISATEUR : choisir la v3 et ses modes**
+**5.3 DÉCISION UTILISATEUR : choisir la v3 et ses modes**
 
 ## 5. Étape suivante
 
-**3.1 Le bot qui communique.**
+**3.1 Le bot qui communique** (en cours dans la session interactive du 13 oct. ; si le Verrou est vidé sans que l'étape soit marquée FAIT, reprendre là).
 
 ## 6. Verrou
 
@@ -214,14 +178,19 @@ EN COURS depuis le 2026-10-13 08:27 (heure de Paris) : session interactive avec 
 ## 7. Compteur de passages
 
 - Semaine en cours : depuis le lundi 12 oct. 2026, 22 h (heure de Paris).
-- Passages ayant réellement travaillé cette semaine : **0** (plafond : 6).
+- Passages ayant réellement travaillé cette semaine : **0** (plafond : 12, décision du 13 oct.).
 - Règle : le compteur est remis à zéro au premier passage qui suit un lundi 22 h. Un passage qui s'arrête aussitôt (décision attendue, verrou, campagne en cours, plafond) ne compte pas.
 
 ## 8. Réponses de l'auteur
 
 *L'auteur écrit ici ses réponses aux DÉCISIONS UTILISATEUR, avec la date ; le passage suivant les applique et repart.*
 
-- 3.3 (valider le bot fort et le plan réduit) : *en attente*
+- **13 oct. 2026 (validation du bot fort, fin de la phase 2)** :
+  1. bot de référence : MC 64 chacun pour soi, MC 128 pour les contrôles ;
+  2. plan réduit : 15 duos et 5 trios, 4 parties par table ;
+  3. le bot qui communique est construit en premier ;
+  4. organisation : un passage n'attend jamais un calcul de plus de 15 minutes (il lance, note et s'arrête) ; plafond de 12 passages qui travaillent par semaine.
+- 3.7 (fixer la v2) : *en attente*
 
 ## 9. Campagnes GitHub
 
@@ -246,7 +215,8 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 
 | Date | Début | Durée | Statut | Résumé |
 |---|---|---|---|---|
-| 13 oct. 2026 | – | – | terminé | Mise en place (session interactive) : phase 2 terminée, ETAT.md créé, workflows en Node 24, tâche planifiée créée. Pas compté dans le plafond. |
+| 13 oct. 2026 | – | – | terminé | Mise en place (session interactive) : phase 2 terminée, ETAT.md créé, workflows en Node 24 (tests verts), tâche planifiée « Forêt qui rêve · tests autonomes » créée (3 h 35, 9 h 35, 15 h 35). Pas compté dans le plafond. |
+| 13 oct. 2026 | 08:27 | – | en cours | Session interactive avec l'auteur : décisions de fin de phase 2 prises (section 8), planification revue, étape 3.1 en cours. |
 
 ## 11. Reprendre la main
 
