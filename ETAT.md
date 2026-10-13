@@ -176,7 +176,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 - 0.7 Bot à portefeuille ; 0.8 bot de contrôle (FAIT le 13 oct. : paramètre `portefeuille` du bot `mc`, `MCP64` et `CONTROLE` dans `foret/batterie.py`, moteur 1.8 ; **validation à faire en 0.11** au budget réel : en V0.3, MCP64 ≥ MC64R apparié ; en V0.2, choix surtout « reve0 »).
 - 0.9 Criblage et exploration (FAIT le 13 oct. : `foret/cycle.py` réunit criblage de Morris, MAP-Elites et étalon au hasard, confirmation en manches, contrôle, rapport et alertes ; plan du cycle 1 : `cycles/c1.json`, 13 variables).
 - 0.10 Orchestrateur et surveillance (FAIT le 13 oct. : workflows `cycle.yml` et `surveillance.yml`, `scripts/publier_resultats.sh` ; essai complet réussi : cycle « essai », 7 lancements enchaînés seuls en 4 min, rapport et issue n° 1 ; tâche « tests autonomes » passée à un passage par jour).
-- 0.11 Ligne de base P2 (EN COURS : campagnes `ligne_base_p2` (Campagne 16) et `ligne_base_p2_v02` lancées le 13 oct. vers 15 h 25) : valider MCP64 (sinon garder MC64R comme bot fort dans `cycles/c1.json`), les témoins des nouvelles mesures, coordination et chef unique au bot fort sur la V0.3 ; réétiqueter les mesures fragiles. Puis lancer le cycle 1 : `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/workflows/cycle.yml/dispatches -f ref=main -f 'inputs[cycle]=c1' -f 'inputs[lots]=20'`.
+- 0.11 Ligne de base P2 (FAIT le 13 oct. : `projet/4-bilans/ligne-de-base-p2.md`. MCP64 non validé (−1,6 point, incertain) : **MC64R reste le bot fort** ; gain d'apprentissage +1,7 (orange), témoin réussi ; choix morts : Voler seul, témoin partiel ; coordination et chef unique nuls au bot fort ; durée réglée à 4 joueurs et plus par les lunes, rouge à 2 et 3 ; jeu trop facile partout, 90 à 99 %).
 
 **Cycles 1 à 3** (V0.3 → V0.4 → V0.5 → V0.6) : préparer (Claude) → criblage, exploration, confirmation, contrôle, rapport (GitHub, seul) → analyser et proposer (Claude) → **DÉCISION UTILISATEUR : adopter la version**. Priorités : cycle 1 la durée ; cycle 2 l'intérêt des choix et la profondeur ; cycle 3 l'équilibre fin. Arrêt anticipé si plus aucun objectif rouge (bot fort et bot de contrôle).
 
@@ -184,8 +184,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 5. Étape suivante
 
-**0.1 et 0.2** : renommer les versions et écrire la V0.3 dans le moteur (le préréglage « V2 proposée » plus le module des lunes, code `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:`, avec « V2 proposée » gardée comme variante nommée « V0.3-sans-lunes »). Bot fort de cette maquette : `MC64R` jusqu'à ce que le bot à portefeuille (0.7) le remplace.
-
+**Cycle 1 en cours sur GitHub** (lancé le 13 oct. vers 16 h 35, Paris ; plan `cycles/c1.json`, V0.3 → V0.4). Il s'enchaîne seul (workflow Cycle) ; état dans `etat_pipeline.json` et `cycles/c1/` sur la branche `resultats`. Durée estimée : 5 à 6 h. Quand `statut` vaut « rapport prêt », déclencher la tâche « analyse de fin de cycle » (section 3 bis, point 5) ; elle proposera la V0.4 (DÉCISION UTILISATEUR). Cibles du cycle : la durée à 2 et 3 joueurs (54 à 56 % de fins avant la mi-partie en V0.3) et la difficulté (90 à 99 % de forêt gardée ; cible provisoire 50 à 80 %).
 
 **Incident GitHub (13 oct.).** Le groupe de concurrence des fusions (`publication-resultats`) ne garde qu'une tâche en attente et annule les autres : les fusions des campagnes 12 et 13 ont été annulées, puis relancées avec `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/runs/<id>/rerun-failed-jobs` (une seule à la fois). Corrigé pour les lancements suivants : plus de groupe, la publication réessaie. Les lots de campagne sont gardés 3 jours (1 jour avant la correction).
 
@@ -193,7 +192,6 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
-EN COURS (13 oct. 2026, 14 h) : conversation interactive avec l'auteur. À vider à la fin de la conversation.
 
 
 ## 7. Compteur de passages
@@ -247,8 +245,9 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Campagne 14 | robustesse_v1, bonus 0/10/25, 720 parties | 20 | 75 min | 28 min | réussi ; traité (section 8) |
 | Campagne 15 | robustesse_v2, 16 variantes × bonus 10 et 25, 1 920 parties | 20 | 101 min (attentes comprises) | 34 min environ | réussi ; traité (diagnostic, section 8) |
 | Cycle « essai » | essai du pipeline (étape 0.10) : criblage, 2 générations, 2 manches, contrôle, rapport ; glouton, très petit | 4 | 4 min (7 lancements enchaînés seuls) | < 1 min | réussi ; issue n° 1 fermée |
-| Campagne 16 | ligne_base_p2 (V0.3, 2 à 6 joueurs) : MC64R contre MCP64, témoins, coordination ; 544 parties | 14 | – | – | lancée le 13 oct. 15 h 24 (Paris) ; à traiter en 0.11 |
-| Campagne 17 | ligne_base_p2_v02 (V0.2) : MCP64 contre MC64, choix morts (mammifères sans pouvoir) ; 108 parties | 6 | – | – | lancée le 13 oct. vers 15 h 30 ; à traiter en 0.11 |
+| Campagne 16 | ligne_base_p2 (V0.3, 2 à 6 joueurs) : MC64R contre MCP64, témoins, coordination ; 544 parties | 14 | 48 min | 48 min (228 s-cœur par partie en moyenne) | réussi ; traité (ligne de base P2) |
+| Campagne 17 | ligne_base_p2_v02 (V0.2) : MCP64 contre MC64, choix morts (mammifères sans pouvoir) ; 108 parties | 6 | 17 min | 17 min | réussi ; traité (ligne de base P2) |
+| Cycle 1 | c1 : criblage (336 variantes, gloutons, 2 à 6 joueurs), exploration MAP-Elites, confirmation MC64R, contrôle | 20 | – | – | lancé le 13 oct. vers 16 h 35 ; s'enchaîne seul ; réveil armé vers 22 h 40 |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
@@ -258,7 +257,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 |---|---|---|---|---|
 | 13 oct. 2026 | – | – | terminé | Mise en place (session interactive) : phase 2 terminée, ETAT.md créé, workflows en Node 24 (tests verts), tâche planifiée « Forêt qui rêve · tests autonomes » créée (3 h 35, 9 h 35, 15 h 35). Pas compté dans le plafond. |
 | 13 oct. 2026 | 08:27 | 3 h 35 | terminé | Session interactive avec l'auteur : décisions de fin de phase 2 (section 8), planification revue ; étapes 3.1 à 3.6 faites (moteur 1.7.1, bot fort de la V2 qui rêve, mesures du bot fort, jeu restreint, options de la v2, robustesse ; campagnes 9 à 15 et batteries 3 à 6). Livrable : `projet/4-bilans/diagnostic-v1-options-v2.md`. Étape suivante : 3.7, décision de l'auteur. Pas compté dans le plafond. |
-| 13 oct. 2026 | 13:00 | en cours | en cours | Session interactive avec l'auteur : point de situation, pistes d'amélioration, plan vers la V1 (`projet/3-pilotage/plan-vers-v1.md`), versions renommées, règle de décision ; ETAT réorganisé (étapes 0.1 à 0.11, cycles). Pas compté dans le plafond. |
+| 13 oct. 2026 | 13:00 | 3 h 35 | terminé | Session interactive avec l'auteur : point de situation ; plan vers la V1 (`projet/3-pilotage/plan-vers-v1.md`), versions renommées, règle de décision, critère des tailles de table ; trois tâches planifiées (Sonnet courant, Opus fin de cycle, réveil) ; étape 0 faite en entier (0.1 à 0.11, moteur 1.8, pipeline autonome essayé) ; ligne de base P2 ; cycle 1 lancé. Pas compté dans le plafond. |
 
 ## 11. Reprendre la main
 
