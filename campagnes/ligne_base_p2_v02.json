@@ -1,0 +1,144 @@
+{
+ "nom": "ligne_base_p2_v02",
+ "maquette": "v1",
+ "description": "Plan vers la V1, étape 0.11 (13 oct. 2026) : témoins sur la V0.2 (étalon figé). (1) le bot à portefeuille MCP64 doit surtout choisir de ne pas rêver, et égaler MC64 ; (2) choix morts : avec les mammifères sans pouvoir, Tenir et Renverser doivent compter comme morts (interdire leur moitié ne coûte rien).",
+ "blocs": [
+  {
+   "nom": "portefeuille",
+   "variantes": [
+    "defaut"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi"
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "portefeuille": [
+       {
+        "nom": "reve0",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.0
+        }
+       },
+       {
+        "nom": "reve05",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.5
+        }
+       },
+       {
+        "nom": "reve1",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0
+        }
+       },
+       {
+        "nom": "reve1_sommeil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "sommeil"
+        }
+       },
+       {
+        "nom": "reve1_reveil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "reveil"
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "choix_morts",
+   "variantes": [
+    "temoin_mammiferes_sans_pouvoir",
+    "patch:{\"pouvoirs\":{\"tenir\":{\"actif\":false},\"renverser\":{\"actif\":false}},\"regles\":{\"interdits\":[\"moitie:tenir\"]}}",
+    "patch:{\"pouvoirs\":{\"tenir\":{\"actif\":false},\"renverser\":{\"actif\":false}},\"regles\":{\"interdits\":[\"moitie:renverser\"]}}"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi"
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "mammiferes",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ],
+   "reference": "temoin_mammiferes_sans_pouvoir"
+  }
+ ]
+}

@@ -1,0 +1,391 @@
+{
+ "nom": "ligne_base_p2",
+ "maquette": "v0.3",
+ "description": "Plan vers la V1, étape 0.11 (13 oct. 2026) : ligne de base du protocole P2 sur la V0.3, à toutes les tailles de table (échantillon du bot fort : 6 duos, 4 trios, 3 quatuors, 2 quintettes, la table de six ; 4 parties par table, graines appariées). Blocs : (1) validation du bot à portefeuille MCP64 contre MC64R ; (2) gain d'apprentissage du Méchant et son témoin (une seule tactique), et « sans lunes » ; (3) coordination et chef unique remesurés au bot fort qui rêve (duos).",
+ "blocs": [
+  {
+   "nom": "bots",
+   "variantes": [
+    "defaut"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "portefeuille": [
+       {
+        "nom": "reve0",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.0
+        }
+       },
+       {
+        "nom": "reve05",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.5
+        }
+       },
+       {
+        "nom": "reve1",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0
+        }
+       },
+       {
+        "nom": "reve1_sommeil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "sommeil"
+        }
+       },
+       {
+        "nom": "reve1_reveil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "reveil"
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "insectes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "temoins",
+   "variantes": [
+    "defaut",
+    "temoin_sans_apprentissage",
+    "temoin_une_tactique",
+    "patch:{\"piste\":{\"disposition\":[\"Cupidite\",\"Cupidite\",\"Cupidite\",\"Cupidite\",\"Cupidite\",\"Cupidite\",\"Cupidite\",\"Cupidite\",\"Cupidite\",\"Cupidite\",\"Cupidite\"]},\"regles\":{\"apprentissage\":false}}",
+    "sans_lunes"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "insectes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ],
+   "reference": "defaut"
+  },
+  {
+   "nom": "soi",
+   "variantes": [
+    "comm_aucun_signe",
+    "defaut",
+    "comm_tout_dire"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      },
+      "annonces": true
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ]
+     ],
+     "parties": 4
+    }
+   ],
+   "reference": "defaut"
+  },
+  {
+   "nom": "central",
+   "variantes": [
+    "defaut"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "tout",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      },
+      "annonces": true
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  }
+ ]
+}
