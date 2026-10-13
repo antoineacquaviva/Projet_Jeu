@@ -1,0 +1,15 @@
+{
+  "nom": "coordination_mc_2",
+  "description": "Phase 3, étape 3.1 (13 oct. 2026) : la coordination avec un bot qui communique. Bot de référence MC 64 chacun pour soi, qui annonce ses intentions (traces et jetons de sa politique, le glouton, et il s'y tient) et dont les tirages au sort respectent les annonces des autres (Partie.annonces). Trois formes : aucun signe, celle de la maquette (conseil parlé en v1, traces en v2), tout dire ; plus le mode central. Les 15 duos, 4 parties chacun, graines appariées avec coordination_mc. Part récupérée = (maquette - aucun signe) / (tout dire - aucun signe), bande verte 40 à 80 %.",
+  "maquette": "v1",
+  "blocs": [
+    {"nom": "soi",
+     "variantes": ["comm_aucun_signe", "defaut", "comm_tout_dire"],
+     "bots": [{"type": "mc", "params": {"budget": 64, "savoir": "soi", "annonces": true}}],
+     "tables": [{"tailles": [2], "parties": 4}]},
+    {"nom": "central",
+     "variantes": ["defaut"],
+     "bots": [{"type": "mc", "params": {"budget": 64, "savoir": "tout", "annonces": true}}],
+     "tables": [{"tailles": [2], "parties": 4}]}
+  ]
+}

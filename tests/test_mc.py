@@ -103,3 +103,42 @@ def test_chacun_pour_soi_retire_au_sort_les_programmes_caches(monkeypatch):
     Partie(charger("v1", "defaut"), peuples, bots, graine=12).jouer()
     assert any(e == 0 for e, _, _ in appels) and any(e > 0 for e, _, _ in appels)
     assert any(change for _, _, change in appels)
+
+
+def test_annonces_traduit_les_traces_en_contraintes():
+    """Partie.annonces (R2.5, savoir="soi") : traces datées et non datées."""
+    p = Partie(charger("v1", "defaut"), ["oiseaux", "insectes"], [fabriquer({"type": "glouton"}, i) for i in range(2)],
+               graine=1)
+    p.traces = {0: [(1, "reve"), (3, "Z5")], 1: [(None, "reve"), (None, "Z2"), (None, "Z4")]}
+    assert p.annonces(0, [1, 2, 3]) == {1: "reve", 3: "carte"}
+    assert p.annonces(0, [2, 3]) == {3: "carte"}
+    assert p.annonces(1, [1, 2, 3]) == {1: "reve", 2: "carte", 3: "carte"}
+    assert p.annonces(1, [2, 3]) == {2: "reve", 3: "carte"}
+
+
+def test_le_bot_qui_annonce_tient_ses_traces():
+    """annonces=True : chaque trace datée qu'il pose est tenue à la programmation."""
+    tenues = []
+    vrai = Partie.conseil
+
+    def espion(self):
+        vrai(self)
+        if self is not originale[0]:          # les suites (copies) jouent la politique, pas le bot
+            return
+        for idx, ts in self.traces.items():
+            for e, z in ts:
+                if e is None:
+                    continue
+                j = self.prog[e].get(idx) or next((g for g in self.glisses if g.siege == idx and g.etape == e), None)
+                tenues.append(j is not None and (j.mode == "reve") == (z == "reve"))
+    import foret.moteur as M
+    originale = [None]
+    M.Partie.conseil = espion
+    try:
+        bots = [fabriquer({"type": "mc", "params": {"budget": 2, "savoir": "soi", "annonces": True}}, 80 + i)
+                for i in range(2)]
+        originale[0] = Partie(charger("v1", "comm_traces"), ["oiseaux", "mammiferes"], bots, graine=5)
+        originale[0].jouer()
+    finally:
+        M.Partie.conseil = vrai
+    assert tenues and all(tenues)

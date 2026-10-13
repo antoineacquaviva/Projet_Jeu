@@ -944,9 +944,11 @@ class Partie(Plans):
             modes.append("reve")
         return modes
 
-    def _programmer(self, s, etapes=None, deja=()):
+    def _programmer(self, s, etapes=None, deja=(), annonces=None):
         """R2.1 ; etapes : seulement ces étapes ; deja : jeux de ce siège déjà faits ce tour
-        (pour la limite de rêves). Rend les nouveaux jeux."""
+        (pour la limite de rêves) ; annonces : {étape: "reve" ou "carte"}, contraintes à la
+        place des traces qui engagent (tirage au sort conforme aux annonces, Partie.brouiller).
+        Rend les nouveaux jeux."""
         jeux = list(deja)
         n0 = len(jeux)
         for e in (self.etapes if etapes is None else etapes):
@@ -954,7 +956,7 @@ class Partie(Plans):
                 continue
             if not s.main:
                 break
-            eng = self.trace_engageante(s.idx, e)                    # R2.5 : traces qui engagent
+            eng = self.trace_engageante(s.idx, e) if annonces is None else annonces.get(e)  # R2.5
             cartes = [None] + list(s.main) if eng is None else list(s.main)
             carte = self.decider(s, "programmer_carte", cartes, etape=e)
             if carte is None:
@@ -1056,7 +1058,7 @@ class Partie(Plans):
                     for j in jeux:
                         s.joues.remove(j.carte)
                         s.main.append(j.carte)
-                    self._provisoire[idx] = self._programmer(s)
+                    self._provisoire[idx] = self._programmer(s, annonces=self.annonces(idx, self.etapes))
                     self.stat("brouillage")
             elif self.etape > 0:                                          # pendant la résolution
                 caches = [e for e in self.etapes if e > self.etape]
@@ -1088,13 +1090,39 @@ class Partie(Plans):
                     restes = [j for v in self.prog.values() for j in v.values() if j.siege == s.idx]
                     restes += [g for g in self.glisses if g.siege == s.idx]
                     libres = [e for e in caches if s.idx not in self.prog[e]]
-                    nouveaux = self._programmer(s, etapes=libres, deja=restes)
+                    nouveaux = self._programmer(s, etapes=libres, deja=restes,
+                                                annonces=self.annonces(s.idx, libres, restes))
                     self._ranger(s.idx, nouveaux)
                     self.stat("brouillage")
                 # les cartes glissées (de tous) sous une carte reprogrammée se relient
                 self._lier_glisses([g for g in self.glisses if g.etape in caches and not g.lie])
         finally:
             self._imposes = imposes
+
+    def annonces(self, idx, caches, deja=()):
+        """Ce que les traces publiques du siège idx disent de ses programmes encore cachés
+        (étapes `caches`) : {étape: "reve" ou "carte"}. Trace datée (étape, rêve) : il rêve à
+        cette étape ; (étape, zone) : il y joue une carte qui ne rêve pas. Traces non datées
+        (conseil parlé) : un rêve annoncé et pas encore fait va sur la première étape cachée ;
+        chaque zone annoncée, sur l'étape cachée suivante. Les jetons du partage ne disent
+        pas l'étape : ils ne contraignent rien. Sert au tirage au sort (Partie.brouiller)."""
+        out = {}
+        ts = self.traces.get(idx, ())
+        caches = list(caches)
+        datees = [(e, z) for e, z in ts if e is not None]
+        for e, z in datees:
+            if e in caches:
+                out[e] = "reve" if z == "reve" else "carte"
+        libres = [e for e in caches if e not in out]
+        nd = [z for e, z in ts if e is None]
+        if nd and libres:
+            deja_reve = any(j.mode == "reve" for j in deja)
+            if "reve" in nd and not deja_reve:
+                out[libres.pop(0)] = "reve"
+            for z in nd:
+                if z != "reve" and libres:
+                    out[libres.pop(0)] = "carte"
+        return out
 
     # =================================================================== communication (R2.5)
     def communiquer(self):

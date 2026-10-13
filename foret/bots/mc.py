@@ -22,7 +22,12 @@ Ce que le bot sait (paramètre « savoir ») :
   savoir (les programmes encore cachés des autres : étapes, moitiés, rêves,
   cartes glissées) est retiré au sort par la politique (Partie.brouiller). Il
   ne voit des autres que ce qui est public : leurs cartes révélées, leurs
-  traces ou jetons (communication partielle, R2.5), leurs actions.
+  traces ou jetons (communication partielle, R2.5), leurs actions. Le tirage
+  respecte les traces des autres (Partie.annonces : une trace « je rêve » à une
+  étape impose un rêve, une trace de zone une carte qui ne rêve pas).
+- annonces=True : ses traces et jetons sont ceux de sa politique (le glouton
+  annonce ce qu'il compte faire), et il s'y tient en programmant. Sans ce
+  réglage, il n'annonce rien : dans ses suites, personne ne lit les annonces.
 
 Une politique de jeu meilleure que le glouton rendrait le bot plus fort ; le
 bot est par construction au moins aussi bon que sa politique, à la variance des
@@ -51,6 +56,7 @@ class MonteCarlo(Bot):
         "max_options": 24,                # au-delà : le choix de la politique et des options tirées au sort
         "devin": False,                   # True : les suites gardent les vrais dés à venir (valeur de l'information)
         "reves_par_tour": None,           # None = libre ; un nombre = taux de rêve imposé (comme le glouton)
+        "annonces": False,                # True : il annonce (traces, jetons) comme sa politique et s'y tient
     }
 
     def __init__(self, graine=0, **params):
@@ -72,6 +78,8 @@ class MonteCarlo(Bot):
         permis = list(range(len(options)))
         if type_ == "programmer_mode" and self.p["reves_par_tour"] is not None:
             permis = self._taux_impose(partie, siege, options, ctx["etape"])
+        if self.p["annonces"] and type_ in ("programmer_carte", "programmer_mode"):
+            permis = self._tenir_annonces(partie, siege, type_, options, ctx["etape"], permis)
         choix = options[self._chercher(partie, siege, type_, options, ctx, permis)]
         if type_ == "programmer_mode" and choix == "reve" and self.p["reves_par_tour"] is not None:
             self._quota[(partie.lignee, partie.tour, siege.idx)][1] += 1
@@ -99,13 +107,25 @@ class MonteCarlo(Bot):
             return [reve]
         return tous
 
+    def _tenir_annonces(self, partie, siege, type_, options, etape, permis):
+        """Ce que ses traces ont annoncé pour cette étape (Partie.annonces) : il s'y tient."""
+        voulu = partie.annonces(siege.idx, partie.etapes).get(etape)
+        if voulu is None:
+            return permis
+        if type_ == "programmer_carte":
+            ok = [i for i in permis if options[i] is not None]
+        else:
+            ok = [i for i in permis if (options[i] == "reve") == (voulu == "reve")]
+        return ok or permis
+
     def _chercher(self, partie, siege, type_, options, ctx, permis):
         """Rend l'indice (dans options, la liste du moteur) de l'option retenue parmi permis."""
         if len(permis) == 1:
             return permis[0]
-        if type_ in self.p["ignorer"] or len(permis) > self.p["max_options"]:
+        ignore = type_ in self.p["ignorer"] or (self.p["annonces"] and type_ in ("trace", "partage"))
+        if ignore or len(permis) > self.p["max_options"]:
             prefere = self._prefere(partie, siege, type_, options, ctx, permis)
-            if type_ in self.p["ignorer"]:
+            if ignore:
                 return prefere
             autres = [i for i in permis if i != prefere]
             self.rng.shuffle(autres)
