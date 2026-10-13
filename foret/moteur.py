@@ -39,7 +39,7 @@ from .decisions import DECISIONS
 from .observateurs import Compteur, Journal
 from .plans import Plans
 
-VERSION = "1.7"
+VERSION = "1.7.1"
 CENTRE = 7                      # R5.1 : 2-6 éveil, 7 centre, 8-12 rêve
 CASES = tuple(range(2, 13))
 PROBA = {c: (6 - abs(c - CENTRE)) / 36 for c in CASES}
@@ -944,10 +944,12 @@ class Partie(Plans):
             modes.append("reve")
         return modes
 
-    def _programmer(self, s, etapes=None, deja=(), annonces=None):
+    def _programmer(self, s, etapes=None, deja=(), annonces=None, pleines=False):
         """R2.1 ; etapes : seulement ces étapes ; deja : jeux de ce siège déjà faits ce tour
         (pour la limite de rêves) ; annonces : {étape: "reve" ou "carte"}, contraintes à la
-        place des traces qui engagent (tirage au sort conforme aux annonces, Partie.brouiller).
+        place des traces qui engagent (tirage au sort conforme aux annonces, Partie.brouiller) ;
+        pleines : chaque étape reçoit une carte, posée devant soi (Partie.brouiller pendant la
+        résolution : ce qui se voit sur la table, une carte face cachée à cette étape, est gardé).
         Rend les nouveaux jeux."""
         jeux = list(deja)
         n0 = len(jeux)
@@ -957,7 +959,7 @@ class Partie(Plans):
             if not s.main:
                 break
             eng = self.trace_engageante(s.idx, e) if annonces is None else annonces.get(e)  # R2.5
-            cartes = [None] + list(s.main) if eng is None else list(s.main)
+            cartes = [None] + list(s.main) if (eng is None and not pleines) else list(s.main)
             carte = self.decider(s, "programmer_carte", cartes, etape=e)
             if carte is None:
                 continue
@@ -971,7 +973,7 @@ class Partie(Plans):
             mode = self.decider(s, "programmer_mode", modes, etape=e, carte=carte)
             hote = None
             inst = self.pouvoir_moitie.get((s.peuple, mode)) if mode != "reve" else None
-            if inst is not None:
+            if inst is not None and not pleines:
                 opts = inst.options_hote(s, e)
                 if opts:
                     idx = self.decider(s, "hote", [None] + opts, etape=e)
@@ -1064,6 +1066,11 @@ class Partie(Plans):
                 caches = [e for e in self.etapes if e > self.etape]
                 if not caches:
                     return
+                # Moteur 1.7.1 : ce qui se voit sur la table est gardé. Une carte face cachée à une
+                # étape reste une carte à cette étape (seuls la carte, la moitié et le rêve sont
+                # retirés au sort) ; une étape vide reste vide ; les cartes glissées restent où
+                # elles sont. Avant, une étape pouvait se vider ou se remplir, et un choix fait sur
+                # la table vue (Parler, R6.10) pouvait viser une carte absente de la copie.
                 for s in self.sieges:
                     if s.idx == sait:
                         continue
@@ -1076,12 +1083,6 @@ class Partie(Plans):
                                 a.lie = False
                             j.attaches = []
                             defaits.append(j)
-                    for g in [g for g in self.glisses if g.siege == s.idx and g.etape in caches]:
-                        self.glisses.remove(g)
-                        h = self.prog[g.etape].get(g.hote[0])
-                        if h is not None and g in h.attaches:
-                            h.attaches.remove(g)
-                        defaits.append(g)
                     if not defaits:
                         continue
                     for j in defaits:
@@ -1089,9 +1090,9 @@ class Partie(Plans):
                         s.main.append(j.carte)
                     restes = [j for v in self.prog.values() for j in v.values() if j.siege == s.idx]
                     restes += [g for g in self.glisses if g.siege == s.idx]
-                    libres = [e for e in caches if s.idx not in self.prog[e]]
-                    nouveaux = self._programmer(s, etapes=libres, deja=restes,
-                                                annonces=self.annonces(s.idx, libres, restes))
+                    pleines = sorted(j.etape for j in defaits)
+                    nouveaux = self._programmer(s, etapes=pleines, deja=restes, pleines=True,
+                                                annonces=self.annonces(s.idx, pleines, restes))
                     self._ranger(s.idx, nouveaux)
                     self.stat("brouillage")
                 # les cartes glissées (de tous) sous une carte reprogrammée se relient

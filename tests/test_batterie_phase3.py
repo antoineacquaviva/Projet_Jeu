@@ -27,7 +27,8 @@ def test_le_plan_reduit_contient_ce_qui_a_ete_decide():
     assert all(x["bots"][0] == B.MC64 or x["bots"][0] == B.INERTE for x in t if x["exp"] == "tables")
     assert all(x.get("politique_sondes") == B.G0 for x in t if x.get("sondes"))
     assert {x["etiquette"] for x in t if x["exp"] == "reves"} == {"taux:0.0", "taux:0.5", "taux:1.0"}
-    assert len(B.plan_complet(list(B.PLAN3))) == 676
+    assert len(B.plan_complet(["p3_v1", "p3_v2"])) == 676
+    assert B.PLAN3["p3_v2r"][2]["params"]["politique"]["params"]["reves_par_tour"] == 1.0
 
 
 def test_le_plan_reduit_se_joue_et_se_mesure(plan3):

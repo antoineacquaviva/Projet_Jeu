@@ -105,6 +105,33 @@ def test_chacun_pour_soi_retire_au_sort_les_programmes_caches(monkeypatch):
     assert any(change for _, _, change in appels)
 
 
+def test_brouiller_garde_ce_qui_se_voit_sur_la_table(monkeypatch):
+    """Moteur 1.7.1 (R2.1, R6.8, R6.10) : pendant la résolution, brouiller ne change que ce qui est
+    caché. Chaque étape à venir garde une carte (ou reste vide) pour chaque joueur, et les cartes
+    glissées restent où elles sont : un choix fait sur la table vue (Parler déplace une carte
+    cachée, R6.10) vise toujours une carte présente dans la copie."""
+    vus = []
+    vrai = Partie.brouiller
+
+    def table(self, sait):
+        cartes = sorted((i, e) for e, v in self.prog.items() for i in v if i != sait and e > self.etape)
+        glisses = sorted((g.siege, g.etape, g.hote) for g in self.glisses if g.siege != sait and g.etape > self.etape)
+        return cartes, glisses
+
+    def espion(self, sait):
+        avant = table(self, sait)
+        vrai(self, sait)
+        if self.etape > 0:
+            vus.append(avant == table(self, sait))
+        self.controler()
+    monkeypatch.setattr(Partie, "brouiller", espion)
+    peuples = ["insectes", "humains", "reptiles"]
+    bots = [fabriquer({"type": "mc", "params": {"budget": 2, "savoir": "soi",
+                                                "politique": {"type": "aleatoire"}}}, 60 + i) for i in range(3)]
+    Partie(charger("v1", "defaut"), peuples, bots, graine=12).jouer()
+    assert vus and all(vus)
+
+
 def test_annonces_traduit_les_traces_en_contraintes():
     """Partie.annonces (R2.5, savoir="soi") : traces datées et non datées."""
     p = Partie(charger("v1", "defaut"), ["oiseaux", "insectes"], [fabriquer({"type": "glouton"}, i) for i in range(2)],

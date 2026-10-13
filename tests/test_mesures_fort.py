@@ -119,7 +119,7 @@ def test_le_programme_mesures3():
     assert all(x["bots"][0]["params"]["juger"] == B.JUGE3 for x in t if x["exp"] == "dilemmes")
     assert {x["etiquette"] for x in B.taches("m3_v1_sans_reve") if x["exp"] == "reves"} == \
         {"taux:0.0", "taux:0.5", "taux:1.0"}
-    assert len(B.plan_complet(list(B.PLAN_M3))) == 1020
+    assert len(B.plan_complet([k for k in B.PLAN_M3 if k != "m3_v2r"])) == 1020
     assert set(B.PROGRAMMES) == {"phase1", "phase3", "mesures3"}
 
 

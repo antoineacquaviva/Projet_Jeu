@@ -266,7 +266,7 @@ Paramètres du bot `mc` :
 
 Coût mesuré (un cœur) : une suite coûte 5 à 15 ms ; une partie de duo demande 100 à 150 recherches. Ordres de grandeur avec le moteur 1.7 : MC 32 environ 30 s (v1) à 1 min 30 (v2) par partie de duo, MC 128 environ 2 min (v1) à 6 min (v2). La batterie complète (96 200 parties) est hors de portée du bot fort : la phase 3 utilise un plan réduit.
 
-Le moteur : `Partie.copie(..., brouiller=siège)` et `Partie.brouiller(siège)` (information cachée) ; une partie dont un bot copie la partie (`reprises = True`) prend une photo à chaque segment ; la prévision est gardée pendant les rondes de traces et la défense par zone pendant une prévision (deux fois plus rapide, mêmes résultats).
+Le moteur : `Partie.copie(..., brouiller=siège)` et `Partie.brouiller(siège)` (information cachée ; depuis le moteur 1.7.1, pendant la résolution, ce qui se voit sur la table est gardé : une carte face cachée à une étape reste une carte à cette étape, une étape vide reste vide, les cartes glissées ne bougent pas ; seuls la carte, sa moitié et le rêve sont retirés au sort. Avant, un choix fait sur la table vue, comme Parler (R6.10), pouvait viser une carte absente de la copie : une partie sur 180 de la campagne 10 s'est arrêtée sur cette erreur) ; une partie dont un bot copie la partie (`reprises = True`) prend une photo à chaque segment ; la prévision est gardée pendant les rondes de traces et la défense par zone pendant une prévision (deux fois plus rapide, mêmes résultats).
 
 ## Faire évoluer
 

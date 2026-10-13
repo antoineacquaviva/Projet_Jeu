@@ -95,7 +95,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 - **Fin d'étape.** Tests verts ; essai à l'échelle 0,1 sur GitHub (moins de 15 min) ; puis lancer le plan complet (v1 et V2), en plusieurs lancements si un lot risque de dépasser 6 h.
 - **Livrable.** `docs/mesures.md` complété ; durée estimée et réelle dans la section 9.
 
-**3.3 Les mesures qui attendaient le bot fort** (EN COURS, session interactive du 13 oct.)
+**3.3 Les mesures qui attendaient le bot fort** (FAIT le 13 oct. : coordination et chef unique traités, section 5 bis du bilan des bots ; tape-taupe, gain du bot libre, dilemmes codés, programme `mesures3` lancé en Batterie 4 ; moteur 1.7.1, correction du tirage au sort)
 - **Quoi.** D'abord, traiter `coordination_mc_2` : section « Coordination » de `projet/4-bilans/bots-echelle-validation.md`, avec la part de l'écart récupérée (bande verte 40 à 80 %). Ensuite, coder les quatre mesures en attente du registre `MESURES` (`foret/mesures.py` ; définitions dans `projet/3-pilotage/objectifs-invariants-catalogue.md`, section 2), chacune avec son témoin et son test :
   - tape-taupe : un bot qui pare toujours la menace la plus probable, contre le bot fort ;
   - gain du bot libre sur le meilleur taux fixe ;
@@ -103,7 +103,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
   - chef unique : MC tout contre MC soi.
 - **Fin d'étape.** `python -m foret.conformite --mesures` ne liste plus de mesure en attente ; lancer leur campagne (v1 et V2, duos).
 
-**3.4 Le jeu restreint et les options de la v2** (À FAIRE)
+**3.4 Le jeu restreint et les options de la v2** (EN COURS, session interactive du 13 oct.)
 - **Quoi.** Écrire deux campagnes :
   - `campagnes/jeu_restreint.json` : interdire au bot une action ou un pouvoir à la fois (Saboter d'abord, puis Barrer, Aller et chaque règle brisée), avec un paramètre du bot `mc` qui retire des options ;
   - `campagnes/v2_options_mc.json` : les variantes à une option près autour de « V2 proposée » (codes d'atelier de `campagnes/v2_options.json`), jouées par le bot de référence sur les duos.
@@ -169,7 +169,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 
 ## 5. Étape suivante
 
-**3.3 Les mesures qui attendaient le bot fort.** Commencer par traiter les campagnes 9 et 10 si elles sont terminées (section 9). La Batterie 3 sera traitée en 3.5.
+**3.4 Le jeu restreint et les options de la v2** (en cours dans la session interactive du 13 oct. ; si le Verrou est vidé sans que l'étape soit marquée FAIT, reprendre là). Les batteries 3 et 4 seront traitées en 3.5.
 
 ## 6. Verrou
 
@@ -208,9 +208,10 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Campagne 7 | coordination_mc, v2 | 20 | 47,2 min | 27,6 min | réussi (a attendu la 6) |
 | Campagne 8 | reference, v1, échelle 0,02 (essai des workflows Node 24) | 3 | 0,5 min | 0,2 min | réussi |
 | Batterie 2 | batterie phase 1, 4 configurations principales, échelle 0,05 (essai des workflows Node 24) | 4 | 0,7 min | 0,3 min | réussi |
-| Campagne 9 | coordination_mc_2, v1 : MC 64 soi qui annonce × 3 communications + central, 240 parties | 20 | – | – | lancée le 13 oct. 09:20 ; à traiter en 3.3 (section « Coordination » du bilan des bots) |
-| Campagne 10 | coordination_mc_2, v2 | 20 | – | – | lancée le 13 oct. 09:20 ; à traiter en 3.3 |
+| Campagne 9 | coordination_mc_2, v1 : MC 64 soi qui annonce × 3 communications + central, 240 parties | 20 | 19,2 min | 11,9 min | réussi ; traité (bilan des bots, section 5 bis) |
+| Campagne 10 | coordination_mc_2, v2 | 20 | 31,5 min | 13,3 min | réussi, 1 partie en erreur (corrigée : moteur 1.7.1) ; traité |
 | Batterie 3 | batterie phase3 (plan réduit), MC 64 soi, p3_v1 et p3_v2, 676 parties ; résultats dans `batterie/run3_phase3/` | 20 | – | – | lancée le 13 oct. 09:25, durée estimée 1 à 2 h (attend les campagnes 9 et 10) ; à traiter en 3.5 |
+| Batterie 4 | programme mesures3 : tape-taupe, dilemmes (v1, V2), témoins (une tactique, sans rêve, essoufflement), 1 020 parties dont 330 de MC 64 environ ; résultats et parties dans `batterie/run4_mesures3/` | 20 | – | – | lancée le 13 oct. 09:40 (attend la Batterie 3), durée estimée 1 h ; à traiter en 3.5 (tape-taupe : comparer aussi le glouton par table aux valeurs d'équipe de la Batterie 3 ; témoins ; seuils des dilemmes à faire confirmer par l'auteur) |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 

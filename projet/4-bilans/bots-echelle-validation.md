@@ -1,6 +1,6 @@
 # Bots : échelle et validation (phase 2)
 
-*Statut (13 oct. 2026, nuit) : livrable de la phase 2 du « Plan d'action ». Moteur 1.7. Bot fort : Monte-Carlo à un coup, déterminisé. Toutes les campagnes ont tourné sur GitHub Actions (7 campagnes, 1 440 parties de bot fort, environ 94 heures-cœur). Les chiffres portent sur les 15 duos, avec 2 à 4 parties par duo et les mêmes graines pour tous les bots (comparaisons appariées). Les marges indiquées sont des intervalles à 95 % non appariés : les écarts entre bots sont mieux mesurés qu'elles ne le laissent croire, mais ce sont encore des indices.*
+*Statut (13 oct. 2026, nuit ; section 5 bis ajoutée le 13 oct. au matin, étape 3.3) : livrable de la phase 2 du « Plan d'action ». Moteur 1.7. Bot fort : Monte-Carlo à un coup, déterminisé. Toutes les campagnes ont tourné sur GitHub Actions (7 campagnes, 1 440 parties de bot fort, environ 94 heures-cœur). Les chiffres portent sur les 15 duos, avec 2 à 4 parties par duo et les mêmes graines pour tous les bots (comparaisons appariées). Les marges indiquées sont des intervalles à 95 % non appariés : les écarts entre bots sont mieux mesurés qu'elles ne le laissent croire, mais ce sont encore des indices.*
 *Décision de l'auteur attendue : valider le bot fort et le plan réduit de la phase 3 (section 8).*
 
 ## En bref
@@ -9,7 +9,7 @@
 - **Le risque principal change de nature.** Bien jouée, la défense neutralise presque le Méchant en v1 : 10 % de ses ordres réussissent. C'est le risque du tape-taupe : lire la menace suffit à la contrer.
 - **Le hasard pèse lourd.** Le même bot qui connaîtrait les dés à l'avance (le devin) garde 16 à 19 points de forêt de plus.
 - **Le chef unique rapporte peu.** Voir les cartes cachées des partenaires vaut 4,8 points en v1 et 1,7 en v2, ce qui reste dans la bande verte (5 à 20 %) ou juste en dessous.
-- **La coordination par les traces n'est toujours pas mesurable.** Le bot n'annonce rien et ne lit pas les annonces : la mesure attend un bot qui communique (étape de la phase 3).
+- **Mise à jour du 13 oct. (étape 3.1, section 5 bis) : avec le bot qui communique, la coordination se mesure.** Les traces numérotées de la V2 récupèrent 66 % de l'écart entre « aucun signe » et « tout dire » (vert) ; le conseil parlé de la v1, tel que le moteur l'approche, seulement 7 % (rouge, mais l'approximation est grossière). Le chef unique rapporte 7 % en v1 (vert) et rien en V2 (rouge : les traces suffisent).
 - **Le bot fort est lent** : de 30 secondes à 6 minutes de calcul par partie. La batterie complète est hors de portée ; la phase 3 doit utiliser un plan réduit.
 
 ## 1. Ce qui a été construit (moteur 1.7)
@@ -78,6 +78,25 @@ Campagnes 6 et 7, 4 parties par duo.
 
   Il faut un bot qui annonce ses intentions et des déterminisations qui respectent les annonces des autres : c'est une étape de la phase 3.
 
+## 5 bis. La coordination avec le bot qui communique (étape 3.1, 13 oct.)
+Campagnes 9 (v1) et 10 (V2), `coordination_mc_2` : MC 64 chacun pour soi qui annonce ses intentions (traces et jetons de sa politique, le glouton, et il s'y tient en programmant) et dont les tirages au sort respectent les annonces des autres (une trace « je rêve à l'étape 2 » impose un rêve à l'étape 2). Les 15 duos, 4 parties chacun, mêmes graines que les campagnes 6 et 7.
+
+| MC 64 qui annonce | v1 | V2 |
+|---|---|---|
+| Chacun pour soi, aucun signe | 83,6 % (± 3,1) | 79,8 % (± 3,6) |
+| Chacun pour soi, communication de la maquette (conseil parlé en v1, traces en V2) | 84,2 % (± 3,6) | **85,8 %** (± 3,0) |
+| Chacun pour soi, tout dire | 92,2 % (± 2,3) | 88,9 % (± 2,5) |
+| Central (il voit tout), communication de la maquette | 90,2 % (± 2,6) | 86,0 % (± 2,7) |
+
+*« Aucun signe » donne exactement les chiffres des campagnes 6 et 7 : sans trace, annoncer ne change rien, ce qui valide le montage. Une partie de la V2 (chacun pour soi, maquette) s'est arrêtée sur une erreur du bot, corrigée depuis (moteur 1.7.1, voir plus bas) ; la moyenne porte sur 59 parties.*
+
+- **L'écart « tout dire » est maintenant mesurable** : 8,6 points en v1 et 9,1 en V2, au-delà de leur marge (3,8 et 4,3). Savoir ce que font les partenaires vaut près de 9 points de forêt pour ce bot.
+- **Coordination, V2 : 66 % de l'écart récupéré par les traces numérotées** (vert, bande 40 à 80 %). Les traces disent à quelle étape on rêve ou on défend une zone : c'est l'essentiel de ce qui sert.
+- **Coordination, v1 : 7 % récupérés** (rouge, moins de 20 %). Indice faible : le moteur approche le conseil parlé par des traces sans étape (« j'agirai ici »), ce que permet le livret, mais une table humaine dira plus. La mesure dit surtout que, sans dire *quand*, l'annonce sert peu à ce bot.
+- **Chef unique** (central contre chacun pour soi, même communication) : **+7,1 % en v1** (± 5,3 ; vert, bande 5 à 20 %) et **+0,2 % en V2** (± 4,7 ; rouge, moins de 2 % : un chef n'apporte rien quand les traces disent déjà l'essentiel). Lecture prudente : les marges couvrent plusieurs bandes. Ce rouge de la V2 n'est pas un défaut au sens d'un « effet leader » ; il dit que les traces rendent le jeu « solitaire à plusieurs » pour ce bot, ce qui demandera à être regardé avec des humains.
+- **Témoin du chef unique** (« tout dire » : chacun pour soi sait tout ce que sait le chef) : −2,2 % en v1, −3,3 % en V2, rouge comme attendu. Chacun pour soi en « tout dire » fait même un peu mieux que le central avec la communication de la maquette : sans trace qui engage, le bot garde plus de liberté.
+- **Correction du bot (moteur 1.7.1).** L'erreur de la campagne 10 venait du tirage au sort des programmes cachés pendant la résolution : il pouvait vider ou remplir une étape, alors que la présence d'une carte face cachée se voit sur la table. Un pouvoir comme Parler (R6.10), choisi sur la table vue, visait alors une carte absente de la copie. Désormais, ce qui se voit est gardé (une carte à cette étape, ou rien ; les cartes glissées ne bougent pas) ; seuls la carte, sa moitié et le rêve sont retirés au sort. Les campagnes 9 et 10 et les batteries 3 et 4, lancées avant la correction, gardent l'ancien tirage : l'écart est minime (même information, seule la forme du tirage change), mais il est noté.
+
 ## 6. Validation des bots : bilan
 
 | Critère du plan (section 4.4) | Résultat |
@@ -87,7 +106,7 @@ Campagnes 6 et 7, 4 parties par duo.
 | Test de bon sens : jouer Tenir quand c'est utile, placer sa présence mieux que le hasard | **Non mesuré** (compteurs à lire en phase 3 ; le bot cherche aussi la présence, qui est une décision comme une autre) |
 | Stabilité entre deux séries de graines et entre deux budgets proches | **Partiel** : MC 64 et MC 128 s'ordonnent comme attendu ; pas de seconde série de graines |
 | Bot devin | **Fait** (section 4) |
-| Modes de coopération | Central et chacun pour soi **faits** ; communication partielle **non mesurable** (section 5) |
+| Modes de coopération | Central et chacun pour soi **faits** ; communication partielle **mesurée** avec le bot qui communique (section 5 bis) |
 | Styles du panel, tables mixtes | **Outils faits**, mesures à faire en phase 3 |
 
 ## 7. Coût, et ce qu'il impose à la phase 3
@@ -101,4 +120,4 @@ Campagnes 6 et 7, 4 parties par duo.
 3. **Le bot qui communique** (annonces et lecture des annonces), à construire au début de la phase 3, avant la mesure de la coordination. *Recommandé.*
 
 ## Sources des chiffres
-Branche `resultats` du dépôt, dossiers `campagnes/` : `echelle_bots_run2` (v1) et `_run3` (v2), `echelle_bots_2_run4` et `_run5`, `coordination_mc_run6` et `_run7`. Campagnes : `campagnes/echelle_bots.json`, `echelle_bots_2.json`, `coordination_mc.json`.
+Branche `resultats` du dépôt, dossiers `campagnes/` : `echelle_bots_run2` (v1) et `_run3` (v2), `echelle_bots_2_run4` et `_run5`, `coordination_mc_run6` et `_run7`, `coordination_mc_2_run9` et `_run10`. Campagnes : `campagnes/echelle_bots.json`, `echelle_bots_2.json`, `coordination_mc.json`, `coordination_mc_2.json`. La part récupérée et le chef unique sont recalculés par `python scripts/resume_campagne.py <dossier>` (fonctions `coordination_depuis_synthese` et `chef_depuis_synthese` de `foret/mesures.py`).

@@ -93,6 +93,12 @@ TAUX = {"limite": [0.0, 0.25, 0.5, 0.75, 1.0], "illimite": [0.0, 1.0, 2.0, 3.0]}
 # 4 parties par table. Les trios : les 4 « triangles » (un compartiment sans spécialiste) et une
 # « étoile » (les trois peuples du compartiment du Méchant).
 MC64 = {"type": "mc", "params": {"budget": 64, "savoir": "soi"}}
+# Le même bot dont les suites rêvent une carte par tour (glouton qui rêve). Ajouté le 13 oct. (étape 3.3) :
+# en V2, le bot de référence, dont les suites ne rêvent pas, rêve peu et garde moins de forêt que le
+# glouton qui rêve (tape-taupe négatif) ; avec des suites qui rêvent, MC 128 passait de 87,8 à 92,5 %
+# (phase 2). En v1, c'est l'inverse (94,3 contre 92,2 %) : MC64 reste la référence de la v1.
+MC64R = {"type": "mc", "params": {"budget": 64, "savoir": "soi",
+                                  "politique": {"type": "glouton", "params": {"reves_par_tour": 1.0}}}}
 TRIOS3 = [("oiseaux", "reptiles", "humains"), ("mammiferes", "reptiles", "insectes"),
           ("oiseaux", "mammiferes", "entites"), ("insectes", "humains", "entites"),
           ("oiseaux", "humains", "entites")]
@@ -100,6 +106,7 @@ TOUT3 = ("tables3", "spectateur3", "reves3")
 PLAN3 = {
     "p3_v1": ("v1", "defaut", MC64, TOUT3, 4),
     "p3_v2": ("v2", "defaut", MC64, TOUT3, 4),
+    "p3_v2r": ("v2", "defaut", MC64R, TOUT3, 4),
 }
 TAUX3 = [0.0, 0.5, 1.0]
 
@@ -115,6 +122,7 @@ JUGE3 = 0.25
 PLAN_M3 = {
     "m3_v1": ("v1", "defaut", MC64, ("tables_duos", "taupe", "dilemmes"), 4),
     "m3_v2": ("v2", "defaut", MC64, ("tables_duos", "taupe", "dilemmes"), 4),
+    "m3_v2r": ("v2", "defaut", MC64R, ("tables_duos", "taupe", "dilemmes"), 4),
     # témoins
     "m3_v1_une_tactique": ("v1", "temoin_une_tactique", MC64, ("tables_duos", "taupe"), 4),
     "m3_v1_sans_reve": ("v1", "temoin_sans_reve", MC64, ("tables_duos", "reves_duos"), 4),
@@ -229,7 +237,7 @@ def taches(nom, echelle=1.0):
             ajouter("tables", [p], [INERTE], range(n), "personne")
         for eq in itertools.combinations(PEUPLES, 2):
             ajouter("tables", eq, [bot] * 2, range(nb_sondes), "equipe", sondes=True, copies=16,
-                    politique_sondes=G0)
+                    politique_sondes=bot.get("params", {}).get("politique", G0))   # la politique des suites du bot
             ajouter("tables", eq, [bot] * 2, range(nb_sondes, n), "equipe")
         for eq in TRIOS3:
             ajouter("tables", eq, [bot] * 3, range(n), "equipe")

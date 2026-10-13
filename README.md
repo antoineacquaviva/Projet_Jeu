@@ -6,7 +6,7 @@ Ce dépôt réunit deux choses :
 - **les documents de conception** : les idées, les maquettes de règles, le plan de travail et les bilans ;
 - **le moteur de simulation** `foret` : il joue les règles sans interface, avec des joueurs virtuels, pour trouver les failles des règles et mesurer les variantes.
 
-Où en est le projet (13 oct. 2026) : les phases 1 (mesures) et 2 (le bot fort, moteur 1.7) sont faites. La phase 3 (diagnostic de la v1 et options de la v2) attend la validation du bot fort par l'auteur. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
+Où en est le projet (13 oct. 2026) : les phases 1 (mesures) et 2 (le bot fort, moteur 1.7) sont faites. La phase 3 (diagnostic de la v1 et options de la v2) est en cours : bot qui communique, plan réduit du bot fort et mesures du bot fort faits, calculs lancés sur GitHub. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
 
 ## Carte du dépôt
 

@@ -7,8 +7,9 @@ import os
 import sys
 
 PRINCIPALES = [("v1_g1", "v1, rêve"), ("v1_g0", "v1, sans rêve"), ("v2_g1", "V2, rêve"), ("v2_g0", "V2, sans rêve"),
-               ("p3_v1", "v1, bot fort"), ("p3_v2", "V2, bot fort"),
-               ("m3_v1", "v1, mesures du bot fort"), ("m3_v2", "V2, mesures du bot fort")]
+               ("p3_v1", "v1, bot fort"), ("p3_v2", "V2, bot fort"), ("p3_v2r", "V2, bot fort qui rêve"),
+               ("m3_v1", "v1, mesures du bot fort"), ("m3_v2", "V2, mesures du bot fort"),
+               ("m3_v2r", "V2, mesures du bot fort qui rêve")]
 LIGNES = ["robustesse", "concentration", "surprise", "reve_fixe", "shapley", "synergies", "pire_table", "spectateur",
           "predictibilite", "incertitude", "fins_precoces", "menace_croissante", "plancher", "echelle_bots",
           "tape_taupe", "gain_libre", "dilemmes"]
