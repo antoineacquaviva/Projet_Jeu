@@ -28,6 +28,7 @@ def main(dossier):
     for bloc, agg in S["campagnes"].items():
         out.append(f"| {bloc} | " + " | ".join(_f(valeur(agg, cle), dec) for cle, _, dec in INDICATEURS) + " |")
     out += mesures_coordination(S)
+    out += ecarts_apparies(S)
     print("\n".join(out))
 
 
@@ -53,6 +54,31 @@ def mesures_coordination(S):
             lignes.append(f"| {nom} | {v['tables']} | {_f(v['reference'], 1)} | {_f(v['restreint'], 1)} | "
                           f"{_f(v['perte'], 1)} ± {_f(v['marge'], 1)} |")
     return ["", *lignes] if lignes else []
+
+
+def ecarts_apparies(S, limite=40):
+    """Écarts de forêt appariés à la référence de chaque bloc (plan vers la V1, étape 0.3)."""
+    ap = S.get("apparie")
+    if not ap:
+        return []
+    lignes = ["", "Écarts appariés à la référence (points de forêt ; mêmes tables, mêmes graines ; "
+              "intervalle à 95 % par rééchantillonnage ; « sûr » : l'intervalle exclut 0, "
+              "« négligeable » : il tient dans ± 1 point) :", "",
+              "| Groupe | Variante | Paires | Écart | Intervalle apparié | Sans apparier | Verdict |",
+              "|---|---|---|---|---|---|---|"]
+    n = 0
+    for g, d in ap.items():
+        for v, e in sorted(d["ecarts"].items(), key=lambda kv: -(kv[1]["ecart"] or 0)):
+            fr = lambda x: f"{x:+.1f}".replace(".", ",")  # noqa: E731
+            ic = e["ic95"] and f"{fr(e['ic95'][0])} à {fr(e['ic95'][1])}"
+            ii = e["ic95_independant"] and f"{fr(e['ic95_independant'][0])} à {fr(e['ic95_independant'][1])}"
+            lignes.append(f"| {g.split(' | ')[0]} (réf. {d['reference'][:40]}) | {v[:60]} | {e['paires']} | "
+                          f"{_f(e['ecart'], 1)} | {ic or '–'} | {ii or '–'} | {e['verdict']} |")
+            n += 1
+            if n >= limite:
+                lignes.append(f"| … | ({sum(len(x['ecarts']) for x in ap.values()) - limite} de plus dans synthese.json) | | | | | |")
+                return lignes
+    return lignes
 
 
 if __name__ == "__main__":

@@ -88,6 +88,15 @@ Le chef unique a sa campagne (`coordination_mc_2`). Depuis l'étape 3.3, le work
 ## Robustesse au bonus de fin (A12, étape 3.5)
 Le résultat est la forêt restante, sans bonus de fin (A12) ; la robustesse des conclusions est vérifiée avec un bonus de 10 et 25 % de la forêt initiale pour une fin par un rêve. Campagnes `robustesse_v1` (bot de référence libre et à taux fixes, bonus 0, 10 et 25 %, variantes « regles:bonus_fin=… ») et `robustesse_v2` (les 16 variantes de `v2_options_mc` avec le réglage `bonus` de l'atelier à 10 puis 25), mêmes duos et mêmes graines que les campagnes de référence : comparaisons appariées. Une recommandation qui change avec le bonus est signalée comme fragile.
 
+## Statistiques appariées (plan vers la V1, étape 0.3)
+Code : `foret/stats.py` ; tests : `tests/test_stats.py`.
+- **Paires.** Deux variantes jouées avec les mêmes peuples, la même graine et le même bot forment une paire : seule la règle changée les distingue. L'écart apparié (variante − référence) annule le hasard commun, si bien que sa marge est bien plus étroite que la différence de deux moyennes. Les campagnes jouent déjà des graines appariées ; la synthèse le calcule désormais.
+- **Marges.** Intervalle à 95 % par rééchantillonnage (bootstrap percentile, 2 000 tirages, graine fixe : reproductible), sans hypothèse de loi normale. La synthèse donne aussi, pour comparer, la marge qu'on aurait sans apparier.
+- **Règle de l'écart sûr.** « Sûr » : l'intervalle exclut 0. « Négligeable » : il tient entièrement dans ± 1 point de forêt. « Incertain » : sinon, et il faut plus de parties. Seuls les écarts « sûrs » fondent une recommandation ; un écart « incertain » est un indice.
+- **Référence d'un bloc.** Clé `reference` du bloc, sinon de la campagne, sinon `defaut` si le bloc la joue, sinon sa première variante.
+- **Dans la synthèse.** `apparie` (par bloc et par bot : référence et écarts) et `parties_compactes` (une ligne par partie : bloc, variante, bot, peuples, graine, forêt en %, tour, fin, cartes en rêve), qui permettent de réanalyser une campagne sans la rejouer, par exemple par taille de table. Le résumé Markdown affiche les 40 premiers écarts.
+- **Pourquoi c'est un gain.** *Supposé, à mesurer sur le premier cycle* : la part de hasard commune aux deux parties d'une paire (dés, mains) est grande dans ce jeu. Sur un témoin synthétique avec une forte variance commune, la marge appariée est plus de 4 fois plus étroite (test).
+
 ## Témoins
 Variantes cassées exprès (préfixe `temoin_`, dans `maquettes/v1.json` et `v2.json`), jamais proposées comme règles :
 

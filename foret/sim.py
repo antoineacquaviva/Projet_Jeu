@@ -43,6 +43,7 @@ from multiprocessing import Pool
 from .maquette import charger, lire, resume
 from .moteur import Partie, VERSION
 from .bots import fabriquer_table
+from .stats import apparier, references_par_bloc, parties_compactes
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -182,6 +183,9 @@ def synthetiser(resultats, campagne, maquette, ignorees, duree, extra_meta=None)
         "par_peuples": {k: agreger(v) for k, v in
                         grouper([r for r in resultats if r["variante"] == "defaut"],
                                 ["campagne", "bot_params", "peuples"]).items()},
+        # plan vers la V1, étape 0.3 : écarts appariés (mêmes tables, mêmes graines) et parties compactes
+        "apparie": apparier(resultats, references_par_bloc(campagne)),
+        "parties_compactes": parties_compactes(resultats),
     }
     return syn
 
