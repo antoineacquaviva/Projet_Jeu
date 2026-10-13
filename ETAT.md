@@ -78,14 +78,14 @@ Une étape tient en un passage. Statuts : À FAIRE, EN COURS, FAIT, DÉCISION UT
 ### Phase 3 : diagnostiquer la v1 et comparer les options de la v2
 Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget": 64, "savoir": "soi"}}`), MC 128 pour les contrôles. Plan réduit : 15 duos et 5 trios, 4 parties par table (décisions du 13 oct., section 8).
 
-**3.1 Le bot qui communique** (EN COURS, session interactive du 13 oct.)
+**3.1 Le bot qui communique** (FAIT le 13 oct. : moteur 1.7, `annonces` et `brouiller` conditionné ; campagnes 9 et 10)
 - **Quoi.** Le bot `mc` chacun pour soi annonce ses intentions et tient compte de celles des autres :
   - (a) ses traces et jetons (décisions `trace`, `partage`) annoncent ce qu'il compte faire ;
   - (b) `Partie.brouiller` ne tire au sort que des programmes compatibles avec les traces datées des autres. Une trace « (étape, rêve) » impose un rêve ; une trace « (étape, zone) » impose une carte qui ne rêve pas.
 - **Fin d'étape.** Tests verts ; lancer `campagnes/coordination_mc_2.json` sur v1 et v2.
 - **Livrable.** Code, tests, et la campagne lancée. Le traitement de ses résultats se fait en 3.3.
 
-**3.2 La batterie du bot fort, plan réduit** (À FAIRE)
+**3.2 La batterie du bot fort, plan réduit** (FAIT le 13 oct. : `python -m foret.batterie phase3`, 676 parties ; lancée en Batterie 3, sans essai préalable à l'échelle 0,1 : le plan a été joué en entier au glouton dans les tests)
 - **Quoi.** Un plan « phase3 » dans `foret/batterie.py`, à côté de `PLAN` (phase 1) :
   - configurations v1 et V2 proposée, bot de référence ;
   - les 15 duos et 5 trios, 4 parties par table. Les trios : les 4 « triangles » (trois peuples autour d'un même coin du tétraèdre) et une « étoile » (les trois peuples d'un même compartiment) ;
@@ -95,7 +95,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 - **Fin d'étape.** Tests verts ; essai à l'échelle 0,1 sur GitHub (moins de 15 min) ; puis lancer le plan complet (v1 et V2), en plusieurs lancements si un lot risque de dépasser 6 h.
 - **Livrable.** `docs/mesures.md` complété ; durée estimée et réelle dans la section 9.
 
-**3.3 Les mesures qui attendaient le bot fort** (À FAIRE)
+**3.3 Les mesures qui attendaient le bot fort** (EN COURS, session interactive du 13 oct.)
 - **Quoi.** D'abord, traiter `coordination_mc_2` : section « Coordination » de `projet/4-bilans/bots-echelle-validation.md`, avec la part de l'écart récupérée (bande verte 40 à 80 %). Ensuite, coder les quatre mesures en attente du registre `MESURES` (`foret/mesures.py` ; définitions dans `projet/3-pilotage/objectifs-invariants-catalogue.md`, section 2), chacune avec son témoin et son test :
   - tape-taupe : un bot qui pare toujours la menace la plus probable, contre le bot fort ;
   - gain du bot libre sur le meilleur taux fixe ;
@@ -169,7 +169,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 
 ## 5. Étape suivante
 
-**3.1 Le bot qui communique** (en cours dans la session interactive du 13 oct. ; si le Verrou est vidé sans que l'étape soit marquée FAIT, reprendre là).
+**3.3 Les mesures qui attendaient le bot fort.** Commencer par traiter les campagnes 9 et 10 si elles sont terminées (section 9). La Batterie 3 sera traitée en 3.5.
 
 ## 6. Verrou
 
@@ -208,6 +208,9 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Campagne 7 | coordination_mc, v2 | 20 | 47,2 min | 27,6 min | réussi (a attendu la 6) |
 | Campagne 8 | reference, v1, échelle 0,02 (essai des workflows Node 24) | 3 | 0,5 min | 0,2 min | réussi |
 | Batterie 2 | batterie phase 1, 4 configurations principales, échelle 0,05 (essai des workflows Node 24) | 4 | 0,7 min | 0,3 min | réussi |
+| Campagne 9 | coordination_mc_2, v1 : MC 64 soi qui annonce × 3 communications + central, 240 parties | 20 | – | – | lancée le 13 oct. 09:20 ; à traiter en 3.3 (section « Coordination » du bilan des bots) |
+| Campagne 10 | coordination_mc_2, v2 | 20 | – | – | lancée le 13 oct. 09:20 ; à traiter en 3.3 |
+| Batterie 3 | batterie phase3 (plan réduit), MC 64 soi, p3_v1 et p3_v2, 676 parties ; résultats dans `batterie/run3_phase3/` | 20 | – | – | lancée le 13 oct. 09:25, durée estimée 1 à 2 h (attend les campagnes 9 et 10) ; à traiter en 3.5 |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
