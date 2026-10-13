@@ -178,7 +178,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 - 0.10 Orchestrateur et surveillance (FAIT le 13 oct. : workflows `cycle.yml` et `surveillance.yml`, `scripts/publier_resultats.sh` ; essai complet réussi : cycle « essai », 7 lancements enchaînés seuls en 4 min, rapport et issue n° 1 ; tâche « tests autonomes » passée à un passage par jour).
 - 0.11 Ligne de base P2 (FAIT le 13 oct. : `projet/4-bilans/ligne-de-base-p2.md`. MCP64 non validé (−1,6 point, incertain) : **MC64R reste le bot fort** ; gain d'apprentissage +1,7 (orange), témoin réussi ; choix morts : Voler seul, témoin partiel ; coordination et chef unique nuls au bot fort ; durée réglée à 4 joueurs et plus par les lunes, rouge à 2 et 3 ; jeu trop facile partout, 90 à 99 %).
 
-**Cycle 1** (FAIT le 13 oct. : rapport `cycles/c1/rapport.md`, branche resultats ; bilan `projet/4-bilans/cycle-1-bilan.md`). **DÉCISION UTILISATEUR : adopter la version V0.4** (section 5).
+**Cycle 1** (FAIT le 13 oct. : rapport `cycles/c1/rapport.md`, branche resultats ; bilan `projet/4-bilans/cycle-1-bilan.md`). **DÉCISION UTILISATEUR : adopter la version V0.4** (FAIT le 13 oct., 23 h 27 : V0.4 adoptée, section 8).
 
 **Cycles 1 à 3** (V0.3 → V0.4 → V0.5 → V0.6) : préparer (Claude) → criblage, exploration, confirmation, contrôle, rapport (GitHub, seul) → analyser et proposer (Claude) → **DÉCISION UTILISATEUR : adopter la version**. Priorités : cycle 1 la durée ; cycle 2 l'intérêt des choix et la profondeur ; cycle 3 l'équilibre fin. Arrêt anticipé si plus aucun objectif rouge (bot fort et bot de contrôle).
 
@@ -186,26 +186,16 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 5. Étape suivante
 
-**DÉCISION UTILISATEUR : adopter la version V0.4** (bilan : `projet/4-bilans/cycle-1-bilan.md`, sections 6 et 7). Tant que l'auteur n'a pas répondu en section 8, les passages s'arrêtent et rappellent la décision.
+**Cycle 2, étape a : préparer (À FAIRE).** La V0.4 est adoptée (section 8, 13 oct., 23 h 27). Détail des priorités et des alertes : `projet/4-bilans/cycle-1-bilan.md`, sections 4, 6 et 8. Une sous-étape par passage, dans cet ordre :
 
-- **Ce que dit le cycle 1.** La durée est réglée : 0 % de fins avant la mi-partie de 2 à 6 joueurs, avec le bot fort et le bot de contrôle (V0.3 : 62 à 71 % à 2 joueurs). La difficulté baisse de façon sûre (−20 points au bot fort, −8 au contrôle), mais le bot de contrôle garde encore 93 à 95 % de la forêt à 3, 5 et 6 joueurs : verdict non stable entre les bots.
-- **Recommandation de Claude : adopter la variante A comme V0.4.** Code d'atelier `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5,A4|p:escalade=5,lunes=3`, plus les réglages `{"regles": {"cercle_par_joueur": {"2": 4, "4": 3}, "machines_en_jeu": 5, "ordres_par_etape": {"2": 1, "4": 2}, "reves_par_pas": 2}}`. Cela fait 2 éléments propres au nombre de joueurs (Cercle 4/4/3/3/3, ordres 1/1/2/2/2).
-- **Ce que l'auteur doit accepter explicitement** (formes de règles) :
-  1. le sablier des rêves (2 rêves pour un pas de l'esprit) ;
-  2. les ordres supplémentaires du Méchant et leur modélisation (dés neufs ; ni présage, ni Voir, ni Hanter, ni embuscade ; barrages oui) ;
-  3. le module A4, escalade du soir dès le tour 5.
-- **Alertes de conception.**
-  - A (rêve payé trop tard) : à lever, la durée est corrigée par les paramètres.
-  - **E (nouvelle)** : à 2 et 3 joueurs, le rêve n'aboutit presque plus (96 à 100 % de fins par la nuit). Le dilemme est à remesurer en priorité.
-  - **D (nouvelle)** : le jeu reste trop facile pour un joueur qui adapte son rythme de rêve.
-  - Ni D ni E ne demande encore de règle nouvelle.
-- **Alternatives** : la variante B (7 tours, 6 cartes, 1 trace) ; ou refuser les ordres supplémentaires, ce qui laisserait la difficulté sans son premier levier.
-- **Après l'adoption (étape a du cycle 2)** :
-  - écrire `maquettes/v0.4.json` et les tests ;
-  - recalibrer le bot fort sur la V0.4 (MC64R, MCP64, MC 64 à rêve 0,5, MC 256 à portefeuille), décision technique de Claude ;
-  - protocole P3 avec les mesures des objectifs 1 à 3 et l'ancre V0.3 ;
-  - recaler le coût de MC 256 ;
-  - lancer le cycle 2. Priorités : intérêt des choix et profondeur, dilemme du rêve à 2 et 3 joueurs, difficulté à 3, 5 et 6 joueurs.
+1. **V0.4 dans le moteur** :
+   - `maquettes/v0.4.json` (base `v0.3`, code d'atelier et réglages de la section 8) ;
+   - tests citant la décision (`tests/test_v04.py`), documents (`docs/noeuds_v2.md` : la modélisation des ordres supplémentaires n'est plus « à confirmer ») ;
+   - `projet/3-pilotage/plan-vers-v1.md` (section 1 : V0.4 adoptée ; section 6 : alerte A levée pour la durée, alertes D et E) ;
+   - contrôles complets.
+2. **Recalibrer le bot fort sur la V0.4** (décision technique de Claude, bilan section 4) : campagne appariée de 2 à 6 joueurs opposant MC64R, MCP64, MC 64 à rêve 0,5 et MC 256 à portefeuille. Le meilleur à coût raisonnable devient le bot fort du cycle 2. Recaler aussi le coût de MC 256 dans `foret/cycle.py`.
+3. **Protocole P3 et sa ligne de base** : P2 rejoué sur la V0.4 avec l'ancre V0.3, plus les mesures des objectifs 1 à 3 (concentration, surprise, tape-taupe, meilleur taux de rêve fixe et gain du bot libre, Shapley, duos). Le meilleur taux de rêve fixe tranche l'alerte E : s'il vaut 0 à 2 et 3 joueurs, l'alerte est confirmée et devient une DÉCISION UTILISATEUR.
+4. **Plan `cycles/c2.json` et lancement du cycle 2** (V0.4 → V0.5). Priorités : l'intérêt des choix et la profondeur ; le dilemme du rêve à 2 et 3 joueurs (alerte E) ; la difficulté à 3, 5 et 6 joueurs (alerte D), avec un réglage taille par taille et au plus 4 éléments propres au nombre de joueurs.
 
 **Incident GitHub (13 oct.).** Le groupe de concurrence des fusions (`publication-resultats`) ne garde qu'une tâche en attente et annule les autres : les fusions des campagnes 12 et 13 ont été annulées, puis relancées avec `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/runs/<id>/rerun-failed-jobs` (une seule à la fois). Corrigé pour les lancements suivants : plus de groupe, la publication réessaie. Les lots de campagne sont gardés 3 jours (1 jour avant la correction).
 
@@ -236,6 +226,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 - **13 oct. 2026, 14:27 (critère ajouté)** : le jeu doit tenir tous ses objectifs à 2, 3, 4, 5 et 6 joueurs ; des règles propres au nombre de joueurs sont acceptées, en particulier sur le nombre d'éléments. Traduit dans le plan, section 7 bis : qualité = objectif le plus faible à la taille de table la plus faible ; paramètres par taille ; mesures adaptées, bandes inchangées.
 - **13 oct. 2026, 14:31** : un seul plateau pour toutes les tailles de table (des gabarits par taille seulement si une alerte le demande) ; **au plus 4 éléments** propres au nombre de joueurs, dans un petit tableau du livret. « Go » pour la suite.
 - **13 oct. 2026, 14:45** : réveil au bon moment (une tâche « réveil » réarmée par chaque passage à la fin prévue des calculs) ; **Sonnet pour les passages courants, Opus pour les analyses de fin de cycle** (demande explicite de l'auteur). Consigne des passages déplacée dans la section 3 bis.
+- **13 oct. 2026, 23:27 (adopter la V0.4, fin du cycle 1)** : l'auteur valide la proposition de V0.4 du bilan du cycle 1 (`projet/4-bilans/cycle-1-bilan.md`, section 7), soit la variante A : code d'atelier `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5,A4|p:escalade=5,lunes=3` et réglages `{"regles": {"cercle_par_joueur": {"2": 4, "4": 3}, "machines_en_jeu": 5, "ordres_par_etape": {"2": 1, "4": 2}, "reves_par_pas": 2}}`. Sont acceptées avec elle les trois formes de règles qu'elle contient : le sablier des rêves (2 rêves pour un pas de l'esprit) ; les ordres supplémentaires du Méchant avec leur modélisation (dés neufs ; ni présage, ni Voir, ni Hanter, ni embuscade ; barrages oui) ; le module A4 (escalade du soir dès le tour 5). L'alerte A est levée pour la durée ; les alertes D et E restent à surveiller au cycle 2, comme le propose le bilan (section 6).
 
 ## 9. Campagnes GitHub
 
