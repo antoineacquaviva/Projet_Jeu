@@ -1,7 +1,7 @@
 {
  "cycle": "c1",
  "etape": "exploration",
- "gen": 7,
+ "gen": 8,
  "statut": "en cours",
  "historique": [
   {
@@ -38,10 +38,15 @@
    "etape": "exploration",
    "gen": 7,
    "date": "2026-10-13T14:41:51+00:00"
+  },
+  {
+   "etape": "exploration",
+   "gen": 8,
+   "date": "2026-10-13T14:46:02+00:00"
   }
  ],
  "debut": "2026-10-13T14:14:38+00:00",
  "fin_estimee": "2026-10-13T14:48:35+00:00",
  "parties": 74202,
- "maj": "2026-10-13T14:42:07+00:00"
+ "maj": "2026-10-13T14:46:02+00:00"
 }
