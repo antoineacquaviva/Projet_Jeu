@@ -191,8 +191,8 @@ def fusionner(base, patch):
     """Fusion récursive : les dictionnaires se fusionnent, le reste est remplacé."""
     out = copy.deepcopy(base)
     for k, v in (patch or {}).items():
-        if isinstance(v, dict) and isinstance(out.get(k), dict):
-            out[k] = fusionner(out[k], v)
+        if isinstance(v, dict) and isinstance(out.get(k), dict) and not est_par_table(v):
+            out[k] = fusionner(out[k], v)                     # une valeur par taille de table se remplace d'un bloc
         else:
             out[k] = copy.deepcopy(v)
     return out
@@ -262,6 +262,10 @@ def charger(nom, variante=None):
     if variante and variante != "defaut":
         if variante.startswith("code:"):
             patch = {"atelier": variante[len("code:"):]}
+        elif variante.startswith("patch:"):                  # plan vers la V1 : « patch:<objet JSON> » (criblage, exploration)
+            patch = json.loads(variante[len("patch:"):])
+            if not isinstance(patch, dict):
+                raise ErreurMaquette(f"variante patch : objet JSON attendu ({variante[:60]}…)")
         elif variante.startswith("interdire:"):              # [mesure:jeu_restreint] « interdire:a+b »
             patch = {"regles": {"interdits": variante[len("interdire:"):].split("+")}}
         elif variante.startswith("regles:"):                 # « regles:bonus_fin=10,lunes=3 » (valeurs JSON)

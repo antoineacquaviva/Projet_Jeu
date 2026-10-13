@@ -125,11 +125,13 @@ def parties_compactes(resultats):
     """Une ligne par partie, pour réanalyser une campagne sans la rejouer (par taille de table, par paire…).
 
     Rend {"colonnes": [...], "lignes": [[...], ...]} ; les parties en erreur sont omises."""
-    cols = ["campagne", "variante", "bot", "peuples", "graine", "foret_pct", "tour", "fin", "cartes_en_reve"]
+    cols = ["campagne", "variante", "bot", "peuples", "graine", "foret_pct", "tour", "fin", "cartes_en_reve",
+            "tours_max", "bot_params"]
     lignes = []
     for r in resultats:
         if "erreur" in r:
             continue
         lignes.append([r["campagne"], r["variante"], r["bot"], "+".join(r["peuples"]), r["graine"],
-                       round(foret_pct(r), 2), r["tour"], r["fin"], r.get("cartes_en_reve")])
+                       round(foret_pct(r), 2), r["tour"], r["fin"], r.get("cartes_en_reve"),
+                       r.get("tours_max"), json.dumps(r.get("bot_params", {}), sort_keys=True)])
     return {"colonnes": cols, "lignes": lignes}

@@ -1,0 +1,127 @@
+{
+ "cycle": "essai",
+ "maquette": "v0.3",
+ "graine": 3,
+ "espace": [
+  {
+   "nom": "cercle",
+   "chemin": [
+    "regles",
+    "cercle_par_joueur"
+   ],
+   "niveaux": [
+    3,
+    2,
+    4,
+    {
+     "2": 4,
+     "4": 3
+    }
+   ]
+  },
+  {
+   "nom": "lunes",
+   "chemin": [
+    "regles",
+    "lunes"
+   ],
+   "niveaux": [
+    2,
+    1,
+    "n-1"
+   ]
+  },
+  {
+   "nom": "pas_esprit",
+   "chemin": [
+    "regles",
+    "reves_par_pas"
+   ],
+   "niveaux": [
+    1,
+    2
+   ]
+  },
+  {
+   "nom": "tours",
+   "chemin": [
+    "tours"
+   ],
+   "niveaux": [
+    6,
+    7
+   ]
+  }
+ ],
+ "bots_glouton": [
+  {
+   "type": "glouton",
+   "params": {
+    "reves_par_tour": 1.0
+   }
+  }
+ ],
+ "tables_glouton": [
+  {
+   "liste": [
+    [
+     "oiseaux",
+     "insectes"
+    ],
+    [
+     "reptiles",
+     "humains",
+     "entites"
+    ]
+   ],
+   "parties": 2
+  }
+ ],
+ "tables_fort": [
+  [
+   "oiseaux",
+   "insectes"
+  ],
+  [
+   "mammiferes",
+   "reptiles",
+   "humains"
+  ]
+ ],
+ "criblage": {
+  "trajectoires": 2,
+  "retenir": 3
+ },
+ "exploration": {
+  "population": 3,
+  "generations_max": 2
+ },
+ "confirmation": {
+  "candidats": 3,
+  "parties": [
+   1,
+   1
+  ],
+  "garder": [
+   2,
+   2
+  ]
+ },
+ "controle": {
+  "finalistes": 1,
+  "parties": 1
+ },
+ "bot_fort": {
+  "type": "glouton",
+  "params": {
+   "reves_par_tour": 1.0
+  }
+ },
+ "bot_controle": {
+  "type": "glouton",
+  "params": {
+   "reves_par_tour": 0.5
+  }
+ },
+ "description": "Cycle d'essai du pipeline (étape 0.10) : très petit, glouton seulement."
+}

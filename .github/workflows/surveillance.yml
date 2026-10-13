@@ -1,0 +1,73 @@
+name: Surveillance des cycles
+
+# Une fois par jour (plan vers la V1, étape 0.10) : si une étape de cycle aurait dû finir depuis plus de
+# 3 heures et qu'aucun lancement du workflow Cycle ne tourne, la relancer ; au deuxième échec sur la même
+# étape, ouvrir une issue et marquer le cycle « échec » (Claude le signalera à l'auteur). Sans Claude.
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  surveiller:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Lire l'état et décider
+        id: decision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch -q --depth=1 origin resultats || { echo "pas de branche resultats"; exit 0; }
+          git show FETCH_HEAD:etat_pipeline.json > etat_pipeline.json 2>/dev/null || { echo "aucun cycle"; exit 0; }
+          git show "FETCH_HEAD:cycles/$(python3 -c "import json;print(json.load(open('etat_pipeline.json'))['cycle'])")/surveillance.json" > surveillance.json 2>/dev/null || echo '{}' > surveillance.json
+          EN_COURS=$(gh api "repos/${{ github.repository }}/actions/workflows/cycle.yml/runs?per_page=5" \
+            --jq '[.workflow_runs[] | select(.status != "completed")] | length')
+          python3 - "$EN_COURS" <<'PY'
+          import datetime, json, os, sys
+          en_cours = int(sys.argv[1])
+          e = json.load(open("etat_pipeline.json"))
+          s = json.load(open("surveillance.json"))
+          action = "rien"
+          if e.get("statut") == "en cours" and e.get("fin_estimee") and en_cours == 0:
+              fin = datetime.datetime.fromisoformat(e["fin_estimee"])
+              if datetime.datetime.now(datetime.timezone.utc) > fin + datetime.timedelta(hours=3):
+                  cle = f"{e['etape']}-{e['gen']}"
+                  s[cle] = s.get(cle, 0) + 1
+                  action = "relancer" if s[cle] <= 2 else "echec"
+          json.dump(s, open("surveillance.json", "w"))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"action={action}\ncycle={e['cycle']}\netape={e.get('etape')}-{e.get('gen')}\n")
+          print(action, e)
+          PY
+      - name: Relancer l'étape
+        if: steps.decision.outputs.action == 'relancer'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CYCLE: ${{ steps.decision.outputs.cycle }}
+        run: |
+          mkdir -p surv && cp surveillance.json surv/
+          scripts/publier_resultats.sh surv "cycles/$CYCLE" "Surveillance : relance de $CYCLE (${{ steps.decision.outputs.etape }})"
+          gh api -X POST "repos/${{ github.repository }}/actions/workflows/cycle.yml/dispatches" \
+            -f ref=main -f "inputs[cycle]=$CYCLE" -f "inputs[lots]=20"
+      - name: Signaler l'échec
+        if: steps.decision.outputs.action == 'echec'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CYCLE: ${{ steps.decision.outputs.cycle }}
+        run: |
+          python3 -c "import json;e=json.load(open('etat_pipeline.json'));e['statut']='échec';json.dump(e,open('etat_pipeline.json','w'),ensure_ascii=False)"
+          mkdir -p surv && cp surveillance.json surv/
+          scripts/publier_resultats.sh surv "cycles/$CYCLE" "Surveillance : échec de $CYCLE" etat_pipeline.json:etat_pipeline.json
+          gh api -X POST "repos/${{ github.repository }}/issues" \
+            -f title="Cycle $CYCLE bloqué (${{ steps.decision.outputs.etape }})" \
+            -f body="L'étape ${{ steps.decision.outputs.etape }} du cycle $CYCLE a échoué deux fois malgré les relances automatiques. Voir l'onglet Actions (workflow Cycle). Claude la diagnostiquera au prochain passage."

@@ -1,0 +1,204 @@
+name: Cycle
+
+# Un cycle de recherche qui s'enchaîne seul (plan vers la V1, étape 0.10 ; foret/cycle.py).
+# Chaque lancement joue UNE étape (criblage, une génération d'exploration, une manche de confirmation,
+# le contrôle) par lots, l'intègre dans l'état du cycle (branche « resultats », cycles/<cycle>/), puis
+# relance ce même workflow pour l'étape suivante. À la fin : rapport.md et une issue (courriel à l'auteur).
+# Une seule étape tourne à la fois : jamais deux campagnes en concurrence pour les 20 tâches simultanées.
+# Lancement : gh api -X POST repos/<dépôt>/actions/workflows/cycle.yml/dispatches -f ref=main \
+#   -f 'inputs[cycle]=c1' -f 'inputs[lots]=20'
+
+on:
+  workflow_dispatch:
+    inputs:
+      cycle:
+        description: "Plan du cycle (cycles/<nom>.json, sans .json)"
+        default: "c1"
+        required: true
+      lots:
+        description: "Nombre de lots en parallèle (1 à 20)"
+        default: "20"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  preparer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    outputs:
+      campagne: ${{ steps.prep.outputs.campagne }}
+      lots: ${{ steps.prep.outputs.lots }}
+      etape: ${{ steps.prep.outputs.etape }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Récupérer l'état du cycle
+        env:
+          CYCLE: ${{ inputs.cycle }}
+        run: |
+          if [[ ! "$CYCLE" =~ ^[A-Za-z0-9_-]+$ ]]; then echo "nom de cycle invalide"; exit 1; fi
+          mkdir -p etat
+          if git fetch -q --depth=1 origin resultats; then
+            git archive FETCH_HEAD "cycles/$CYCLE" 2>/dev/null | tar -x -C /tmp 2>/dev/null || true
+            if [ -d "/tmp/cycles/$CYCLE" ]; then cp -r "/tmp/cycles/$CYCLE/." etat/; fi
+          fi
+          ls etat
+      - name: Préparer la campagne de l'étape
+        id: prep
+        env:
+          CYCLE: ${{ inputs.cycle }}
+          LOTS: ${{ inputs.lots }}
+        run: |
+          if [[ ! "$LOTS" =~ ^[0-9]+$ ]] || [ "$LOTS" -lt 1 ] || [ "$LOTS" -gt 20 ]; then echo "lots : 1 à 20"; exit 1; fi
+          python -m foret.cycle preparer --plan "cycles/$CYCLE.json" --etat etat --sortie campagne.json --lots "$LOTS" | tee prep.json
+          python3 - <<'PY'
+          import json, os
+          d = json.load(open("prep.json"))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"etape={d['etape']}\n")
+              f.write(f"campagne={d.get('campagne') or ''}\n")
+              f.write("lots=" + json.dumps(list(range(d.get("lots", 0)))) + "\n")
+          PY
+          echo "### Cycle $CYCLE : $(cat prep.json)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Publier l'état (fin estimée, pour le réveil de Claude)
+        env:
+          CYCLE: ${{ inputs.cycle }}
+        run: |
+          python -m foret.cycle pipeline --plan "cycles/$CYCLE.json" --etat etat --sortie etat_pipeline.json
+          scripts/publier_resultats.sh etat "cycles/$CYCLE" "Cycle $CYCLE : étape préparée (run ${{ github.run_number }})" etat_pipeline.json:etat_pipeline.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: etape
+          path: |
+            campagne.json
+            etat/
+          retention-days: 3
+          if-no-files-found: ignore
+
+  lot:
+    needs: preparer
+    if: needs.preparer.outputs.campagne != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        lot: ${{ fromJSON(needs.preparer.outputs.lots) }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: etape
+          path: etape
+      - name: Jouer le lot (un nouvel essai en cas d'échec)
+        env:
+          LOT: ${{ matrix.lot }}
+          N: ${{ strategy.job-total }}
+        run: |
+          for essai in 1 2; do
+            if python -m foret.sim etape/campagne.json --lot "$LOT/$N" --sortie lots; then exit 0; fi
+            echo "lot $LOT en échec (essai $essai)"; rm -rf lots
+          done
+          exit 1
+      - uses: actions/upload-artifact@v7
+        with:
+          name: lot-${{ matrix.lot }}
+          path: lots/
+          retention-days: 3
+          if-no-files-found: error
+
+  integrer:
+    needs: [preparer, lot]
+    if: needs.preparer.outputs.campagne != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      actions: write          # relancer ce workflow pour l'étape suivante
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: etape
+          path: etape
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: lot-*
+          path: lots
+          merge-multiple: true
+      - name: Fusionner et intégrer
+        env:
+          CYCLE: ${{ inputs.cycle }}
+        run: |
+          python -m foret.sim etape/campagne.json --fusionner lots --sortie fusion
+          python scripts/resume_campagne.py fusion >> "$GITHUB_STEP_SUMMARY"
+          python -m foret.cycle integrer --plan "cycles/$CYCLE.json" --etat etape/etat --synthese fusion/synthese.json | tee suite.json
+          NOM=$(python3 -c "import json; print(json.load(open('etape/campagne.json'))['nom'])")
+          mkdir -p "etape/etat/campagnes/$NOM"
+          gzip -c fusion/synthese.json > "etape/etat/campagnes/$NOM/synthese.json.gz"
+          python scripts/resume_campagne.py fusion > "etape/etat/campagnes/$NOM/resume.md"
+          python -m foret.cycle pipeline --plan "cycles/$CYCLE.json" --etat etape/etat --sortie etat_pipeline.json
+          scripts/publier_resultats.sh etape/etat "cycles/$CYCLE" "Cycle $CYCLE : $NOM intégrée (run ${{ github.run_number }})" etat_pipeline.json:etat_pipeline.json
+      - name: Lancer l'étape suivante
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CYCLE: ${{ inputs.cycle }}
+          LOTS: ${{ inputs.lots }}
+        run: |
+          gh api -X POST "repos/${{ github.repository }}/actions/workflows/cycle.yml/dispatches" \
+            -f ref=main -f "inputs[cycle]=$CYCLE" -f "inputs[lots]=$LOTS"
+
+  rapport:
+    needs: preparer
+    if: needs.preparer.outputs.campagne == '' && needs.preparer.outputs.etape == 'rapport'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      issues: write           # signaler la fin du cycle à l'auteur (courriel de GitHub)
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: etape
+          path: etape
+      - name: Écrire et publier le rapport
+        env:
+          CYCLE: ${{ inputs.cycle }}
+        run: |
+          python -m foret.cycle rapport --plan "cycles/$CYCLE.json" --etat etape/etat --sortie etape/etat/rapport.md
+          python3 - <<'PY'
+          import json, os
+          p = os.path.join("etape", "etat", "etat.json")
+          e = json.load(open(p)); e["statut"] = "rapport prêt"; json.dump(e, open(p, "w"), ensure_ascii=False, indent=1)
+          PY
+          python -m foret.cycle pipeline --plan "cycles/$CYCLE.json" --etat etape/etat --sortie etat_pipeline.json
+          cat etape/etat/rapport.md >> "$GITHUB_STEP_SUMMARY"
+          scripts/publier_resultats.sh etape/etat "cycles/$CYCLE" "Cycle $CYCLE : rapport (run ${{ github.run_number }})" etat_pipeline.json:etat_pipeline.json
+      - name: Ouvrir une issue (fin du cycle)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CYCLE: ${{ inputs.cycle }}
+        run: |
+          ALERTES=$(python3 -c "import re;t=open('etape/etat/rapport.md').read();s=t.split('## Alertes de conception')[1].split('##')[0].strip();print(s)")
+          gh api -X POST "repos/${{ github.repository }}/issues" \
+            -f title="Cycle $CYCLE terminé : rapport prêt" \
+            -f body="Le rapport automatique du cycle $CYCLE est sur la branche resultats : cycles/$CYCLE/rapport.md. Une session Claude va l'analyser et proposer la version suivante dans ETAT.md.
+
+          Alertes de conception :
+          $ALERTES"

@@ -40,7 +40,7 @@ import traceback
 from collections import Counter, defaultdict
 from multiprocessing import Pool
 
-from .maquette import charger, lire, resume
+from .maquette import charger, lire, resume, valeur_table
 from .moteur import Partie, VERSION
 from .bots import fabriquer_table
 from .stats import apparier, references_par_bloc, parties_compactes
@@ -75,14 +75,15 @@ def taches(campagne, maquette, echelle=1.0):
     out, ignorees = [], set()
     for bloc in campagne["blocs"]:
         for v in bloc["variantes"]:
-            if v not in connues and not v.startswith(("code:", "interdire:", "regles:")):
+            if v not in connues and not v.startswith(("code:", "interdire:", "regles:", "patch:")):
                 ignorees.add(v)
                 continue
             for bot in bloc["bots"]:
                 for tspec in bloc["tables"]:
                     n = max(1, round(tspec.get("parties", bloc.get("parties", 100)) * echelle))
+                    g0 = bloc.get("graine0", 0)                      # graines nouvelles (manches de confirmation)
                     for table in _tables(tspec, peuples):
-                        for g in range(n):
+                        for g in range(g0, g0 + n):
                             out.append((bloc["nom"], maquette, v, bot, table, g))
     return out, sorted(ignorees)
 
@@ -100,6 +101,7 @@ def jouer_une(tache):
         m = _maquette(maquette, variante)
         bots = fabriquer_table(bot, len(peuples), graine * 100)
         base.update(Partie(m, list(peuples), bots, graine=graine, observateurs=[Usage()]).jouer())
+        base["tours_max"] = valeur_table(m["tours"], len(peuples))
     except Exception as e:  # noqa: BLE001 - tout attraper : c'est le but de la campagne
         base["erreur"] = f"{type(e).__name__}: {e}"
         base["trace"] = traceback.format_exc(limit=8)
