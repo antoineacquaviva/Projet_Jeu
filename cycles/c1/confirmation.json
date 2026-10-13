@@ -1,0 +1,2444 @@
+{
+ "m1": {
+  "metriques": {
+   "defaut": {
+    "tailles": {
+     "2": {
+      "foret": 92.06,
+      "precoces": 70.8,
+      "parties": 24,
+      "tour": 3.54,
+      "fins": {
+       "nuit": 4.2,
+       "reveil": 66.7,
+       "sommeil": 29.2
+      }
+     },
+     "3": {
+      "foret": 96.43,
+      "precoces": 31.2,
+      "parties": 16,
+      "tour": 4.0,
+      "fins": {
+       "nuit": 6.2,
+       "sommeil": 93.8
+      }
+     },
+     "4": {
+      "foret": 94.44,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 5.42,
+      "fins": {
+       "nuit": 58.3,
+       "sommeil": 41.7
+      }
+     },
+     "5": {
+      "foret": 95.83,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 5.75,
+      "fins": {
+       "nuit": 75.0,
+       "sommeil": 25.0
+      }
+     },
+     "6": {
+      "foret": 91.67,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 6.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 0.0,
+    "score_difficulte": 0.0,
+    "qualite": 0.0,
+    "tour_moyen": 4.94,
+    "ecart_tailles": 4.76,
+    "foret_min": 91.67,
+    "precoces_max": 70.8
+   },
+   "patch:{\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"escalade\":4,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2,\"traces_par_joueur\":1},\"tours\":5}": {
+    "tailles": {
+     "2": {
+      "foret": 87.3,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 3.21,
+      "fins": {
+       "reveil": 100.0
+      }
+     },
+     "3": {
+      "foret": 86.9,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "4": {
+      "foret": 63.09,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 4.67,
+      "fins": {
+       "nuit": 33.3,
+       "sommeil": 66.7
+      }
+     },
+     "5": {
+      "foret": 73.81,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 4.75,
+      "fins": {
+       "nuit": 62.5,
+       "sommeil": 37.5
+      }
+     },
+     "6": {
+      "foret": 75.0,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.513,
+    "qualite": 0.513,
+    "tour_moyen": 4.53,
+    "ecart_tailles": 24.21,
+    "foret_min": 63.09,
+    "precoces_max": 0.0
+   },
+   "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":5,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":5}": {
+    "tailles": {
+     "2": {
+      "foret": 84.13,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "3": {
+      "foret": 93.16,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "4": {
+      "foret": 74.6,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 4.67,
+      "fins": {
+       "nuit": 16.7,
+       "sommeil": 83.3
+      }
+     },
+     "5": {
+      "foret": 75.0,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "6": {
+      "foret": 88.09,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 75.0,
+       "sommeil": 25.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.123,
+    "qualite": 0.123,
+    "tour_moyen": 4.93,
+    "ecart_tailles": 18.56,
+    "foret_min": 74.6,
+    "precoces_max": 0.0
+   },
+   "patch:{\"pouvoirs\":{\"attendre\":{\"par_tour\":2}},\"presence\":{\"pions\":2},\"regles\":{\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2,\"traces_par_joueur\":1},\"tours\":5}": {
+    "tailles": {
+     "2": {
+      "foret": 87.1,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 3.33,
+      "fins": {
+       "reveil": 100.0
+      }
+     },
+     "3": {
+      "foret": 88.09,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "4": {
+      "foret": 59.13,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 4.75,
+      "fins": {
+       "nuit": 50.0,
+       "sommeil": 50.0
+      }
+     },
+     "5": {
+      "foret": 80.36,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 87.5,
+       "sommeil": 12.5
+      }
+     },
+     "6": {
+      "foret": 79.76,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 4.75,
+      "fins": {
+       "sommeil": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.461,
+    "qualite": 0.461,
+    "tour_moyen": 4.57,
+    "ecart_tailles": 28.96,
+    "foret_min": 59.13,
+    "precoces_max": 0.0
+   },
+   "patch:{\"cartes\":{\"main\":6},\"regles\":{\"cercle_par_joueur\":5,\"escalade\":4,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2},\"tours\":5}": {
+    "tailles": {
+     "2": {
+      "foret": 80.36,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "3": {
+      "foret": 91.07,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "4": {
+      "foret": 73.59,
+      "precoces": 0.0,
+      "parties": 11,
+      "tour": 4.55,
+      "fins": {
+       "nuit": 9.1,
+       "sommeil": 90.9
+      }
+     },
+     "5": {
+      "foret": 86.31,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 4.25,
+      "fins": {
+       "nuit": 12.5,
+       "sommeil": 87.5
+      }
+     },
+     "6": {
+      "foret": 90.47,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 3.75,
+      "fins": {
+       "sommeil": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.262,
+    "qualite": 0.262,
+    "tour_moyen": 4.51,
+    "ecart_tailles": 17.48,
+    "foret_min": 73.59,
+    "precoces_max": 0.0
+   },
+   "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":5,\"4\":4,\"6\":3},\"escalade\":4,\"lunes\":{\"2\":1,\"4\":2,\"6\":3},\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":3},\"tours\":5}": {
+    "tailles": {
+     "2": {
+      "foret": 83.73,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "3": {
+      "foret": 90.77,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "4": {
+      "foret": 94.84,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "5": {
+      "foret": 83.93,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "6": {
+      "foret": 65.47,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 5.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.011,
+    "qualite": 0.011,
+    "tour_moyen": 5.0,
+    "ecart_tailles": 29.37,
+    "foret_min": 65.47,
+    "precoces_max": 0.0
+   },
+   "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2},\"voir\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"escalade\":4,\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":2},\"tours\":7}": {
+    "tailles": {
+     "2": {
+      "foret": 81.94,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 6.96,
+      "fins": {
+       "nuit": 95.8,
+       "reveil": 4.2
+      }
+     },
+     "3": {
+      "foret": 86.91,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 93.8,
+       "sommeil": 6.2
+      }
+     },
+     "4": {
+      "foret": 94.44,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "5": {
+      "foret": 68.45,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 87.5,
+       "sommeil": 12.5
+      }
+     },
+     "6": {
+      "foret": 86.91,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.037,
+    "qualite": 0.037,
+    "tour_moyen": 6.99,
+    "ecart_tailles": 25.99,
+    "foret_min": 68.45,
+    "precoces_max": 0.0
+   },
+   "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":4,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":7}": {
+    "tailles": {
+     "2": {
+      "foret": 76.39,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "3": {
+      "foret": 85.42,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 6.94,
+      "fins": {
+       "nuit": 93.8,
+       "sommeil": 6.2
+      }
+     },
+     "4": {
+      "foret": 73.81,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 5.17,
+      "fins": {
+       "nuit": 8.3,
+       "sommeil": 91.7
+      }
+     },
+     "5": {
+      "foret": 58.93,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 6.75,
+      "fins": {
+       "nuit": 87.5,
+       "sommeil": 12.5
+      }
+     },
+     "6": {
+      "foret": 73.81,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.639,
+    "qualite": 0.639,
+    "tour_moyen": 6.57,
+    "ecart_tailles": 26.49,
+    "foret_min": 58.93,
+    "precoces_max": 0.0
+   },
+   "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":5,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":7}": {
+    "tailles": {
+     "2": {
+      "foret": 76.79,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "3": {
+      "foret": 86.61,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 6.94,
+      "fins": {
+       "nuit": 93.8,
+       "sommeil": 6.2
+      }
+     },
+     "4": {
+      "foret": 71.43,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 5.08,
+      "fins": {
+       "nuit": 8.3,
+       "sommeil": 91.7
+      }
+     },
+     "5": {
+      "foret": 58.33,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 6.62,
+      "fins": {
+       "nuit": 50.0,
+       "sommeil": 50.0
+      }
+     },
+     "6": {
+      "foret": 73.81,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 6.5,
+      "fins": {
+       "nuit": 75.0,
+       "sommeil": 25.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.559,
+    "qualite": 0.559,
+    "tour_moyen": 6.43,
+    "ecart_tailles": 28.28,
+    "foret_min": 58.33,
+    "precoces_max": 0.0
+   },
+   "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2},\"voir\":{\"par_tour\":1}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":4,\"lunes\":3,\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":3,\"traces_par_joueur\":1},\"tours\":7}": {
+    "tailles": {
+     "2": {
+      "foret": 76.19,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "3": {
+      "foret": 85.71,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "4": {
+      "foret": 92.46,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "5": {
+      "foret": 55.95,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "6": {
+      "foret": 76.19,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.169,
+    "qualite": 0.169,
+    "tour_moyen": 7.0,
+    "ecart_tailles": 36.51,
+    "foret_min": 55.95,
+    "precoces_max": 0.0
+   },
+   "patch:{\"cartes\":{\"main\":4},\"pouvoirs\":{\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":2,\"escalade\":4,\"lunes\":\"n-2\",\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":3}}": {
+    "tailles": {
+     "2": {
+      "foret": 84.92,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 6.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "3": {
+      "foret": 93.16,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 5.75,
+      "fins": {
+       "nuit": 68.8,
+       "reveil": 31.2
+      }
+     },
+     "4": {
+      "foret": 94.84,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 6.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "5": {
+      "foret": 67.26,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 6.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "6": {
+      "foret": 78.57,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 6.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.011,
+    "qualite": 0.011,
+    "tour_moyen": 5.95,
+    "ecart_tailles": 27.58,
+    "foret_min": 67.26,
+    "precoces_max": 0.0
+   },
+   "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2}}": {
+    "tailles": {
+     "2": {
+      "foret": 73.61,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 6.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "3": {
+      "foret": 82.44,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 6.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "4": {
+      "foret": 66.66,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 4.92,
+      "fins": {
+       "nuit": 16.7,
+       "sommeil": 83.3
+      }
+     },
+     "5": {
+      "foret": 74.4,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 5.62,
+      "fins": {
+       "nuit": 25.0,
+       "sommeil": 75.0
+      }
+     },
+     "6": {
+      "foret": 84.52,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 5.5,
+      "fins": {
+       "sommeil": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.699,
+    "qualite": 0.699,
+    "tour_moyen": 5.61,
+    "ecart_tailles": 17.86,
+    "foret_min": 66.66,
+    "precoces_max": 0.0
+   },
+   "patch:{\"cartes\":{\"main\":6},\"regles\":{\"cercle_par_joueur\":{\"2\":5,\"4\":4,\"6\":3},\"escalade\":5,\"lunes\":1,\"ordres_par_etape\":{\"2\":1,\"4\":2}},\"tours\":7}": {
+    "tailles": {
+     "2": {
+      "foret": 86.11,
+      "precoces": 0.0,
+      "parties": 24,
+      "tour": 6.12,
+      "fins": {
+       "nuit": 41.7,
+       "sommeil": 58.3
+      }
+     },
+     "3": {
+      "foret": 91.07,
+      "precoces": 0.0,
+      "parties": 16,
+      "tour": 6.19,
+      "fins": {
+       "nuit": 50.0,
+       "sommeil": 50.0
+      }
+     },
+     "4": {
+      "foret": 72.22,
+      "precoces": 0.0,
+      "parties": 12,
+      "tour": 5.58,
+      "fins": {
+       "sommeil": 100.0
+      }
+     },
+     "5": {
+      "foret": 77.98,
+      "precoces": 0.0,
+      "parties": 8,
+      "tour": 5.5,
+      "fins": {
+       "nuit": 37.5,
+       "sommeil": 62.5
+      }
+     },
+     "6": {
+      "foret": 85.72,
+      "precoces": 0.0,
+      "parties": 4,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.262,
+    "qualite": 0.262,
+    "tour_moyen": 6.08,
+    "ecart_tailles": 18.85,
+    "foret_min": 72.22,
+    "precoces_max": 0.0
+   }
+  },
+  "apparie": {
+   "confirmation | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "reference": "defaut",
+    "ecarts": {
+     "patch:{\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"escalade\":4,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2,\"traces_par_joueur\":1},\"tours\":5}": {
+      "paires": 64,
+      "ecart": -13.84,
+      "ic95": [
+       -17.86,
+       -10.27
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -17.52,
+       -10.16
+      ]
+     },
+     "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":5,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":5}": {
+      "paires": 64,
+      "ecart": -10.34,
+      "ic95": [
+       -13.54,
+       -7.37
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -13.44,
+       -7.24
+      ]
+     },
+     "patch:{\"pouvoirs\":{\"attendre\":{\"par_tour\":2}},\"presence\":{\"pions\":2},\"regles\":{\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2,\"traces_par_joueur\":1},\"tours\":5}": {
+      "paires": 64,
+      "ecart": -13.24,
+      "ic95": [
+       -17.04,
+       -9.82
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -16.82,
+       -9.66
+      ]
+     },
+     "patch:{\"cartes\":{\"main\":6},\"regles\":{\"cercle_par_joueur\":5,\"escalade\":4,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2},\"tours\":5}": {
+      "paires": 63,
+      "ecart": -10.66,
+      "ic95": [
+       -13.76,
+       -7.48
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -13.91,
+       -7.41
+      ]
+     },
+     "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":5,\"4\":4,\"6\":3},\"escalade\":4,\"lunes\":{\"2\":1,\"4\":2,\"6\":3},\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":3},\"tours\":5}": {
+      "paires": 64,
+      "ecart": -7.59,
+      "ic95": [
+       -10.42,
+       -4.84
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -10.69,
+       -4.49
+      ]
+     },
+     "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2},\"voir\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"escalade\":4,\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":2},\"tours\":7}": {
+      "paires": 64,
+      "ecart": -9.9,
+      "ic95": [
+       -13.62,
+       -6.62
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -13.3,
+       -6.49
+      ]
+     },
+     "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":4,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":7}": {
+      "paires": 64,
+      "ecart": -18.23,
+      "ic95": [
+       -21.73,
+       -14.73
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -21.74,
+       -14.72
+      ]
+     },
+     "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":5,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":7}": {
+      "paires": 64,
+      "ecart": -18.3,
+      "ic95": [
+       -22.62,
+       -13.99
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -22.73,
+       -13.88
+      ]
+     },
+     "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2},\"voir\":{\"par_tour\":1}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":4,\"lunes\":3,\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":3,\"traces_par_joueur\":1},\"tours\":7}": {
+      "paires": 64,
+      "ecart": -14.96,
+      "ic95": [
+       -18.97,
+       -11.38
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -18.88,
+       -11.03
+      ]
+     },
+     "patch:{\"cartes\":{\"main\":4},\"pouvoirs\":{\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":2,\"escalade\":4,\"lunes\":\"n-2\",\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":3}}": {
+      "paires": 64,
+      "ecart": -7.81,
+      "ic95": [
+       -11.09,
+       -4.84
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -11.08,
+       -4.54
+      ]
+     },
+     "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2}}": {
+      "paires": 64,
+      "ecart": -18.75,
+      "ic95": [
+       -22.17,
+       -15.4
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -22.05,
+       -15.45
+      ]
+     },
+     "patch:{\"cartes\":{\"main\":6},\"regles\":{\"cercle_par_joueur\":{\"2\":5,\"4\":4,\"6\":3},\"escalade\":5,\"lunes\":1,\"ordres_par_etape\":{\"2\":1,\"4\":2}},\"tours\":7}": {
+      "paires": 64,
+      "ecart": -10.34,
+      "ic95": [
+       -14.21,
+       -6.7
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -13.99,
+       -6.69
+      ]
+     }
+    }
+   }
+  },
+  "usage": {
+   "confirmation | defaut | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 576,
+     "pris": 424,
+     "taux": 73.6
+    },
+    "action:saboter": {
+     "offert": 479,
+     "pris": 152,
+     "taux": 31.7
+    },
+    "aller": {
+     "offert": 882,
+     "pris": 310,
+     "taux": 35.1
+    },
+    "embuscade:aller": {
+     "offert": 290,
+     "pris": 24,
+     "taux": 8.3
+    },
+    "embuscade:barrer": {
+     "offert": 290,
+     "pris": 240,
+     "taux": 82.8
+    },
+    "embuscade:immobiliser": {
+     "offert": 206,
+     "pris": 26,
+     "taux": 12.6
+    },
+    "moitie:attendre": {
+     "offert": 347,
+     "pris": 290,
+     "taux": 83.6
+    },
+    "moitie:egarer": {
+     "offert": 238,
+     "pris": 65,
+     "taux": 27.3
+    },
+    "moitie:enrayer": {
+     "offert": 207,
+     "pris": 43,
+     "taux": 20.8
+    },
+    "moitie:hanter": {
+     "offert": 238,
+     "pris": 111,
+     "taux": 46.6
+    },
+    "moitie:parler": {
+     "offert": 161,
+     "pris": 15,
+     "taux": 9.3
+    },
+    "moitie:renverser": {
+     "offert": 314,
+     "pris": 127,
+     "taux": 40.4
+    },
+    "moitie:s_unir": {
+     "offert": 207,
+     "pris": 96,
+     "taux": 46.4
+    },
+    "moitie:se_fondre": {
+     "offert": 347,
+     "pris": 23,
+     "taux": 6.6
+    },
+    "moitie:tenir": {
+     "offert": 314,
+     "pris": 119,
+     "taux": 37.9
+    },
+    "moitie:tromper": {
+     "offert": 161,
+     "pris": 93,
+     "taux": 57.8
+    },
+    "moitie:voir": {
+     "offert": 493,
+     "pris": 198,
+     "taux": 40.2
+    },
+    "moitie:voler": {
+     "offert": 85,
+     "pris": 2,
+     "taux": 2.4
+    },
+    "pouvoir:hanter": {
+     "offert": 101,
+     "pris": 77,
+     "taux": 76.2
+    },
+    "pouvoir:s_unir": {
+     "offert": 96,
+     "pris": 11,
+     "taux": 11.5
+    },
+    "pouvoir:tromper": {
+     "offert": 78,
+     "pris": 30,
+     "taux": 38.5
+    },
+    "reve": {
+     "offert": 509,
+     "pris": 319,
+     "taux": 62.7
+    }
+   },
+   "confirmation | patch:{\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"escalade\":4,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2,\"traces_par_joueur\":1},\"tours\":5} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 744,
+     "pris": 516,
+     "taux": 69.4
+    },
+    "action:saboter": {
+     "offert": 586,
+     "pris": 228,
+     "taux": 38.9
+    },
+    "aller": {
+     "offert": 1340,
+     "pris": 614,
+     "taux": 45.8
+    },
+    "embuscade:aller": {
+     "offert": 297,
+     "pris": 56,
+     "taux": 18.9
+    },
+    "embuscade:barrer": {
+     "offert": 297,
+     "pris": 217,
+     "taux": 73.1
+    },
+    "embuscade:immobiliser": {
+     "offert": 192,
+     "pris": 24,
+     "taux": 12.5
+    },
+    "moitie:attendre": {
+     "offert": 410,
+     "pris": 297,
+     "taux": 72.4
+    },
+    "moitie:egarer": {
+     "offert": 341,
+     "pris": 125,
+     "taux": 36.7
+    },
+    "moitie:enrayer": {
+     "offert": 301,
+     "pris": 109,
+     "taux": 36.2
+    },
+    "moitie:hanter": {
+     "offert": 341,
+     "pris": 147,
+     "taux": 43.1
+    },
+    "moitie:parler": {
+     "offert": 263,
+     "pris": 58,
+     "taux": 22.1
+    },
+    "moitie:renverser": {
+     "offert": 378,
+     "pris": 143,
+     "taux": 37.8
+    },
+    "moitie:s_unir": {
+     "offert": 301,
+     "pris": 133,
+     "taux": 44.2
+    },
+    "moitie:se_fondre": {
+     "offert": 410,
+     "pris": 63,
+     "taux": 15.4
+    },
+    "moitie:tenir": {
+     "offert": 378,
+     "pris": 160,
+     "taux": 42.3
+    },
+    "moitie:tromper": {
+     "offert": 263,
+     "pris": 142,
+     "taux": 54.0
+    },
+    "moitie:voir": {
+     "offert": 497,
+     "pris": 286,
+     "taux": 57.5
+    },
+    "moitie:voler": {
+     "offert": 110,
+     "pris": 5,
+     "taux": 4.5
+    },
+    "pouvoir:hanter": {
+     "offert": 147,
+     "pris": 101,
+     "taux": 68.7
+    },
+    "pouvoir:parler": {
+     "offert": 14,
+     "pris": 3,
+     "taux": 21.4
+    },
+    "pouvoir:s_unir": {
+     "offert": 133,
+     "pris": 36,
+     "taux": 27.1
+    },
+    "pouvoir:tromper": {
+     "offert": 204,
+     "pris": 98,
+     "taux": 48.0
+    },
+    "reve": {
+     "offert": 610,
+     "pris": 354,
+     "taux": 58.0
+    }
+   },
+   "confirmation | patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":5,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":5} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 776,
+     "pris": 524,
+     "taux": 67.5
+    },
+    "action:saboter": {
+     "offert": 622,
+     "pris": 252,
+     "taux": 40.5
+    },
+    "aller": {
+     "offert": 1573,
+     "pris": 816,
+     "taux": 51.9
+    },
+    "embuscade:aller": {
+     "offert": 380,
+     "pris": 59,
+     "taux": 15.5
+    },
+    "embuscade:barrer": {
+     "offert": 380,
+     "pris": 279,
+     "taux": 73.4
+    },
+    "embuscade:immobiliser": {
+     "offert": 285,
+     "pris": 42,
+     "taux": 14.7
+    },
+    "moitie:attendre": {
+     "offert": 455,
+     "pris": 380,
+     "taux": 83.5
+    },
+    "moitie:egarer": {
+     "offert": 393,
+     "pris": 137,
+     "taux": 34.9
+    },
+    "moitie:enrayer": {
+     "offert": 315,
+     "pris": 104,
+     "taux": 33.0
+    },
+    "moitie:hanter": {
+     "offert": 393,
+     "pris": 194,
+     "taux": 49.4
+    },
+    "moitie:parler": {
+     "offert": 297,
+     "pris": 72,
+     "taux": 24.2
+    },
+    "moitie:renverser": {
+     "offert": 427,
+     "pris": 162,
+     "taux": 37.9
+    },
+    "moitie:s_unir": {
+     "offert": 315,
+     "pris": 155,
+     "taux": 49.2
+    },
+    "moitie:se_fondre": {
+     "offert": 455,
+     "pris": 47,
+     "taux": 10.3
+    },
+    "moitie:tenir": {
+     "offert": 427,
+     "pris": 218,
+     "taux": 51.1
+    },
+    "moitie:tromper": {
+     "offert": 297,
+     "pris": 175,
+     "taux": 58.9
+    },
+    "moitie:voir": {
+     "offert": 526,
+     "pris": 340,
+     "taux": 64.6
+    },
+    "moitie:voler": {
+     "offert": 106,
+     "pris": 6,
+     "taux": 5.7
+    },
+    "pouvoir:hanter": {
+     "offert": 152,
+     "pris": 114,
+     "taux": 75.0
+    },
+    "pouvoir:parler": {
+     "offert": 16,
+     "pris": 5,
+     "taux": 31.2
+    },
+    "pouvoir:s_unir": {
+     "offert": 155,
+     "pris": 43,
+     "taux": 27.7
+    },
+    "pouvoir:tromper": {
+     "offert": 224,
+     "pris": 99,
+     "taux": 44.2
+    },
+    "reve": {
+     "offert": 688,
+     "pris": 267,
+     "taux": 38.8
+    }
+   },
+   "confirmation | patch:{\"pouvoirs\":{\"attendre\":{\"par_tour\":2}},\"presence\":{\"pions\":2},\"regles\":{\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2,\"traces_par_joueur\":1},\"tours\":5} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 722,
+     "pris": 510,
+     "taux": 70.6
+    },
+    "action:saboter": {
+     "offert": 538,
+     "pris": 212,
+     "taux": 39.4
+    },
+    "aller": {
+     "offert": 1363,
+     "pris": 645,
+     "taux": 47.3
+    },
+    "embuscade:aller": {
+     "offert": 307,
+     "pris": 51,
+     "taux": 16.6
+    },
+    "embuscade:barrer": {
+     "offert": 307,
+     "pris": 220,
+     "taux": 71.7
+    },
+    "embuscade:immobiliser": {
+     "offert": 174,
+     "pris": 36,
+     "taux": 20.7
+    },
+    "moitie:attendre": {
+     "offert": 416,
+     "pris": 307,
+     "taux": 73.8
+    },
+    "moitie:egarer": {
+     "offert": 388,
+     "pris": 121,
+     "taux": 31.2
+    },
+    "moitie:enrayer": {
+     "offert": 323,
+     "pris": 106,
+     "taux": 32.8
+    },
+    "moitie:hanter": {
+     "offert": 388,
+     "pris": 191,
+     "taux": 49.2
+    },
+    "moitie:parler": {
+     "offert": 269,
+     "pris": 57,
+     "taux": 21.2
+    },
+    "moitie:renverser": {
+     "offert": 370,
+     "pris": 132,
+     "taux": 35.7
+    },
+    "moitie:s_unir": {
+     "offert": 323,
+     "pris": 150,
+     "taux": 46.4
+    },
+    "moitie:se_fondre": {
+     "offert": 416,
+     "pris": 54,
+     "taux": 13.0
+    },
+    "moitie:tenir": {
+     "offert": 370,
+     "pris": 164,
+     "taux": 44.3
+    },
+    "moitie:tromper": {
+     "offert": 269,
+     "pris": 150,
+     "taux": 55.8
+    },
+    "moitie:voir": {
+     "offert": 499,
+     "pris": 281,
+     "taux": 56.3
+    },
+    "moitie:voler": {
+     "offert": 103,
+     "pris": 11,
+     "taux": 10.7
+    },
+    "pouvoir:hanter": {
+     "offert": 156,
+     "pris": 104,
+     "taux": 66.7
+    },
+    "pouvoir:parler": {
+     "offert": 10,
+     "pris": 5,
+     "taux": 50.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 150,
+     "pris": 62,
+     "taux": 41.3
+    },
+    "pouvoir:tromper": {
+     "offert": 220,
+     "pris": 91,
+     "taux": 41.4
+    },
+    "reve": {
+     "offert": 603,
+     "pris": 367,
+     "taux": 60.9
+    }
+   },
+   "confirmation | patch:{\"cartes\":{\"main\":6},\"regles\":{\"cercle_par_joueur\":5,\"escalade\":4,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2},\"tours\":5} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 688,
+     "pris": 473,
+     "taux": 68.8
+    },
+    "action:saboter": {
+     "offert": 543,
+     "pris": 215,
+     "taux": 39.6
+    },
+    "aller": {
+     "offert": 1428,
+     "pris": 737,
+     "taux": 51.6
+    },
+    "embuscade:aller": {
+     "offert": 296,
+     "pris": 52,
+     "taux": 17.6
+    },
+    "embuscade:barrer": {
+     "offert": 296,
+     "pris": 207,
+     "taux": 69.9
+    },
+    "embuscade:immobiliser": {
+     "offert": 172,
+     "pris": 37,
+     "taux": 21.5
+    },
+    "moitie:attendre": {
+     "offert": 390,
+     "pris": 296,
+     "taux": 75.9
+    },
+    "moitie:egarer": {
+     "offert": 359,
+     "pris": 116,
+     "taux": 32.3
+    },
+    "moitie:enrayer": {
+     "offert": 298,
+     "pris": 105,
+     "taux": 35.2
+    },
+    "moitie:hanter": {
+     "offert": 359,
+     "pris": 172,
+     "taux": 47.9
+    },
+    "moitie:parler": {
+     "offert": 271,
+     "pris": 72,
+     "taux": 26.6
+    },
+    "moitie:renverser": {
+     "offert": 416,
+     "pris": 154,
+     "taux": 37.0
+    },
+    "moitie:s_unir": {
+     "offert": 298,
+     "pris": 139,
+     "taux": 46.6
+    },
+    "moitie:se_fondre": {
+     "offert": 390,
+     "pris": 57,
+     "taux": 14.6
+    },
+    "moitie:tenir": {
+     "offert": 416,
+     "pris": 200,
+     "taux": 48.1
+    },
+    "moitie:tromper": {
+     "offert": 271,
+     "pris": 150,
+     "taux": 55.4
+    },
+    "moitie:voir": {
+     "offert": 490,
+     "pris": 281,
+     "taux": 57.3
+    },
+    "moitie:voler": {
+     "offert": 103,
+     "pris": 3,
+     "taux": 2.9
+    },
+    "pouvoir:hanter": {
+     "offert": 134,
+     "pris": 103,
+     "taux": 76.9
+    },
+    "pouvoir:parler": {
+     "offert": 17,
+     "pris": 3,
+     "taux": 17.6
+    },
+    "pouvoir:s_unir": {
+     "offert": 139,
+     "pris": 29,
+     "taux": 20.9
+    },
+    "pouvoir:tromper": {
+     "offert": 188,
+     "pris": 76,
+     "taux": 40.4
+    },
+    "reve": {
+     "offert": 655,
+     "pris": 309,
+     "taux": 47.2
+    }
+   },
+   "confirmation | patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":5,\"4\":4,\"6\":3},\"escalade\":4,\"lunes\":{\"2\":1,\"4\":2,\"6\":3},\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":3},\"tours\":5} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 878,
+     "pris": 600,
+     "taux": 68.3
+    },
+    "action:saboter": {
+     "offert": 705,
+     "pris": 278,
+     "taux": 39.4
+    },
+    "aller": {
+     "offert": 1661,
+     "pris": 804,
+     "taux": 48.4
+    },
+    "embuscade:aller": {
+     "offert": 375,
+     "pris": 59,
+     "taux": 15.7
+    },
+    "embuscade:barrer": {
+     "offert": 375,
+     "pris": 274,
+     "taux": 73.1
+    },
+    "embuscade:immobiliser": {
+     "offert": 244,
+     "pris": 42,
+     "taux": 17.2
+    },
+    "moitie:attendre": {
+     "offert": 445,
+     "pris": 375,
+     "taux": 84.3
+    },
+    "moitie:egarer": {
+     "offert": 358,
+     "pris": 130,
+     "taux": 36.3
+    },
+    "moitie:enrayer": {
+     "offert": 308,
+     "pris": 110,
+     "taux": 35.7
+    },
+    "moitie:hanter": {
+     "offert": 358,
+     "pris": 213,
+     "taux": 59.5
+    },
+    "moitie:parler": {
+     "offert": 280,
+     "pris": 76,
+     "taux": 27.1
+    },
+    "moitie:renverser": {
+     "offert": 423,
+     "pris": 202,
+     "taux": 47.8
+    },
+    "moitie:s_unir": {
+     "offert": 308,
+     "pris": 176,
+     "taux": 57.1
+    },
+    "moitie:se_fondre": {
+     "offert": 445,
+     "pris": 62,
+     "taux": 13.9
+    },
+    "moitie:tenir": {
+     "offert": 423,
+     "pris": 208,
+     "taux": 49.2
+    },
+    "moitie:tromper": {
+     "offert": 280,
+     "pris": 181,
+     "taux": 64.6
+    },
+    "moitie:voir": {
+     "offert": 512,
+     "pris": 333,
+     "taux": 65.0
+    },
+    "moitie:voler": {
+     "offert": 92,
+     "pris": 5,
+     "taux": 5.4
+    },
+    "pouvoir:hanter": {
+     "offert": 167,
+     "pris": 124,
+     "taux": 74.3
+    },
+    "pouvoir:parler": {
+     "offert": 16,
+     "pris": 5,
+     "taux": 31.2
+    },
+    "pouvoir:s_unir": {
+     "offert": 176,
+     "pris": 46,
+     "taux": 26.1
+    },
+    "pouvoir:tromper": {
+     "offert": 211,
+     "pris": 92,
+     "taux": 43.6
+    },
+    "reve": {
+     "offert": 517,
+     "pris": 89,
+     "taux": 17.2
+    }
+   },
+   "confirmation | patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2},\"voir\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"escalade\":4,\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":2},\"tours\":7} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 1203,
+     "pris": 765,
+     "taux": 63.6
+    },
+    "action:saboter": {
+     "offert": 950,
+     "pris": 438,
+     "taux": 46.1
+    },
+    "aller": {
+     "offert": 2213,
+     "pris": 1015,
+     "taux": 45.9
+    },
+    "embuscade:aller": {
+     "offert": 493,
+     "pris": 53,
+     "taux": 10.8
+    },
+    "embuscade:barrer": {
+     "offert": 493,
+     "pris": 386,
+     "taux": 78.3
+    },
+    "embuscade:immobiliser": {
+     "offert": 356,
+     "pris": 54,
+     "taux": 15.2
+    },
+    "moitie:attendre": {
+     "offert": 578,
+     "pris": 493,
+     "taux": 85.3
+    },
+    "moitie:egarer": {
+     "offert": 576,
+     "pris": 189,
+     "taux": 32.8
+    },
+    "moitie:enrayer": {
+     "offert": 392,
+     "pris": 156,
+     "taux": 39.8
+    },
+    "moitie:hanter": {
+     "offert": 576,
+     "pris": 351,
+     "taux": 60.9
+    },
+    "moitie:parler": {
+     "offert": 327,
+     "pris": 83,
+     "taux": 25.4
+    },
+    "moitie:renverser": {
+     "offert": 600,
+     "pris": 296,
+     "taux": 49.3
+    },
+    "moitie:s_unir": {
+     "offert": 392,
+     "pris": 201,
+     "taux": 51.3
+    },
+    "moitie:se_fondre": {
+     "offert": 578,
+     "pris": 70,
+     "taux": 12.1
+    },
+    "moitie:tenir": {
+     "offert": 600,
+     "pris": 273,
+     "taux": 45.5
+    },
+    "moitie:tromper": {
+     "offert": 327,
+     "pris": 211,
+     "taux": 64.5
+    },
+    "moitie:voir": {
+     "offert": 672,
+     "pris": 407,
+     "taux": 60.6
+    },
+    "moitie:voler": {
+     "offert": 150,
+     "pris": 10,
+     "taux": 6.7
+    },
+    "pouvoir:hanter": {
+     "offert": 341,
+     "pris": 278,
+     "taux": 81.5
+    },
+    "pouvoir:parler": {
+     "offert": 18,
+     "pris": 4,
+     "taux": 22.2
+    },
+    "pouvoir:s_unir": {
+     "offert": 201,
+     "pris": 47,
+     "taux": 23.4
+    },
+    "pouvoir:tromper": {
+     "offert": 228,
+     "pris": 97,
+     "taux": 42.5
+    },
+    "reve": {
+     "offert": 666,
+     "pris": 180,
+     "taux": 27.0
+    }
+   },
+   "confirmation | patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":4,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":7} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 1070,
+     "pris": 692,
+     "taux": 64.7
+    },
+    "action:saboter": {
+     "offert": 864,
+     "pris": 378,
+     "taux": 43.8
+    },
+    "aller": {
+     "offert": 2169,
+     "pris": 1121,
+     "taux": 51.7
+    },
+    "embuscade:aller": {
+     "offert": 450,
+     "pris": 90,
+     "taux": 20.0
+    },
+    "embuscade:barrer": {
+     "offert": 450,
+     "pris": 323,
+     "taux": 71.8
+    },
+    "embuscade:immobiliser": {
+     "offert": 302,
+     "pris": 37,
+     "taux": 12.3
+    },
+    "moitie:attendre": {
+     "offert": 559,
+     "pris": 450,
+     "taux": 80.5
+    },
+    "moitie:egarer": {
+     "offert": 569,
+     "pris": 174,
+     "taux": 30.6
+    },
+    "moitie:enrayer": {
+     "offert": 411,
+     "pris": 134,
+     "taux": 32.6
+    },
+    "moitie:hanter": {
+     "offert": 569,
+     "pris": 332,
+     "taux": 58.3
+    },
+    "moitie:parler": {
+     "offert": 382,
+     "pris": 107,
+     "taux": 28.0
+    },
+    "moitie:renverser": {
+     "offert": 590,
+     "pris": 261,
+     "taux": 44.2
+    },
+    "moitie:s_unir": {
+     "offert": 411,
+     "pris": 211,
+     "taux": 51.3
+    },
+    "moitie:se_fondre": {
+     "offert": 559,
+     "pris": 63,
+     "taux": 11.3
+    },
+    "moitie:tenir": {
+     "offert": 590,
+     "pris": 278,
+     "taux": 47.1
+    },
+    "moitie:tromper": {
+     "offert": 382,
+     "pris": 219,
+     "taux": 57.3
+    },
+    "moitie:voir": {
+     "offert": 697,
+     "pris": 439,
+     "taux": 63.0
+    },
+    "moitie:voler": {
+     "offert": 130,
+     "pris": 4,
+     "taux": 3.1
+    },
+    "pouvoir:hanter": {
+     "offert": 324,
+     "pris": 257,
+     "taux": 79.3
+    },
+    "pouvoir:parler": {
+     "offert": 25,
+     "pris": 8,
+     "taux": 32.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 211,
+     "pris": 64,
+     "taux": 30.3
+    },
+    "pouvoir:tromper": {
+     "offert": 281,
+     "pris": 135,
+     "taux": 48.0
+    },
+    "reve": {
+     "offert": 903,
+     "pris": 313,
+     "taux": 34.7
+    }
+   },
+   "confirmation | patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":5,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":7} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 1062,
+     "pris": 710,
+     "taux": 66.9
+    },
+    "action:saboter": {
+     "offert": 872,
+     "pris": 352,
+     "taux": 40.4
+    },
+    "aller": {
+     "offert": 2103,
+     "pris": 1073,
+     "taux": 51.0
+    },
+    "embuscade:aller": {
+     "offert": 436,
+     "pris": 76,
+     "taux": 17.4
+    },
+    "embuscade:barrer": {
+     "offert": 436,
+     "pris": 312,
+     "taux": 71.6
+    },
+    "embuscade:immobiliser": {
+     "offert": 309,
+     "pris": 48,
+     "taux": 15.5
+    },
+    "moitie:attendre": {
+     "offert": 573,
+     "pris": 436,
+     "taux": 76.1
+    },
+    "moitie:egarer": {
+     "offert": 570,
+     "pris": 182,
+     "taux": 31.9
+    },
+    "moitie:enrayer": {
+     "offert": 404,
+     "pris": 146,
+     "taux": 36.1
+    },
+    "moitie:hanter": {
+     "offert": 570,
+     "pris": 304,
+     "taux": 53.3
+    },
+    "moitie:parler": {
+     "offert": 367,
+     "pris": 90,
+     "taux": 24.5
+    },
+    "moitie:renverser": {
+     "offert": 587,
+     "pris": 259,
+     "taux": 44.1
+    },
+    "moitie:s_unir": {
+     "offert": 404,
+     "pris": 185,
+     "taux": 45.8
+    },
+    "moitie:se_fondre": {
+     "offert": 573,
+     "pris": 85,
+     "taux": 14.8
+    },
+    "moitie:tenir": {
+     "offert": 587,
+     "pris": 260,
+     "taux": 44.3
+    },
+    "moitie:tromper": {
+     "offert": 367,
+     "pris": 222,
+     "taux": 60.5
+    },
+    "moitie:voir": {
+     "offert": 692,
+     "pris": 415,
+     "taux": 60.0
+    },
+    "moitie:voler": {
+     "offert": 140,
+     "pris": 4,
+     "taux": 2.9
+    },
+    "pouvoir:hanter": {
+     "offert": 294,
+     "pris": 234,
+     "taux": 79.6
+    },
+    "pouvoir:parler": {
+     "offert": 19,
+     "pris": 7,
+     "taux": 36.8
+    },
+    "pouvoir:s_unir": {
+     "offert": 185,
+     "pris": 56,
+     "taux": 30.3
+    },
+    "pouvoir:tromper": {
+     "offert": 278,
+     "pris": 127,
+     "taux": 45.7
+    },
+    "reve": {
+     "offert": 915,
+     "pris": 380,
+     "taux": 41.5
+    }
+   },
+   "confirmation | patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2},\"voir\":{\"par_tour\":1}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":4,\"lunes\":3,\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":3,\"traces_par_joueur\":1},\"tours\":7} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 1286,
+     "pris": 803,
+     "taux": 62.4
+    },
+    "action:saboter": {
+     "offert": 1029,
+     "pris": 483,
+     "taux": 46.9
+    },
+    "aller": {
+     "offert": 2284,
+     "pris": 1025,
+     "taux": 44.9
+    },
+    "embuscade:aller": {
+     "offert": 482,
+     "pris": 86,
+     "taux": 17.8
+    },
+    "embuscade:barrer": {
+     "offert": 482,
+     "pris": 359,
+     "taux": 74.5
+    },
+    "embuscade:immobiliser": {
+     "offert": 299,
+     "pris": 37,
+     "taux": 12.4
+    },
+    "moitie:attendre": {
+     "offert": 553,
+     "pris": 482,
+     "taux": 87.2
+    },
+    "moitie:egarer": {
+     "offert": 606,
+     "pris": 188,
+     "taux": 31.0
+    },
+    "moitie:enrayer": {
+     "offert": 421,
+     "pris": 150,
+     "taux": 35.6
+    },
+    "moitie:hanter": {
+     "offert": 606,
+     "pris": 391,
+     "taux": 64.5
+    },
+    "moitie:parler": {
+     "offert": 373,
+     "pris": 108,
+     "taux": 29.0
+    },
+    "moitie:renverser": {
+     "offert": 615,
+     "pris": 318,
+     "taux": 51.7
+    },
+    "moitie:s_unir": {
+     "offert": 421,
+     "pris": 240,
+     "taux": 57.0
+    },
+    "moitie:se_fondre": {
+     "offert": 553,
+     "pris": 60,
+     "taux": 10.8
+    },
+    "moitie:tenir": {
+     "offert": 615,
+     "pris": 271,
+     "taux": 44.1
+    },
+    "moitie:tromper": {
+     "offert": 373,
+     "pris": 240,
+     "taux": 64.3
+    },
+    "moitie:voir": {
+     "offert": 475,
+     "pris": 351,
+     "taux": 73.9
+    },
+    "moitie:voler": {
+     "offert": 202,
+     "pris": 18,
+     "taux": 8.9
+    },
+    "pouvoir:hanter": {
+     "offert": 384,
+     "pris": 313,
+     "taux": 81.5
+    },
+    "pouvoir:parler": {
+     "offert": 21,
+     "pris": 7,
+     "taux": 33.3
+    },
+    "pouvoir:s_unir": {
+     "offert": 240,
+     "pris": 66,
+     "taux": 27.5
+    },
+    "pouvoir:tromper": {
+     "offert": 257,
+     "pris": 100,
+     "taux": 38.9
+    },
+    "reve": {
+     "offert": 616,
+     "pris": 143,
+     "taux": 23.2
+    }
+   },
+   "confirmation | patch:{\"cartes\":{\"main\":4},\"pouvoirs\":{\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":2,\"escalade\":4,\"lunes\":\"n-2\",\"ordres_par_etape\":{\"2\":1,\"5\":2},\"reves_par_pas\":3}} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 1071,
+     "pris": 722,
+     "taux": 67.4
+    },
+    "action:saboter": {
+     "offert": 845,
+     "pris": 349,
+     "taux": 41.3
+    },
+    "aller": {
+     "offert": 1966,
+     "pris": 923,
+     "taux": 46.9
+    },
+    "embuscade:aller": {
+     "offert": 416,
+     "pris": 78,
+     "taux": 18.8
+    },
+    "embuscade:barrer": {
+     "offert": 416,
+     "pris": 292,
+     "taux": 70.2
+    },
+    "embuscade:immobiliser": {
+     "offert": 245,
+     "pris": 46,
+     "taux": 18.8
+    },
+    "moitie:attendre": {
+     "offert": 496,
+     "pris": 416,
+     "taux": 83.9
+    },
+    "moitie:egarer": {
+     "offert": 490,
+     "pris": 157,
+     "taux": 32.0
+    },
+    "moitie:enrayer": {
+     "offert": 340,
+     "pris": 122,
+     "taux": 35.9
+    },
+    "moitie:hanter": {
+     "offert": 490,
+     "pris": 314,
+     "taux": 64.1
+    },
+    "moitie:parler": {
+     "offert": 284,
+     "pris": 82,
+     "taux": 28.9
+    },
+    "moitie:renverser": {
+     "offert": 523,
+     "pris": 244,
+     "taux": 46.7
+    },
+    "moitie:s_unir": {
+     "offert": 340,
+     "pris": 194,
+     "taux": 57.1
+    },
+    "moitie:se_fondre": {
+     "offert": 496,
+     "pris": 71,
+     "taux": 14.3
+    },
+    "moitie:tenir": {
+     "offert": 523,
+     "pris": 271,
+     "taux": 51.8
+    },
+    "moitie:tromper": {
+     "offert": 284,
+     "pris": 191,
+     "taux": 67.3
+    },
+    "moitie:voir": {
+     "offert": 637,
+     "pris": 360,
+     "taux": 56.5
+    },
+    "moitie:voler": {
+     "offert": 133,
+     "pris": 7,
+     "taux": 5.3
+    },
+    "pouvoir:hanter": {
+     "offert": 302,
+     "pris": 252,
+     "taux": 83.4
+    },
+    "pouvoir:parler": {
+     "offert": 15,
+     "pris": 2,
+     "taux": 13.3
+    },
+    "pouvoir:s_unir": {
+     "offert": 194,
+     "pris": 57,
+     "taux": 29.4
+    },
+    "pouvoir:tromper": {
+     "offert": 199,
+     "pris": 80,
+     "taux": 40.2
+    },
+    "reve": {
+     "offert": 498,
+     "pris": 84,
+     "taux": 16.9
+    }
+   },
+   "confirmation | patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2}} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 890,
+     "pris": 562,
+     "taux": 63.1
+    },
+    "action:saboter": {
+     "offert": 731,
+     "pris": 328,
+     "taux": 44.9
+    },
+    "aller": {
+     "offert": 1838,
+     "pris": 973,
+     "taux": 52.9
+    },
+    "embuscade:aller": {
+     "offert": 399,
+     "pris": 69,
+     "taux": 17.3
+    },
+    "embuscade:barrer": {
+     "offert": 399,
+     "pris": 284,
+     "taux": 71.2
+    },
+    "embuscade:immobiliser": {
+     "offert": 234,
+     "pris": 46,
+     "taux": 19.7
+    },
+    "moitie:attendre": {
+     "offert": 511,
+     "pris": 399,
+     "taux": 78.1
+    },
+    "moitie:egarer": {
+     "offert": 439,
+     "pris": 160,
+     "taux": 36.4
+    },
+    "moitie:enrayer": {
+     "offert": 391,
+     "pris": 153,
+     "taux": 39.1
+    },
+    "moitie:hanter": {
+     "offert": 439,
+     "pris": 216,
+     "taux": 49.2
+    },
+    "moitie:parler": {
+     "offert": 331,
+     "pris": 99,
+     "taux": 29.9
+    },
+    "moitie:renverser": {
+     "offert": 496,
+     "pris": 198,
+     "taux": 39.9
+    },
+    "moitie:s_unir": {
+     "offert": 391,
+     "pris": 193,
+     "taux": 49.4
+    },
+    "moitie:se_fondre": {
+     "offert": 511,
+     "pris": 71,
+     "taux": 13.9
+    },
+    "moitie:tenir": {
+     "offert": 496,
+     "pris": 244,
+     "taux": 49.2
+    },
+    "moitie:tromper": {
+     "offert": 331,
+     "pris": 191,
+     "taux": 57.7
+    },
+    "moitie:voir": {
+     "offert": 592,
+     "pris": 353,
+     "taux": 59.6
+    },
+    "moitie:voler": {
+     "offert": 121,
+     "pris": 5,
+     "taux": 4.1
+    },
+    "pouvoir:hanter": {
+     "offert": 180,
+     "pris": 127,
+     "taux": 70.6
+    },
+    "pouvoir:parler": {
+     "offert": 22,
+     "pris": 8,
+     "taux": 36.4
+    },
+    "pouvoir:s_unir": {
+     "offert": 193,
+     "pris": 55,
+     "taux": 28.5
+    },
+    "pouvoir:tromper": {
+     "offert": 244,
+     "pris": 106,
+     "taux": 43.4
+    },
+    "reve": {
+     "offert": 526,
+     "pris": 278,
+     "taux": 52.9
+    }
+   },
+   "confirmation | patch:{\"cartes\":{\"main\":6},\"regles\":{\"cercle_par_joueur\":{\"2\":5,\"4\":4,\"6\":3},\"escalade\":5,\"lunes\":1,\"ordres_par_etape\":{\"2\":1,\"4\":2}},\"tours\":7} | mc | {\"budget\": 64, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+    "action:barrer": {
+     "offert": 986,
+     "pris": 642,
+     "taux": 65.1
+    },
+    "action:saboter": {
+     "offert": 770,
+     "pris": 344,
+     "taux": 44.7
+    },
+    "aller": {
+     "offert": 1851,
+     "pris": 888,
+     "taux": 48.0
+    },
+    "embuscade:aller": {
+     "offert": 405,
+     "pris": 61,
+     "taux": 15.1
+    },
+    "embuscade:barrer": {
+     "offert": 405,
+     "pris": 310,
+     "taux": 76.5
+    },
+    "embuscade:immobiliser": {
+     "offert": 246,
+     "pris": 34,
+     "taux": 13.8
+    },
+    "moitie:attendre": {
+     "offert": 498,
+     "pris": 407,
+     "taux": 81.7
+    },
+    "moitie:egarer": {
+     "offert": 416,
+     "pris": 176,
+     "taux": 42.3
+    },
+    "moitie:enrayer": {
+     "offert": 376,
+     "pris": 130,
+     "taux": 34.6
+    },
+    "moitie:hanter": {
+     "offert": 416,
+     "pris": 188,
+     "taux": 45.2
+    },
+    "moitie:parler": {
+     "offert": 341,
+     "pris": 74,
+     "taux": 21.7
+    },
+    "moitie:renverser": {
+     "offert": 563,
+     "pris": 236,
+     "taux": 41.9
+    },
+    "moitie:s_unir": {
+     "offert": 376,
+     "pris": 187,
+     "taux": 49.7
+    },
+    "moitie:se_fondre": {
+     "offert": 498,
+     "pris": 69,
+     "taux": 13.9
+    },
+    "moitie:tenir": {
+     "offert": 563,
+     "pris": 271,
+     "taux": 48.1
+    },
+    "moitie:tromper": {
+     "offert": 341,
+     "pris": 216,
+     "taux": 63.3
+    },
+    "moitie:voir": {
+     "offert": 624,
+     "pris": 351,
+     "taux": 56.2
+    },
+    "moitie:voler": {
+     "offert": 120,
+     "pris": 4,
+     "taux": 3.3
+    },
+    "pouvoir:hanter": {
+     "offert": 158,
+     "pris": 113,
+     "taux": 71.5
+    },
+    "pouvoir:parler": {
+     "offert": 17,
+     "pris": 5,
+     "taux": 29.4
+    },
+    "pouvoir:s_unir": {
+     "offert": 187,
+     "pris": 61,
+     "taux": 32.6
+    },
+    "pouvoir:tromper": {
+     "offert": 294,
+     "pris": 138,
+     "taux": 46.9
+    },
+    "reve": {
+     "offert": 425,
+     "pris": 269,
+     "taux": 63.3
+    }
+   }
+  }
+ }
+}
