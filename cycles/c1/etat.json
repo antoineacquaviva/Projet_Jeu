@@ -1,7 +1,7 @@
 {
  "cycle": "c1",
- "etape": "confirmation",
- "gen": 2,
+ "etape": "controle",
+ "gen": 1,
  "statut": "en cours",
  "historique": [
   {
@@ -63,10 +63,15 @@
    "etape": "confirmation",
    "gen": 2,
    "date": "2026-10-13T16:51:01+00:00"
+  },
+  {
+   "etape": "controle",
+   "gen": 1,
+   "date": "2026-10-13T18:32:54+00:00"
   }
  ],
  "debut": "2026-10-13T14:14:38+00:00",
  "fin_estimee": "2026-10-13T17:44:16+00:00",
  "parties": 896,
- "maj": "2026-10-13T16:51:16+00:00"
+ "maj": "2026-10-13T18:32:54+00:00"
 }
