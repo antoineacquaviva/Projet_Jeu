@@ -1,0 +1,429 @@
+{
+ "effets": {
+  "tours": {
+   "qualite": {
+    "mu_etoile": 0.0,
+    "sigma": 0.0,
+    "n": 2
+   },
+   "score_duree": {
+    "mu_etoile": 0.0,
+    "sigma": 0.0,
+    "n": 2
+   },
+   "score_difficulte": {
+    "mu_etoile": 0.0,
+    "sigma": 0.0,
+    "n": 2
+   },
+   "tour_moyen": {
+    "mu_etoile": 0.125,
+    "sigma": 0.1768,
+    "n": 2
+   },
+   "ecart_tailles": {
+    "mu_etoile": 2.375,
+    "sigma": 3.3588,
+    "n": 2
+   },
+   "foret_min": {
+    "mu_etoile": 2.375,
+    "sigma": 3.3588,
+    "n": 2
+   },
+   "precoces_max": {
+    "mu_etoile": 0.0,
+    "sigma": 0.0,
+    "n": 2
+   }
+  },
+  "lunes": {
+   "qualite": {
+    "mu_etoile": 0.5,
+    "sigma": 0.7071,
+    "n": 2
+   },
+   "score_duree": {
+    "mu_etoile": 0.5,
+    "sigma": 0.7071,
+    "n": 2
+   },
+   "score_difficulte": {
+    "mu_etoile": 0.2695,
+    "sigma": 0.3811,
+    "n": 2
+   },
+   "tour_moyen": {
+    "mu_etoile": 1.5,
+    "sigma": 2.1213,
+    "n": 2
+   },
+   "ecart_tailles": {
+    "mu_etoile": 11.9,
+    "sigma": 3.3658,
+    "n": 2
+   },
+   "foret_min": {
+    "mu_etoile": 7.14,
+    "sigma": 10.0975,
+    "n": 2
+   },
+   "precoces_max": {
+    "mu_etoile": 50.0,
+    "sigma": 70.7107,
+    "n": 2
+   }
+  },
+  "pas_esprit": {
+   "qualite": {
+    "mu_etoile": 1.0,
+    "sigma": 0.0,
+    "n": 2
+   },
+   "score_duree": {
+    "mu_etoile": 1.0,
+    "sigma": 0.0,
+    "n": 2
+   },
+   "score_difficulte": {
+    "mu_etoile": 0.539,
+    "sigma": 0.0,
+    "n": 2
+   },
+   "tour_moyen": {
+    "mu_etoile": 2.125,
+    "sigma": 0.1768,
+    "n": 2
+   },
+   "ecart_tailles": {
+    "mu_etoile": 15.465,
+    "sigma": 5.0558,
+    "n": 2
+   },
+   "foret_min": {
+    "mu_etoile": 3.575,
+    "sigma": 5.0558,
+    "n": 2
+   },
+   "precoces_max": {
+    "mu_etoile": 100.0,
+    "sigma": 0.0,
+    "n": 2
+   }
+  },
+  "cercle": {
+   "qualite": {
+    "mu_etoile": 0.0,
+    "sigma": 0.0,
+    "n": 2
+   },
+   "score_duree": {
+    "mu_etoile": 0.0,
+    "sigma": 0.0,
+    "n": 2
+   },
+   "score_difficulte": {
+    "mu_etoile": 0.0,
+    "sigma": 0.0,
+    "n": 2
+   },
+   "tour_moyen": {
+    "mu_etoile": 0.25,
+    "sigma": 0.3536,
+    "n": 2
+   },
+   "ecart_tailles": {
+    "mu_etoile": 7.145,
+    "sigma": 10.1046,
+    "n": 2
+   },
+   "foret_min": {
+    "mu_etoile": 7.145,
+    "sigma": 10.1046,
+    "n": 2
+   },
+   "precoces_max": {
+    "mu_etoile": 0.0,
+    "sigma": 0.0,
+    "n": 2
+   }
+  }
+ },
+ "rangs": [
+  "pas_esprit",
+  "lunes",
+  "tours",
+  "cercle"
+ ],
+ "retenues": [
+  "pas_esprit",
+  "lunes",
+  "tours"
+ ],
+ "variantes": {
+  "defaut": {
+   "tailles": {
+    "2": {
+     "foret": 80.95,
+     "precoces": 100.0,
+     "parties": 2,
+     "tour": 3.0,
+     "fins": {
+      "reveil": 100.0
+     }
+    },
+    "3": {
+     "foret": 88.09,
+     "precoces": 100.0,
+     "parties": 2,
+     "tour": 3.0,
+     "fins": {
+      "sommeil": 100.0
+     }
+    }
+   },
+   "score_duree": 0.0,
+   "score_difficulte": 0.461,
+   "qualite": 0.0,
+   "tour_moyen": 3.0,
+   "ecart_tailles": 7.14,
+   "foret_min": 80.95,
+   "precoces_max": 100.0
+  },
+  "patch:{\"regles\":{\"cercle_par_joueur\":4,\"lunes\":\"n-1\",\"reves_par_pas\":2},\"tours\":7}": {
+   "tailles": {
+    "2": {
+     "foret": 52.38,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 7.0,
+     "fins": {
+      "nuit": 100.0
+     }
+    },
+    "3": {
+     "foret": 69.05,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 7.0,
+     "fins": {
+      "nuit": 100.0
+     }
+    }
+   },
+   "score_duree": 1.0,
+   "score_difficulte": 1.0,
+   "qualite": 1.0,
+   "tour_moyen": 7.0,
+   "ecart_tailles": 16.67,
+   "foret_min": 52.38,
+   "precoces_max": 0.0
+  },
+  "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"lunes\":\"n-1\",\"reves_par_pas\":2},\"tours\":7}": {
+   "tailles": {
+    "2": {
+     "foret": 52.38,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 7.0,
+     "fins": {
+      "nuit": 100.0
+     }
+    },
+    "3": {
+     "foret": 69.05,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 7.0,
+     "fins": {
+      "nuit": 100.0
+     }
+    }
+   },
+   "score_duree": 1.0,
+   "score_difficulte": 1.0,
+   "qualite": 1.0,
+   "tour_moyen": 7.0,
+   "ecart_tailles": 16.67,
+   "foret_min": 52.38,
+   "precoces_max": 0.0
+  },
+  "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"lunes\":\"n-1\"},\"tours\":7}": {
+   "tailles": {
+    "2": {
+     "foret": 59.53,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 6.5,
+     "fins": {
+      "nuit": 50.0,
+      "sommeil": 50.0
+     }
+    },
+    "3": {
+     "foret": 88.09,
+     "precoces": 100.0,
+     "parties": 2,
+     "tour": 3.0,
+     "fins": {
+      "sommeil": 100.0
+     }
+    }
+   },
+   "score_duree": 0.0,
+   "score_difficulte": 0.461,
+   "qualite": 0.0,
+   "tour_moyen": 4.75,
+   "ecart_tailles": 28.56,
+   "foret_min": 59.53,
+   "precoces_max": 100.0
+  },
+  "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"lunes\":1},\"tours\":7}": {
+   "tailles": {
+    "2": {
+     "foret": 59.53,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 6.5,
+     "fins": {
+      "nuit": 50.0,
+      "sommeil": 50.0
+     }
+    },
+    "3": {
+     "foret": 78.57,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 6.0,
+     "fins": {
+      "sommeil": 100.0
+     }
+    }
+   },
+   "score_duree": 1.0,
+   "score_difficulte": 1.0,
+   "qualite": 1.0,
+   "tour_moyen": 6.25,
+   "ecart_tailles": 19.04,
+   "foret_min": 59.53,
+   "precoces_max": 0.0
+  },
+  "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"lunes\":1}}": {
+   "tailles": {
+    "2": {
+     "foret": 64.28,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 6.0,
+     "fins": {
+      "nuit": 50.0,
+      "sommeil": 50.0
+     }
+    },
+    "3": {
+     "foret": 78.57,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 6.0,
+     "fins": {
+      "sommeil": 100.0
+     }
+    }
+   },
+   "score_duree": 1.0,
+   "score_difficulte": 1.0,
+   "qualite": 1.0,
+   "tour_moyen": 6.0,
+   "ecart_tailles": 14.29,
+   "foret_min": 64.28,
+   "precoces_max": 0.0
+  },
+  "patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2},\"tours\":7}": {
+   "tailles": {
+    "2": {
+     "foret": 66.67,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 6.0,
+     "fins": {
+      "reveil": 100.0
+     }
+    },
+    "3": {
+     "foret": 69.05,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 7.0,
+     "fins": {
+      "nuit": 100.0
+     }
+    }
+   },
+   "score_duree": 1.0,
+   "score_difficulte": 1.0,
+   "qualite": 1.0,
+   "tour_moyen": 6.5,
+   "ecart_tailles": 2.38,
+   "foret_min": 66.67,
+   "precoces_max": 0.0
+  },
+  "patch:{\"regles\":{\"lunes\":\"n-1\"},\"tours\":7}": {
+   "tailles": {
+    "2": {
+     "foret": 66.67,
+     "precoces": 0.0,
+     "parties": 2,
+     "tour": 6.0,
+     "fins": {
+      "reveil": 100.0
+     }
+    },
+    "3": {
+     "foret": 88.09,
+     "precoces": 100.0,
+     "parties": 2,
+     "tour": 3.0,
+     "fins": {
+      "sommeil": 100.0
+     }
+    }
+   },
+   "score_duree": 0.0,
+   "score_difficulte": 0.461,
+   "qualite": 0.0,
+   "tour_moyen": 4.5,
+   "ecart_tailles": 21.42,
+   "foret_min": 66.67,
+   "precoces_max": 100.0
+  },
+  "patch:{\"tours\":7}": {
+   "tailles": {
+    "2": {
+     "foret": 80.95,
+     "precoces": 100.0,
+     "parties": 2,
+     "tour": 3.0,
+     "fins": {
+      "reveil": 100.0
+     }
+    },
+    "3": {
+     "foret": 88.09,
+     "precoces": 100.0,
+     "parties": 2,
+     "tour": 3.0,
+     "fins": {
+      "sommeil": 100.0
+     }
+    }
+   },
+   "score_duree": 0.0,
+   "score_difficulte": 0.461,
+   "qualite": 0.0,
+   "tour_moyen": 3.0,
+   "ecart_tailles": 7.14,
+   "foret_min": 80.95,
+   "precoces_max": 100.0
+  }
+ }
+}

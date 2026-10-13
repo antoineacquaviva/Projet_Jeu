@@ -1,11 +1,17 @@
 {
  "cycle": "essai",
- "etape": "criblage",
- "gen": 0,
+ "etape": "exploration",
+ "gen": 1,
  "statut": "en cours",
- "historique": [],
+ "historique": [
+  {
+   "etape": "exploration",
+   "gen": 1,
+   "date": "2026-10-13T13:23:41+00:00"
+  }
+ ],
  "debut": "2026-10-13T13:23:14+00:00",
  "fin_estimee": "2026-10-13T13:27:14+00:00",
  "parties": 36,
- "maj": "2026-10-13T13:23:14+00:00"
+ "maj": "2026-10-13T13:23:41+00:00"
 }

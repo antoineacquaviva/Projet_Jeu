@@ -1,9 +1,9 @@
 {
  "cycle": "essai",
- "etape": "criblage",
- "gen": 0,
+ "etape": "exploration",
+ "gen": 1,
  "statut": "en cours",
  "fin_estimee": "2026-10-13T13:27:14+00:00",
  "rapport": null,
- "maj": "2026-10-13T13:23:14+00:00"
+ "maj": "2026-10-13T13:23:41+00:00"
 }
