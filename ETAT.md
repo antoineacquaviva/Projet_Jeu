@@ -30,6 +30,7 @@ Documents à lire avant de travailler :
 - **Phase 1 (B1 à B4).** Bandes gelées. Synergie = duos qui battent leur meilleur peuple seul. Siège spectateur tenu par le bot inerte. `voir_trahi` et l'abattage en chemin (v1) sont des cas permis.
 - **Calcul (décision 10).** Les campagnes tournent sur GitHub Actions dans ce dépôt public : volumes raisonnables, pas de lancements en continu, aucune donnée personnelle.
 - **Algorithme de la phase 4.** MAP-Elites, avec une recherche au hasard comme étalon (décision 4).
+- **13 oct., 14 h : plan vers la V1 et règle de décision.** Les versions sont renommées (V0.3 = v2 fixée) et la suite suit `projet/3-pilotage/plan-vers-v1.md`. **Claude tranche seul** les choix techniques (outils, code, workflows, calibrage des mesures et des témoins, seuils techniques, axes de la carte, bots, budgets) en appliquant sa recommandation et en l'inscrivant au journal ; **l'auteur tranche** les règles nouvelles et leurs formes, l'adoption de chaque version, les invariants et les bandes, les alertes de conception et le gel de la V1.0. Un défaut que les paramètres ne corrigent pas est signalé à l'auteur dès qu'il apparaît.
 - **Règles de travail.**
   - Après tout changement de règle ou de code : mettre à jour les documents, ajouter un test qui cite la règle, puis lancer `python -m foret.conformite` (avec `--v2` et `--mesures`) et `python -m pytest -q tests`.
   - Chaque mesure porte une étiquette (mesure, indice, humain seulement) et est validée sur des témoins.
@@ -121,55 +122,27 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 **3.7 DÉCISION UTILISATEUR : fixer la v2** (FAIT le 13 oct. : réponse en section 8)
 - L'auteur tranche les décisions ouvertes de la v2 à partir du diagnostic. Le passage suivant écrit `maquettes/v2.json` (ou une v3) selon ses réponses et met à jour les documents de conception.
 
-### Phase 4 : explorer la v2 fixée
+### Plan vers la V1 (remplace les phases 4 et 5 ; décision de l'auteur du 13 oct., 14 h)
+Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.1 = v0, V0.2 = v1 (étalon figé, plus de campagne), **V0.3 = v2 fixée** (point de départ), puis V0.4, V0.5, V0.6 (un cycle chacune, trois au plus), V1.0 (gelée pour les tests humains). Moteur 1.7.1 ≠ version du jeu.
 
-**4.1 Écrire la v2 fixée et le criblage** (À FAIRE ; la réponse de 3.7 est arrivée)
-- **Quoi.** Appliquer les réponses de 3.7 (maquette, documents, tests). Coder `foret/criblage.py` : quelques centaines de variantes tirées selon un plan de Morris sur les paramètres libres du catalogue (section 5), jouées par le glouton.
-- **Fin d'étape.** Lancer le criblage par lots sur GitHub.
+**Étape 0 : l'outillage** (À FAIRE ; une étape par passage, dans cet ordre, sauf dépendance)
+- 0.1 Versions renommées (README, documents, `maquettes/v0.3.json`) ; 0.2 V0.3 dans le moteur, tests, conformité.
+- 0.3 Statistiques appariées et intervalles par rééchantillonnage dans les résumés.
+- 0.4 Leviers du rêve en paramètres : avance de l'esprit (case d'entrée, pas) ; formes du coût du rêve **acceptées par l'auteur** (alerte A du plan, section 6 : DÉCISION UTILISATEUR attendue, non bloquante pour 0.1 à 0.3).
+- 0.5 Mesure « choix morts » ; 0.6 mesure « apprentissage du Méchant » ; chacune avec son témoin.
+- 0.7 Bot à portefeuille (validé sur V0.3 et V0.2) ; 0.8 bot de contrôle.
+- 0.9 `foret/criblage.py` (Morris, glouton) et `foret/exploration.py` (MAP-Elites, étalon au hasard).
+- 0.10 Orchestrateur `cycle.yml` (une étape à la fois, enchaînement par `workflow_dispatch`, relance automatique, surveillance quotidienne, `resultats/etat_pipeline.json`, issue de fin de cycle) et rapport automatique.
+- 0.11 Mesures fragiles réétiquetées ; coordination et chef unique remesurés au bot fort sur V0.3 ; protocole P2 et sa ligne de base (ancre V0.3). Puis lancer le cycle 1.
 
-**4.2 Résultats du criblage et proposition des axes** (À FAIRE)
-- **Quoi.** Classer les variables par influence sur chaque objectif ; retenir les 8 à 12 influentes ; proposer deux axes pour la carte (par exemple part du hasard × durée).
-- **Livrable.** `projet/4-bilans/criblage.md`.
+**Cycles 1 à 3** (V0.3 → V0.4 → V0.5 → V0.6) : préparer (Claude) → criblage, exploration, confirmation, contrôle, rapport (GitHub, seul) → analyser et proposer (Claude) → **DÉCISION UTILISATEUR : adopter la version**. Priorités : cycle 1 la durée ; cycle 2 l'intérêt des choix et la profondeur ; cycle 3 l'équilibre fin. Arrêt anticipé si plus aucun objectif rouge (bot fort et bot de contrôle).
 
-**4.3 DÉCISION UTILISATEUR : axes de la carte et variables retenues**
-
-**4.4 MAP-Elites et recherche au hasard** (À FAIRE)
-- **Quoi.** Coder `foret/exploration.py` : MAP-Elites sur les variables retenues.
-  - Filtre : niveau 1 de la batterie.
-  - Qualité : le plus faible des objectifs normalisés.
-  - Course d'élimination, avec les mêmes graines pour toutes les variantes.
-  - Étalon : recherche au hasard à budget égal.
-  - La carte est enregistrée dans le dépôt (`resultats/exploration/`) pour reprendre d'un passage à l'autre.
-- **Fin d'étape.** Tests verts ; lancer les premières générations.
-
-**4.5 Faire tourner l'exploration** (À FAIRE ; un passage par vague de générations)
-- **Quoi.** Intégrer la vague terminée, puis lancer la suivante, jusqu'à ce que la carte se stabilise ou que le budget fixé en 4.3 soit atteint.
-
-**4.6 Carte des variantes et candidats** (À FAIRE)
-- **Livrable.** `projet/4-bilans/carte-des-variantes.md` :
-  - la carte ;
-  - ce qui fait bouger chaque objectif ;
-  - 3 à 5 candidats commentés, avec leur code d'atelier ;
-  - candidats pour les modes famille et expert.
-
-**4.7 DÉCISION UTILISATEUR : présélectionner les finalistes**
-
-### Phase 5 : valider
-
-**5.1 Finalistes, bot de contrôle et ablation** (À FAIRE)
-- **Quoi.** Écrire et lancer deux campagnes :
-  - les finalistes avec toutes les compositions de tables, plus de parties, et un bot de contrôle jamais utilisé pendant la recherche (par exemple MC 256, ou MC dont la politique est l'aléatoire bruité) ;
-  - l'ablation de chaque finaliste, en annulant ses changements un par un (comme `campagnes/ablation_v1.json`).
-
-**5.2 Lecture par profil, fiches papier et candidats v3** (À FAIRE)
-- **Quoi.** Traiter les résultats. Lire les grilles des profils (catalogue, section 6), avec des tables mixtes et le bot bruité (Nadia) et un seul bot qui pilote plusieurs peuples (Thomas). Préparer les fiches de règles à imprimer.
-- **Livrable.** `projet/4-bilans/candidats-v3.md` et `projet/2-maquettes/fiches-test-v3.md`.
-
-**5.3 DÉCISION UTILISATEUR : choisir la v3 et ses modes**
+**Validation et V1.0** : validation complète de la candidate, livret, fiches à imprimer, kit de test humain → **DÉCISION UTILISATEUR : geler la V1.0**.
 
 ## 5. Étape suivante
 
-**4.1 Écrire la v2 fixée et le criblage.** Appliquer la réponse du 13 oct. (section 8) : `maquettes/v2.json` devient la v2 fixée (le préréglage « V2 proposée » plus le module des lunes, code `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:`), en gardant l'ancienne « V2 proposée » comme variante nommée pour comparer ; mettre à jour `projet/2-maquettes/maquette-de-conception-v2.md`, `docs/noeuds_v2.md` et les tests. Bot fort de cette maquette : `MC64R`. Puis coder le criblage (Morris, glouton) en donnant la priorité aux variables qui freinent le rêve, et le lancer sur GitHub.
+**0.1 et 0.2** : renommer les versions et écrire la V0.3 dans le moteur (le préréglage « V2 proposée » plus le module des lunes, code `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:`, avec « V2 proposée » gardée comme variante nommée « V0.3-sans-lunes »). Bot fort de cette maquette : `MC64R` jusqu'à ce que le bot à portefeuille (0.7) le remplace.
+
 
 **Incident GitHub (13 oct.).** Le groupe de concurrence des fusions (`publication-resultats`) ne garde qu'une tâche en attente et annule les autres : les fusions des campagnes 12 et 13 ont été annulées, puis relancées avec `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/runs/<id>/rerun-failed-jobs` (une seule à la fois). Corrigé pour les lancements suivants : plus de groupe, la publication réessaie. Les lots de campagne sont gardés 3 jours (1 jour avant la correction).
 
@@ -177,7 +150,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 
 ## 6. Verrou
 
-PAUSE (13 oct. 2026, 13 h 15) : conversation interactive avec l'auteur en cours. À vider à la fin de la conversation.
+EN COURS (13 oct. 2026, 14 h) : conversation interactive avec l'auteur. À vider à la fin de la conversation.
 
 
 ## 7. Compteur de passages
@@ -196,7 +169,9 @@ PAUSE (13 oct. 2026, 13 h 15) : conversation interactive avec l'auteur en cours.
   3. le bot qui communique est construit en premier ;
   4. organisation : un passage n'attend jamais un calcul de plus de 15 minutes (il lance, note et s'arrête) ; plafond de 12 passages qui travaillent par semaine.
 - **13 oct. 2026, 12:57 (3.7, fixer la v2)** : l'auteur valide les recommandations de la section 9 du diagnostic. La v2 fixée est « V2 proposée » plus le module des lunes à toutes les tailles de table : D1 qui et où ; D2 le favori ; D3 Représailles = la plus défendue ; D4 Machine HS désignée remorquée au chantier ; D5 le rêve choisit sa voie ; D6 seuil du Cercle 3 cases par joueur (axe de la phase 4) ; D8 les traces (2 par joueur, numérotées) ; D9 les lunes (2 lunes, nombre en axe de la phase 4). Code d'atelier : `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:`. La phase 4 cherche d'abord à freiner le rêve (seuil du Cercle, nombre de lunes, avance de l'esprit vers le long sommeil, coût d'un rêve), avec la durée comme premier objectif.
-- Seuils provisoires des dilemmes (1 et 3 points) et leur témoin raté (diagnostic, section 5) : *en attente, non bloquant* ; d'ici là, la mesure des dilemmes est un indice descriptif.
+- Seuils provisoires des dilemmes (1 et 3 points) et leur témoin raté (diagnostic, section 5) : *confiés à Claude par la règle de décision du 13 oct., 14 h (seuil technique) : recalibrage à l'étape 0.11* ; d'ici là, la mesure des dilemmes est un indice descriptif.
+- **13 oct. 2026, 14:04 (suite de la phase 3)** : l'auteur valide toutes les recommandations du point du 13 oct. (pistes J1 à J3, T1 à T7) et demande : versions renommées (V0.3 = v2 fixée, objectif V1.0 jouable pour des tests humains) ; trois cycles « campagne → version du jeu → version du protocole » au plus ; traitements GitHub autonomes, parallèles, sans blocage ; peu de consommation d'IA ; signalement immédiat des défauts de conception que les paramètres ne corrigent pas ; amélioration du jeu (équilibre des peuples, profondeur, durée, synergies, Méchant, intérêt de tous les choix) et des méthodes (évaluation, test, sélection, algorithme génétique, bots) ; Claude tranche les choix techniques sans demander. Traduit dans `projet/3-pilotage/plan-vers-v1.md`.
+- **DÉCISION UTILISATEUR (ouverte le 13 oct., 14 h ; non bloquante pour 0.1 à 0.3)** : alerte A du plan, « le rêve n'a pas de prix ». Quelles formes du coût d'un rêve coder comme variantes (tempo, risque, rendement décroissant, entretien, ou d'autres) ?
 
 ## 9. Campagnes GitHub
 
@@ -218,7 +193,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Campagne 10 | coordination_mc_2, v2 | 20 | 31,5 min | 13,3 min | réussi, 1 partie en erreur (corrigée : moteur 1.7.1) ; traité |
 | Batterie 3 | batterie phase3 (plan réduit), MC 64 soi, p3_v1 et p3_v2, 676 parties ; résultats dans `batterie/run3_phase3/` | 20 | 29,1 min | 13 min | réussi ; à traiter en 3.5 |
 | Batterie 4 | programme mesures3 : tape-taupe, dilemmes (v1, V2), témoins (une tactique, sans rêve, essoufflement), 1 020 parties dont 330 de MC 64 environ ; résultats et parties dans `batterie/run4_mesures3/` | 20 | 17,9 min | 8 min | réussi (témoins : 2 sur 3) ; à traiter en 3.5 (tape-taupe : comparer aussi le glouton par table aux valeurs d'équipe de la Batterie 3 ; témoins ; seuils des dilemmes à faire confirmer par l'auteur) |
-| Batterie 5 | phase3, p3_v2r (V2, bot fort qui rêve), 338 parties | 10 | – | – | lancée le 13 oct. 10:02 ; à traiter en 3.5 |
+| Batterie 5 | phase3, p3_v2r (V2, bot fort qui rêve), 338 parties | 10 | – | – | réussi ; traité (diagnostic, sections 2 et 4) |
 | Batterie 6 | mesures3, m3_v2r, 300 parties | 10 | 8 min environ | 1,3 min | réussi ; à traiter en 3.5 |
 | Campagne 11 | jeu_restreint, v1, MC 64, 480 parties | 20 | 77 min (attentes comprises) | 23 min | réussi ; traité (diagnostic, section 6) |
 | Campagne 12 | jeu_restreint_v2, V2, MC 64 qui rêve, 480 parties | 20 | 80 min | 8 min | fusion annulée par le groupe de concurrence, relancée (rerun-failed-jobs) : réussi ; traité |
@@ -234,6 +209,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 |---|---|---|---|---|
 | 13 oct. 2026 | – | – | terminé | Mise en place (session interactive) : phase 2 terminée, ETAT.md créé, workflows en Node 24 (tests verts), tâche planifiée « Forêt qui rêve · tests autonomes » créée (3 h 35, 9 h 35, 15 h 35). Pas compté dans le plafond. |
 | 13 oct. 2026 | 08:27 | 3 h 35 | terminé | Session interactive avec l'auteur : décisions de fin de phase 2 (section 8), planification revue ; étapes 3.1 à 3.6 faites (moteur 1.7.1, bot fort de la V2 qui rêve, mesures du bot fort, jeu restreint, options de la v2, robustesse ; campagnes 9 à 15 et batteries 3 à 6). Livrable : `projet/4-bilans/diagnostic-v1-options-v2.md`. Étape suivante : 3.7, décision de l'auteur. Pas compté dans le plafond. |
+| 13 oct. 2026 | 13:00 | en cours | en cours | Session interactive avec l'auteur : point de situation, pistes d'amélioration, plan vers la V1 (`projet/3-pilotage/plan-vers-v1.md`), versions renommées, règle de décision ; ETAT réorganisé (étapes 0.1 à 0.11, cycles). Pas compté dans le plafond. |
 
 ## 11. Reprendre la main
 
