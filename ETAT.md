@@ -67,6 +67,45 @@ Documents à lire avant de travailler :
   - Les lancements se lancent sur `main` : committer et pousser le code avant.
 - **Coût du bot fort** (moteur 1.7, un cœur ; une suite = une copie de la partie jouée jusqu'au bout) : une suite coûte 5 à 15 ms. Une partie de duo : MC 32 environ 30 s (v1) à 1 min 30 (v2) ; MC 128 de 2 à 6 min. Sur GitHub, une campagne de 240 parties de MC 64 sur 20 lots a pris 22 min (v1) à 47 min (v2). Les trios coûtent environ 1,5 fois plus.
 
+## 3 bis. Consigne des passages
+
+*Lue à la lettre par les tâches planifiées « Forêt qui rêve · tests autonomes » et « Forêt qui rêve · réveil » (13 oct. 2026, 14 h 45). Modifier cette section suffit pour changer leur comportement.*
+
+**Les trois tâches planifiées** (décision de l'auteur du 13 oct., 14 h 45 : Sonnet pour les passages courants, Opus pour les analyses de fin de cycle)
+
+| Tâche | Identifiant | Modèle | Quand | Rôle |
+|---|---|---|---|---|
+| Forêt qui rêve · tests autonomes | `trig_011udKReur3DBBjnHXU29nNe` | Sonnet | 3 h 35, 9 h 35, 15 h 35 (un passage par jour après l'étape 0.10) | les étapes courantes : code, lancements, suivi |
+| Forêt qui rêve · réveil | `trig_016BFvRNtLMbFYYZX6Le9wcE` | Sonnet | une seule fois, à l'heure armée par un passage | même rôle, au moment où un calcul GitHub doit finir |
+| Forêt qui rêve · analyse de fin de cycle | `trig_01VUxMg7UjXfZzUXczfz5ANX` | Opus | déclenchée par un passage | l'étape g d'un cycle : bilan, proposition de version, alertes |
+
+**Consigne**
+1. Lis ce fichier en entier, puis `projet/3-pilotage/plan-vers-v1.md` si l'étape le demande.
+2. Arrête-toi immédiatement, sans rien faire d'autre, dans les cas suivants :
+   - le Verrou (section 6) contient PAUSE (pas de notification ; ce passage ne compte pas) ;
+   - le Verrou indique EN COURS depuis moins de 6 h ;
+   - tout est terminé, ou l'étape suivante est une DÉCISION UTILISATEUR encore sans réponse : envoie seulement une notification qui la rappelle ;
+   - le compteur de passages (section 7) a atteint le plafond ;
+   - un calcul lancé par un passage précédent est encore en cours sur GitHub : vérifie que la tâche « réveil » est armée après sa fin prévue (sinon, arme-la, voir point 6), puis arrête-toi ; ce passage ne compte pas.
+3. Si le Verrou indique EN COURS depuis plus de 6 h, considère le passage précédent comme abandonné : note-le dans le journal (avec la raison si elle est visible), reprends l'étape et signale-le dans la notification.
+4. Avant de travailler, inscris EN COURS avec la date et l'heure de Paris (`TZ=Europe/Paris date '+%Y-%m-%d %H:%M'`) dans le Verrou, commite et pousse.
+5. **Fin de cycle.** Si un rapport de fin de cycle est prêt et pas encore analysé, ne l'analyse pas toi-même : déclenche la tâche « analyse de fin de cycle » avec l'outil `fire_trigger` (à charger via ToolSearch) et l'identifiant ci-dessus, note-le dans le journal, vide le Verrou et arrête-toi.
+6. Sinon, traite d'abord les résultats des calculs terminés, puis réalise uniquement l'étape suivante. Commite et pousse régulièrement, pour qu'une interruption (limite d'usage, erreur) ne fasse rien perdre.
+7. **Calculs GitHub** (les calculs lourds tournent sur GitHub Actions, jamais dans la session) :
+   - lance-les par l'API REST (`gh api -X POST …/dispatches`, section 3), jamais par `gh workflow run` ; estime d'abord la durée à partir du tableau de la section 9 ;
+   - s'ils doivent finir dans les 15 minutes, attends-les avec une seule commande de surveillance (une vérification par minute), puis traite les résultats dans le même passage ;
+   - sinon, **arme le réveil** : `update_trigger` sur la tâche « réveil », avec `run_once_at` = fin estimée + 15 min (RFC 3339, en UTC). Note le numéro du lancement, l'heure du réveil et ce qu'il faudra faire des résultats dans la section 9, vide le Verrou et arrête-toi ;
+   - ne crée jamais de nouvelle tâche planifiée ; ne change jamais leur modèle ;
+   - si un calcul échoue, relance-le une fois ; en cas de second échec, note l'erreur, marque l'étape DÉCISION UTILISATEUR avec ton diagnostic et signale-le ;
+   - complète le tableau de la section 9 à chaque calcul terminé.
+8. Règles pendant tout le passage :
+   - ne pose jamais de question. Suis la règle de décision de la section 2 (13 oct., 14 h) : tranche seul ce qui est technique et consigne-le ; un vrai choix de conception (règle nouvelle, adoption d'une version, alerte) devient une DÉCISION UTILISATEUR : pousse et arrête-toi ;
+   - n'agis que dans le dépôt, ses workflows GitHub et les deux tâches planifiées ci-dessus : pas de page publiée, pas de message envoyé, pas de téléchargement hors des registres de paquets habituels ;
+   - les livrables sont des fichiers Markdown commités dans le dépôt ;
+   - commandes non interactives seulement, chacune avec un délai maximal adapté ;
+   - après tout changement de code : `python -m pip install pytest`, puis `python -m foret.conformite`, `--v2`, `--mesures` et `python -m pytest -q tests`.
+9. En fin d'étape : vide le Verrou, mets à jour l'étape suivante (section 5), incrémente le compteur, complète le journal, commite et pousse. Le dernier message est la notification : trois lignes, en français (ce qui a été fait, où est le livrable, l'étape suivante ou la décision attendue).
+
 ## 4. Étapes restantes
 
 Une étape tient en un passage. Statuts : À FAIRE, EN COURS, FAIT, DÉCISION UTILISATEUR. Chaque livrable est un fichier Markdown du dépôt, commité ; pas de page publiée.
@@ -132,7 +171,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 - 0.5 Mesure « choix morts » ; 0.6 mesure « apprentissage du Méchant » ; chacune avec son témoin.
 - 0.7 Bot à portefeuille (validé sur V0.3 et V0.2) ; 0.8 bot de contrôle.
 - 0.9 `foret/criblage.py` (Morris, glouton) et `foret/exploration.py` (MAP-Elites, étalon au hasard).
-- 0.10 Orchestrateur `cycle.yml` (une étape à la fois, enchaînement par `workflow_dispatch`, relance automatique, surveillance quotidienne, `resultats/etat_pipeline.json`, issue de fin de cycle) et rapport automatique.
+- 0.10 Orchestrateur `cycle.yml` (une étape à la fois, enchaînement par `workflow_dispatch`, relance automatique, surveillance quotidienne, `resultats/etat_pipeline.json`, issue de fin de cycle) et rapport automatique, qui donne l'heure de fin estimée de chaque étape pour armer le réveil. Puis passer la tâche « tests autonomes » à un passage par jour (`update_trigger`, sans changer le modèle).
 - 0.11 Mesures fragiles réétiquetées ; coordination et chef unique remesurés au bot fort sur V0.3 ; protocole P2 et sa ligne de base (ancre V0.3). Puis lancer le cycle 1.
 
 **Cycles 1 à 3** (V0.3 → V0.4 → V0.5 → V0.6) : préparer (Claude) → criblage, exploration, confirmation, contrôle, rapport (GitHub, seul) → analyser et proposer (Claude) → **DÉCISION UTILISATEUR : adopter la version**. Priorités : cycle 1 la durée ; cycle 2 l'intérêt des choix et la profondeur ; cycle 3 l'équilibre fin. Arrêt anticipé si plus aucun objectif rouge (bot fort et bot de contrôle).
@@ -174,6 +213,7 @@ EN COURS (13 oct. 2026, 14 h) : conversation interactive avec l'auteur. À vider
 - **13 oct. 2026, 14:20 (alerte A du plan)** : pour l'auteur, le prix du rêve est le principe « une carte côté rêve prive d'une action » (déjà dans les règles : R3.6, carte perdue pour la partie). Pas de prix supplémentaire pour l'instant : le cycle 1 corrige l'équilibre avec les paramètres existants (seuil du Cercle, lunes selon la taille de la table, accepté, par exemple une de moins que de joueurs ; avance de l'esprit ; menace des premiers tours ; taille de la main ; tours). Si le criblage ne suffit pas, Claude propose des formes de prix supplémentaires à l'auteur.
 - **13 oct. 2026, 14:27 (critère ajouté)** : le jeu doit tenir tous ses objectifs à 2, 3, 4, 5 et 6 joueurs ; des règles propres au nombre de joueurs sont acceptées, en particulier sur le nombre d'éléments. Traduit dans le plan, section 7 bis : qualité = objectif le plus faible à la taille de table la plus faible ; paramètres par taille ; mesures adaptées, bandes inchangées.
 - **13 oct. 2026, 14:31** : un seul plateau pour toutes les tailles de table (des gabarits par taille seulement si une alerte le demande) ; **au plus 4 éléments** propres au nombre de joueurs, dans un petit tableau du livret. « Go » pour la suite.
+- **13 oct. 2026, 14:45** : réveil au bon moment (une tâche « réveil » réarmée par chaque passage à la fin prévue des calculs) ; **Sonnet pour les passages courants, Opus pour les analyses de fin de cycle** (demande explicite de l'auteur). Consigne des passages déplacée dans la section 3 bis.
 
 ## 9. Campagnes GitHub
 
