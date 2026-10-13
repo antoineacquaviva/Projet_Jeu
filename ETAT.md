@@ -192,7 +192,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
-
+EN COURS depuis le 2026-10-13 23:10 (heure de Paris) : analyse de fin de cycle 1 (Opus).
 
 ## 7. Compteur de passages
 
