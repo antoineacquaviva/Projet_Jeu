@@ -183,7 +183,7 @@ L'auteur accepte des règles propres au nombre de joueurs, en particulier sur le
   2. Une fois les paramètres communs fixés, chaque taille de table est réglée à part sur ses seuls paramètres, ce qui ajoute peu de calcul.
 - **Coût.** Une partie à 6 joueurs coûte environ 4 à 5 fois une partie de duo au bot fort (estimation, à mesurer à l'étape 0.10). Les lots sont équilibrés par coût estimé (section 4).
 - **Rapport.** Chaque objectif est présenté par taille de table, et l'alerte de conception s'applique taille par taille.
-- **Livret.** Les règles propres au nombre de joueurs tiendront dans un petit tableau. Sa taille maximale est à fixer par l'auteur (section 9).
+- **Décisions de l'auteur (13 oct., 14 h 31).** Un seul plateau pour toutes les tailles de table : des gabarits par taille ne seront envisagés que si une alerte le demande. **Au plus 4 éléments** propres au nombre de joueurs, dans un petit tableau du livret. La recherche explore plus de paramètres de table, mais une version proposée n'en garde que 4 au plus.
 
 ## 8. Améliorer la méthode (souhait 6)
 | Domaine | Aujourd'hui | Amélioration | Quand |
