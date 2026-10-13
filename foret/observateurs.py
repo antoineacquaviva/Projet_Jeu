@@ -129,7 +129,9 @@ class Usage(Observateur):
     déplacement, embuscade), combien de fois il a été offert et combien de fois il a été pris, par les
     décisions des bots (pas les décisions forcées ni imposées). Écrit bilan["usage"] = {clé: [offert, pris]}.
 
-    Clés : « action:<nom> », « moitie:<pouvoir> », « reve », « aller », « embuscade:<nom> »."""
+    Clés : « action:<nom> », « moitie:<pouvoir> » (orientation de la carte ; Voir, joué au conseil, y compte
+    aussi), « reve », « aller », « embuscade:<nom> », « pouvoir:<nom> » (usage d'un pouvoir quand il se décide à
+    part : Hanter, Tromper, Parler, S'unir)."""
 
     def __init__(self):
         self.u = {}
@@ -159,6 +161,14 @@ class Usage(Observateur):
         elif type_ == "aller":
             if any(o is not None for o in options):
                 self._compter({"aller"}, "aller" if choix is not None else None)
+        elif type_ == "voir":                                # Voir se joue au conseil : compte pour sa moitié
+            self._compter({"moitie:voir"}, "moitie:voir" if choix is not None else None)
+        elif type_ in ("pouvoir", "tromper"):                # Hanter (quand), Tromper (si)
+            nom = (ctx.get("pouvoir") if type_ == "pouvoir" else "tromper") or "?"
+            self._compter({f"pouvoir:{nom}"}, f"pouvoir:{nom}" if choix else None)
+        elif type_ in ("parler", "hote"):                    # Parler, S'unir : utilisés ou non
+            nom = "parler" if type_ == "parler" else "s_unir"
+            self._compter({f"pouvoir:{nom}"}, f"pouvoir:{nom}" if choix is not None else None)
 
     def fin(self, partie, bilan):
         bilan["usage"] = {k: list(v) for k, v in sorted(self.u.items())}
