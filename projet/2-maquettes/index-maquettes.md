@@ -1,6 +1,8 @@
 # Maquette v1 - index : où trouver quoi
 *Mis à jour le 12 oct. 2026 (maquette de conception v2 et sa place dans le plan de test ; phase 1 terminée, moteur 1.5). Point d'entrée pour toute discussion qui reprend la v1 ou la v2.*
 
+> **Noms des versions (13 oct. 2026).** v0 = **V0.1**, v1 = **V0.2** (livret publié, étalon figé), v2 fixée = **V0.3** (« V2 proposée » + lunes, `maquettes/v0.3.json`), point de départ du [plan vers la V1](../3-pilotage/plan-vers-v1.md). Ci-dessous, les anciens noms sont gardés tels qu'ils étaient écrits.
+
 ## Nouveau (12 oct., fin de journée) : la batterie d'évaluation
 - **Batterie d'évaluation (phase 1)** (doc du projet) : les mesures, leur validation par les témoins, les verdicts sur la v1 et « V2 proposée » (indices du glouton), les décisions B1 à B4 de l'auteur.
 - **Batterie de la Forêt qui rêve** (artefact, tableau de bord) : https://claude.ai/artifact/9K122xkH4XH7xYodfVAbVG . Copie du source : `claude/moteur-v1/resultats/tableau_batterie_phase1.html` ; rapport brut : `claude/moteur-v1/resultats/batterie_phase1_rapport.json`.

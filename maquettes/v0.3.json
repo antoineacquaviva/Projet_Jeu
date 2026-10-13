@@ -1,0 +1,16 @@
+{
+  "nom": "v0.3",
+  "base": "v2",
+  "description": "Jeu V0.3 : la v2 fixée par l'auteur le 13 oct. 2026 (décision 3.7) = préréglage « V2 proposée » plus le module des lunes (D5, 2 lunes) à toutes les tailles de table. Point de départ du plan vers la V1 (projet/3-pilotage/plan-vers-v1.md). Variante « sans_lunes » = « V2 proposée » (maquettes/v2.json), gardée pour comparer.",
+  "document": "docs/noeuds_v2.md",
+  "atelier": "c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:",
+  "variantes_heritees": true,
+
+  "regles": {
+    "lunes": 2
+  },
+
+  "variantes": {
+    "sans_lunes": {"regles": {"lunes": null}}
+  }
+}

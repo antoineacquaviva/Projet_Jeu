@@ -1,5 +1,7 @@
 # Maquette v2 : les nœuds de l'atelier dans le moteur
 
+> **V0.3 (13 oct. 2026)** : la maquette `v0.3` = ces nœuds avec le préréglage « V2 proposée » plus [v2:D5] les lunes (2) ; code `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:` ; tests `tests/test_v03.py`.
+
 *Statut (12 oct. 2026, moteur 1.3) : la maquette de conception v2 (« Atelier de la Forêt qui rêve », https://claude.ai/artifact/WJiQMwXDJEDwVvAERsDWss) telle que le moteur la joue. Chaque nœud de l'atelier porte son identifiant ([v2:A2a]…), cité dans le code et dans les tests ; `python -m foret.conformite --v2` vérifie que chaque nœud codé a au moins un renvoi dans le code et un test. Les numéros du livret de l'atelier changent avec la variante : on cite les nœuds, pas les numéros.*
 
 `maquettes/v2.json` est le préréglage « V2 proposée » (code `c:A2a,d_fav,C2a,D2v_choix|m:C3|p:`). Toute autre variante se charge par son code d'atelier : `charger("v2", "code:<code>")`, ou `"code:<code>"` dans la liste des variantes d'une campagne (`foret/atelier.py`). Les zones gardent leurs noms du moteur : Z1 Lisière, Z2 Clairière, Z3 Várzea, Z4 Igapó, Z5 Sources, Z6 Colline aux aras, Z7 Samaúma.

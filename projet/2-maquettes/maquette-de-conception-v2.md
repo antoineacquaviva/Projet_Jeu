@@ -1,5 +1,7 @@
 # Maquette de conception v2 : plan du Méchant, fins, conseil
 
+> **13 oct. 2026 : la v2 fixée s'appelle désormais V0.3** (`maquettes/v0.3.json`) ; voir le [plan vers la V1](../3-pilotage/plan-vers-v1.md).
+
 *Statut (12 oct. 2026) : propositions de Claude sur les quatre demandes de l'auteur, rangées dans l'« Atelier de la Forêt qui rêve » (artefact HTML : https://claude.ai/artifact/WJiQMwXDJEDwVvAERsDWss ; source : `claude/maquette-html/atelier_v2.html`). La décision 7 (bonus) est tranchée ; les autres restent ouvertes et seront éclairées par la simulation (voir la dernière section). La maquette v1 reste la référence publiée du moteur.*
 
 ## 1. Le plan du Méchant : deux pistes, « qui » et « où »

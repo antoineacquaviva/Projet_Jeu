@@ -214,7 +214,7 @@ def taches(nom, echelle=1.0):
             for k in (2, 3):
                 for eq in itertools.combinations(PEUPLES, k):
                     ajouter("reves", eq, [b] * k, range(max(2, round(n / 3))), f"taux:{taux}")
-        if maquette == "v2":
+        if charger(maquette, variante)["regles"].get("voies_reve"):          # v2 et ses descendantes (V0.3…)
             for voie in ("sommeil", "reveil"):
                 b = {"type": "glouton", "params": dict(bot.get("params", {}), voie=voie)}
                 for k in (2, 3):
