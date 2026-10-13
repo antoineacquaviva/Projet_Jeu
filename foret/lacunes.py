@@ -55,6 +55,10 @@ LACUNES = {
         "Une trace qui engage ne peut pas être tenue (pas de carte, pas de moitié permise, zone hors d'atteinte)",
         "La carte est libre.", alternatives="La carte est perdue ; la trace ne pouvait pas être posée.",
         regle="R2.5"),
+    "interdit_intenable": _l(
+        "[mesure:jeu_restreint] Jeu restreint : toutes les options d'une décision sont interdites",
+        "Tout reste permis pour cette décision (la restriction ne s'applique pas).",
+        alternatives="Passer la décision quand c'est possible."),
     "represailles_sans_attaque": _l(
         "Représailles tirée alors qu'aucun organe n'a encore été neutralisé",
         "Comme Cupidité.", "tranchée", regle="R4.2"),

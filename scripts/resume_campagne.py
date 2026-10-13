@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from foret.comparer import INDICATEURS, valeur, _f  # noqa: E402
-from foret.mesures import chef_depuis_synthese, coordination_depuis_synthese  # noqa: E402
+from foret.mesures import chef_depuis_synthese, coordination_depuis_synthese, jeu_restreint_depuis_synthese  # noqa: E402
 
 
 def main(dossier):
@@ -45,6 +45,13 @@ def mesures_coordination(S):
         if ch:
             lignes.append(f"- **{lib}** : {_f(ch['gain'], 1)} % ± {_f(ch['marge'], 1)} "
                           f"(central {_f(ch['central'], 1)}, chacun pour soi {_f(ch['soi'], 1)}) : {ch['verdict']}")
+    jr = jeu_restreint_depuis_synthese(S)
+    if jr:
+        lignes += ["", "Jeu restreint (perte en points de forêt, même bot, mêmes tables) :", "",
+                   "| Interdit | Tables | Référence | Restreint | Perte |", "|---|---|---|---|---|"]
+        for nom, v in sorted(jr.items(), key=lambda kv: -kv[1]["perte"]):
+            lignes.append(f"| {nom} | {v['tables']} | {_f(v['reference'], 1)} | {_f(v['restreint'], 1)} | "
+                          f"{_f(v['perte'], 1)} ± {_f(v['marge'], 1)} |")
     return ["", *lignes] if lignes else []
 
 

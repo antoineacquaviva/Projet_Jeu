@@ -1,0 +1,51 @@
+{
+ "nom": "v2_options_mc",
+ "description": "Phase 3, étape 3.4 (13 oct. 2026) : les options de la v2 avec le bot fort. Les 16 variantes de v2_options (« V2 proposée », les préréglages de l'atelier, et une option changée à la fois pour les décisions ouvertes 1 à 6, 8 et 9), jouées par MC 64 chacun pour soi dont les suites rêvent une carte par tour (le bot fort de la V2), sur les 15 duos, 4 parties chacun, graines appariées.",
+ "maquette": "v2",
+ "blocs": [
+  {
+   "nom": "options",
+   "variantes": [
+    "defaut",
+    "coeur",
+    "gang",
+    "heritage_v1",
+    "code:c:A2b,d_fav,C2a,D2v_choix|m:C3|p:",
+    "code:c:A2a,d_bb,C2a,D2v_choix|m:C3|p:",
+    "code:c:A2a,d_hes,C2a,D2v_choix|m:C3|p:",
+    "code:c:A2a,d_six,C2a,D2v_choix|m:C3|p:",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:represailles=attaque",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:hs=organe",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:hs=rien",
+    "code:c:A2a,d_fav,C2a,D2v_deux|m:C3|p:",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:seuil=2",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:seuil=4",
+    "code:c:A2a,d_fav,C2b,D2v_choix|m:C3|p:",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "tailles": [
+      2
+     ],
+     "parties": 4
+    }
+   ]
+  }
+ ]
+}

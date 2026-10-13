@@ -183,7 +183,7 @@ python -m foret.conformite --v2                            # nœuds de l'atelier
 
 Nouvelles règles de maquette (toutes présentes, avec la valeur v1 par défaut) : `plan`, `double`,
 `portee`, `machine_hs_designee`, `escalade`, `voies_reve`, `cercle_par_joueur`,
-`silence_du_chantier`, `bonus_fin`, `reves_par_tour_table`, `lunes`, `egarer`, `barrage_sortie` ;
+`silence_du_chantier`, `bonus_fin`, `reves_par_tour_table`, `lunes`, `egarer`, `barrage_sortie` ; `interdits` (jeu restreint, étape 3.4 : options retirées à tous ; variante « interdire:… ») ;
 sections `manoeuvres`, `machines.sixieme`, `plateau.fleches`, champ `entree` des Machines.
 Nouvelles décisions : `lune` ; la décision `reve` peut offrir `("reveil",)`. Le bilan donne
 `resultat` (forêt + bonus selon la fin) et le Cercle ; la synthèse d'une campagne donne

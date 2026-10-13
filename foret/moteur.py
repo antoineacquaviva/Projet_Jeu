@@ -413,6 +413,8 @@ class Partie(Plans):
             raise ErreurMoteur(f"décision non répertoriée : {type_}")
         if not options:
             raise ErreurMoteur(f"aucune option pour la décision {type_}")
+        if self.R["interdits"]:
+            options = self._restreindre(siege, type_, options)
         self.signaler("decision", type_)
         if len(options) == 1:
             self.signaler("decision_forcee", type_)
@@ -440,6 +442,11 @@ class Partie(Plans):
             finally:
                 self._en_cours = None
             i = _indice(options, choix)
+            if i is None and self.R["interdits"]:
+                # [mesure:jeu_restreint] un bot qui ne connaît pas la restriction a choisi une option
+                # interdite : la première option permise la remplace (compté)
+                i, choix = 0, options[0]
+                self.stat("choix_interdit_remplace")
             if i is None:
                 raise ErreurMoteur(f"choix illégal pour {type_} ({siege.peuple}) : {choix!r}")
             impose = False
@@ -452,6 +459,31 @@ class Partie(Plans):
         return choix
 
     # =================================================================== copies
+    def _restreindre(self, siege, type_, options):
+        """[mesure:jeu_restreint] Jeu restreint (règle « interdits ») : retire les options interdites,
+        pour tous les joueurs et dans les copies. S'il ne reste rien, tout reste permis (lacune)."""
+        I = self.R["interdits"]
+        actions = {e.split(":", 1)[1] for e in I if e.startswith("action:")}
+        moities = {e.split(":", 1)[1] for e in I if e.startswith("moitie:")}
+
+        def permis(o):
+            if type_ in ("action", "embuscade") and isinstance(o, tuple):
+                return o[0] not in actions and not (o[0] == "aller" and "aller" in I)
+            if type_ == "aller":
+                return o is None or "aller" not in I
+            if type_ == "programmer_mode":
+                if o == "reve":
+                    return "reve" not in I
+                return self.M["peuples"][siege.peuple][o].get("pouvoir") not in moities
+            if type_ == "voir":
+                return o is None or "voir" not in moities
+            return True
+        restent = [o for o in options if permis(o)]
+        if not restent:
+            self.lacune("interdit_intenable", f"{type_} : toutes les options sont interdites")
+            return options
+        return restent
+
     def _passer_la_main(self):
         """Fin du rejeu d'une copie : les bots décident désormais, et le hasard
         à venir est retiré si on l'a demandé."""

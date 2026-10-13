@@ -8,6 +8,7 @@
   frappe dans une variante, par exemple) est une erreur, pas un réglage ignoré.
 """
 import copy
+import re
 import json
 import os
 
@@ -63,6 +64,15 @@ def _liste_de(*vals):
     return v
 
 
+def _interdits(x):
+    """[mesure:jeu_restreint] Le jeu restreint (étape 3.4) : « action:<nom> » (Saboter, Barrer…, aussi en
+    embuscade), « aller », « moitie:<pouvoir> » (la moitié de carte qui porte ce pouvoir n'est
+    jamais jouée), « reve »."""
+    return isinstance(x, list) and all(
+        isinstance(e, str) and (e in ("aller", "reve") or re.fullmatch(r"(action|moitie):[a-z_]+", e)) for e in x)
+_interdits.doc = "liste de « action:<nom> », « aller », « moitie:<pouvoir> », « reve »"
+
+
 REGLES = {
     "pouvoirs": _bool,
     "fin_de_partie": _choix("immediate", "fin_de_tour"),
@@ -106,6 +116,7 @@ REGLES = {
     # Témoins de mesure (moteur 1.4, phase 1d) : jamais proposés comme règles du jeu
     "des_fixes": _des_fixes,           # [mesure:temoins] dés truqués : chaque lancer donne ces deux faces
     "apprentissage": _bool,            # [mesure:temoins] false = le Méchant n'apprend plus
+    "interdits": _interdits,           # [mesure:jeu_restreint] jeu restreint : options retirées à tous
 }
 
 
@@ -156,13 +167,16 @@ def lire(nom, _vus=()):
 def charger(nom, variante=None):
     """Maquette prête à jouer : héritage résolu, variante appliquée, validée.
 
-    Une variante peut être un nom de la maquette, ou « code:<code de l'atelier> »
-    (maquette v2 : foret/atelier.py). Une variante nommée peut elle-même porter
+    Une variante peut être un nom de la maquette, « code:<code de l'atelier> »
+    (maquette v2 : foret/atelier.py), ou « interdire:<interdit>[+<interdit>…] » (jeu
+    restreint, règle « interdits »). Une variante nommée peut elle-même porter
     un code d'atelier (clé « atelier »)."""
     m = lire(nom)
     if variante and variante != "defaut":
         if variante.startswith("code:"):
             patch = {"atelier": variante[len("code:"):]}
+        elif variante.startswith("interdire:"):              # [mesure:jeu_restreint] « interdire:a+b »
+            patch = {"regles": {"interdits": variante[len("interdire:"):].split("+")}}
         elif variante not in m["variantes"]:
             raise ErreurMaquette(f"variante inconnue pour {m['nom']} : {variante} "
                                  f"(connues : {sorted(m['variantes'])})")

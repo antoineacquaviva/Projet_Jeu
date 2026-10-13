@@ -225,7 +225,8 @@ class Glouton(Bot):
         return max(options, key=lambda z: (menace[z] - 0.2 * mien[z], -partie.plateau.numero[z]))
 
     def d_voir(self, partie, siege, options, etape):
-        if self.p["voir"] and etape == partie.etapes[0] and len(siege.main) >= 4:
+        if self.p["voir"] and etape == partie.etapes[0] and len(siege.main) >= 4 \
+                and any(o is siege.main[0] for o in options):          # jeu restreint : Voir peut être interdit
             return siege.main[0]
         return None
 

@@ -79,6 +79,12 @@ Décisions de l'auteur du 13 oct. : bot de référence MC 64 chacun pour soi ; 1
 - `m3_v1_essoufflement` : témoin des dilemmes ; le Méchant s'essouffle, on *suppose* que les choix comptent moins : plus de décisions indifférentes que dans la v1. C'est une attente non démontrée : si le témoin rate, on regarde la mesure avant de conclure.
 Le chef unique a sa campagne (`coordination_mc_2`). Depuis l'étape 3.3, le workflow publie aussi les parties (`parties.tar.gz`, sauf pour la phase 1) avec le rapport, pour refaire l'analyse sans rejouer.
 
+## Le jeu restreint (étape 3.4)
+- **Jeu restreint** (indice, bot fort, lecture du niveau 3 : actions sans intérêt). On interdit une action (Saboter, Barrer, Aller) ou une moitié de carte (donc son pouvoir) à tous les joueurs, et on mesure la forêt perdue par le bot fort par rapport au même bot sans restriction, sur les mêmes duos (4 parties par duo, graines appariées). Perte nulle : l'élément est inutile ou remplaçable ; perte énorme : il est indispensable, peut-être dominant. Descriptive (pas de bande) ; la fréquence d'usage se lit dans les compteurs de la référence.
+- Moteur : règle `interdits` (liste de « action:<nom> », « aller », « moitie:<pouvoir> », « reve »), appliquée dans `Partie.decider` à tous les joueurs et dans les copies (les suites du bot respectent la restriction). Une décision dont toutes les options seraient interdites reste libre (lacune `interdit_intenable`). Un bot qui choisirait une option interdite est remplacé par la première option permise (compteur `choix_interdit_remplace`).
+- Campagnes `jeu_restreint` (v1, MC 64) et `jeu_restreint_v2` (V2, MC 64 dont les suites rêvent) : un bloc « reference », un bloc « actions » (15 duos), un bloc par peuple pour ses deux moitiés (les 5 duos qui le comptent) ; 480 parties chacune. Variantes « interdire:<a>[+<b>] » (`charger`). Lecture : `python scripts/resume_campagne.py <dossier>` (`jeu_restreint_depuis_synthese`).
+- Campagne `v2_options_mc` : les 16 variantes de `v2_options` (une option changée à la fois autour de « V2 proposée ») jouées par le bot fort de la V2, 15 duos, 4 parties ; 960 parties.
+
 ## Témoins
 Variantes cassées exprès (préfixe `temoin_`, dans `maquettes/v1.json` et `v2.json`), jamais proposées comme règles :
 

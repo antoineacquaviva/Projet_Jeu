@@ -124,7 +124,8 @@
     "egarer": "retiree",
     "barrage_sortie": true,
     "des_fixes": null,
-    "apprentissage": true
+    "apprentissage": true,
+    "interdits": []
   },
 
   "variantes": {

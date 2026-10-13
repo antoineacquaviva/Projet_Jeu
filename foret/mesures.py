@@ -20,6 +20,7 @@ témoins : des variantes dont on connaît le défaut et le verdict attendu. Les
 renvois [mesure:<id>] relient le code et les tests à cette liste
 (python -m foret.conformite --mesures).
 """
+import json
 import math
 import zlib
 from collections import Counter, defaultdict
@@ -399,6 +400,37 @@ def coordination_depuis_synthese(syn, bloc="soi"):
             "verdict": verdict("coordination", part) if part is not None else "non mesurable"}
 
 
+def jeu_restreint_depuis_synthese(syn, peuples=("oiseaux", "mammiferes", "reptiles", "insectes", "humains", "entites")):
+    """[mesure:jeu_restreint] Perte (points de forêt) quand une action ou une moitié de carte est
+    interdite (variantes « interdire:… »), par rapport au même bot sans restriction (bloc
+    « reference »), sur les mêmes tables : toutes celles du bloc « reference » pour un bloc qui
+    ne porte pas le nom d'un peuple, sinon celles qui comptent ce peuple. Perte nulle : l'élément
+    est inutile ou remplaçable ; perte énorme : il est indispensable, peut-être dominant."""
+    ref = {}
+    for k, a in syn.get("par_peuples", {}).items():
+        morceaux = k.split(" | ")
+        if morceaux[0] == "reference":
+            ref[frozenset(json.loads(morceaux[-1]))] = _moy_ic(a)[0]
+    r_all = _bloc(syn, "reference", "defaut")
+    if not ref or not r_all:
+        return None
+    ic_ref = _moy_ic(r_all)[1]
+    out = {}
+    for k, a in syn["detail"].items():
+        bloc, var = k.split(" | ")[:2]
+        if not var.startswith("interdire:"):
+            continue
+        tables = [t for t in ref if bloc not in peuples or bloc in t]
+        if not tables:
+            continue
+        m_ref = sum(ref[t] for t in tables) / len(tables)
+        m, ic = _moy_ic(a)
+        out[var[len("interdire:"):]] = {
+            "perte": round(m_ref - m, 2), "reference": round(m_ref, 1), "restreint": round(m, 1),
+            "marge": round((ic ** 2 + (ic_ref ** 2) * len(ref) / len(tables)) ** 0.5, 2), "tables": len(tables)}
+    return out
+
+
 # [mesure:dilemmes] Seuils de classement des décisions, en points de forêt (% de la forêt
 # initiale). Provisoires (13 oct.) : à confirmer par l'auteur avec les premiers résultats.
 PROCHE, NET = 1.0, 3.0
@@ -663,6 +695,10 @@ MESURES = {
         vert=(1, None), rouge=[(None, 2 / 3 - E)],
         temoins=[("v1", "temoin_essoufflement", "glouton", "rouge (le Méchant s'essouffle)"),
                  ("v2", "temoin_essoufflement", "glouton", "rouge (le Méchant s'essouffle)")]),
+    # ---------------------------------------------------------------- niveau 3 : actions sans intérêt
+    "jeu_restreint": dict(
+        niveau=3, objectif="lecture", nom="Jeu restreint : perte quand une action ou une moitié de carte est interdite",
+        etiquette="indice", unite="points de forêt", bot="fort (MC 64)", descriptive=True, temoins=[]),
     # ---------------------------------------------------------------- garde-fou
     "plancher": dict(
         niveau=2, objectif="garde-fou", nom="Plancher : forêt gardée par le pire décile",

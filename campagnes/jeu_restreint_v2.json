@@ -1,0 +1,361 @@
+{
+ "nom": "jeu_restreint_v2",
+ "description": "Phase 3, étape 3.4 (13 oct. 2026) : le jeu restreint. On interdit au bot fort (MC 64 chacun pour soi), à tous les sièges et dans ses suites, une action (Saboter, Barrer, Aller) ou une moitié de carte (donc son pouvoir), et on mesure ce qu'il perd par rapport au même bot sans restriction, sur les mêmes duos (4 parties par duo, graines appariées). Variantes « interdire:… » (règle « interdits », foret/moteur.py, Partie._restreindre). Une moitié n'est jouée qu'aux tables de son peuple : les 5 duos qui le comptent. Perte nulle : l'élément est inutile ou remplaçable ; perte énorme : indispensable, peut-être dominant. Lecture : python scripts/resume_campagne.py <dossier> (jeu_restreint_depuis_synthese). Maquette V2 proposée, bot MC 64 dont les suites rêvent une carte par tour (MC64R, le bot fort de la V2).",
+ "maquette": "v2",
+ "blocs": [
+  {
+   "nom": "reference",
+   "variantes": [
+    "defaut"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "tailles": [
+      2
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "actions",
+   "variantes": [
+    "interdire:action:saboter",
+    "interdire:action:barrer",
+    "interdire:aller"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "tailles": [
+      2
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "oiseaux",
+   "variantes": [
+    "interdire:moitie:voir",
+    "interdire:moitie:voler"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "oiseaux",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "mammiferes",
+   "variantes": [
+    "interdire:moitie:tenir",
+    "interdire:moitie:renverser"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "mammiferes",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "reptiles",
+   "variantes": [
+    "interdire:moitie:attendre",
+    "interdire:moitie:se_fondre"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "oiseaux",
+       "reptiles"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "insectes",
+   "variantes": [
+    "interdire:moitie:s_unir",
+    "interdire:moitie:enrayer"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "oiseaux",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "insectes",
+       "humains"
+      ],
+      [
+       "insectes",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "humains",
+   "variantes": [
+    "interdire:moitie:tromper",
+    "interdire:moitie:parler"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "oiseaux",
+       "humains"
+      ],
+      [
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "insectes",
+       "humains"
+      ],
+      [
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "entites",
+   "variantes": [
+    "interdire:moitie:hanter",
+    "interdire:moitie:egarer"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "oiseaux",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "entites"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 4
+    }
+   ]
+  }
+ ]
+}
