@@ -44,6 +44,7 @@ from .maquette import charger, lire, resume
 from .moteur import Partie, VERSION
 from .bots import fabriquer_table
 from .stats import apparier, references_par_bloc, parties_compactes
+from .observateurs import Usage
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -98,7 +99,7 @@ def jouer_une(tache):
     try:
         m = _maquette(maquette, variante)
         bots = fabriquer_table(bot, len(peuples), graine * 100)
-        base.update(Partie(m, list(peuples), bots, graine=graine).jouer())
+        base.update(Partie(m, list(peuples), bots, graine=graine, observateurs=[Usage()]).jouer())
     except Exception as e:  # noqa: BLE001 - tout attraper : c'est le but de la campagne
         base["erreur"] = f"{type(e).__name__}: {e}"
         base["trace"] = traceback.format_exc(limit=8)
@@ -154,6 +155,14 @@ def agreger(resultats):
         forc.update(r.get("decisions_forcees", {}))
     a["decisions_par_partie"] = {k: round(v / n, 2) for k, v in sorted(dec.items())}
     a["decisions_forcees_pct"] = {k: round(100 * forc[k] / v, 1) for k, v in sorted(dec.items()) if v}
+    us = defaultdict(lambda: [0, 0])                                     # [mesure:choix_morts]
+    for r in ok:
+        for k, (o, p) in r.get("usage", {}).items():
+            us[k][0] += o
+            us[k][1] += p
+    if us:
+        a["usage"] = {k: {"offert": o, "pris": p, "taux": round(100 * p / o, 1) if o else None}
+                      for k, (o, p) in sorted(us.items())}
     return a
 
 

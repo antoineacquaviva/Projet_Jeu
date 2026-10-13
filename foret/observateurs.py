@@ -122,3 +122,43 @@ class Journal(Observateur):
             self.lignes.append(pref + f"  ? lacune {code} {detail}")
         elif categorie == "incoherence":
             self.lignes.append(pref + f"  ! incohérence {code} {detail}")
+
+
+class Usage(Observateur):
+    """[mesure:choix_morts] Pour chaque élément de choix (action, moitié de carte par son pouvoir, rêve,
+    déplacement, embuscade), combien de fois il a été offert et combien de fois il a été pris, par les
+    décisions des bots (pas les décisions forcées ni imposées). Écrit bilan["usage"] = {clé: [offert, pris]}.
+
+    Clés : « action:<nom> », « moitie:<pouvoir> », « reve », « aller », « embuscade:<nom> »."""
+
+    def __init__(self):
+        self.u = {}
+
+    def _compter(self, offerts, pris):
+        for k in offerts:
+            self.u.setdefault(k, [0, 0])[0] += 1
+        if pris is not None:
+            self.u.setdefault(pris, [0, 0])[1] += 1
+
+    def decision(self, partie, siege, type_, options, indice, ctx, impose):
+        if impose or len(options) < 2:
+            return
+        choix = options[indice]
+        if type_ == "programmer_mode":
+            def cle(o):
+                if o == "reve":
+                    return "reve"
+                p = partie.M["peuples"][siege.peuple][o].get("pouvoir")
+                return f"moitie:{p}" if p else None
+            offerts = {cle(o) for o in options} - {None}
+            self._compter(offerts, cle(choix))
+        elif type_ in ("action", "embuscade"):
+            pre = "action" if type_ == "action" else "embuscade"
+            offerts = {f"{pre}:{o[0]}" for o in options if isinstance(o, tuple)}
+            self._compter(offerts, f"{pre}:{choix[0]}" if isinstance(choix, tuple) else None)
+        elif type_ == "aller":
+            if any(o is not None for o in options):
+                self._compter({"aller"}, "aller" if choix is not None else None)
+
+    def fin(self, partie, bilan):
+        bilan["usage"] = {k: list(v) for k, v in sorted(self.u.items())}

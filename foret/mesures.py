@@ -549,6 +549,35 @@ def quantile(xs, q):
 
 
 # =================================================================== bandes
+# ------------------------------------------------------------------ choix morts et apprentissage (plan vers la V1, 0.5 et 0.6)
+SEUIL_PRIS = 5.0          # % : en dessous, un élément offert est presque jamais pris
+OFFERT_MIN = 20           # occasions au moins pour juger
+
+
+def choix_morts(usage, pertes=None, seuil_pris=SEUIL_PRIS, offert_min=OFFERT_MIN):
+    """[mesure:choix_morts] Un élément de choix est « mort » si le bot fort ne le prend presque jamais quand
+    il est offert (moins de seuil_pris %), ou si l'interdire ne coûte rien de mesurable (perte au jeu
+    restreint « négligeable », foret/stats.py). usage : agrégat {clé: {"offert", "pris"}} ; pertes : {clé:
+    verdict apparié} (facultatif). Rend {"morts": [...], "n": nombre, "detail": {clé: raison}}."""
+    detail = {}
+    for k, u in (usage or {}).items():
+        if u["offert"] >= offert_min and 100 * u["pris"] / u["offert"] < seuil_pris:
+            detail[k] = f"pris {100 * u['pris'] / u['offert']:.1f} % des fois offert"
+    for k, v in (pertes or {}).items():
+        if v == "négligeable":
+            detail[k] = (detail[k] + " ; " if k in detail else "") + "l'interdire ne coûte rien"
+    return {"morts": sorted(detail), "n": len(detail), "detail": detail}
+
+
+def gain_apprentissage(ecart_apparie):
+    """[mesure:apprentissage_mechant] Points de forêt que l'apprentissage fait gagner au Méchant : forêt du
+    témoin « Méchant qui n'apprend plus » moins forêt de la maquette, apparié (mêmes tables, mêmes graines).
+    ecart_apparie : écart (témoin − maquette) tel que rendu par foret.stats.ecart_apparie."""
+    if not ecart_apparie or ecart_apparie.get("ecart") is None:
+        return None
+    return {"gain": ecart_apparie["ecart"], "ic95": ecart_apparie["ic95"], "verdict_ecart": ecart_apparie["verdict"]}
+
+
 def intervalle(lo=None, hi=None):
     return (lo, hi)
 
@@ -628,6 +657,16 @@ MESURES = {
         etiquette="indice", unite="%", bot="fort (MC 64)",
         vert=(5, None), rouge=[(None, 1 - E)],
         temoins=[("v1", "temoin_sans_reve", "MC 64", "rouge (aucun rêve possible : tous les taux se valent)")]),
+    "choix_morts": dict(
+        niveau=3, objectif="2", nom="Choix morts : éléments presque jamais pris, ou qu'on interdit sans perte",
+        etiquette="indice", unite="éléments", bot="fort (puis contrôle)",
+        vert=(0, 0), rouge=[(3, None)],
+        temoins=[("v1", "temoin_mammiferes_sans_pouvoir", "fort", "Tenir et Renverser comptés morts")]),
+    "apprentissage_mechant": dict(
+        niveau=3, objectif="1", nom="Gain d'apprentissage du Méchant (témoin sans apprentissage − maquette)",
+        etiquette="indice", unite="points de forêt", bot="fort (puis contrôle)",
+        vert=(5, None), rouge=[(None, 1 - E)],
+        temoins=[("v0.3", "temoin_une_tactique", "fort", "gain plus petit que celui de la V0.3 (une seule tactique : moins à réordonner)")]),
     "dilemmes": dict(
         niveau=3, objectif="2", nom="Dilemmes parmi les décisions non forcées",
         etiquette="indice", unite="%", bot="fort (MC 64, sur échantillon)",

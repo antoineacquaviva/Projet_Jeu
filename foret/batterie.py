@@ -44,6 +44,7 @@ from multiprocessing import Pool
 
 from .bots import fabriquer
 from .maquette import charger, lire
+from .observateurs import Usage
 from .mesures import (MESURES, Mesureur, Sondeur, auc, distance_pistes, duo_contre_meilleur_seul, duos_complets,
                       shapley_restreint, gain_libre, part_dilemmes, tape_taupe,
                       exactitude_equilibree, synergies_relatives,
@@ -148,7 +149,7 @@ def jouer(tache):
     try:
         m = charger(t["maquette"], t["variante"])
         bots = [fabriquer(b, t["graine"] * 100 + i) for i, b in enumerate(t["bots"])]
-        obs = [Mesureur()]
+        obs = [Mesureur(), Usage()]
         if t.get("sondes"):
             obs.append(Sondeur(SONDES, copies=t.get("copies", 16), graine=t["graine"],
                                politique=t.get("politique_sondes")))
@@ -162,7 +163,7 @@ def jouer(tache):
             "foret_pct": round(100 * b["foret"] / b["foret_initiale"], 3),
             "machines_hs": b["machines_hs"], "cartes_en_reve": b["cartes_en_reve"],
             "mesures": b["mesures"], "stats": b["stats"], "lacunes": b["lacunes"],
-            "incoherences": b["incoherences"], "sondes": b.get("sondes")})
+            "incoherences": b["incoherences"], "sondes": b.get("sondes"), "usage": b.get("usage")})
     except Exception as e:  # noqa: BLE001
         out["erreur"] = f"{type(e).__name__}: {e}"
         out["trace"] = traceback.format_exc(limit=6)
