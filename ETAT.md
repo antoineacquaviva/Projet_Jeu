@@ -186,14 +186,14 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 5. Étape suivante
 
-**Cycle 2, étape a : préparer (À FAIRE).** La V0.4 est adoptée (section 8, 13 oct., 23 h 27). Détail des priorités et des alertes : `projet/4-bilans/cycle-1-bilan.md`, sections 4, 6 et 8. Une sous-étape par passage, dans cet ordre :
+**Cycle 2, étape a : préparer (EN COURS : a.1 FAIT, a.2 lancée).** La V0.4 est adoptée (section 8, 13 oct., 23 h 27). Détail des priorités et des alertes : `projet/4-bilans/cycle-1-bilan.md`, sections 4, 6 et 8. Une sous-étape par passage, dans cet ordre :
 
-1. **V0.4 dans le moteur** :
+1. **V0.4 dans le moteur** (FAIT le 13 oct., 23 h 45 : `maquettes/v0.4.json`, `tests/test_v04.py`, `docs/noeuds_v2.md`, plan et README à jour ; conformité et 361 tests verts) :
    - `maquettes/v0.4.json` (base `v0.3`, code d'atelier et réglages de la section 8) ;
    - tests citant la décision (`tests/test_v04.py`), documents (`docs/noeuds_v2.md` : la modélisation des ordres supplémentaires n'est plus « à confirmer ») ;
    - `projet/3-pilotage/plan-vers-v1.md` (section 1 : V0.4 adoptée ; section 6 : alerte A levée pour la durée, alertes D et E) ;
    - contrôles complets.
-2. **Recalibrer le bot fort sur la V0.4** (décision technique de Claude, bilan section 4) : campagne appariée de 2 à 6 joueurs opposant MC64R, MCP64, MC 64 à rêve 0,5 et MC 256 à portefeuille. Le meilleur à coût raisonnable devient le bot fort du cycle 2. Recaler aussi le coût de MC 256 dans `foret/cycle.py`.
+2. **Recalibrer le bot fort sur la V0.4** (LANCÉE le 13 oct., 23 h 45 : Campagne 18, `campagnes/calibration_v04.json`, 256 parties, 20 lots ; durée estimée 1 h environ, le lot le plus lent fixe la fin. *À faire au passage suivant* : lire `campagnes/calibration_v04_run18/synthese.json` sur la branche resultats ; comparer les quatre bots en apparié par taille de table (forêt, fins, tour ; `scripts/analyse_ligne_base.py` sert de modèle) ; retenir le plus fort à coût raisonnable comme bot fort du cycle 2, l'écrire dans le futur `cycles/c2.json` et dans `foret/batterie.py` si besoin ; recaler `COUT["mc256"]` dans `foret/cycle.py` sur la durée mesurée ; consigner la décision au journal) (décision technique de Claude, bilan section 4) : campagne appariée de 2 à 6 joueurs opposant MC64R, MCP64, MC 64 à rêve 0,5 et MC 256 à portefeuille. Le meilleur à coût raisonnable devient le bot fort du cycle 2. Recaler aussi le coût de MC 256 dans `foret/cycle.py`.
 3. **Protocole P3 et sa ligne de base** : P2 rejoué sur la V0.4 avec l'ancre V0.3, plus les mesures des objectifs 1 à 3 (concentration, surprise, tape-taupe, meilleur taux de rêve fixe et gain du bot libre, Shapley, duos). Le meilleur taux de rêve fixe tranche l'alerte E : s'il vaut 0 à 2 et 3 joueurs, l'alerte est confirmée et devient une DÉCISION UTILISATEUR.
 4. **Plan `cycles/c2.json` et lancement du cycle 2** (V0.4 → V0.5). Priorités : l'intérêt des choix et la profondeur ; le dilemme du rêve à 2 et 3 joueurs (alerte E) ; la difficulté à 3, 5 et 6 joueurs (alerte D), avec un réglage taille par taille et au plus 4 éléments propres au nombre de joueurs.
 
@@ -203,7 +203,6 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
-EN COURS depuis le 2026-10-13 23:34 (heure de Paris) : cycle 2, étape a.1, V0.4 dans le moteur (session interactive).
 
 ## 7. Compteur de passages
 
@@ -260,6 +259,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Campagne 16 | ligne_base_p2 (V0.3, 2 à 6 joueurs) : MC64R contre MCP64, témoins, coordination ; 544 parties | 14 | 48 min | 48 min (228 s-cœur par partie en moyenne) | réussi ; traité (ligne de base P2) |
 | Campagne 17 | ligne_base_p2_v02 (V0.2) : MCP64 contre MC64, choix morts (mammifères sans pouvoir) ; 108 parties | 6 | 17 min | 17 min | réussi ; traité (ligne de base P2) |
 | Cycle 1 | c1 : criblage (336 variantes, gloutons, 2 à 6 joueurs), exploration MAP-Elites (10 générations), confirmation MC64R (2 manches), contrôle MC 256 à portefeuille | 20 | 6 h 45 (estimé 5 h 20) | contrôle : 2 h 25 | réussi ; traité (bilan du cycle 1) |
+| Campagne 18 | calibration_v04 (V0.4, 2 à 6 joueurs) : MC64R, MCP64, MC 64 rêve 0,5, MC 256 à portefeuille ; 256 parties, échantillon P2 | 20 | – | – | lancée le 13 oct. à 23 h 45 (Paris) ; à traiter en étape a.2 |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
@@ -272,6 +272,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | 13 oct. 2026 | 13:00 | 3 h 35 | terminé | Session interactive avec l'auteur : point de situation ; plan vers la V1 (`projet/3-pilotage/plan-vers-v1.md`), versions renommées, règle de décision, critère des tailles de table ; trois tâches planifiées (Sonnet courant, Opus fin de cycle, réveil) ; étape 0 faite en entier (0.1 à 0.11, moteur 1.8, pipeline autonome essayé) ; ligne de base P2 ; cycle 1 lancé. Pas compté dans le plafond. |
 | 13 oct. 2026 | 23:08 | 5 min | arrêté | Réveil : rapport du cycle 1 prêt (`cycles/c1/rapport.md`, branche resultats). Le déclenchement de la tâche « analyse de fin de cycle » (fire_trigger) a été refusé par le classificateur d'autorisations ; rien contourné. Analyse à lancer à la main. Pas compté. |
 | 13 oct. 2026 | 23:10 | 35 min | terminé | Analyse de fin de cycle 1 (Opus, tâche « analyse de fin de cycle » lancée à la main) : bilan `projet/4-bilans/cycle-1-bilan.md`. Durée réglée (0 % de fins précoces, deux bots) ; difficulté −20 points au bot fort et −8 au contrôle (sûrs), verdict non stable ; nouvelles alertes D et E ; alerte A à lever. Décision technique : bot fort recalibré en ouverture du cycle 2. Proposition : V0.4 = variante A. DÉCISION UTILISATEUR : adopter la V0.4. README à jour. |
+| 13 oct. 2026 | 23:27 | 20 min | terminé | Session interactive avec l'auteur : V0.4 adoptée (section 8). Étape a.1 faite : `maquettes/v0.4.json` (égale à la variante A jouée au cycle 1), `tests/test_v04.py`, docs, plan (alerte A levée, alertes D et E), README ; contrôles verts (361 tests). Étape a.2 lancée : Campagne 18, `calibration_v04`. Réveil non armé : le passage quotidien de 9 h 35 traitera les résultats. Pas compté dans le plafond. |
 
 ## 11. Reprendre la main
 
