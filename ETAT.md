@@ -209,7 +209,7 @@ Une étape tient en un passage de quelques heures. Statuts : À FAIRE, EN COURS,
 
 ## 6. Verrou
 
-(vide)
+EN COURS depuis le 2026-10-13 08:27 (heure de Paris) : session interactive avec l'auteur (étapes 3.1 et suivantes).
 
 ## 7. Compteur de passages
 
