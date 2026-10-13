@@ -75,12 +75,16 @@ Documents à lire avant de travailler :
 
 | Tâche | Identifiant | Modèle | Quand | Rôle |
 |---|---|---|---|---|
-| Forêt qui rêve · tests autonomes | `trig_011udKReur3DBBjnHXU29nNe` | Sonnet | 3 h 35, 9 h 35, 15 h 35 (un passage par jour après l'étape 0.10) | les étapes courantes : code, lancements, suivi |
+| Forêt qui rêve · tests autonomes | `trig_011udKReur3DBBjnHXU29nNe` | Sonnet | 9 h 35 chaque jour (depuis le 13 oct., étape 0.10) | les étapes courantes : code, lancements, suivi |
 | Forêt qui rêve · réveil | `trig_016BFvRNtLMbFYYZX6Le9wcE` | Sonnet | une seule fois, à l'heure armée par un passage | même rôle, au moment où un calcul GitHub doit finir |
 | Forêt qui rêve · analyse de fin de cycle | `trig_01VUxMg7UjXfZzUXczfz5ANX` | Opus | déclenchée par un passage | l'étape g d'un cycle : bilan, proposition de version, alertes |
 
 **Consigne**
-1. Lis ce fichier en entier, puis `projet/3-pilotage/plan-vers-v1.md` si l'étape le demande.
+1. Lis d'abord `etat_pipeline.json` sur la branche `resultats` (quelques lignes : `gh api "repos/antoineacquaviva/Projet_Jeu/contents/etat_pipeline.json?ref=resultats" -H "Accept: application/vnd.github.raw"`), puis ce fichier en entier, puis `projet/3-pilotage/plan-vers-v1.md` si l'étape le demande.
+   - **Cycle en cours sur GitHub** (`statut` « en cours ») : il s'enchaîne seul (workflow Cycle) ; n'y touche pas. Arme le réveil une heure après `fin_estimee` (c'est la fin de l'étape en cours, pas du cycle), vide le Verrou et arrête-toi ; ce passage ne compte pas.
+   - **Rapport prêt** (`statut` « rapport prêt ») et pas encore analysé : point 5.
+   - **Échec** (`statut` « échec ») : diagnostique l'étape (onglet Actions, `gh api …/actions/runs`), corrige si c'est technique, relance le workflow Cycle ; sinon DÉCISION UTILISATEUR.
+   - **Lancer un cycle** : quand l'étape suivante le demande, `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/workflows/cycle.yml/dispatches -f ref=main -f 'inputs[cycle]=<cycle>' -f 'inputs[lots]=20'`, puis arme le réveil 5 h plus tard (durée estimée d'un cycle : 3 à 5 h).
 2. Arrête-toi immédiatement, sans rien faire d'autre, dans les cas suivants :
    - le Verrou (section 6) contient PAUSE (pas de notification ; ce passage ne compte pas) ;
    - le Verrou indique EN COURS depuis moins de 6 h ;
@@ -170,9 +174,9 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 - 0.4 Leviers du rêve et de la taille de table (FAIT le 13 oct. : `reves_par_pas`, `ordres_par_etape`, `machines_en_jeu`, valeurs par taille de table ou formule « n-1 » pour lunes, Cercle, main, tours… ; `tests/test_par_table.py`). Indice (glouton, 24 parties par case) : un ordre de plus par étape fait perdre 15 à 20 points de forêt ; tout combiné, le duo va au tour 6 mais tombe à 23 % : de la matière pour le criblage.
 - 0.5 Mesure « choix morts » ; 0.6 mesure « apprentissage du Méchant » (FAIT le 13 oct. : observateur `Usage` dans toutes les campagnes, `choix_morts`, `gain_apprentissage`, bandes provisoires et témoins déclarés ; validation des témoins avec P2 en 0.11).
 - 0.7 Bot à portefeuille ; 0.8 bot de contrôle (FAIT le 13 oct. : paramètre `portefeuille` du bot `mc`, `MCP64` et `CONTROLE` dans `foret/batterie.py`, moteur 1.8 ; **validation à faire en 0.11** au budget réel : en V0.3, MCP64 ≥ MC64R apparié ; en V0.2, choix surtout « reve0 »).
-- 0.9 `foret/criblage.py` (Morris, glouton) et `foret/exploration.py` (MAP-Elites, étalon au hasard).
-- 0.10 Orchestrateur `cycle.yml` (une étape à la fois, enchaînement par `workflow_dispatch`, relance automatique, surveillance quotidienne, `resultats/etat_pipeline.json`, issue de fin de cycle) et rapport automatique, qui donne l'heure de fin estimée de chaque étape pour armer le réveil. Puis passer la tâche « tests autonomes » à un passage par jour (`update_trigger`, sans changer le modèle).
-- 0.11 Mesures fragiles réétiquetées ; coordination et chef unique remesurés au bot fort sur V0.3 ; protocole P2 et sa ligne de base (ancre V0.3). Puis lancer le cycle 1.
+- 0.9 Criblage et exploration (FAIT le 13 oct. : `foret/cycle.py` réunit criblage de Morris, MAP-Elites et étalon au hasard, confirmation en manches, contrôle, rapport et alertes ; plan du cycle 1 : `cycles/c1.json`, 13 variables).
+- 0.10 Orchestrateur et surveillance (FAIT le 13 oct. : workflows `cycle.yml` et `surveillance.yml`, `scripts/publier_resultats.sh` ; essai complet réussi : cycle « essai », 7 lancements enchaînés seuls en 4 min, rapport et issue n° 1 ; tâche « tests autonomes » passée à un passage par jour).
+- 0.11 Ligne de base P2 (EN COURS : campagnes `ligne_base_p2` (Campagne 16) et `ligne_base_p2_v02` lancées le 13 oct. vers 15 h 25) : valider MCP64 (sinon garder MC64R comme bot fort dans `cycles/c1.json`), les témoins des nouvelles mesures, coordination et chef unique au bot fort sur la V0.3 ; réétiqueter les mesures fragiles. Puis lancer le cycle 1 : `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/workflows/cycle.yml/dispatches -f ref=main -f 'inputs[cycle]=c1' -f 'inputs[lots]=20'`.
 
 **Cycles 1 à 3** (V0.3 → V0.4 → V0.5 → V0.6) : préparer (Claude) → criblage, exploration, confirmation, contrôle, rapport (GitHub, seul) → analyser et proposer (Claude) → **DÉCISION UTILISATEUR : adopter la version**. Priorités : cycle 1 la durée ; cycle 2 l'intérêt des choix et la profondeur ; cycle 3 l'équilibre fin. Arrêt anticipé si plus aucun objectif rouge (bot fort et bot de contrôle).
 
@@ -242,6 +246,9 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Campagne 13 | v2_options_mc, 16 variantes, MC 64 qui rêve, 960 parties | 20 | 82 min | 17 min | fusion annulée, relancée : réussi ; traité (section 7) |
 | Campagne 14 | robustesse_v1, bonus 0/10/25, 720 parties | 20 | 75 min | 28 min | réussi ; traité (section 8) |
 | Campagne 15 | robustesse_v2, 16 variantes × bonus 10 et 25, 1 920 parties | 20 | 101 min (attentes comprises) | 34 min environ | réussi ; traité (diagnostic, section 8) |
+| Cycle « essai » | essai du pipeline (étape 0.10) : criblage, 2 générations, 2 manches, contrôle, rapport ; glouton, très petit | 4 | 4 min (7 lancements enchaînés seuls) | < 1 min | réussi ; issue n° 1 fermée |
+| Campagne 16 | ligne_base_p2 (V0.3, 2 à 6 joueurs) : MC64R contre MCP64, témoins, coordination ; 544 parties | 14 | – | – | lancée le 13 oct. 15 h 24 (Paris) ; à traiter en 0.11 |
+| Campagne 17 | ligne_base_p2_v02 (V0.2) : MCP64 contre MC64, choix morts (mammifères sans pouvoir) ; 108 parties | 6 | – | – | lancée le 13 oct. vers 15 h 30 ; à traiter en 0.11 |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
