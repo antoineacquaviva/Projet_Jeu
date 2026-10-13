@@ -1,17 +1,22 @@
 {
  "cycle": "essai",
  "etape": "exploration",
- "gen": 1,
+ "gen": 2,
  "statut": "en cours",
  "historique": [
   {
    "etape": "exploration",
    "gen": 1,
    "date": "2026-10-13T13:23:41+00:00"
+  },
+  {
+   "etape": "exploration",
+   "gen": 2,
+   "date": "2026-10-13T13:24:14+00:00"
   }
  ],
  "debut": "2026-10-13T13:23:14+00:00",
  "fin_estimee": "2026-10-13T13:27:52+00:00",
  "parties": 24,
- "maj": "2026-10-13T13:23:52+00:00"
+ "maj": "2026-10-13T13:24:14+00:00"
 }

@@ -179,5 +179,41 @@
     }
    }
   }
+ },
+ "4-1": {
+  "genome": [
+   0,
+   2,
+   1,
+   0
+  ],
+  "variante": "patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2}}",
+  "qualite": 1.0,
+  "score_duree": 1.0,
+  "score_difficulte": 1.0,
+  "tour_moyen": 6.0,
+  "ecart_tailles": 7.14,
+  "foret_min": 66.67,
+  "precoces_max": 0.0,
+  "tailles": {
+   "2": {
+    "foret": 66.67,
+    "precoces": 0.0,
+    "parties": 2,
+    "tour": 6.0,
+    "fins": {
+     "reveil": 100.0
+    }
+   },
+   "3": {
+    "foret": 73.81,
+    "precoces": 0.0,
+    "parties": 2,
+    "tour": 6.0,
+    "fins": {
+     "nuit": 100.0
+    }
+   }
+  }
  }
 }
