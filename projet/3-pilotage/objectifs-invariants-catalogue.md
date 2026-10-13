@@ -145,6 +145,8 @@ Le conseil parlé (C2c) n'est pas modélisable tel quel. Le moteur l'approchera 
 | D3 Les trois fins | socle | long sommeil, **réveil de la forêt**, nuit ; immédiates | sommeil, silence, nuit | invariant (pas de défaite) | partiel |
 | D4 Le bilan (D7) | socle | bonus **0** ; 10 % ; 25 % | forêt seule (A12) | décidé (A12) ; 10 et 25 % pour la robustesse | à coder |
 | D5 Les lunes (D9) | module | **absent** jusqu'à trois joueurs, présent au-delà (proposition) ; 1, **2**, 3 lunes par tour | – | à trancher en phase 3 | à coder |
+| Rêves pour un pas de l'esprit (0.4) | paramètre | **1**, 2, 3 ; par taille de table | – | libre (freine le long sommeil) | codé |
+| Lunes, Cercle, main, tours… par taille de table (0.4) | paramètre | nombre, valeur par taille, ou formule « n-1 » | – | libre ; au plus 4 éléments propres au nombre de joueurs dans une version | codé |
 | D6 Le dernier sursaut | module | **absent** ; 1 à **3** plans | absent (codé) | module | codé (v1) |
 | D7 Le silence du chantier | module | retiré en v2 | présent | v1 seulement | codé |
 
@@ -153,6 +155,8 @@ Le conseil parlé (C2c) n'est pas modélisable tel quel. Le moteur l'approchera 
 |---|---|---|---|---|---|
 | E1 Le plateau | socle | **v1 (7 zones)** ; gabarits à dessiner ; flèches de percée en v2 | v1 | libre par gabarits | codé (flèches à coder) |
 | E2 Les Machines | socle | organes R1.2 ; zones d'entrée (v2) ; Machines au chantier au départ 0, 1, **2** | 3 en jeu, 2 en réserve | difficulté ; effets des organes libres | codé (zones d'entrée à coder) |
+| Machines en jeu au départ (0.4) | paramètre | 3 (maquette) à 5 ; par taille de table | – | libre (difficulté selon la table) | codé |
+| Ordres du Méchant par étape (0.4) | paramètre | **1**, 2 ; par taille de table | – | libre ; forme des ordres en plus à confirmer s'il est retenu | codé |
 
 ### 5.F Variables propres à la v1 (piste unique)
 Elles ne servent qu'à la v1 et au préréglage « Héritage v1 » : tuiles Réparer (avec ou sans Machine HS) et Renfort ; critères v1 (Représailles sur la dernière attaque, fenêtre sans limite ou ce tour ; Percée devant la plus avancée) ; sens de « défendue » (pions visibles, ou cartes jouées, barrages…) ; silence avec une réserve non vide ; effets des organes ; Tenir (zones de présence, passif, barrer en plus ; formes v0 = témoins) ; Renverser (tous les organes ou les chenilles). Statut : libres pour la v1, sans recherche prévue tant que la v2 n'est pas tranchée.

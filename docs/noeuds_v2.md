@@ -75,7 +75,7 @@ Les règles de la v1 (docs/regles_v1.md) s'appliquent pour tout ce que ces nœud
 
 ## D. Le moteur des rêves et les fins
 
-**[v2:D1] Rêver.** Une carte en travers part en rêve (R3.6). Réglage `reves_limite` : un par joueur et par tour (`joueur`), ou deux ou trois par tour pour la table (`table2`, `table3`).
+**[v2:D1] Rêver.** Une carte en travers part en rêve (R3.6). Réglage `reves_limite` : un par joueur et par tour (`joueur`), ou deux ou trois par tour pour la table (`table2`, `table3`). Réglage `reves_par_pas` (plan vers la V1, 0.4) : il faut ce nombre de rêves vers le sommeil pour un pas de l'esprit (entrée en 12 ou avance) ; les rêves en attente sont comptés sur un sablier public, remis à zéro à chaque pas ; 1 = R5.3.
 *Choix de modélisation, à confirmer : avec une limite de table et une programmation simultanée, les rêves se font dans l'ordre des étapes et des joueurs ; les cartes en trop ne rêvent pas et reviennent en main à la fin du tour (lacune `reves_table_depasses`) ; la limite de table remplace la limite par joueur.*
 
 **[v2:D2] Les deux voies du rêve.** Voie du sommeil : un esprit entre en 12 ou avance (R5.3). Voie du réveil : le rêve rejoint le Cercle, qui compte `seuil` cases par joueur ; rien ne le fait reculer. Règle `voies_reve`, `cercle_par_joueur`.
@@ -101,4 +101,9 @@ Les règles de la v1 (docs/regles_v1.md) s'appliquent pour tout ce que ces nœud
 
 **[v2:E1] Le plateau.** Le plateau v1, avec une flèche de percée par zone non centrale (`plateau.fleches`). Le gabarit g1 n'est pas dessiné : refusé.
 
-**[v2:E2] Les Machines.** Grosse Gueule (moteur, chenilles ; Lisière), Rapiat (moteur, chenilles, phares ; Clairière), Mâchoire (moteur, phares ; Várzea) en jeu ; Tonton Débard (moteur, chenilles ; entrée Lisière) et Ripaille (moteur, chenilles, phares ; entrée Várzea) au chantier. Réglage `m_chantier` (0, 1, 2) : Machines au chantier au départ.
+**[v2:E2] Les Machines.** Grosse Gueule (moteur, chenilles ; Lisière), Rapiat (moteur, chenilles, phares ; Clairière), Mâchoire (moteur, phares ; Várzea) en jeu ; Tonton Débard (moteur, chenilles ; entrée Lisière) et Ripaille (moteur, chenilles, phares ; entrée Várzea) au chantier. Réglage `m_chantier` (0, 1, 2) : Machines au chantier au départ. Règle `machines_en_jeu` (plan vers la V1, 0.4) : nombre de Machines en jeu au départ, les suivantes de la réserve entrant par leur zone d'entrée ; null = la maquette.
+
+## Valeurs par taille de table et ordres par étape (plan vers la V1, étape 0.4)
+- **Valeurs par taille de table** (`foret/maquette.py`, `PAR_TABLE`) : `lunes`, `cercle_par_joueur`, `reves_par_pas`, `reves_par_tour_table`, `reves_par_joueur_et_tour`, `escalade`, `ordres_par_etape`, `machines_en_jeu`, `tours` et `cartes.main` acceptent un nombre, un dict `{"2": …, "6": …}` (une taille absente prend la valeur de la plus proche taille inférieure) ou une formule `n`, `n-1`, `n+2`. La maquette est résolue à la création de la partie ; la validation porte sur chaque taille de 1 à 6. Une version proposée n'en garde que 4 au plus (décision du 13 oct.). Tests : `tests/test_par_table.py`.
+- **Ordres par étape** (`ordres_par_etape`, 1 par défaut) : après l'ordre de l'étape, le Méchant en donne d'autres, avec des dés neufs. *Choix de modélisation, à confirmer par l'auteur s'il est retenu : ni le présage, ni Voir, ni Hanter, ni les embuscades ne concernent ces ordres ; les barrages de l'étape, si.*
+

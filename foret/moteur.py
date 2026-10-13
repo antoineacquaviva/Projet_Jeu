@@ -38,6 +38,7 @@ from .lacunes import LACUNES, INCOHERENCES
 from .decisions import DECISIONS
 from .observateurs import Compteur, Journal
 from .plans import Plans
+from .maquette import resoudre_table
 
 VERSION = "1.7.1"
 CENTRE = 7                      # R5.1 : 2-6 éveil, 7 centre, 8-12 rêve
@@ -189,6 +190,7 @@ class Partie(Plans):
         self.lignee = R0.get("lignee") or next(_LIGNEES)
         self._init_args = (list(peuples), graine, controle)
         self._memo_m = None                  # calculé à la première copie
+        maquette = resoudre_table(maquette, len(peuples))   # plan vers la V1, 7 bis : valeurs par taille de table
         self._pos = ("conseil", 1) if maquette["tours"] >= 1 else None
         M = self.M = maquette
         self.R = maquette["regles"]
@@ -212,6 +214,7 @@ class Partie(Plans):
         self.etape = 0
         self.etapes = tuple(range(1, M["etapes"] + 1))
         self.esprit_vu_au_centre = False
+        self.sablier = 0                  # [v2:D1] rêves accumulés vers le prochain pas de l'esprit (reves_par_pas)
         self.derniere_attaque = None      # (zone, tour, étape)
         self.attaques = []                # [(zone, tour, étape)] : Représailles dans le rayon [v2:A3]
         self.cercle = []                  # [v2:D2] la voie du réveil : [(peuple, source)]
@@ -253,6 +256,14 @@ class Partie(Plans):
         self.machines = []
         specs = [(s, s["zone"], "plateau") for s in self.M["machines"]["en_jeu"]]
         specs += [(s, None, "reserve") for s in self.M["machines"].get("reserve", [])]
+        k = self.R.get("machines_en_jeu")                   # [v2:E2] Machines en jeu au départ (par table)
+        if k is not None:
+            if k > len(specs):
+                raise ErreurMoteur(f"machines_en_jeu = {k} : seulement {len(specs)} Machines")
+            specs = [(sp, (z if z else sp.get("entree") or sp.get("zone")), "plateau") if i < k
+                     else (sp, None, "reserve") for i, (sp, z, _) in enumerate(specs)]
+            if any(e == "plateau" and z is None for _, z, e in specs):
+                raise ErreurMoteur("machines_en_jeu : une Machine de réserve sans zone d'entrée")
         n_pistes = len(specs)
         if self.R["plan"] == "qui_ou" and self.R["double"] == "sixieme":      # [v2:A2a_d] Zizanie
             specs.append((self.M["machines"]["sixieme"], None, "reserve"))
@@ -785,6 +796,16 @@ class Partie(Plans):
                     self.rejoindre_cercle(siege, source)
                 return
             choix = self.decider(siege, "reve", opts, source=source)
+        k = self.R.get("reves_par_pas", 1)                 # [v2:D1] avance de l'esprit : k rêves pour un pas
+        if k > 1:
+            self.sablier += 1
+            if self.sablier < k:
+                self.stat("reves_en_attente")
+                self.log(f"  rêve : vers le sommeil ({self.sablier}/{k} pour le prochain pas de l'esprit)")
+                if voies == "deux":
+                    self.rejoindre_cercle(siege, source)
+                return
+            self.sablier = 0
         self.rever(choix)
         self.stat("esprits_" + source)
         self.verifier_sommeil()
@@ -1489,6 +1510,12 @@ class Partie(Plans):
         # 7. Exécution et apprentissage
         if info is not None:
             self.executer_et_apprendre(info)
+        # 8. Ordres supplémentaires (plan vers la V1, 7 bis : nombre d'ordres selon la taille de la table)
+        for _ in range(1, self.R.get("ordres_par_etape", 1)):
+            info = self.ee.info = self.tirer_ordre(e, supplementaire=True)
+            if info is not None:
+                self.stat("ordres_supplementaires")
+                self.executer_et_apprendre(info)
 
     def options_aller(self, jeu):
         """R3.2 (+ Voler, Se fondre)"""
@@ -1630,18 +1657,22 @@ class Partie(Plans):
                 self.resoudre_sabotage(a)
 
     # =================================================================== ordre
-    def tirer_ordre(self, e):
-        """R4.1 : la tuile désignée par les dés ; un esprit : pas d'ordre (R6.11 : Hanter, pas de dés)."""
-        if self.ee.annule:
+    def tirer_ordre(self, e, supplementaire=False):
+        """R4.1 : la tuile désignée par les dés ; un esprit : pas d'ordre (R6.11 : Hanter, pas de dés).
+
+        supplementaire (règle ordres_par_etape) : un ordre de plus dans l'étape, avec des dés neufs ;
+        choix de modélisation : ni le présage, ni Voir, ni Hanter, ni les embuscades ne le concernent ;
+        les barrages de l'étape, si."""
+        if self.ee.annule and not supplementaire:
             self.stat("ordres_hantes")
             self.log("  hanté : l'ordre est annulé")
             return None
-        d = self.des_vus.get(e) or self.lancer_des()
+        d = self.lancer_des() if supplementaire else (self.des_vus.get(e) or self.lancer_des())
         if self.R["plan"] != "une_piste":
-            return self._tirer_ordre_v2(e, d)
+            return self._tirer_ordre_v2(e, d, supplementaire)
         case = sum(d)
         tuile = self.piste[case]
-        if e in self.tuile_vue and self.tuile_vue[e] is not tuile:
+        if not supplementaire and e in self.tuile_vue and self.tuile_vue[e] is not tuile:
             if self.des_source.get(e) == "presage":
                 self.stat("presage_detourne")                    # R2.6 : un rêve a changé la case annoncée
             else:
@@ -1659,11 +1690,11 @@ class Partie(Plans):
             self.log(f"  {tuile.nom} vise {info['cible']} ; Machine : {info['machine']}")
         return info
 
-    def _tirer_ordre_v2(self, e, d):
+    def _tirer_ordre_v2(self, e, d, supplementaire=False):
         """[v2:A2a] [v2:A2b] : la somme et l'écart des dés."""
         info = self.interpreter(d)
         tuile = info["tuile"]
-        if e in self.tuile_vue and self.tuile_vue[e] is not tuile:
+        if not supplementaire and e in self.tuile_vue and self.tuile_vue[e] is not tuile:
             if self.des_source.get(e) == "presage":
                 self.stat("presage_detourne")
             else:

@@ -165,9 +165,9 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.1 = v0, V0.2 = v1 (étalon figé, plus de campagne), **V0.3 = v2 fixée** (point de départ), puis V0.4, V0.5, V0.6 (un cycle chacune, trois au plus), V1.0 (gelée pour les tests humains). Moteur 1.7.1 ≠ version du jeu.
 
 **Étape 0 : l'outillage** (À FAIRE ; une étape par passage, dans cet ordre, sauf dépendance)
-- 0.1 Versions renommées (README, documents, `maquettes/v0.3.json`) ; 0.2 V0.3 dans le moteur, tests, conformité.
-- 0.3 Statistiques appariées et intervalles par rééchantillonnage dans les résumés.
-- 0.4 Leviers du rêve en paramètres : avance de l'esprit (case d'entrée, pas), lunes selon la taille de la table, taille de la main ; aucune règle nouvelle (réponse de l'auteur du 13 oct., 14:20).
+- 0.1 Versions renommées ; 0.2 V0.3 dans le moteur (FAIT le 13 oct. : `maquettes/v0.3.json`, `tests/test_v03.py`).
+- 0.3 Statistiques appariées (FAIT le 13 oct. : `foret/stats.py`, synthèses `apparie` et `parties_compactes`, docs/mesures.md).
+- 0.4 Leviers du rêve et de la taille de table (FAIT le 13 oct. : `reves_par_pas`, `ordres_par_etape`, `machines_en_jeu`, valeurs par taille de table ou formule « n-1 » pour lunes, Cercle, main, tours… ; `tests/test_par_table.py`). Indice (glouton, 24 parties par case) : un ordre de plus par étape fait perdre 15 à 20 points de forêt ; tout combiné, le duo va au tour 6 mais tombe à 23 % : de la matière pour le criblage.
 - 0.5 Mesure « choix morts » ; 0.6 mesure « apprentissage du Méchant » ; chacune avec son témoin.
 - 0.7 Bot à portefeuille (validé sur V0.3 et V0.2) ; 0.8 bot de contrôle.
 - 0.9 `foret/criblage.py` (Morris, glouton) et `foret/exploration.py` (MAP-Elites, étalon au hasard).

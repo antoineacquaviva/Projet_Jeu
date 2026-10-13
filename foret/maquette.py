@@ -111,6 +111,9 @@ REGLES = {
     "bonus_fin": _entier_nat,                                      # [v2:D4] % de la forêt initiale
     "reves_par_tour_table": _entier_ou_rien,                       # [v2:D1]
     "lunes": _entier_ou_rien,                                      # [v2:D5]
+    "reves_par_pas": _entier_pos,
+    "ordres_par_etape": _entier_pos,
+    "machines_en_jeu": _entier_ou_rien,                            # [v2:E2] Machines en jeu au départ (null = la maquette)                               # [v0.3:ordres] ordres du Méchant par étape                                  # [v0.3:pas] rêves pour un pas de l'esprit
     "egarer": _choix("retiree", "chantier"),                       # [v2:B3]
     "barrage_sortie": _bool,                                       # [v2:B2]
     # Témoins de mesure (moteur 1.4, phase 1d) : jamais proposés comme règles du jeu
@@ -118,6 +121,69 @@ REGLES = {
     "apprentissage": _bool,            # [mesure:temoins] false = le Méchant n'apprend plus
     "interdits": _interdits,           # [mesure:jeu_restreint] jeu restreint : options retirées à tous
 }
+
+
+# ------------------------------------------------------------------ valeurs par taille de table
+# Plan vers la V1, section 7 bis (critère du 13 oct. 2026) : certaines valeurs peuvent dépendre du
+# nombre de joueurs. Forme : un nombre (comme avant), un dict {"2": …, "6": …} (clés de "1" à "6" ;
+# une taille absente prend la valeur de la plus proche taille inférieure donnée, sinon la plus petite),
+# ou une formule « n », « n-1 », « n+2 » (n = nombre de joueurs ; résultat ramené à 0 au moins).
+PAR_TABLE = (("regles", "lunes"), ("regles", "cercle_par_joueur"), ("regles", "reves_par_pas"),
+             ("regles", "reves_par_tour_table"), ("regles", "reves_par_joueur_et_tour"),
+             ("regles", "escalade"), ("regles", "ordres_par_etape"), ("regles", "machines_en_jeu"),
+             ("tours",), ("cartes", "main"))
+TAILLES = range(1, 7)
+_FORMULE = re.compile(r"n([+-][0-9]+)?")
+
+
+def est_par_table(x):
+    if isinstance(x, str):
+        return bool(_FORMULE.fullmatch(x.replace(" ", "")))
+    return (isinstance(x, dict) and bool(x) and all(k in {str(t) for t in TAILLES} for k in x))
+
+
+def valeur_table(x, n):
+    """Valeur d'un réglage pour une table de n joueurs (x : nombre, dict par taille ou formule)."""
+    if isinstance(x, str) and est_par_table(x):
+        f = _FORMULE.fullmatch(x.replace(" ", ""))
+        return max(0, n + int(f.group(1) or 0))
+    if isinstance(x, dict) and est_par_table(x):
+        tailles = sorted(int(k) for k in x)
+        bas = [t for t in tailles if t <= n]
+        return x[str(bas[-1] if bas else tailles[0])]
+    return x
+
+
+def _lire_chemin(m, chemin):
+    o = m
+    for k in chemin:
+        if not isinstance(o, dict) or k not in o:
+            return None, False
+        o = o[k]
+    return o, True
+
+
+def a_des_valeurs_par_table(m):
+    return any(est_par_table(_lire_chemin(m, c)[0]) for c in PAR_TABLE)
+
+
+def resoudre_table(m, n):
+    """Maquette pour une table de n joueurs : les valeurs par taille de table remplacées par leur valeur.
+    Rend la maquette elle-même (même objet) si elle n'en contient aucune."""
+    if not a_des_valeurs_par_table(m):
+        return m
+    out = dict(m)
+    for chemin in PAR_TABLE:
+        v, ok = _lire_chemin(m, chemin)
+        if not ok or not est_par_table(v):
+            continue
+        if len(chemin) == 1:
+            out[chemin[0]] = valeur_table(v, n)
+        else:
+            out[chemin[0]] = dict(out[chemin[0]])
+            out[chemin[0]][chemin[1]] = valeur_table(v, n)
+    out["par_table"] = {"joueurs": n}
+    return out
 
 
 # ------------------------------------------------------------------ fusion
@@ -164,6 +230,26 @@ def lire(nom, _vus=()):
     return data
 
 
+def _morceaux(texte):
+    """Découpe « a=1,b={"2":1,"4":2},c="n-1" » aux virgules hors accolades, crochets et guillemets."""
+    out, prof, guill, cur = [], 0, False, ""
+    for ch in texte:
+        if ch == '"':
+            guill = not guill
+        elif not guill and ch in "{[":
+            prof += 1
+        elif not guill and ch in "}]":
+            prof -= 1
+        if ch == "," and prof == 0 and not guill:
+            out.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    if cur:
+        out.append(cur)
+    return out
+
+
 def charger(nom, variante=None):
     """Maquette prête à jouer : héritage résolu, variante appliquée, validée.
 
@@ -180,7 +266,7 @@ def charger(nom, variante=None):
             patch = {"regles": {"interdits": variante[len("interdire:"):].split("+")}}
         elif variante.startswith("regles:"):                 # « regles:bonus_fin=10,lunes=3 » (valeurs JSON)
             patch = {"regles": {}}
-            for morceau in variante[len("regles:"):].split(","):
+            for morceau in _morceaux(variante[len("regles:"):]):
                 k, _, v = morceau.partition("=")
                 try:
                     patch["regles"][k] = json.loads(v)
@@ -206,6 +292,18 @@ def charger(nom, variante=None):
 
 # ------------------------------------------------------------------ validation
 def valider(m):
+    """Valide une maquette ; si elle a des valeurs par taille de table, la valide pour chaque taille."""
+    if a_des_valeurs_par_table(m):
+        for n in TAILLES:
+            try:
+                _valider(resoudre_table(m, n))
+            except ErreurMaquette as e:
+                raise ErreurMaquette(f"{e} (table de {n} joueurs)") from None
+        return m
+    return _valider(m)
+
+
+def _valider(m):
     from .criteres import CRITERES
     from .chantier import CHANTIER
     from .pouvoirs import POUVOIRS
@@ -213,7 +311,7 @@ def valider(m):
     def err(msg):
         raise ErreurMaquette(f"maquette {m.get('nom')} ({m.get('variante')}) : {msg}")
 
-    inconnues = set(m) - CLES - {"herite_de", "variante"}
+    inconnues = set(m) - CLES - {"herite_de", "variante", "par_table"}
     if inconnues:
         err(f"clés inconnues {sorted(inconnues)}")
     for k in ("tours", "etapes"):
