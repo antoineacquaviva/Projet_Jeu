@@ -6,7 +6,7 @@ Ce dépôt réunit deux choses :
 - **les documents de conception** : les idées, les maquettes de règles, le plan de travail et les bilans ;
 - **le moteur de simulation** `foret` : il joue les règles sans interface, avec des joueurs virtuels, pour trouver les failles des règles et mesurer les variantes.
 
-Où en est le projet (13 oct. 2026) : les phases 1 (mesures) et 2 (le bot fort, moteur 1.7) sont faites. La phase 3 (diagnostic de la v1 et options de la v2) est en cours : bot qui communique, plan réduit du bot fort et mesures du bot fort faits, calculs lancés sur GitHub. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
+Où en est le projet (13 oct. 2026) : les phases 1 (mesures) et 2 (le bot fort, moteur 1.7) sont faites. Le diagnostic de la phase 3 est fait ([projet/4-bilans/diagnostic-v1-options-v2.md](projet/4-bilans/diagnostic-v1-options-v2.md)) : il attend la décision de l'auteur pour fixer la v2. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
 
 ## Carte du dépôt
 
@@ -50,6 +50,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Phase 1 : avancement](projet/4-bilans/phase1-avancement.md) | Copie d'état, communication, v2 dans le moteur |
 | | [Batterie d'évaluation (phase 1)](projet/4-bilans/batterie-evaluation-phase1.md) | **Le livrable de la phase 1** : les mesures, les témoins, les verdicts |
 | | [Bots : échelle et validation (phase 2)](projet/4-bilans/bots-echelle-validation.md) | **Le livrable de la phase 2** : le bot fort, l'échelle des bots, défendre ou rêver, le devin, le chef unique |
+| | [Diagnostic de la v1 et options de la v2 (phase 3)](projet/4-bilans/diagnostic-v1-options-v2.md) | **Le livrable de la phase 3** : verdicts du bot fort, jeu restreint, options de la v2, robustesse, recommandations |
 
 Les fichiers HTML s'ouvrent dans un navigateur, après téléchargement. Les documents citent parfois des chemins `claude/moteur-v1/…` : ce sont ceux de l'espace de travail d'origine, qui correspondent ici à la racine du dépôt.
 

@@ -114,7 +114,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 - **Fin d'étape.** Lancer la vérification de robustesse : les campagnes clés rejouées avec un bonus de fin de 10 et de 25 % (réglage `bonus` de l'atelier).
 - **Livrable.** `projet/4-bilans/diagnostic-v1-options-v2.md` (créer le fichier), sections v1, V2, mesures du bot fort, jeu restreint.
 
-**3.6 Les options de la v2, et le diagnostic complet** (EN COURS, session interactive du 13 oct. ; reste la robustesse de la V2, campagne 15)
+**3.6 Les options de la v2, et le diagnostic complet** (FAIT le 13 oct. : diagnostic terminé, sections 7 à 10 ; README et plan d'action à jour)
 - **Quoi.** Traiter `v2_options_mc` et la robustesse. Pour chaque décision ouverte (D1 à D6, D8, D9), un tableau des mesures clés (forêt, concentration, meilleur taux de rêve, fins avant la mi-partie, chef unique) et la recommandation de Claude.
 - **Livrable.** Le diagnostic terminé : en bref, problèmes de la v1 classés par gravité, options de la v2, recommandations, limites. README et plan d'action à jour.
 
@@ -169,7 +169,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 
 ## 5. Étape suivante
 
-**3.6 Les options de la v2, et le diagnostic complet** (en cours dans la session interactive du 13 oct. ; si le Verrou est vidé sans que l'étape soit marquée FAIT, reprendre là : traiter la campagne 15, robustesse de la V2, dans la section 8 du diagnostic, puis finir le diagnostic). Ensuite : 3.7, DÉCISION UTILISATEUR.
+**3.7 DÉCISION UTILISATEUR : fixer la v2.** Lire `projet/4-bilans/diagnostic-v1-options-v2.md`, section 9 (recommandations de Claude pour D1 à D6, D8, D9), et répondre dans la section 8 ci-dessous. Deux points annexes à trancher en même temps : les seuils provisoires des dilemmes (1 et 3 points) et leur témoin (raté), section 5 du diagnostic. Tant que la réponse manque, les passages automatiques s'arrêtent et le rappellent.
 
 **Incident GitHub (13 oct.).** Le groupe de concurrence des fusions (`publication-resultats`) ne garde qu'une tâche en attente et annule les autres : les fusions des campagnes 12 et 13 ont été annulées, puis relancées avec `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/runs/<id>/rerun-failed-jobs` (une seule à la fois). Corrigé pour les lancements suivants : plus de groupe, la publication réessaie. Les lots de campagne sont gardés 3 jours (1 jour avant la correction).
 
@@ -177,7 +177,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 
 ## 6. Verrou
 
-EN COURS depuis le 2026-10-13 08:27 (heure de Paris) : session interactive avec l'auteur (étapes 3.1 et suivantes).
+
 
 ## 7. Compteur de passages
 
@@ -194,7 +194,7 @@ EN COURS depuis le 2026-10-13 08:27 (heure de Paris) : session interactive avec 
   2. plan réduit : 15 duos et 5 trios, 4 parties par table ;
   3. le bot qui communique est construit en premier ;
   4. organisation : un passage n'attend jamais un calcul de plus de 15 minutes (il lance, note et s'arrête) ; plafond de 12 passages qui travaillent par semaine.
-- 3.7 (fixer la v2) : *en attente*
+- 3.7 (fixer la v2, diagnostic section 9 ; et seuils et témoin des dilemmes, section 5) : *en attente*
 
 ## 9. Campagnes GitHub
 
@@ -222,7 +222,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Campagne 12 | jeu_restreint_v2, V2, MC 64 qui rêve, 480 parties | 20 | 80 min | 8 min | fusion annulée par le groupe de concurrence, relancée (rerun-failed-jobs) : réussi ; traité |
 | Campagne 13 | v2_options_mc, 16 variantes, MC 64 qui rêve, 960 parties | 20 | 82 min | 17 min | fusion annulée, relancée : réussi ; traité (section 7) |
 | Campagne 14 | robustesse_v1, bonus 0/10/25, 720 parties | 20 | 75 min | 28 min | réussi ; traité (section 8) |
-| Campagne 15 | robustesse_v2, 16 variantes × bonus 10 et 25, 1 920 parties | 20 | – | – | en cours ; à traiter en 3.6 (section 8 du diagnostic) |
+| Campagne 15 | robustesse_v2, 16 variantes × bonus 10 et 25, 1 920 parties | 20 | 101 min (attentes comprises) | 34 min environ | réussi ; traité (diagnostic, section 8) |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
@@ -231,7 +231,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Date | Début | Durée | Statut | Résumé |
 |---|---|---|---|---|
 | 13 oct. 2026 | – | – | terminé | Mise en place (session interactive) : phase 2 terminée, ETAT.md créé, workflows en Node 24 (tests verts), tâche planifiée « Forêt qui rêve · tests autonomes » créée (3 h 35, 9 h 35, 15 h 35). Pas compté dans le plafond. |
-| 13 oct. 2026 | 08:27 | – | en cours | Session interactive avec l'auteur : décisions de fin de phase 2 prises (section 8), planification revue, étape 3.1 en cours. |
+| 13 oct. 2026 | 08:27 | 3 h 35 | terminé | Session interactive avec l'auteur : décisions de fin de phase 2 (section 8), planification revue ; étapes 3.1 à 3.6 faites (moteur 1.7.1, bot fort de la V2 qui rêve, mesures du bot fort, jeu restreint, options de la v2, robustesse ; campagnes 9 à 15 et batteries 3 à 6). Livrable : `projet/4-bilans/diagnostic-v1-options-v2.md`. Étape suivante : 3.7, décision de l'auteur. Pas compté dans le plafond. |
 
 ## 11. Reprendre la main
 

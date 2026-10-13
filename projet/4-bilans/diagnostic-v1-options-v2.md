@@ -1,6 +1,6 @@
 # Diagnostic de la v1 et options de la v2 (phase 3)
 
-*Statut (13 oct. 2026, matin) : brouillon de l'étape 3.5. Moteur 1.7 et 1.7.1. Bot fort : Monte-Carlo à un coup, 64 suites par décision, chacun pour soi (MC 64). En v1, ses suites ne rêvent pas ; en V2, elles rêvent une carte par tour (voir « Le bot fort de la V2 »). Plan réduit décidé le 13 oct. : les 6 peuples seuls, les 15 duos, 5 trios, 4 parties par table. Toutes les valeurs sont des **indices** : elles décrivent le jeu joué par ce bot, sur peu de parties (marges de 2 à 6 points). Les sections « jeu restreint », « options de la v2 » et « robustesse » viendront avec les campagnes 11 à 15 (étapes 3.5 et 3.6).*
+*Statut (13 oct. 2026, midi) : livrable des étapes 3.5 et 3.6 du « Plan d'action ». Décision de l'auteur attendue : fixer la v2 (section 9). Moteur 1.7 et 1.7.1. Bot fort : Monte-Carlo à un coup, 64 suites par décision, chacun pour soi (MC 64). En v1, ses suites ne rêvent pas ; en V2, elles rêvent une carte par tour (voir « Le bot fort de la V2 »). Plan réduit décidé le 13 oct. : les 6 peuples seuls, les 15 duos, 5 trios, 4 parties par table. Toutes les valeurs sont des **indices** : elles décrivent le jeu joué par ce bot, sur peu de parties (marges de 2 à 6 points).*
 
 ## En bref
 - **v1 : la menace est lue et contrée.** Le Méchant concentre 96 % de sa menace sur autant de zones qu'il y a de joueurs, et le bot fort fait échouer quatre ordres sur cinq. Ce verdict ne dépend pas du bot (rouge aussi avec le glouton). C'est le défaut le plus solide de la v1.
@@ -8,12 +8,15 @@
 - **v1 : un peuple suffit.** Joués seuls par le bot fort, les reptiles gardent 99 % de la forêt ; seuls 4 duos sur 15 font mieux que leur meilleur peuple seul (objectif 3 rouge). Les insectes et les mammifères pèsent peu (spectateur 0,23 et 0,36).
 - **V2 proposée : le rêve domine et la partie finit au tour 3.** Avec le bot fort qui rêve, 81 % des parties finissent avant la mi-partie, par le réveil (60 %) ou le sommeil (40 %), et l'issue est connue dès le tour 3 (incertitude nulle). Le meilleur taux de rêve est le maximum permis (objectifs 2 et 4 rouges). C'est le premier problème de la V2.
 - **V2 proposée : l'équipe fonctionne.** Shapley, synergies, pire table et aucun spectateur sont verts, et les traces numérotées récupèrent 66 % de la coordination. Mais la partie est si courte que chaque table s'en sort bien : ces verts sont à revérifier une fois la durée corrigée.
+- **Aucune option de la V2, seule, ne corrige la durée** (section 7). Le seuil du Cercle bascule d'une voie trop rapide à l'autre ; les lunes ralentissent un peu ; les autres options déplacent la forêt de 1 à 3 points. Les conclusions sur la V2 tiennent avec un bonus de fin de 10 ou 25 % ; celle de la v1 sur le rêve, non (section 8).
+- **Jeu restreint** (section 6) : en v1, Voir, l'embuscade, Hanter et Barrer portent le jeu, Saboter n'aide pas ce bot ; en V2, presque rien ne pèse, Saboter compris (1 point), parce que la partie finit avant que les actions comptent.
 - **Témoins du bot fort** : trois sur quatre tombent où il faut ; celui des dilemmes rate (section 5) : la mesure des dilemmes reste à confirmer.
+- **Recommandation** (section 9) : garder les options proposées de la V2, ajouter les lunes à toutes les tailles de table, et consacrer la phase 4 à freiner le rêve (seuil du Cercle, lunes, pas de l'esprit, coût du rêve).
 
 ## 1. Méthode
-- **Configurations** (`foret/batterie.py`) : `p3_v1` (v1, MC 64), `p3_v2r` (V2 proposée, MC 64 qui rêve), et `p3_v2` (V2, MC 64 qui ne rêve pas, gardé pour comparaison). Les mesures du bot fort viennent du programme `mesures3` (`m3_v1`, `m3_v2r`, témoins). Les campagnes 9 et 10 donnent la coordination et le chef unique.
+- **Configurations** (`foret/batterie.py`) : `p3_v1` (v1, MC 64), `p3_v2r` (V2 proposée, MC 64 qui rêve), et `p3_v2` (V2, MC 64 qui ne rêve pas, gardé pour comparaison). Les mesures du bot fort viennent du programme `mesures3` (`m3_v1`, `m3_v2r`, témoins). Les campagnes 9 et 10 donnent la coordination et le chef unique ; 11 et 12 le jeu restreint ; 13 les options de la v2 ; 14 et 15 la robustesse au bonus de fin.
 - **Comparaison avec le glouton** : chaque verdict est comparé à celui de la batterie de la phase 1 (glouton qui rêve une carte par tour, `v1_g1`, `v2_g1`, et glouton qui ne rêve pas, `v1_g0`, `v2_g0`). Un verdict qui change avec le bot décrit les bots, pas le jeu ; un verdict stable est un défaut (ou une qualité) du jeu.
-- **Sources** : branche `resultats`, `batterie/run3_phase3`, `run4_mesures3`, `run5_phase3`, `run6_mesures3` (rapports et parties) ; `campagnes/coordination_mc_2_run9` et `_run10`.
+- **Sources** : branche `resultats`, `batterie/run3_phase3`, `run4_mesures3`, `run5_phase3`, `run6_mesures3` (rapports et parties) ; `campagnes/coordination_mc_2_run9` et `_run10`, `jeu_restreint_run11`, `jeu_restreint_v2_run12`, `v2_options_mc_run13`, `robustesse_v1_run14`, `robustesse_v2_run15` (synthèses ; `python scripts/resume_campagne.py <dossier>`).
 
 ### Le bot fort de la V2
 En V2, le bot de référence dont les suites ne rêvent pas garde 82 % de la forêt, moins que le glouton qui rêve une carte par tour (86 %) : il ne découvre pas seul l'intérêt de rêver (limite connue d'un bot à un coup). Avec des suites qui rêvent, le même bot garde 92 %. Le bot fort de la V2 est donc MC 64 chacun pour soi dont les suites rêvent (décision technique du 13 oct., signalée à l'auteur). En v1, c'est l'inverse : ses suites ne rêvent pas, et c'est là qu'il est le plus fort. Les campagnes de coordination (9 et 10) ont été jouées avec le bot qui ne rêve pas.
@@ -134,7 +137,28 @@ Campagne 13 (`v2_options_mc`, 960 parties) : « V2 proposée », les préréglag
 - **D5 « un rêve nourrit les deux voies »** accélère le réveil : à écarter si l'on veut allonger la partie.
 - **D1, D2, D3, D4, D8** : écarts de 0 à 3 points, sans effet sur la durée. Le plan « qui et où » (D1) et le doublé « favori » ou « sixième Machine » (D2) gardent le plus de forêt ; « branle-bas » rend le Méchant plus efficace (56 % d'ordres réussis) mais coûte 3 points. Ces décisions peuvent se trancher sur d'autres critères (lisibilité, goût), la simulation ne les départage guère.
 
-## 8. Limites
+## 8. Robustesse au bonus de fin (A12)
+Le résultat est la forêt restante, sans bonus. On vérifie que les conclusions tiennent si une fin par le rêve rapportait 10 ou 25 % de la forêt initiale (campagnes 14 et 15, mêmes duos, mêmes graines).
+- **V2 : tout tient.** Les 16 variantes gardent la même forêt (à 1 point près), la même durée (tour 2,1 à 3,9) et presque le même classement : seuil 2, « un rêve nourrit les deux voies », V2 proposée et sixième Machine restent en tête ; seuil 4 et branle-bas en queue. Le bot fort finissait déjà par un rêve : le bonus ne change pas sa façon de jouer.
+- **v1 : la conclusion « rêver ne compte pas » ne tient pas.** Avec un bonus de 10 %, rêver une carte par tour devient nettement meilleur (résultat 92,7 contre 84,0 sans rêver ; 106 contre 84 avec 25 %) et la partie finit au tour 4 par le sommeil. Le verdict de l'objectif 2 reste rouge dans tous les cas, mais pour des raisons opposées : sans bonus, tous les taux se valent ; avec un bonus, rêver domine. Le dilemme de la v1 est donc fragile dans les deux sens. (Le bot libre ne profite pas du bonus : ses suites ne rêvent pas.)
+
+## 9. Recommandations pour fixer la v2 (décision 3.7 de l'auteur)
+La simulation départage peu les options une à une ; elle dit surtout que **la V2 a un problème de rythme que ses options ne règlent pas** : le rêve finit la partie au tour 3. Recommandations de Claude :
+
+| Décision | Recommandation | Raison (mesurée ou supposée) |
+|---|---|---|
+| D1 plan du Méchant | **qui et où** (inchangé) | 3 points de forêt de plus que « où et comment », même durée (mesuré, à la marge) |
+| D2 doublé | **le favori** (inchangé) ; la sixième Machine en réserve | même forêt ; la sixième finit un peu moins tôt (77 % contre 88 %), écart dans le bruit (mesuré) ; le favori est plus simple (supposé) |
+| D3 Représailles | **la plus défendue** (inchangé) | aucun écart mesurable : la simulation ne départage pas |
+| D4 Machine HS désignée | **remorquée au chantier** (inchangé) | aucun écart mesurable ; mais Saboter ne vaut qu'un point en V2 (jeu restreint) : le principe « trois façons d'agir » est menacé et devra être revu quand la durée sera corrigée |
+| D5 voies du rêve | **le rêve choisit sa voie** (inchangé) | « nourrir les deux » accélère encore le réveil (mesuré) |
+| D6 seuil du Cercle | **garder 3 pour l'instant, et en faire un axe de la phase 4** | le seuil seul bascule d'une voie trop rapide à l'autre (2 : tour 2 ; 4 : le sommeil gagne au tour 3,5) (mesuré) |
+| D8 communication | **les traces** (inchangé) | 66 % de la coordination récupérée, vert ; le partage ne fait pas mieux (mesuré) |
+| D9 limite des rêves | **les lunes à toutes les tailles de table**, nombre de lunes en axe de la phase 4 | c'est la seule option qui ralentit (tour 3,6, deux tiers de fins avant la mi-partie au lieu de 88 %) (mesuré) ; insuffisant seul |
+
+**Et pour la phase 4** : explorer en priorité ce qui freine le rêve (seuil du Cercle, nombre de lunes, pas de l'esprit vers le long sommeil, coût d'un rêve), avec la durée (fins avant la mi-partie) comme premier objectif, puis le dilemme défendre ou rêver. Pour la v1 (si elle sert encore de référence), la menace résolue et le peuple qui suffit sont les deux défauts à corriger.
+
+## 10. Limites
 - **Peu de parties** : 4 par table pour le bot fort ; les écarts de moins de 4 points ne sont pas sûrs.
 - **Un bot à un coup** ne découvre pas une stratégie que sa politique ne joue jamais (d'où le bot qui rêve en V2).
 - **Les sondes** (prédictibilité, incertitude) sont jouées par la politique du bot, pas par le bot fort.
