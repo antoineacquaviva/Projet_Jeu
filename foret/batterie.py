@@ -100,6 +100,20 @@ MC64 = {"type": "mc", "params": {"budget": 64, "savoir": "soi"}}
 # (phase 2). En v1, c'est l'inverse (94,3 contre 92,2 %) : MC64 reste la référence de la v1.
 MC64R = {"type": "mc", "params": {"budget": 64, "savoir": "soi",
                                   "politique": {"type": "glouton", "params": {"reves_par_tour": 1.0}}}}
+# Plan vers la V1, étapes 0.7 et 0.8 : le bot à portefeuille (il choisit à chaque tour la politique de ses
+# suites : rêver 0, 0,5 ou 1 carte par tour, par la voie du sommeil ou du réveil) et le bot de contrôle
+# (le même, 256 suites, et une politique bruitée en plus), jamais utilisé pendant la recherche.
+PORTEFEUILLE = [
+    {"nom": "reve0", "type": "glouton", "params": {"reves_par_tour": 0.0}},
+    {"nom": "reve05", "type": "glouton", "params": {"reves_par_tour": 0.5}},
+    {"nom": "reve1", "type": "glouton", "params": {"reves_par_tour": 1.0}},
+    {"nom": "reve1_sommeil", "type": "glouton", "params": {"reves_par_tour": 1.0, "voie": "sommeil"}},
+    {"nom": "reve1_reveil", "type": "glouton", "params": {"reves_par_tour": 1.0, "voie": "reveil"}},
+]
+MCP64 = {"type": "mc", "params": {"budget": 64, "savoir": "soi", "portefeuille": PORTEFEUILLE}}
+CONTROLE = {"type": "mc", "params": {"budget": 256, "savoir": "soi", "suites_choix": 16,
+                                     "portefeuille": PORTEFEUILLE + [
+                                         {"nom": "bruite", "type": "bruite", "params": {"base": {"type": "glouton", "params": {"reves_par_tour": 0.5}}, "bruit": 0.2}}]}}
 TRIOS3 = [("oiseaux", "reptiles", "humains"), ("mammiferes", "reptiles", "insectes"),
           ("oiseaux", "mammiferes", "entites"), ("insectes", "humains", "entites"),
           ("oiseaux", "humains", "entites")]

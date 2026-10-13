@@ -268,6 +268,13 @@ Coût mesuré (un cœur) : une suite coûte 5 à 15 ms ; une partie de duo deman
 
 Le moteur : `Partie.copie(..., brouiller=siège)` et `Partie.brouiller(siège)` (information cachée ; depuis le moteur 1.7.1, pendant la résolution, ce qui se voit sur la table est gardé : une carte face cachée à une étape reste une carte à cette étape, une étape vide reste vide, les cartes glissées ne bougent pas ; seuls la carte, sa moitié et le rêve sont retirés au sort. Avant, un choix fait sur la table vue, comme Parler (R6.10), pouvait viser une carte absente de la copie : une partie sur 180 de la campagne 10 s'est arrêtée sur cette erreur) ; une partie dont un bot copie la partie (`reprises = True`) prend une photo à chaque segment ; la prévision est gardée pendant les rondes de traces et la défense par zone pendant une prévision (deux fois plus rapide, mêmes résultats).
 
+## Plan vers la V1 : outillage (13 oct. 2026, moteur 1.8)
+- **V0.3** : `maquettes/v0.3.json` (« V2 proposée » + 2 lunes) ; variante `sans_lunes`.
+- **Valeurs par taille de table** : nombre, dict `{"2": …}` ou formule `n-1` pour `lunes`, `cercle_par_joueur`, `reves_par_pas`, `ordres_par_etape`, `machines_en_jeu`, `tours`, `cartes.main`… (`foret/maquette.py`, `PAR_TABLE` ; résolues à la création de la partie). Nouvelles règles : `reves_par_pas`, `ordres_par_etape`, `machines_en_jeu` (docs/noeuds_v2.md).
+- **Statistiques appariées** : `foret/stats.py` ; synthèses `apparie` et `parties_compactes`.
+- **Usage des choix** : observateur `Usage` (bilan `usage`), agrégé dans les synthèses ; mesures `choix_morts` et `apprentissage_mechant`.
+- **Bot à portefeuille** : paramètre `portefeuille` du bot `mc` (liste de politiques nommées) ; au premier coup de chaque tour, `suites_choix` suites par politique depuis l'état présent, et la meilleure joue ses suites pendant ce tour ; statistique `portefeuille_<nom>`. Bot fort `MCP64` et bot de contrôle `CONTROLE` (256 suites, une politique bruitée en plus) dans `foret/batterie.py`. *Indice local (budget 8, 6 suites par politique, 8 duos) : la sélection est bruitée à ce budget ; validation au budget réel avec la ligne de base P2 (0.11) : en V0.3, MCP64 doit égaler MC64R ; en V0.2, il doit surtout choisir de ne pas rêver.*
+
 ## Faire évoluer
 
 **Une nouvelle itération des règles.** Créer `maquettes/v3.json` avec `"base": "v2"` et

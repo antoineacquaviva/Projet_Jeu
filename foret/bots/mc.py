@@ -64,6 +64,12 @@ class MonteCarlo(Bot):
         "annonces": False,                # True : il annonce (traces, jetons) comme sa politique et s'y tient
         "juger": 0.0,                     # part des décisions cherchées qu'il juge en entier (mesure des dilemmes)
         "suites_juge": 16,                # suites par option pour juger une décision
+        # Plan vers la V1, étape 0.7 : bot à portefeuille. Au premier coup de chaque tour, il joue
+        # suites_choix suites par politique du portefeuille depuis l'état présent (mêmes hasards pour toutes)
+        # et garde, pour ce tour, celle qui garde le plus de forêt ; ses suites la jouent ensuite. Il découvre
+        # ainsi s'il vaut mieux rêver, et à quel rythme, au lieu de le recevoir.
+        "portefeuille": None,             # None, ou liste de politiques {"nom": …, "type": …, "params": …}
+        "suites_choix": 12,
     }
 
     def __init__(self, graine=0, **params):
@@ -83,6 +89,8 @@ class MonteCarlo(Bot):
     # ------------------------------------------------------------------ décision
     def decider(self, partie, siege, type_, options, ctx):
         self._siege = siege.idx
+        if self.p["portefeuille"]:
+            self._choisir_politique(partie, siege)
         permis = list(range(len(options)))
         if type_ == "programmer_mode" and self.p["reves_par_tour"] is not None:
             permis = self._taux_impose(partie, siege, options, ctx["etape"])
@@ -92,6 +100,32 @@ class MonteCarlo(Bot):
         if type_ == "programmer_mode" and choix == "reve" and self.p["reves_par_tour"] is not None:
             self._quota[(partie.lignee, partie.tour, siege.idx)][1] += 1
         return choix
+
+    def _choisir_politique(self, partie, siege):
+        """Étape 0.7 : la politique du portefeuille qui garde le plus de forêt depuis l'état présent,
+        choisie une fois par tour (mêmes hasards pour toutes les politiques)."""
+        cle = (partie.lignee, partie.tour, siege.idx)
+        if getattr(self, "_cle_politique", None) == cle:
+            return
+        self._cle_politique = cle
+        specs = [{k: v for k, v in sp.items() if k != "nom"} for sp in self.p["portefeuille"]]
+        valeurs = [0.0] * len(specs)
+        for _ in range(self.p["suites_choix"]):
+            hasard = self.rng.randrange(1 << 30)
+            for j, sp in enumerate(specs):
+                bots = [fabriquer(sp, hasard + k) for k in range(len(partie.sieges))]
+                c = partie.copie(bots=bots, hasard=None if self.p["devin"] else hasard,
+                                 brouiller=self._siege if self.p["savoir"] == "soi" else None)
+                b = c.jouer()
+                valeurs[j] += b["resultat"] / b["foret_initiale"]
+                self.stats["suites"] += 1
+        j = max(range(len(specs)), key=lambda x: valeurs[x])
+        self._spec_politique = specs[j]
+        self._politique = fabriquer(specs[j], self.rng.randrange(1 << 30))
+        nom = self.p["portefeuille"][j].get("nom", str(j))
+        self.stats.setdefault("politiques", {})
+        self.stats["politiques"][nom] = self.stats["politiques"].get(nom, 0) + 1
+        partie.stat("portefeuille_" + nom)
 
     def _taux_impose(self, partie, siege, options, etape):
         """Taux de rêve imposé : k rêves ce tour (k tiré comme le glouton), aux étapes que le bot choisit."""

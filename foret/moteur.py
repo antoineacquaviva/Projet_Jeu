@@ -40,7 +40,7 @@ from .observateurs import Compteur, Journal
 from .plans import Plans
 from .maquette import resoudre_table
 
-VERSION = "1.7.1"
+VERSION = "1.8"
 CENTRE = 7                      # R5.1 : 2-6 éveil, 7 centre, 8-12 rêve
 CASES = tuple(range(2, 13))
 PROBA = {c: (6 - abs(c - CENTRE)) / 36 for c in CASES}
