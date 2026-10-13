@@ -6,7 +6,7 @@ Ce dépôt réunit deux choses :
 - **les documents de conception** : les idées, les maquettes de règles, le plan de travail et les bilans ;
 - **le moteur de simulation** `foret` : il joue les règles sans interface, avec des joueurs virtuels, pour trouver les failles des règles et mesurer les variantes.
 
-Où en est le projet (13 oct. 2026) : les phases 1 (mesures) et 2 (le bot fort, moteur 1.7) sont faites. Le diagnostic de la phase 3 est fait ([projet/4-bilans/diagnostic-v1-options-v2.md](projet/4-bilans/diagnostic-v1-options-v2.md)) : il attend la décision de l'auteur pour fixer la v2. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
+Où en est le projet (13 oct. 2026) : les phases 1 (mesures) et 2 (le bot fort, moteur 1.7) sont faites. Le diagnostic de la phase 3 est fait ([projet/4-bilans/diagnostic-v1-options-v2.md](projet/4-bilans/diagnostic-v1-options-v2.md)) : la v2 est fixée (13 oct. : « V2 proposée » plus les lunes) ; la phase 4 (exploration) commence. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
 
 ## Carte du dépôt
 

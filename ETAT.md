@@ -118,12 +118,12 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 - **Quoi.** Traiter `v2_options_mc` et la robustesse. Pour chaque décision ouverte (D1 à D6, D8, D9), un tableau des mesures clés (forêt, concentration, meilleur taux de rêve, fins avant la mi-partie, chef unique) et la recommandation de Claude.
 - **Livrable.** Le diagnostic terminé : en bref, problèmes de la v1 classés par gravité, options de la v2, recommandations, limites. README et plan d'action à jour.
 
-**3.7 DÉCISION UTILISATEUR : fixer la v2**
+**3.7 DÉCISION UTILISATEUR : fixer la v2** (FAIT le 13 oct. : réponse en section 8)
 - L'auteur tranche les décisions ouvertes de la v2 à partir du diagnostic. Le passage suivant écrit `maquettes/v2.json` (ou une v3) selon ses réponses et met à jour les documents de conception.
 
 ### Phase 4 : explorer la v2 fixée
 
-**4.1 Écrire la v2 fixée et le criblage** (À FAIRE, après 3.7)
+**4.1 Écrire la v2 fixée et le criblage** (À FAIRE ; la réponse de 3.7 est arrivée)
 - **Quoi.** Appliquer les réponses de 3.7 (maquette, documents, tests). Coder `foret/criblage.py` : quelques centaines de variantes tirées selon un plan de Morris sur les paramètres libres du catalogue (section 5), jouées par le glouton.
 - **Fin d'étape.** Lancer le criblage par lots sur GitHub.
 
@@ -169,7 +169,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 
 ## 5. Étape suivante
 
-**3.7 DÉCISION UTILISATEUR : fixer la v2.** Lire `projet/4-bilans/diagnostic-v1-options-v2.md`, section 9 (recommandations de Claude pour D1 à D6, D8, D9), et répondre dans la section 8 ci-dessous. Deux points annexes à trancher en même temps : les seuils provisoires des dilemmes (1 et 3 points) et leur témoin (raté), section 5 du diagnostic. Tant que la réponse manque, les passages automatiques s'arrêtent et le rappellent.
+**4.1 Écrire la v2 fixée et le criblage.** Appliquer la réponse du 13 oct. (section 8) : `maquettes/v2.json` devient la v2 fixée (le préréglage « V2 proposée » plus le module des lunes, code `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:`), en gardant l'ancienne « V2 proposée » comme variante nommée pour comparer ; mettre à jour `projet/2-maquettes/maquette-de-conception-v2.md`, `docs/noeuds_v2.md` et les tests. Bot fort de cette maquette : `MC64R`. Puis coder le criblage (Morris, glouton) en donnant la priorité aux variables qui freinent le rêve, et le lancer sur GitHub.
 
 **Incident GitHub (13 oct.).** Le groupe de concurrence des fusions (`publication-resultats`) ne garde qu'une tâche en attente et annule les autres : les fusions des campagnes 12 et 13 ont été annulées, puis relancées avec `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/runs/<id>/rerun-failed-jobs` (une seule à la fois). Corrigé pour les lancements suivants : plus de groupe, la publication réessaie. Les lots de campagne sont gardés 3 jours (1 jour avant la correction).
 
@@ -194,7 +194,8 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
   2. plan réduit : 15 duos et 5 trios, 4 parties par table ;
   3. le bot qui communique est construit en premier ;
   4. organisation : un passage n'attend jamais un calcul de plus de 15 minutes (il lance, note et s'arrête) ; plafond de 12 passages qui travaillent par semaine.
-- 3.7 (fixer la v2, diagnostic section 9 ; et seuils et témoin des dilemmes, section 5) : *en attente*
+- **13 oct. 2026, 12:57 (3.7, fixer la v2)** : l'auteur valide les recommandations de la section 9 du diagnostic. La v2 fixée est « V2 proposée » plus le module des lunes à toutes les tailles de table : D1 qui et où ; D2 le favori ; D3 Représailles = la plus défendue ; D4 Machine HS désignée remorquée au chantier ; D5 le rêve choisit sa voie ; D6 seuil du Cercle 3 cases par joueur (axe de la phase 4) ; D8 les traces (2 par joueur, numérotées) ; D9 les lunes (2 lunes, nombre en axe de la phase 4). Code d'atelier : `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:`. La phase 4 cherche d'abord à freiner le rêve (seuil du Cercle, nombre de lunes, avance de l'esprit vers le long sommeil, coût d'un rêve), avec la durée comme premier objectif.
+- Seuils provisoires des dilemmes (1 et 3 points) et leur témoin raté (diagnostic, section 5) : *en attente, non bloquant* ; d'ici là, la mesure des dilemmes est un indice descriptif.
 
 ## 9. Campagnes GitHub
 

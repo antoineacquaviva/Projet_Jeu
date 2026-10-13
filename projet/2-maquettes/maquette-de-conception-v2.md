@@ -69,6 +69,11 @@ L'atelier remplace la logique « boîte + livret » par un **arbre** : socle (to
 8. Communication : **les traces** (2 par joueur, numérotées) ; le partage à tester avec les lunes.
 9. Limite des rêves : **un par joueur jusqu'à 3 joueurs, les lunes au-delà**.
 
+## Décision de l'auteur du 13 oct. (étape 3.7, après le diagnostic de la phase 3)
+Les recommandations du « Diagnostic de la v1 et options de la v2 » (section 9) sont validées. **La v2 fixée** : qui et où (D1) ; le favori (D2) ; Représailles = la plus défendue (D3) ; Machine HS désignée remorquée au chantier (D4) ; le rêve choisit sa voie (D5) ; seuil du Cercle à 3 cases par joueur (D6) ; bonus 0 (D7) ; les traces, 2 par joueur, numérotées (D8) ; **les lunes à toutes les tailles de table**, 2 lunes (D9, change la recommandation du 12 oct.). Code d'atelier : `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:`.
+
+Pourquoi : avec le bot fort, aucune option seule ne corrige le rythme (le rêve finit la partie au tour 3) ; les lunes sont la seule qui ralentit. Le seuil du Cercle, le nombre de lunes, l'avance de l'esprit vers le long sommeil et le coût d'un rêve deviennent les premiers axes de la phase 4. Point de vigilance confirmé : interdire Saboter ne coûte qu'un point en V2 ; le principe « trois façons d'agir » est à revoir quand la durée sera corrigée.
+
 ## Suite donnée dans le plan de test (12 oct.)
 Décision A13 de l'auteur (« Objectifs, invariants et catalogue », « Plan d'action ») : **la simulation éclaire les décisions 1 à 6, 8 et 9.**
 - **Phase 1** : après la copie d'état et le journal des décisions, le moteur reçoit la communication sous la forme v2 (traces, partage, aucun signe, tout dire) et le présage, puis la v2 nœud par nœud. Il lit le code de variante de l'atelier. La conformité de la v2 s'appuie sur les identifiants des nœuds (A2a, D2…), puisque les numéros du livret changent avec la variante.
