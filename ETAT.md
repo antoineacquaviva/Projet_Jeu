@@ -192,6 +192,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
+EN COURS depuis 2026-10-13 23:08 (Paris)
 
 
 ## 7. Compteur de passages
