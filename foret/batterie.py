@@ -45,6 +45,7 @@ from multiprocessing import Pool
 from .bots import fabriquer
 from .maquette import charger, lire
 from .mesures import (MESURES, Mesureur, Sondeur, auc, distance_pistes, duo_contre_meilleur_seul, duos_complets,
+                      shapley_restreint,
                       exactitude_equilibree, synergies_relatives,
                       ic95, moyenne, quantile, shapley, synergies, variance, verdict)
 from .moteur import Partie, VERSION
@@ -86,6 +87,26 @@ PLAN = {
     "v1_reves_illimites": ("v1", "retour_v0_reves_illimites", G3, ("petites", "reves"), 30),
 }
 TAUX = {"limite": [0.0, 0.25, 0.5, 0.75, 1.0], "illimite": [0.0, 1.0, 2.0, 3.0]}
+
+# --------------------------------------------------------------------------- le plan réduit de la phase 3
+# Décisions de l'auteur du 13 oct. : bot de référence MC 64 chacun pour soi ; 15 duos et 5 trios,
+# 4 parties par table. Les trios : les 4 « triangles » (un compartiment sans spécialiste) et une
+# « étoile » (les trois peuples du compartiment du Méchant).
+MC64 = {"type": "mc", "params": {"budget": 64, "savoir": "soi"}}
+TRIOS3 = [("oiseaux", "reptiles", "humains"), ("mammiferes", "reptiles", "insectes"),
+          ("oiseaux", "mammiferes", "entites"), ("insectes", "humains", "entites"),
+          ("oiseaux", "humains", "entites")]
+TOUT3 = ("tables3", "spectateur3", "reves3")
+PLAN3 = {
+    "p3_v1": ("v1", "defaut", MC64, TOUT3, 4),
+    "p3_v2": ("v2", "defaut", MC64, TOUT3, 4),
+}
+TAUX3 = [0.0, 0.5, 1.0]
+
+
+def _config(nom):
+    """(maquette, variante, bot, expériences, parties) d'une configuration du plan de la phase 1 ou 3."""
+    return PLAN[nom] if nom in PLAN else PLAN3[nom]
 SONDES = {("conseil", 3): "t2", ("conseil", 5): "t5"}
 
 
@@ -99,7 +120,8 @@ def jouer(tache):
         bots = [fabriquer(b, t["graine"] * 100 + i) for i, b in enumerate(t["bots"])]
         obs = [Mesureur()]
         if t.get("sondes"):
-            obs.append(Sondeur(SONDES, copies=t.get("copies", 16), graine=t["graine"]))
+            obs.append(Sondeur(SONDES, copies=t.get("copies", 16), graine=t["graine"],
+                               politique=t.get("politique_sondes")))
         b = Partie(m, list(t["peuples"]), bots, graine=t["graine"], observateurs=obs).jouer()
         out.update({
             "fin": b["fin"], "tour": b["tour"], "foret": b["foret"], "foret_initiale": b["foret_initiale"],
@@ -121,7 +143,7 @@ def _bot_texte(b):
 
 # --------------------------------------------------------------------------- les expériences
 def taches(nom, echelle=1.0):
-    maquette, variante, bot, exps, n = PLAN[nom]
+    maquette, variante, bot, exps, n = _config(nom)
     n = max(2, round(n * echelle))
     base = dict(maquette=maquette, variante=variante)
     out = []
@@ -175,6 +197,30 @@ def taches(nom, echelle=1.0):
                         ajouter("coordination", eq, [b] * k, range(max(2, round(n / 2))), f"{var}|{niveau}")
                         for t in out[t0:]:
                             t["variante"] = var if variante == "defaut" else variante
+    if "tables3" in exps:                     # plan réduit : seuls, duos, 5 trios, « personne »
+        nb_sondes = max(1, round(2 * echelle))
+        for p in PEUPLES:
+            ajouter("tables", [p], [bot], range(n), "equipe")
+            ajouter("tables", [p], [INERTE], range(n), "personne")
+        for eq in itertools.combinations(PEUPLES, 2):
+            ajouter("tables", eq, [bot] * 2, range(nb_sondes), "equipe", sondes=True, copies=16,
+                    politique_sondes=G0)
+            ajouter("tables", eq, [bot] * 2, range(nb_sondes, n), "equipe")
+        for eq in TRIOS3:
+            ajouter("tables", eq, [bot] * 3, range(n), "equipe")
+    if "spectateur3" in exps:
+        ns = max(2, round(n / 2))
+        for eq in list(itertools.combinations(PEUPLES, 2)) + TRIOS3:
+            for i in range(len(eq)):
+                bots = [bot] * len(eq)
+                bots[i] = INERTE
+                ajouter("spectateur", eq, bots, range(ns), f"inerte:{eq[i]}")
+    if "reves3" in exps:
+        nr = max(2, round(n / 2))
+        for taux in TAUX3:
+            b = {"type": bot["type"], "params": dict(bot.get("params", {}), reves_par_tour=taux)}
+            for eq in list(itertools.combinations(PEUPLES, 2)) + TRIOS3:
+                ajouter("reves", eq, [b] * len(eq), range(nr), f"taux:{taux}")
     if "echelle" in exps:
         for b, et in ((ALEA, "aleatoire"), (bot, "glouton")):
             for k in (2, 3):
@@ -203,7 +249,7 @@ def _ecrire_experience(dossier, nom, exp, liste, res, echelle, duree, **extra):
     with open(os.path.join(dossier, f"{exp}.jsonl"), "w", encoding="utf-8") as f:
         for r in res:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
-    maquette, variante, bot, exps, n = PLAN[nom]
+    maquette, variante, bot, exps, n = _config(nom)
     with open(os.path.join(dossier, f"{exp}.meta.json"), "w", encoding="utf-8") as f:
         json.dump(dict({"nom": nom, "experience": exp, "maquette": maquette, "variante": variante, "bot": bot,
                         "echelle": echelle, "parties": len(liste), "erreurs": sum("erreur" in r for r in res),
@@ -597,14 +643,17 @@ def mesures_equipes(parties, maquette, variante, bootstrap=200):
     if pt:
         val = min(x["rapport"] for x in pt.values())
         out["pire_table"] = dict(pt, valeur=val, verdict=verdict("pire_table", val))
-    if not vide or len(g) < 63:
+    complet = len(g) >= 63
+    seuls_duos = all(frozenset((p,)) in g for p in PEUPLES) and \
+        all(frozenset(d) in g for d in itertools.combinations(PEUPLES, 2))
+    if not vide or not (complet or seuls_duos):
         return out
     m = lire(maquette)
 
     def evaluer(gg, vv):
         v = {k: moyenne(x) for k, x in gg.items()}
         v[frozenset()] = moyenne(vv)
-        phi = shapley(v, PEUPLES)
+        phi = shapley(v, PEUPLES) if complet else shapley_restreint(v, PEUPLES)
         moy = moyenne(phi.values())
         syn = synergies(v, PEUPLES)
         return v, phi, moy, syn
@@ -630,7 +679,8 @@ def mesures_equipes(parties, maquette, variante, bootstrap=200):
         vd = "orange"
     out["shapley"] = {"rapports": {p: _r(x, 2) for p, x in rapports.items()}, "ic95": lo_hi,
                       "points": {p: _r(x, 2) for p, x in phi.items()}, "v_vide": _r(v[frozenset()]),
-                      "v_tous": _r(v[frozenset(PEUPLES)]), "ecart_max": _r(pire, 2), "verdict": vd}
+                      "v_tous": _r(v.get(frozenset(PEUPLES))), "ecart_max": _r(pire, 2), "verdict": vd,
+                      "methode": "exacte (63 équipes)" if complet else "restreinte aux tables de 1 et 2 peuples (plan réduit)"}
     # [mesure:synergies] Décision B2 du 12 oct. : le jeu s'adapte au nombre de joueurs (un peuple
     # seul garde déjà l'essentiel de la forêt), la synergie additive est donc négative par
     # construction. « Aucun ne suffit » : le duo bat-il son meilleur peuple joué seul ? (verdict)
@@ -771,7 +821,7 @@ def mesures_echelle(parties):
 
 
 def evaluer_config(nom, parties=None):
-    maquette, variante, bot, exps, n = PLAN[nom]
+    maquette, variante, bot, exps, n = _config(nom)
     parties = parties if parties is not None else lire_parties(nom)
     if parties is None:
         return None
@@ -881,7 +931,7 @@ def rapport(noms=None):
            "mesures": {k: {kk: vv for kk, vv in v.items() if kk not in ("temoins",)} | {"temoins": [list(t) for t in v["temoins"]]}
                        for k, v in MESURES.items()},
            "configs": configs}
-    rap["temoins"] = verifier_temoins(configs)
+    rap["temoins"] = [t for t in verifier_temoins(configs) if t["erreur"] != "configuration absente"]
     os.makedirs(DOSSIER, exist_ok=True)
     with open(os.path.join(DOSSIER, "rapport.json"), "w", encoding="utf-8") as f:
         json.dump(rap, f, ensure_ascii=False, indent=1, default=list)
@@ -898,20 +948,25 @@ def _lot(texte):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("quoi", choices=["phase1", "rapport", "plan"])
+    ap.add_argument("quoi", choices=["phase1", "phase3", "rapport", "plan"])
+    ap.add_argument("--programme", choices=["phase1", "phase3"], default=None,
+                    help="plan et rapport : le programme (phase1 par défaut ; phase3 : plan réduit du bot fort)")
     ap.add_argument("--echelle", type=float, default=1.0)
     ap.add_argument("--seulement", nargs="+")
     ap.add_argument("--processus", type=int)
-    ap.add_argument("--lot", type=_lot, help="phase1 : ne jouer que le lot i/n et l'écrire dans --sortie")
-    ap.add_argument("--fusionner", metavar="DOSSIER", help="phase1 : rassembler les lots de ce dossier, puis le rapport")
+    ap.add_argument("--lot", type=_lot, help="phase1 ou phase3 : ne jouer que le lot i/n et l'écrire dans --sortie")
+    ap.add_argument("--fusionner", metavar="DOSSIER",
+                    help="phase1 ou phase3 : rassembler les lots de ce dossier, puis le rapport")
     ap.add_argument("--sortie", default="lots", help="dossier des lots (avec --lot)")
     a = ap.parse_args()
-    noms = a.seulement or list(PLAN)
-    inconnus = [x for x in noms if x not in PLAN]
+    programme = a.quoi if a.quoi in ("phase1", "phase3") else (a.programme or "phase1")
+    plan = PLAN3 if programme == "phase3" else PLAN
+    noms = a.seulement or list(plan)
+    inconnus = [x for x in noms if x not in plan]
     if inconnus:
-        ap.error(f"configuration(s) inconnue(s) : {', '.join(inconnus)}")
-    if (a.lot or a.fusionner) and a.quoi != "phase1":
-        ap.error("--lot et --fusionner vont avec phase1")
+        ap.error(f"configuration(s) inconnue(s) pour {programme} : {', '.join(inconnus)}")
+    if (a.lot or a.fusionner) and a.quoi not in ("phase1", "phase3"):
+        ap.error("--lot et --fusionner vont avec phase1 ou phase3")
     if a.lot and a.fusionner:
         ap.error("--lot et --fusionner s'excluent")
     if a.quoi == "plan":
@@ -924,10 +979,10 @@ def main():
         return
     if a.fusionner:
         fusionner(a.fusionner, noms, a.echelle)
-    elif a.quoi == "phase1":
+    elif a.quoi in ("phase1", "phase3"):
         for nom in noms:
             executer(nom, a.echelle, a.processus)
-    r = rapport()
+    r = rapport(list(plan))
     print(f"rapport : {os.path.join(DOSSIER, 'rapport.json')} ({len(r['configs'])} configurations)")
 
 

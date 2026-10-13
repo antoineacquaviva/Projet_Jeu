@@ -60,6 +60,16 @@ Ce document décrit les mesures que calcule le moteur (`foret/mesures.py`, `fore
 - **Tactiques et Machines** (lecture). Part des ordres, part réussie, forêts abattues par ordre, par tactique et (v2) par Machine.
 - **Le Méchant apprend-il cette équipe ?** (lecture, niveau 3). Distance (cases différentes) entre pistes finales de deux équipes différentes, moins celle entre deux parties de la même équipe.
 
+## Le plan réduit de la phase 3 (bot fort, moteur 1.7)
+Décisions de l'auteur du 13 oct. : bot de référence MC 64 chacun pour soi ; 15 duos et 5 trios, 4 parties par table. `python -m foret.batterie phase3` (par lots : `--lot i/n`, puis `--fusionner`) ; sur GitHub, workflow Batterie avec `programme = phase3`. Configurations `p3_v1` et `p3_v2` (`PLAN3` dans `foret/batterie.py`), 338 parties chacune :
+- **tables** : les 6 peuples seuls, les 15 duos, 5 trios, et « personne » (bot inerte) ; 4 parties par table. Les trios sont les 4 « triangles » (oiseaux-reptiles-humains, mammifères-reptiles-insectes, oiseaux-mammifères-entités, insectes-humains-entités : un compartiment sans spécialiste) et une « étoile » (oiseaux-humains-entités : le compartiment du Méchant) ;
+- **sondes** (prédictibilité, incertitude) sur 2 parties par duo, mais les 16 copies sont jouées par le glouton (`Sondeur(politique=...)`) : elles prédisent l'issue d'une partie que le bot fort a menée jusqu'au tour 2 ou 5, continuée par le glouton. C'est une approximation, à lire comme telle ;
+- **siège spectateur** : chaque siège des duos et des trios tenu à son tour par le bot inerte, 2 parties ;
+- **taux de rêve fixes** : 0 ; 0,5 ; 1 carte par tour (`reves_par_tour` du bot MC), duos et trios, 2 parties.
+- **Shapley restreint** (`shapley_restreint`) : sans les équipes de 4 à 6 peuples, la valeur de Shapley est remplacée par celle du jeu arrêté aux tables de deux, φ_i = ½ [v(i) − v(∅)] + ½ moyenne_j [v(i, j) − v(j)]. Elle coïncide avec Shapley quand les tables plus grandes n'ajoutent rien de propre à chaque peuple. Les bandes restent celles de Shapley ; le rapport l'indique (`methode`). Les synergies (B2) et le tétraèdre ne demandent que les seuls et les duos : inchangés.
+- Ni coordination ni échelle des bots : elles ont leurs campagnes (`coordination_mc_2`, `echelle_bots`).
+- Coût estimé : environ 4 heures-cœur pour la v1 et 10 pour la V2 (moteur 1.7).
+
 ## Témoins
 Variantes cassées exprès (préfixe `temoin_`, dans `maquettes/v1.json` et `v2.json`), jamais proposées comme règles :
 

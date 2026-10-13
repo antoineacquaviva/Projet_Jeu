@@ -9,6 +9,10 @@ name: Batterie
 on:
   workflow_dispatch:
     inputs:
+      programme:
+        description: "phase1 (glouton, 20 configurations) ou phase3 (plan réduit, bot fort)"
+        default: "phase1"
+        required: true
       echelle:
         description: "Échelle : 0.05 = 5 % des parties, 1 = la batterie entière (environ 96 000 parties)"
         default: "1"
@@ -40,13 +44,18 @@ jobs:
         id: matrice
         env:
           ECHELLE: ${{ inputs.echelle }}
+          PROGRAMME: ${{ inputs.programme }}
           LOTS: ${{ inputs.lots }}
           SEULEMENT: ${{ inputs.seulement }}
         run: |
           python3 - <<'EOF'
           import json, os, re, sys
-          from foret.batterie import PLAN
+          from foret.batterie import PLAN, PLAN3
           echelle, lots, seulement = os.environ["ECHELLE"], os.environ["LOTS"], os.environ["SEULEMENT"].split()
+          programme = os.environ["PROGRAMME"]
+          if programme not in ("phase1", "phase3"):
+              sys.exit(f"programme invalide : {programme!r} (phase1 ou phase3)")
+          PLAN = PLAN3 if programme == "phase3" else PLAN
           try:
               if float(echelle) <= 0:
                   raise ValueError
@@ -63,11 +72,12 @@ jobs:
       - name: Taille du plan
         env:
           ECHELLE: ${{ inputs.echelle }}
+          PROGRAMME: ${{ inputs.programme }}
           SEULEMENT: ${{ inputs.seulement }}
         run: |
           ARGS=(--echelle "$ECHELLE")
           if [ -n "$SEULEMENT" ]; then ARGS+=(--seulement $SEULEMENT); fi
-          python -m foret.batterie plan "${ARGS[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
+          python -m foret.batterie plan --programme "$PROGRAMME" "${ARGS[@]}" | tee -a "$GITHUB_STEP_SUMMARY"
 
   lot:
     needs: preparer
@@ -85,13 +95,14 @@ jobs:
       - name: Jouer le lot
         env:
           ECHELLE: ${{ inputs.echelle }}
+          PROGRAMME: ${{ inputs.programme }}
           LOTS: ${{ inputs.lots }}
           SEULEMENT: ${{ inputs.seulement }}
           LOT: ${{ matrix.lot }}
         run: |
           ARGS=(--echelle "$ECHELLE" --lot "$LOT/$LOTS" --sortie lots)
           if [ -n "$SEULEMENT" ]; then ARGS+=(--seulement $SEULEMENT); fi
-          python -m foret.batterie phase1 "${ARGS[@]}"
+          python -m foret.batterie "$PROGRAMME" "${ARGS[@]}"
       - uses: actions/upload-artifact@v7
         with:
           name: batterie-lot-${{ matrix.lot }}
@@ -121,11 +132,12 @@ jobs:
       - name: Fusionner les lots et calculer le rapport
         env:
           ECHELLE: ${{ inputs.echelle }}
+          PROGRAMME: ${{ inputs.programme }}
           SEULEMENT: ${{ inputs.seulement }}
         run: |
           ARGS=(--echelle "$ECHELLE" --fusionner lots)
           if [ -n "$SEULEMENT" ]; then ARGS+=(--seulement $SEULEMENT); fi
-          python -m foret.batterie phase1 "${ARGS[@]}"
+          python -m foret.batterie "$PROGRAMME" "${ARGS[@]}"
       - name: Tableau de bord
         # Il demande les quatre configurations principales (v1_g1, v1_g0, v2_g1, v2_g0).
         continue-on-error: true
@@ -138,9 +150,10 @@ jobs:
         env:
           RUN: ${{ github.run_number }}
           ECHELLE: ${{ inputs.echelle }}
+          PROGRAMME: ${{ inputs.programme }}
           LOTS: ${{ inputs.lots }}
         run: |
-          DEST="batterie/run${RUN}"
+          DEST="batterie/run${RUN}_${PROGRAMME}"
           mkdir -p "/tmp/publie/$DEST"
           cp resultats/batterie/rapport.json resultats/batterie/fusion.json "/tmp/publie/$DEST/"
           if [ -f resultats/batterie/tableau.html ]; then cp resultats/batterie/tableau.html "/tmp/publie/$DEST/"; fi

@@ -228,11 +228,12 @@ class Sondeur(Observateur):
     avec un autre hasard (mêmes bots) jusqu'au bout et note la forêt restante
     de chacune (en % de la forêt initiale). bilan["sondes"] = {nom: [..]}."""
 
-    def __init__(self, points, copies=16, graine=0):
+    def __init__(self, points, copies=16, graine=0, politique=None):
         self.points = dict(points)           # segment -> nom
         self.copies = copies
         self.graine = graine
-        self.sondes = {}
+        self.politique = politique           # bot des copies (None : les bots de la partie) ; phase 3 :
+        self.sondes = {}                     # le glouton, pour que le bot fort ne joue pas 16 suites entières
 
     def point(self, partie, seg):
         nom = self.points.get(seg)
@@ -240,7 +241,12 @@ class Sondeur(Observateur):
             return
         out = []
         for r in range(self.copies):
-            c = partie.copie(hasard=self.graine * 7919 + r * 104729 + zlib.crc32(nom.encode()) % 1000)
+            h = self.graine * 7919 + r * 104729 + zlib.crc32(nom.encode()) % 1000
+            bots = None
+            if self.politique is not None:
+                from .bots import fabriquer
+                bots = [fabriquer(self.politique, h + k) for k in range(len(partie.sieges))]
+            c = partie.copie(bots=bots, hasard=h)
             b = c.jouer()
             out.append(round(100 * b["resultat"] / b["foret_initiale"], 2))
         self.sondes[nom] = out
@@ -283,6 +289,22 @@ def shapley(v, joueurs):
                 S = frozenset(S)
                 s += w * (v[S | {i}] - v[S])
         out[i] = s
+    return out
+
+
+def shapley_restreint(v, joueurs):
+    """[mesure:shapley] Plan réduit de la phase 3 (seules les tables de 1 et 2 peuples sont jouées
+    pour tous les peuples) : la moyenne des contributions marginales d'un peuple quand il arrive
+    en premier ou en deuxième, c'est-à-dire la valeur de Shapley du jeu arrêté aux tables de deux.
+    φ_i = ½ [v(i) − v(∅)] + ½ moyenne_j [v(i, j) − v(j)]. Approximation documentée dans
+    docs/mesures.md ; elle coïncide avec Shapley quand les tables de 3 peuples et plus
+    n'ajoutent rien de propre à chaque peuple."""
+    vide = v[frozenset()]
+    out = {}
+    for i in joueurs:
+        seul = v[frozenset((i,))] - vide
+        duos = [v[frozenset((i, j))] - v[frozenset((j,))] for j in joueurs if j != i]
+        out[i] = 0.5 * seul + 0.5 * sum(duos) / len(duos)
     return out
 
 
