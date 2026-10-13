@@ -7,6 +7,7 @@
 - **Chemin** : trois cycles au plus, chacun « campagne → nouvelle version du jeu → nouvelle version du protocole ». V0.3 → V0.4 → V0.5 → V0.6, puis validation et gel en V1.0.
 - **Les calculs s'enchaînent seuls sur GitHub** : criblage, exploration, confirmation et rapport, sans session Claude et sans attente.
 - **Claude n'intervient qu'aux charnières**, soit environ deux sessions par cycle et une dizaine en tout (estimation), au lieu de passages trois fois par jour.
+- **Toutes les tailles de table** : le jeu doit tenir ses objectifs de 2 à 6 joueurs ; c'est la plus faible taille qui compte (section 7 bis).
 - **Défauts de conception** : signalés dès qu'ils apparaissent, par une alerte automatique dans le rapport et une issue GitHub. Une première alerte est déjà levée : **le rêve se paie trop tard** (section 6).
 - **Règle de décision** : Claude tranche seul les choix techniques. L'auteur tranche la conception du jeu (section 9).
 
@@ -150,10 +151,44 @@ L'alerte nomme alors l'objectif, ce qui a été essayé et la piste de conceptio
 
 La qualité d'une variante reste le plus faible de ses objectifs normalisés (plan d'action, section 5).
 
+## 7 bis. Toutes les tailles de table, de 2 à 6 joueurs (critère ajouté le 13 oct., 14 h 27)
+**Le critère.** Le jeu doit tenir tous ses objectifs à 2, 3, 4, 5 et 6 joueurs. La qualité d'une variante devient **le plus faible de ses objectifs, pris à la taille de table où il est le plus faible**. Une variante excellente à 3 joueurs et rouge à 6 est donc rouge.
+
+L'auteur accepte des règles propres au nombre de joueurs, en particulier sur le **nombre d'éléments**. Les règles nouvelles restent à sa décision (section 9).
+
+**Indice de départ** (mesuré à la phase 1 avec le glouton, sur « V2 proposée » sans lunes, environ 60 parties par équipe) : la forêt gardée monte avec le nombre de joueurs.
+
+| Joueurs | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| Glouton qui rêve | 82 % | 85 % | 93 % | 95 % | 96 % | 98 % |
+| Glouton qui ne rêve pas | 63 % | 73 % | 80 % | 89 % | 93 % | 95 % |
+
+- *Supposé* : la menace du Méchant ne croît pas avec la table (3 Machines en jeu, 2 en réserve, 7 zones, 21 forêts, un ordre par étape), si bien qu'à 4 joueurs et plus la partie est presque gagnée d'avance et chaque joueur pèse moins.
+- C'est un **défaut probable, corrigeable par les nombres d'éléments** : à confirmer avec le bot fort au cycle 1.
+- Toutes les mesures de la phase 3 avec le bot fort ne portaient que sur 2 et 3 joueurs.
+
+**Les paramètres qui dépendent de la table.** Chacun prend une valeur par taille de table, ou une formule simple, par exemple « une de moins que de joueurs » :
+- lunes (accepté), cases du Cercle (déjà « par joueur ») ;
+- Machines en jeu et en réserve, forêts par zone, ordres du Méchant par étape ;
+- cartes en main, tours, esprits au départ.
+
+**Méthode** (choix techniques de Claude).
+- **Mesures adaptées à la table, bandes inchangées (B1).**
+  - La concentration compte les *k* zones les plus menacées, avec *k* plafonné pour rester lisible sur 7 zones ; sinon la mesure sature à 6 joueurs.
+  - « Chaque peuple compte » se mesure par l'apport du dernier peuple ajouté : une table de *n* bat sa meilleure sous-table de *n* − 1.
+  - Shapley, aucun spectateur et pire table se calculent à chaque taille.
+- **Compositions échantillonnées.** Il existe 15 duos, 20 trios, 15 quatuors, 6 quintettes et 1 table de six. Le glouton les joue toutes, puisqu'il ne coûte presque rien. Le bot fort joue un échantillon équilibré par peuple (par exemple 15, 6, 6, 6 et 1) en course d'élimination.
+- **Recherche en deux temps.**
+  1. Les paramètres communs sont explorés en même temps que des formules simples pour les paramètres de table.
+  2. Une fois les paramètres communs fixés, chaque taille de table est réglée à part sur ses seuls paramètres, ce qui ajoute peu de calcul.
+- **Coût.** Une partie à 6 joueurs coûte environ 4 à 5 fois une partie de duo au bot fort (estimation, à mesurer à l'étape 0.10). Les lots sont équilibrés par coût estimé (section 4).
+- **Rapport.** Chaque objectif est présenté par taille de table, et l'alerte de conception s'applique taille par taille.
+- **Livret.** Les règles propres au nombre de joueurs tiendront dans un petit tableau. Sa taille maximale est à fixer par l'auteur (section 9).
+
 ## 8. Améliorer la méthode (souhait 6)
 | Domaine | Aujourd'hui | Amélioration | Quand |
 |---|---|---|---|
-| **Fonctions d'évaluation** | quatre objectifs, bandes gelées ; dilemmes et coordination fragiles | durée en premier filtre au cycle 1 ; deux mesures nouvelles (choix morts, apprentissage du Méchant) ; dilemmes recalibrés sur un témoin qui réussit | 0.5, 0.6, 0.11 |
+| **Fonctions d'évaluation** | quatre objectifs, bandes gelées ; dilemmes et coordination fragiles | durée en premier objectif au cycle 1 (jamais un filtre éliminatoire, décision de la phase 0) ; deux mesures nouvelles (choix morts, apprentissage du Méchant) ; dilemmes recalibrés sur un témoin qui réussit | 0.5, 0.6, 0.11 |
 | **Méthode de test** | 4 parties par table, marges de 3 à 4 points non appariées | graines appariées et intervalles par rééchantillonnage ; course d'élimination (plus de parties seulement là où l'écart est serré) ; ancre rejouée à chaque nouveau protocole ; verdict comparé entre deux bots | 0.3, étapes d et e |
 | **Méthode de sélection** | choix manuel sur tableau | rapport à front de Pareto (aucune variante meilleure partout) en plus du score minimal, pour que l'auteur voie les compromis | 0.10 |
 | **Algorithme génétique** | MAP-Elites prévu, étalon au hasard (décision 4) | mutation adaptée au type de variable (pas pour les nombres, saut pour les choix), croisement entre élites voisines, arrêt quand le score de la carte stagne 3 générations ; axes choisis par Claude après le criblage, parmi les variables les plus influentes | 0.9 |
@@ -175,7 +210,7 @@ La qualité d'une variante reste le plus faible de ses objectifs normalisés (pl
 - le **gel de la V1.0** et le protocole des tests humains.
 
 ## 10. La validation et la V1.0
-1. **Validation de la candidate.** Toutes les compositions de tables, plus de parties (marge visée de ± 2 points), bot fort et bot de contrôle, ablation de chaque changement depuis la V0.3, lecture par profil (catalogue, section 6).
+1. **Validation de la candidate.** Toutes les tailles de table, de 2 à 6 joueurs, et toutes les compositions, plus de parties (marge visée de ± 2 points), bot fort et bot de contrôle, ablation de chaque changement depuis la V0.3, lecture par profil (catalogue, section 6).
 2. **Le livret de règles V1.0** et les **fiches à imprimer** : mise en place, aide de jeu par peuple, résumé du tour.
 3. **Le kit de test humain** :
    - un protocole : nombre de tables, compositions, durée ;
