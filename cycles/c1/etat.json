@@ -1,8 +1,8 @@
 {
  "cycle": "c1",
- "etape": "controle",
- "gen": 1,
- "statut": "en cours",
+ "etape": "rapport",
+ "gen": 0,
+ "statut": "rapport prêt",
  "historique": [
   {
    "etape": "exploration",
@@ -68,10 +68,15 @@
    "etape": "controle",
    "gen": 1,
    "date": "2026-10-13T18:32:54+00:00"
+  },
+  {
+   "etape": "rapport",
+   "gen": 0,
+   "date": "2026-10-13T20:58:07+00:00"
   }
  ],
  "debut": "2026-10-13T14:14:38+00:00",
  "fin_estimee": "2026-10-13T19:33:09+00:00",
  "parties": 256,
- "maj": "2026-10-13T18:33:09+00:00"
+ "maj": "2026-10-13T20:58:07+00:00"
 }

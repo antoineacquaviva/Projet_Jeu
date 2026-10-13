@@ -1,9 +1,9 @@
 {
  "cycle": "c1",
- "etape": "controle",
- "gen": 1,
- "statut": "en cours",
+ "etape": "rapport",
+ "gen": 0,
+ "statut": "rapport prêt",
  "fin_estimee": "2026-10-13T19:33:09+00:00",
- "rapport": null,
- "maj": "2026-10-13T18:33:09+00:00"
+ "rapport": "cycles/c1/rapport.md",
+ "maj": "2026-10-13T20:58:07+00:00"
 }
