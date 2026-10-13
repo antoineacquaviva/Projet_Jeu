@@ -1,0 +1,18 @@
+{
+ "lots": 20,
+ "parties": 1020,
+ "erreurs": 0,
+ "duree_max_s": 495,
+ "duree_cumulee_coeurs_s": 27662,
+ "parties_par_s_par_coeur": 0.0,
+ "configurations": [
+  "m3_v1",
+  "m3_v2",
+  "m3_v1_une_tactique",
+  "m3_v1_sans_reve",
+  "m3_v1_essoufflement"
+ ],
+ "echelle": 1.0,
+ "empreinte": "70bede3b8c70aee6",
+ "moteur": "1.7"
+}
