@@ -1242,18 +1242,18 @@
    2,
    2,
    1,
-   1,
+   0,
    0,
    1,
    1
   ],
-  "variante": "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"presence\":{\"pions\":2},\"regles\":{\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2,\"traces_par_joueur\":1},\"tours\":5}",
+  "variante": "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2}},\"presence\":{\"pions\":2},\"regles\":{\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":2,\"traces_par_joueur\":1},\"tours\":5}",
   "qualite": 1.0,
   "score_duree": 1.0,
   "score_difficulte": 1.0,
-  "tour_moyen": 4.05,
-  "ecart_tailles": 9.74,
-  "foret_min": 69.31,
+  "tour_moyen": 3.83,
+  "ecart_tailles": 9.21,
+  "foret_min": 69.84,
   "precoces_max": 0.0,
   "tailles": {
    "2": {
@@ -1266,12 +1266,12 @@
     }
    },
    "3": {
-    "foret": 71.9,
+    "foret": 70.95,
     "precoces": 0.0,
     "parties": 20,
-    "tour": 5.0,
+    "tour": 4.0,
     "fins": {
-     "nuit": 100.0
+     "sommeil": 100.0
     }
    },
    "4": {
@@ -1284,10 +1284,10 @@
     }
    },
    "5": {
-    "foret": 69.31,
+    "foret": 69.84,
     "precoces": 0.0,
     "parties": 18,
-    "tour": 4.17,
+    "tour": 4.06,
     "fins": {
      "nuit": 5.6,
      "sommeil": 94.4
@@ -1526,7 +1526,7 @@
    2,
    0,
    1,
-   1,
+   3,
    2,
    0,
    2,
@@ -1536,17 +1536,17 @@
    0,
    1
   ],
-  "variante": "patch:{\"pouvoirs\":{\"voir\":{\"par_tour\":1}},\"presence\":{\"pions\":2},\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":4,\"ordres_par_etape\":2,\"traces_par_joueur\":1},\"tours\":7}",
+  "variante": "patch:{\"pouvoirs\":{\"voir\":{\"par_tour\":1}},\"presence\":{\"pions\":2},\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"escalade\":5,\"lunes\":3,\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":2,\"traces_par_joueur\":1},\"tours\":7}",
   "qualite": 0.0,
   "score_duree": 0.0,
-  "score_difficulte": 0.175,
+  "score_difficulte": 0.217,
   "tour_moyen": 2.37,
-  "ecart_tailles": 28.57,
-  "foret_min": 63.81,
+  "ecart_tailles": 23.82,
+  "foret_min": 67.93,
   "precoces_max": 100.0,
   "tailles": {
    "2": {
-    "foret": 63.81,
+    "foret": 67.93,
     "precoces": 100.0,
     "parties": 15,
     "tour": 3.0,
@@ -1555,7 +1555,7 @@
     }
    },
    "3": {
-    "foret": 72.62,
+    "foret": 75.71,
     "precoces": 100.0,
     "parties": 20,
     "tour": 2.5,
@@ -1582,7 +1582,7 @@
     }
    },
    "6": {
-    "foret": 92.38,
+    "foret": 91.75,
     "precoces": 100.0,
     "parties": 15,
     "tour": 2.0,
@@ -1596,7 +1596,7 @@
   "genome": [
    1,
    0,
-   2,
+   3,
    0,
    0,
    1,
@@ -1608,13 +1608,13 @@
    0,
    1
   ],
-  "variante": "patch:{\"cartes\":{\"main\":6},\"presence\":{\"pions\":4},\"regles\":{\"cercle_par_joueur\":2,\"escalade\":5,\"reves_par_pas\":3,\"traces_par_joueur\":1},\"tours\":5}",
+  "variante": "patch:{\"cartes\":{\"main\":6},\"presence\":{\"pions\":4},\"regles\":{\"cercle_par_joueur\":2,\"escalade\":5,\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":5}",
   "qualite": 0.0,
   "score_duree": 0.0,
   "score_difficulte": 0.0,
   "tour_moyen": 4.0,
-  "ecart_tailles": 3.81,
-  "foret_min": 93.65,
+  "ecart_tailles": 3.49,
+  "foret_min": 93.97,
   "precoces_max": 100.0,
   "tailles": {
    "2": {
@@ -1636,7 +1636,7 @@
     }
    },
    "4": {
-    "foret": 93.65,
+    "foret": 93.97,
     "precoces": 0.0,
     "parties": 15,
     "tour": 5.0,
@@ -1815,28 +1815,28 @@
    1,
    2,
    0,
+   0,
+   0,
+   0,
    2,
-   2,
-   2,
+   0,
    2,
    1,
    0,
    0,
-   1,
-   0,
-   2
+   0
   ],
-  "variante": "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"voir\":{\"par_tour\":1}},\"regles\":{\"cercle_par_joueur\":2,\"escalade\":4,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":{\"2\":1,\"4\":2},\"traces_par_joueur\":3},\"tours\":7}",
+  "variante": "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"hanter\":{\"par_tour\":2}},\"presence\":{\"pions\":4},\"regles\":{\"cercle_par_joueur\":2,\"lunes\":3}}",
   "qualite": 0.0,
   "score_duree": 0.0,
-  "score_difficulte": 0.222,
-  "tour_moyen": 2.0,
-  "ecart_tailles": 4.05,
-  "foret_min": 87.62,
+  "score_difficulte": 0.0,
+  "tour_moyen": 2.46,
+  "ecart_tailles": 4.76,
+  "foret_min": 94.29,
   "precoces_max": 100.0,
   "tailles": {
    "2": {
-    "foret": 87.62,
+    "foret": 94.29,
     "precoces": 100.0,
     "parties": 15,
     "tour": 2.0,
@@ -1845,16 +1845,16 @@
     }
    },
    "3": {
-    "foret": 91.67,
-    "precoces": 100.0,
+    "foret": 95.48,
+    "precoces": 10.0,
     "parties": 20,
-    "tour": 2.0,
+    "tour": 3.9,
     "fins": {
      "reveil": 100.0
     }
    },
    "4": {
-    "foret": 89.53,
+    "foret": 98.41,
     "precoces": 100.0,
     "parties": 15,
     "tour": 2.0,
@@ -1863,7 +1863,7 @@
     }
    },
    "5": {
-    "foret": 91.54,
+    "foret": 98.68,
     "precoces": 100.0,
     "parties": 18,
     "tour": 2.0,
@@ -1872,10 +1872,155 @@
     }
    },
    "6": {
-    "foret": 91.43,
+    "foret": 99.05,
+    "precoces": 100.0,
+    "parties": 15,
+    "tour": 2.4,
+    "fins": {
+     "sommeil": 100.0
+    }
+   }
+  }
+ },
+ "0-4": {
+  "genome": [
+   3,
+   2,
+   0,
+   1,
+   2,
+   1,
+   2,
+   1,
+   1,
+   0,
+   1,
+   0,
+   1
+  ],
+  "variante": "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"voir\":{\"par_tour\":1}},\"presence\":{\"pions\":2},\"regles\":{\"cercle_par_joueur\":5,\"escalade\":4,\"lunes\":3,\"machines_en_jeu\":5,\"ordres_par_etape\":2,\"traces_par_joueur\":1},\"tours\":5}",
+  "qualite": 0.0,
+  "score_duree": 0.0,
+  "score_difficulte": 0.217,
+  "tour_moyen": 2.35,
+  "ecart_tailles": 36.51,
+  "foret_min": 55.24,
+  "precoces_max": 100.0,
+  "tailles": {
+   "2": {
+    "foret": 55.24,
+    "precoces": 0.0,
+    "parties": 15,
+    "tour": 3.33,
+    "fins": {
+     "sommeil": 100.0
+    }
+   },
+   "3": {
+    "foret": 68.09,
+    "precoces": 65.0,
+    "parties": 20,
+    "tour": 2.35,
+    "fins": {
+     "sommeil": 100.0
+    }
+   },
+   "4": {
+    "foret": 89.21,
+    "precoces": 93.3,
+    "parties": 15,
+    "tour": 2.07,
+    "fins": {
+     "sommeil": 100.0
+    }
+   },
+   "5": {
+    "foret": 90.21,
+    "precoces": 100.0,
+    "parties": 18,
+    "tour": 2.0,
+    "fins": {
+     "sommeil": 100.0
+    }
+   },
+   "6": {
+    "foret": 91.75,
     "precoces": 100.0,
     "parties": 15,
     "tour": 2.0,
+    "fins": {
+     "sommeil": 100.0
+    }
+   }
+  }
+ },
+ "3-0": {
+  "genome": [
+   2,
+   3,
+   3,
+   2,
+   3,
+   2,
+   2,
+   1,
+   0,
+   1,
+   0,
+   1,
+   1
+  ],
+  "variante": "patch:{\"cartes\":{\"main\":6},\"pouvoirs\":{\"attendre\":{\"par_tour\":2},\"hanter\":{\"par_tour\":2}},\"regles\":{\"cercle_par_joueur\":4,\"escalade\":4,\"lunes\":\"n-1\",\"machines_en_jeu\":{\"2\":3,\"4\":4,\"6\":5},\"ordres_par_etape\":{\"2\":1,\"4\":2},\"reves_par_pas\":{\"2\":2,\"5\":3},\"traces_par_joueur\":1},\"tours\":7}",
+  "qualite": 1.0,
+  "score_duree": 1.0,
+  "score_difficulte": 1.0,
+  "tour_moyen": 5.23,
+  "ecart_tailles": 4.12,
+  "foret_min": 66.67,
+  "precoces_max": 0.0,
+  "tailles": {
+   "2": {
+    "foret": 67.62,
+    "precoces": 0.0,
+    "parties": 15,
+    "tour": 7.0,
+    "fins": {
+     "nuit": 100.0
+    }
+   },
+   "3": {
+    "foret": 69.76,
+    "precoces": 0.0,
+    "parties": 20,
+    "tour": 5.9,
+    "fins": {
+     "sommeil": 100.0
+    }
+   },
+   "4": {
+    "foret": 70.79,
+    "precoces": 0.0,
+    "parties": 15,
+    "tour": 4.0,
+    "fins": {
+     "sommeil": 100.0
+    }
+   },
+   "5": {
+    "foret": 66.67,
+    "precoces": 0.0,
+    "parties": 18,
+    "tour": 5.11,
+    "fins": {
+     "nuit": 5.6,
+     "sommeil": 94.4
+    }
+   },
+   "6": {
+    "foret": 70.48,
+    "precoces": 0.0,
+    "parties": 15,
+    "tour": 4.13,
     "fins": {
      "sommeil": 100.0
     }
