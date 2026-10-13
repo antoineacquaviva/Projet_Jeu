@@ -7,7 +7,7 @@
 - **Chemin** : trois cycles au plus, chacun « campagne → nouvelle version du jeu → nouvelle version du protocole ». V0.3 → V0.4 → V0.5 → V0.6, puis validation et gel en V1.0.
 - **Les calculs s'enchaînent seuls sur GitHub** : criblage, exploration, confirmation et rapport, sans session Claude et sans attente.
 - **Claude n'intervient qu'aux charnières**, soit environ deux sessions par cycle et une dizaine en tout (estimation), au lieu de passages trois fois par jour.
-- **Défauts de conception** : signalés dès qu'ils apparaissent, par une alerte automatique dans le rapport et une issue GitHub. Une première alerte est déjà levée : **le rêve n'a pas de prix** (section 6).
+- **Défauts de conception** : signalés dès qu'ils apparaissent, par une alerte automatique dans le rapport et une issue GitHub. Une première alerte est déjà levée : **le rêve se paie trop tard** (section 6).
 - **Règle de décision** : Claude tranche seul les choix techniques. L'auteur tranche la conception du jeu (section 9).
 
 ## 1. Les noms des versions
@@ -59,7 +59,7 @@ Une V1.0 est donc possible en deux à trois semaines.
 | 0.1 | **Versions renommées** : README, ETAT, documents, `maquettes/v0.3.json` | souhait de l'auteur |
 | 0.2 | **V0.3 dans le moteur** (ancienne étape 4.1, première moitié), tests, conformité | point de départ |
 | 0.3 | **Statistiques appariées** (T1) : écarts par graine, intervalles par rééchantillonnage dans les résumés ; une règle écrite de ce qu'est un « écart sûr » | marges plus étroites sans partie de plus |
-| 0.4 | **Leviers du rêve en paramètres** : avance de l'esprit (case d'entrée, pas) ; et les formes du coût d'un rêve que l'auteur aura acceptées (section 6) | la phase 4 doit d'abord freiner le rêve (décision 3.7) |
+| 0.4 | **Leviers du rêve en paramètres** : avance de l'esprit (case d'entrée, pas), lunes selon la taille de la table, taille de la main ; aucune règle nouvelle (section 6) | la phase 4 doit d'abord freiner le rêve (décision 3.7) |
 | 0.5 | **Mesure « choix morts »** : part d'usage de chaque action et de chaque pouvoir par le bot fort, et perte au jeu restreint ; témoin « pouvoir qui ne fait rien » | intérêt de tous les choix |
 | 0.6 | **Mesure « apprentissage du Méchant »** : écart entre le Méchant qui apprend et le témoin « Méchant qui n'apprend plus » | efficacité et apprentissage du Méchant |
 | 0.7 | **Bot à portefeuille** (T3) : ses suites tirent leur politique dans un portefeuille (rêve 0 ou 1 par tour, défenseur, saboteur, bruité) et il garde le meilleur coup. Validé sur deux témoins : en V0.3, il doit égaler `MC64R` sans qu'on lui souffle de rêver ; en V0.2, il doit retrouver qu'il vaut mieux ne pas rêver | un bot qui découvre la stratégie au lieu de la recevoir |
@@ -106,18 +106,24 @@ L'alerte nomme alors l'objectif, ce qui a été essayé et la piste de conceptio
 
 **Alertes déjà levées (13 oct.)**
 
-**A. Le rêve n'a pas de prix.** Probable et important.
-- *Mesuré (diagnostic, section 7)* :
-  - le seuil du Cercle seul fait basculer d'une fin trop rapide à l'autre (réveil au tour 2,2, ou sommeil au tour 3,5) ;
-  - les lunes ne gagnent que 0,4 tour ;
+**A. Le rêve se paie trop tard.** Probable et important. Reformulée le 13 oct., 14 h 20, après la réponse de l'auteur.
+- *Le principe (auteur)* : la tension tient au choix de jouer une carte côté rêve ou côté action, si bien que rêver prive d'une action.
+- *Ce que disent les règles* : ce prix existe déjà, et il est même plus lourd. Une carte en rêve ne fait pas son action, et surtout elle quitte la main **pour le reste de la partie** (R3.6). La main compte 5 cartes pour toute la partie, sans pioche (R1.4), pour 3 étapes par tour.
+- *Mesuré (diagnostic, sections 4, 6 et 7)* :
+  - la partie finit au tour 3,2 ;
+  - en V0.3, interdire une action ne coûte que 0 à 6 points (jeu restreint) ;
   - aucune des 16 options testées ne ramène les fins avant la mi-partie sous 63 %, pour une bande verte à 20 % au plus.
-- *Constat dans le dépôt* : les leviers déjà paramétrés sont le seuil du Cercle, les lunes, les rêves par joueur et par table, les esprits au départ et le nombre de tours. L'avance de l'esprit (entrée en 12, un pas par rêve) est fixe, et **aucun coût du rêve n'existe**. Un rêve coûte seulement l'action de la carte posée en travers.
-- *Supposé* : c'est l'invariant « le rêve existe et coûte de la défense » (noté 9) qui n'est pas tenu en V0.3. Le criblage du cycle 1 dira si les paramètres existants suffisent. S'ils ne suffisent pas, il faut une règle nouvelle, et c'est une décision de conception.
-- *Formes possibles d'un coût*, proposées par Claude et à choisir par l'auteur :
-  1. **Tempo** : rêver occupe la carte et l'étape suivante (pas d'action ni de déplacement).
-  2. **Risque** : chaque rêve donne une occasion au Méchant (par exemple, la Machine la plus proche avance d'un pas).
-  3. **Rendement décroissant** : chaque case du Cercle demande un rêve de plus que la précédente, ou l'esprit avance moins vite à mesure qu'il approche du 7.
-  4. **Entretien** : un tour sans rêve fait reculer l'esprit ou retire une case du Cercle. Le rêve devient alors un engagement qui dure, et non une course.
+- *Supposé (lecture de Claude)* : le prix d'un rêve se paie en actions **futures**, puisque la main se vide, mais le rêve termine la partie avant que ce futur arrive. Les actions perdues au tour 1 ou 2 valent aussi peu, parce que la menace est encore faible. La tension existe donc dans le principe, mais elle est déséquilibrée : rêver ne coûte presque rien précisément parce que rêver va vite.
+- *Correction dans l'esprit du principe, sans règle nouvelle* : rendre l'action plus précieuse au moment où l'on renonce, ou rendre la fin par le rêve plus lointaine pour que la main vidée se fasse sentir. Les leviers sont déjà des paramètres ou des réglages de règles existantes :
+  - le seuil du Cercle ;
+  - les lunes, selon la taille de la table (accepté par l'auteur : par exemple une de moins que de joueurs) ;
+  - l'avance de l'esprit (case d'entrée, pas) ;
+  - la menace des premiers tours (Machines au chantier au départ, escalade) ;
+  - la taille de la main (5 cartes) ;
+  - le nombre de tours.
+
+  Le cycle 1 les explore en priorité.
+- *Si le criblage montre que cela ne suffit pas*, l'alerte sera confirmée et Claude proposera à l'auteur des formes de prix supplémentaires (rêver prive aussi de l'étape suivante, rendement décroissant du Cercle…). Rien n'est codé avant son accord.
 
 **B. « Trois façons d'agir » : Saboter ne pèse presque rien.** À surveiller.
 - *Mesuré* : Saboter coûte 1 point en V0.3.
@@ -162,7 +168,7 @@ La qualité d'une variante reste le plus faible de ses objectifs normalisés (pl
 - ordre des travaux.
 
 **L'auteur tranche** (une question à la fois, avec la recommandation de Claude) :
-- toute **règle nouvelle** ou toute **forme** de règle, par exemple la forme du coût du rêve ;
+- toute **règle nouvelle** ou toute **forme** de règle, par exemple un prix supplémentaire du rêve ;
 - l'**adoption de chaque version** V0.4, V0.5, V0.6 ;
 - les **invariants** et les **bandes des objectifs** (gelées, B1) ;
 - les réponses aux **alertes de conception** ;
