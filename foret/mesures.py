@@ -434,6 +434,7 @@ def jeu_restreint_depuis_synthese(syn, peuples=("oiseaux", "mammiferes", "reptil
 # [mesure:dilemmes] Seuils de classement des décisions, en points de forêt (% de la forêt
 # initiale). Provisoires (13 oct.) : à confirmer par l'auteur avec les premiers résultats.
 PROCHE, NET = 1.0, 3.0
+HORS_DILEMMES = {"trace", "partage"}      # communication : le bot ne la valorise pas (voir part_dilemmes)
 
 
 def classer_decision(valeurs, proche=PROCHE, net=NET):
@@ -457,13 +458,15 @@ def part_dilemmes(jugements, proche=PROCHE, net=NET):
     """[mesure:dilemmes] Part (%) des dilemmes parmi les décisions non forcées jugées, et le détail
     par classe et par type de décision. jugements : [{"type": ..., "valeurs": [...]}, ...].
     La mise en place (placer sa présence) est détaillée par type mais hors de la part : elle
-    n'est pas un choix du jeu en cours."""
+    n'est pas un choix du jeu en cours. Les traces et le partage aussi (13 oct.) : sans le réglage
+    « annonces », personne ne les lit dans les suites du bot, toutes leurs options se valent et
+    elles gonfleraient les décisions indifférentes."""
     classes = Counter()
     par_type = defaultdict(Counter)
     for j in jugements:
         c = classer_decision(j["valeurs"], proche, net)
         par_type[j["type"]][c] += 1
-        if j["type"] not in MISE_EN_PLACE:
+        if j["type"] not in MISE_EN_PLACE | HORS_DILEMMES:
             classes[c] += 1
     n = sum(v for k, v in classes.items() if k != "forcee")
     part = 100 * classes["dilemme"] / n if n else None

@@ -45,9 +45,10 @@ def test_classer_une_decision():
 
 
 def test_part_des_dilemmes_hors_mise_en_place():
-    """[mesure:dilemmes] Part parmi les décisions non forcées ; la mise en place est à part."""
+    """[mesure:dilemmes] Part parmi les décisions non forcées ; la mise en place et les traces sont à part."""
     j = [{"type": "action", "valeurs": [90, 89.5, 80]}, {"type": "action", "valeurs": [90, 80]},
-         {"type": "aller", "valeurs": [80, 80.5]}, {"type": "presence", "valeurs": [90, 89.9, 70]}]
+         {"type": "aller", "valeurs": [80, 80.5]}, {"type": "presence", "valeurs": [90, 89.9, 70]},
+         {"type": "trace", "valeurs": [80, 80, 80]}]
     r = part_dilemmes(j)
     assert r["decisions"] == 3 and r["part"] == pytest.approx(100 / 3)
     assert r["classes"] == {"dilemme": 33.3, "evidente": 33.3, "indifferente": 33.3}
