@@ -168,8 +168,9 @@ def charger(nom, variante=None):
     """Maquette prête à jouer : héritage résolu, variante appliquée, validée.
 
     Une variante peut être un nom de la maquette, « code:<code de l'atelier> »
-    (maquette v2 : foret/atelier.py), ou « interdire:<interdit>[+<interdit>…] » (jeu
-    restreint, règle « interdits »). Une variante nommée peut elle-même porter
+    (maquette v2 : foret/atelier.py), « interdire:<interdit>[+<interdit>…] » (jeu
+    restreint, règle « interdits ») ou « regles:<règle>=<valeur JSON>[,…] » (par exemple
+    « regles:bonus_fin=10 », la vérification de robustesse A12). Une variante nommée peut elle-même porter
     un code d'atelier (clé « atelier »)."""
     m = lire(nom)
     if variante and variante != "defaut":
@@ -177,6 +178,14 @@ def charger(nom, variante=None):
             patch = {"atelier": variante[len("code:"):]}
         elif variante.startswith("interdire:"):              # [mesure:jeu_restreint] « interdire:a+b »
             patch = {"regles": {"interdits": variante[len("interdire:"):].split("+")}}
+        elif variante.startswith("regles:"):                 # « regles:bonus_fin=10,lunes=3 » (valeurs JSON)
+            patch = {"regles": {}}
+            for morceau in variante[len("regles:"):].split(","):
+                k, _, v = morceau.partition("=")
+                try:
+                    patch["regles"][k] = json.loads(v)
+                except ValueError:
+                    patch["regles"][k] = v
         elif variante not in m["variantes"]:
             raise ErreurMaquette(f"variante inconnue pour {m['nom']} : {variante} "
                                  f"(connues : {sorted(m['variantes'])})")

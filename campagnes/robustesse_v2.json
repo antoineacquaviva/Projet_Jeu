@@ -1,0 +1,95 @@
+{
+ "nom": "robustesse_v2",
+ "description": "Phase 3, étape 3.5 (13 oct. 2026) : robustesse au bonus de fin (A12). Les 16 variantes de v2_options_mc rejouées avec un bonus de fin de 10 puis 25 % de la forêt initiale (sommeil ou réveil), même bot (MC 64 qui rêve), mêmes duos et mêmes graines : les comparaisons sont appariées avec v2_options_mc (bonus 0, sauf « Héritage v1 » qui a déjà 10). Le classement des options et les recommandations doivent tenir. Ordre des variantes : celui de v2_options_mc.",
+ "maquette": "v2",
+ "blocs": [
+  {
+   "nom": "bonus10",
+   "variantes": [
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:bonus=10",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:|p:bonus=10",
+    "code:c:A2a,d_fav,C2b,D2v_choix|m:C3,D5|p:bonus=10",
+    "code:c:A2c,d_fav,C2c,D2v_choix|m:C3|p:represailles=attaque,bonus=10",
+    "code:c:A2b,d_fav,C2a,D2v_choix|m:C3|p:bonus=10",
+    "code:c:A2a,d_bb,C2a,D2v_choix|m:C3|p:bonus=10",
+    "code:c:A2a,d_hes,C2a,D2v_choix|m:C3|p:bonus=10",
+    "code:c:A2a,d_six,C2a,D2v_choix|m:C3|p:bonus=10",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:represailles=attaque,bonus=10",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:hs=organe,bonus=10",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:hs=rien,bonus=10",
+    "code:c:A2a,d_fav,C2a,D2v_deux|m:C3|p:bonus=10",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:seuil=2,bonus=10",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:seuil=4,bonus=10",
+    "code:c:A2a,d_fav,C2b,D2v_choix|m:C3|p:bonus=10",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:bonus=10"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "tailles": [
+      2
+     ],
+     "parties": 4
+    }
+   ]
+  },
+  {
+   "nom": "bonus25",
+   "variantes": [
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:bonus=25",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:|p:bonus=25",
+    "code:c:A2a,d_fav,C2b,D2v_choix|m:C3,D5|p:bonus=25",
+    "code:c:A2c,d_fav,C2c,D2v_choix|m:C3|p:represailles=attaque,bonus=25",
+    "code:c:A2b,d_fav,C2a,D2v_choix|m:C3|p:bonus=25",
+    "code:c:A2a,d_bb,C2a,D2v_choix|m:C3|p:bonus=25",
+    "code:c:A2a,d_hes,C2a,D2v_choix|m:C3|p:bonus=25",
+    "code:c:A2a,d_six,C2a,D2v_choix|m:C3|p:bonus=25",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:represailles=attaque,bonus=25",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:hs=organe,bonus=25",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:hs=rien,bonus=25",
+    "code:c:A2a,d_fav,C2a,D2v_deux|m:C3|p:bonus=25",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:seuil=2,bonus=25",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3|p:seuil=4,bonus=25",
+    "code:c:A2a,d_fav,C2b,D2v_choix|m:C3|p:bonus=25",
+    "code:c:A2a,d_fav,C2a,D2v_choix|m:C3,D5|p:bonus=25"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    }
+   ],
+   "tables": [
+    {
+     "tailles": [
+      2
+     ],
+     "parties": 4
+    }
+   ]
+  }
+ ]
+}

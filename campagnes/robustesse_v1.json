@@ -1,0 +1,56 @@
+{
+ "nom": "robustesse_v1",
+ "description": "Phase 3, étape 3.5 (13 oct. 2026) : robustesse au bonus de fin (A12) pour la v1. Le bot de référence (MC 64 chacun pour soi) libre et à taux de rêve fixes (0 ; 0,5 ; 1), avec un bonus de fin de 0, 10 et 25 % (variantes « regles:bonus_fin=… »), 15 duos, 4 parties, graines appariées. Question : le meilleur taux de rêve (0 sans bonus) et le gain du bot libre changent-ils quand finir par un rêve rapporte ?",
+ "maquette": "v1",
+ "blocs": [
+  {
+   "nom": "bonus",
+   "variantes": [
+    "defaut",
+    "regles:bonus_fin=10",
+    "regles:bonus_fin=25"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi"
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "reves_par_tour": 0.0
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "reves_par_tour": 0.5
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "reves_par_tour": 1.0
+     }
+    }
+   ],
+   "tables": [
+    {
+     "tailles": [
+      2
+     ],
+     "parties": 4
+    }
+   ]
+  }
+ ]
+}

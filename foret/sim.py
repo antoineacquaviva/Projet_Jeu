@@ -73,7 +73,7 @@ def taches(campagne, maquette, echelle=1.0):
     out, ignorees = [], set()
     for bloc in campagne["blocs"]:
         for v in bloc["variantes"]:
-            if v not in connues and not v.startswith(("code:", "interdire:")):
+            if v not in connues and not v.startswith(("code:", "interdire:", "regles:")):
                 ignorees.add(v)
                 continue
             for bot in bloc["bots"]:

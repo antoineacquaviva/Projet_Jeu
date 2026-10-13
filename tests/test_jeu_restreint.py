@@ -98,3 +98,17 @@ def test_les_campagnes_de_l_etape_3_4():
     for b in c["blocs"]:
         for v in b["variantes"]:
             charger(c["maquette"], v)
+
+
+def test_la_variante_regles_et_la_robustesse_au_bonus():
+    """[v2:D4] Robustesse A12 : « regles:bonus_fin=10 » pose le bonus de fin ; les campagnes de
+    robustesse rejouent les variantes avec un bonus de 10 et 25 %."""
+    assert charger("v1", "regles:bonus_fin=25")["regles"]["bonus_fin"] == 25
+    with pytest.raises(ErreurMaquette):
+        charger("v1", "regles:bonus_fin=-3")
+    for nom, n in (("robustesse_v1", 720), ("robustesse_v2", 1920)):
+        c = lire_campagne(nom)
+        t, ignorees = taches(c, c["maquette"])
+        assert len(t) == n and not ignorees
+    c = lire_campagne("robustesse_v2")
+    assert {charger("v2", v)["regles"]["bonus_fin"] for v in c["blocs"][1]["variantes"]} == {25}

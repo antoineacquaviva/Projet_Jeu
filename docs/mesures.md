@@ -85,6 +85,9 @@ Le chef unique a sa campagne (`coordination_mc_2`). Depuis l'étape 3.3, le work
 - Campagnes `jeu_restreint` (v1, MC 64) et `jeu_restreint_v2` (V2, MC 64 dont les suites rêvent) : un bloc « reference », un bloc « actions » (15 duos), un bloc par peuple pour ses deux moitiés (les 5 duos qui le comptent) ; 480 parties chacune. Variantes « interdire:<a>[+<b>] » (`charger`). Lecture : `python scripts/resume_campagne.py <dossier>` (`jeu_restreint_depuis_synthese`).
 - Campagne `v2_options_mc` : les 16 variantes de `v2_options` (une option changée à la fois autour de « V2 proposée ») jouées par le bot fort de la V2, 15 duos, 4 parties ; 960 parties.
 
+## Robustesse au bonus de fin (A12, étape 3.5)
+Le résultat est la forêt restante, sans bonus de fin (A12) ; la robustesse des conclusions est vérifiée avec un bonus de 10 et 25 % de la forêt initiale pour une fin par un rêve. Campagnes `robustesse_v1` (bot de référence libre et à taux fixes, bonus 0, 10 et 25 %, variantes « regles:bonus_fin=… ») et `robustesse_v2` (les 16 variantes de `v2_options_mc` avec le réglage `bonus` de l'atelier à 10 puis 25), mêmes duos et mêmes graines que les campagnes de référence : comparaisons appariées. Une recommandation qui change avec le bonus est signalée comme fragile.
+
 ## Témoins
 Variantes cassées exprès (préfixe `temoin_`, dans `maquettes/v1.json` et `v2.json`), jamais proposées comme règles :
 
