@@ -109,12 +109,12 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
   - `campagnes/v2_options_mc.json` : les variantes à une option près autour de « V2 proposée » (codes d'atelier de `campagnes/v2_options.json`), jouées par le bot de référence sur les duos.
 - **Fin d'étape.** Tests verts ; lancer les deux campagnes. Si leur durée estimée dépasse 6 h par lot, les découper.
 
-**3.5 Diagnostic : batterie, mesures, jeu restreint** (EN COURS, session interactive du 13 oct. ; la robustesse est déjà lancée)
+**3.5 Diagnostic : batterie, mesures, jeu restreint** (FAIT le 13 oct. : `projet/4-bilans/diagnostic-v1-options-v2.md`, sections 1 à 6)
 - **Quoi.** Traiter les résultats de la batterie phase3 (3.2), des mesures (3.3) et du jeu restreint (3.4). Comparer chaque verdict à celui du glouton : une mesure qui change de verdict décrit les bots, pas le jeu.
 - **Fin d'étape.** Lancer la vérification de robustesse : les campagnes clés rejouées avec un bonus de fin de 10 et de 25 % (réglage `bonus` de l'atelier).
 - **Livrable.** `projet/4-bilans/diagnostic-v1-options-v2.md` (créer le fichier), sections v1, V2, mesures du bot fort, jeu restreint.
 
-**3.6 Les options de la v2, et le diagnostic complet** (À FAIRE)
+**3.6 Les options de la v2, et le diagnostic complet** (EN COURS, session interactive du 13 oct. ; reste la robustesse de la V2, campagne 15)
 - **Quoi.** Traiter `v2_options_mc` et la robustesse. Pour chaque décision ouverte (D1 à D6, D8, D9), un tableau des mesures clés (forêt, concentration, meilleur taux de rêve, fins avant la mi-partie, chef unique) et la recommandation de Claude.
 - **Livrable.** Le diagnostic terminé : en bref, problèmes de la v1 classés par gravité, options de la v2, recommandations, limites. README et plan d'action à jour.
 
@@ -169,7 +169,9 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 
 ## 5. Étape suivante
 
-**3.5 Diagnostic** (en cours dans la session interactive du 13 oct. ; si le Verrou est vidé sans que l'étape soit marquée FAIT, reprendre là). Données : batteries 3 à 6, campagnes 11 et 12 (jeu restreint) ; puis 3.6 avec les campagnes 13 à 15.
+**3.6 Les options de la v2, et le diagnostic complet** (en cours dans la session interactive du 13 oct. ; si le Verrou est vidé sans que l'étape soit marquée FAIT, reprendre là : traiter la campagne 15, robustesse de la V2, dans la section 8 du diagnostic, puis finir le diagnostic). Ensuite : 3.7, DÉCISION UTILISATEUR.
+
+**Incident GitHub (13 oct.).** Le groupe de concurrence des fusions (`publication-resultats`) ne garde qu'une tâche en attente et annule les autres : les fusions des campagnes 12 et 13 ont été annulées, puis relancées avec `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/runs/<id>/rerun-failed-jobs` (une seule à la fois). Corrigé pour les lancements suivants : plus de groupe, la publication réessaie. Les lots de campagne sont gardés 3 jours (1 jour avant la correction).
 
 **Bot fort de la V2 (13 oct., décision technique de Claude, signalée à l'auteur).** En V2, le bot de référence MC 64 dont les suites ne rêvent pas rêve peu et perd contre le glouton qui rêve (tape-taupe −5 points). Le bot fort de la V2 est donc MC 64 chacun pour soi dont les suites rêvent une carte par tour (`MC64R` dans `foret/batterie.py`) : configurations `p3_v2r` et `m3_v2r`, campagnes de la V2 de l'étape 3.4 et de la robustesse. En v1, la référence reste MC 64 (ses suites ne rêvent pas : c'est là qu'il est le plus fort).
 
@@ -216,7 +218,11 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Batterie 4 | programme mesures3 : tape-taupe, dilemmes (v1, V2), témoins (une tactique, sans rêve, essoufflement), 1 020 parties dont 330 de MC 64 environ ; résultats et parties dans `batterie/run4_mesures3/` | 20 | 17,9 min | 8 min | réussi (témoins : 2 sur 3) ; à traiter en 3.5 (tape-taupe : comparer aussi le glouton par table aux valeurs d'équipe de la Batterie 3 ; témoins ; seuils des dilemmes à faire confirmer par l'auteur) |
 | Batterie 5 | phase3, p3_v2r (V2, bot fort qui rêve), 338 parties | 10 | – | – | lancée le 13 oct. 10:02 ; à traiter en 3.5 |
 | Batterie 6 | mesures3, m3_v2r, 300 parties | 10 | 8 min environ | 1,3 min | réussi ; à traiter en 3.5 |
-| Campagnes 11 à 15 | jeu_restreint (v1, 480 parties), jeu_restreint_v2 (480), v2_options_mc (960), robustesse_v1 (720), robustesse_v2 (1 920), dans l'ordre de lancement probable (vérifier le nom des dossiers `campagnes/<nom>_run<n>`) | 20 chacune | – | – | lancées le 13 oct. entre 10:08 et 10:10 ; jeu restreint en 3.5, le reste en 3.6 |
+| Campagne 11 | jeu_restreint, v1, MC 64, 480 parties | 20 | 77 min (attentes comprises) | 23 min | réussi ; traité (diagnostic, section 6) |
+| Campagne 12 | jeu_restreint_v2, V2, MC 64 qui rêve, 480 parties | 20 | 80 min | 8 min | fusion annulée par le groupe de concurrence, relancée (rerun-failed-jobs) : réussi ; traité |
+| Campagne 13 | v2_options_mc, 16 variantes, MC 64 qui rêve, 960 parties | 20 | 82 min | 17 min | fusion annulée, relancée : réussi ; traité (section 7) |
+| Campagne 14 | robustesse_v1, bonus 0/10/25, 720 parties | 20 | 75 min | 28 min | réussi ; traité (section 8) |
+| Campagne 15 | robustesse_v2, 16 variantes × bonus 10 et 25, 1 920 parties | 20 | – | – | en cours ; à traiter en 3.6 (section 8 du diagnostic) |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 

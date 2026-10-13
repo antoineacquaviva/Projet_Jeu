@@ -80,10 +80,59 @@ Qualités : la contribution des peuples est équilibrée (Shapley 0,90 à 1,15 ;
 - **Gain du bot libre** : en v1, calculé à partir du rapport du plan réduit (moyenne des tables du bot libre contre le meilleur taux fixe) ; les marges sont d'environ ± 4 %.
 
 ## 6. Le jeu restreint
-*À venir (campagnes `jeu_restreint` et `jeu_restreint_v2`).*
+On interdit à tous les joueurs (et dans les suites du bot) une action ou une moitié de carte, et l'on mesure la forêt perdue par le bot fort, sur les mêmes duos (campagnes 11 et 12, 480 parties chacune ; 4 parties par duo ; une moitié n'est jouée qu'aux 5 duos de son peuple, d'où des marges de ± 3 à 10 points). Perte positive : l'élément sert ; nulle : il est inutile ou remplaçable ; négative : s'en passer aide le bot.
+
+| Interdit | Perte v1 (points) | Perte V2 (points) |
+|---|---|---|
+| Voir (oiseaux) | **16,0** ± 9,8 | **5,7** ± 3,5 |
+| Attendre, l'embuscade (reptiles) | **11,9** ± 7,2 | **5,7** ± 3,4 |
+| Hanter (entités) | **10,5** ± 8,2 | 4,0 ± 3,6 |
+| Barrer | **8,1** ± 5,1 | 2,6 ± 2,0 |
+| S'unir (insectes) | 6,0 ± 8,4 | 0,5 ± 3,5 |
+| Enrayer (insectes) | 4,8 ± 9,6 | 2,6 ± 4,6 |
+| Tromper (humains) | 4,0 ± 9,4 | 0,2 ± 3,2 |
+| Tenir (mammifères) | 3,3 ± 7,2 | 1,5 ± 3,6 |
+| Aller | 2,7 ± 4,8 | 1,1 ± 2,0 |
+| Parler (humains) | 0,9 ± 7,8 | −0,5 ± 3,6 |
+| Égarer (entités) | 0,8 ± 7,2 | 0,9 ± 2,9 |
+| Se fondre (reptiles) | −0,2 ± 6,2 | 0,9 ± 3,0 |
+| Voler (oiseaux) | −1,9 ± 7,3 | 0,0 ± 3,0 |
+| **Saboter** | **−4,1** ± 4,2 | 1,1 ± 2,1 |
+| Renverser (mammifères) | −5,7 ± 6,1 | −1,4 ± 4,0 |
+
+Lecture (indices) :
+- **v1 : Voir, l'embuscade, Hanter et Barrer portent le jeu.** Ce sont les outils qui lisent ou annulent la menace : ils confirment le défaut n° 1 (la menace se lit et se contre).
+- **v1 : Saboter n'aide pas ce bot, et l'interdire lui fait même gagner 4 points** (à la limite de la marge). Ses suites sabotent dès que c'est possible (politique du glouton) : l'interdire supprime aussi ce réflexe. Saboter est donc, au mieux, remplaçable par Barrer ; au pire, un piège. À vérifier avec un bot dont la politique ne sabote pas d'office.
+- **v1 : la moitié des pouvoirs ne change rien de mesurable** (Parler, Égarer, Se fondre, Voler, Renverser, et Tenir, Aller dans la marge). Avec 5 duos et 4 parties, une perte de moins de 5 points ne se distingue pas de zéro : ces pouvoirs sont « sans effet mesurable », pas « inutiles ».
+- **V2 : presque tout est sans effet**, Saboter compris (1,1 point, alors que Saboter ne mène plus à une fin en V2 : c'était la vérification prioritaire du plan). Seuls Voir, l'embuscade et Hanter pèsent encore. La raison est la durée : la partie finit au tour 3 par le rêve, avant que les actions comptent. Le jeu restreint de la V2 est à refaire quand la durée sera corrigée.
 
 ## 7. Les options de la v2
-*À venir (étape 3.6, campagne `v2_options_mc` et robustesse).*
+Campagne 13 (`v2_options_mc`, 960 parties) : « V2 proposée », les préréglages de l'atelier, et une option changée à la fois pour chaque décision ouverte, jouées par le bot fort de la V2 sur les 15 duos, 4 parties chacun, mêmes graines. Marges d'environ ± 1,5 point sur la forêt (non appariées ; les écarts entre variantes sont mieux mesurés qu'elles ne le disent).
+
+| Décision | Option | Forêt | Tour de fin | Finies au tour 3 ou avant | Fins | Ordres réussis |
+|---|---|---|---|---|---|---|
+| — | **V2 proposée** | **91,3 %** | 3,2 | 88 % | réveil 80, sommeil 20 | 44 % |
+| D1 plan du Méchant | où et comment (A2b) | 88,3 | 3,3 | 82 % | réveil 75, sommeil 22, nuit 3 | 39 % |
+| D2 doublé | branle-bas | 88,1 | 3,2 | 85 % | réveil 82, sommeil 18 | 56 % |
+| | il hésite | 90,2 | 3,5 | 72 % | réveil 55, sommeil 40, nuit 5 | 43 % |
+| | sixième Machine | 91,3 | 3,3 | 77 % | réveil 83, sommeil 15, nuit 2 | 48 % |
+| D3 Représailles | la plus attaquée | 90,8 | 3,2 | 88 % | réveil 73, sommeil 25, nuit 2 | 47 % |
+| D4 Machine HS désignée | réparée d'un organe | 90,1 | 3,1 | 88 % | réveil 72, sommeil 28 | 50 % |
+| | rien | 90,5 | 3,2 | 85 % | réveil 67, sommeil 32, nuit 2 | 46 % |
+| D5 voies du rêve | un rêve nourrit les deux | 93,3 | 3,1 | 90 % | réveil 100 | 44 % |
+| D6 seuil du Cercle | 2 cases par joueur | 95,4 | **2,2** | 98 % | réveil 100 | 44 % |
+| | 4 cases par joueur | 89,0 | 3,5 | 70 % | sommeil 97, nuit 3 | 55 % |
+| D8 communication | le partage | 90,3 | 3,2 | 85 % | réveil 80, sommeil 20 | 47 % |
+| D9 limite des rêves | les lunes | 90,4 | 3,6 | 67 % | réveil 68, sommeil 23, nuit 8 | 45 % |
+| Préréglages | le cœur seul (sans présage) | 89,9 | 3,4 | 80 % | réveil 68, sommeil 25, nuit 7 | 46 % |
+| | façon The Gang (partage, lunes) | 90,4 | 3,6 | 65 % | réveil 77, sommeil 20, nuit 3 | 48 % |
+| | héritage v1 (une piste, conseil parlé, bonus 10) | 88,4 (résultat 98,4 avec le bonus) | 3,9 | 63 % | réveil 87, sommeil 13 | 31 % |
+
+**Le constat principal : aucune option, seule, ne corrige la durée.** Avec chacune, le bot fort finit la partie par un rêve entre les tours 2 et 4, dans 63 à 98 % des parties avant la mi-partie (bande verte : 20 % au plus). Les options déplacent la forêt de 1 à 4 points et le partage entre réveil et sommeil, pas la durée.
+- **D6, le seuil du Cercle, est le levier le plus fort**, dans les deux sens : à 2 cases, la partie finit au tour 2 ; à 4 cases, le Cercle ne se remplit plus et c'est le long sommeil qui gagne, au tour 3,5. Les deux voies sont trop rapides : relever le seuil ne fait que basculer vers l'autre.
+- **D9, les lunes, et les préréglages qui les contiennent (façon The Gang)** ralentissent un peu (tour 3,6, deux tiers des parties finies au tour 3) : limiter les rêves de la table est la piste la plus prometteuse, à condition d'aller plus loin.
+- **D5 « un rêve nourrit les deux voies »** accélère le réveil : à écarter si l'on veut allonger la partie.
+- **D1, D2, D3, D4, D8** : écarts de 0 à 3 points, sans effet sur la durée. Le plan « qui et où » (D1) et le doublé « favori » ou « sixième Machine » (D2) gardent le plus de forêt ; « branle-bas » rend le Méchant plus efficace (56 % d'ordres réussis) mais coûte 3 points. Ces décisions peuvent se trancher sur d'autres critères (lisibilité, goût), la simulation ne les départage guère.
 
 ## 8. Limites
 - **Peu de parties** : 4 par table pour le bot fort ; les écarts de moins de 4 points ne sont pas sûrs.
