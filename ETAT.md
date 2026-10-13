@@ -178,13 +178,34 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 - 0.10 Orchestrateur et surveillance (FAIT le 13 oct. : workflows `cycle.yml` et `surveillance.yml`, `scripts/publier_resultats.sh` ; essai complet réussi : cycle « essai », 7 lancements enchaînés seuls en 4 min, rapport et issue n° 1 ; tâche « tests autonomes » passée à un passage par jour).
 - 0.11 Ligne de base P2 (FAIT le 13 oct. : `projet/4-bilans/ligne-de-base-p2.md`. MCP64 non validé (−1,6 point, incertain) : **MC64R reste le bot fort** ; gain d'apprentissage +1,7 (orange), témoin réussi ; choix morts : Voler seul, témoin partiel ; coordination et chef unique nuls au bot fort ; durée réglée à 4 joueurs et plus par les lunes, rouge à 2 et 3 ; jeu trop facile partout, 90 à 99 %).
 
+**Cycle 1** (FAIT le 13 oct. : rapport `cycles/c1/rapport.md`, branche resultats ; bilan `projet/4-bilans/cycle-1-bilan.md`). **DÉCISION UTILISATEUR : adopter la version V0.4** (section 5).
+
 **Cycles 1 à 3** (V0.3 → V0.4 → V0.5 → V0.6) : préparer (Claude) → criblage, exploration, confirmation, contrôle, rapport (GitHub, seul) → analyser et proposer (Claude) → **DÉCISION UTILISATEUR : adopter la version**. Priorités : cycle 1 la durée ; cycle 2 l'intérêt des choix et la profondeur ; cycle 3 l'équilibre fin. Arrêt anticipé si plus aucun objectif rouge (bot fort et bot de contrôle).
 
 **Validation et V1.0** : validation complète de la candidate, livret, fiches à imprimer, kit de test humain → **DÉCISION UTILISATEUR : geler la V1.0**.
 
 ## 5. Étape suivante
 
-**Cycle 1 en cours sur GitHub** (lancé le 13 oct. vers 16 h 35, Paris ; plan `cycles/c1.json`, V0.3 → V0.4). Il s'enchaîne seul (workflow Cycle) ; état dans `etat_pipeline.json` et `cycles/c1/` sur la branche `resultats`. Durée estimée : 5 à 6 h. Quand `statut` vaut « rapport prêt », déclencher la tâche « analyse de fin de cycle » (section 3 bis, point 5) ; elle proposera la V0.4 (DÉCISION UTILISATEUR). Cibles du cycle : la durée à 2 et 3 joueurs (54 à 56 % de fins avant la mi-partie en V0.3) et la difficulté (90 à 99 % de forêt gardée ; cible provisoire 50 à 80 %).
+**DÉCISION UTILISATEUR : adopter la version V0.4** (bilan : `projet/4-bilans/cycle-1-bilan.md`, sections 6 et 7). Tant que l'auteur n'a pas répondu en section 8, les passages s'arrêtent et rappellent la décision.
+
+- **Ce que dit le cycle 1.** La durée est réglée : 0 % de fins avant la mi-partie de 2 à 6 joueurs, avec le bot fort et le bot de contrôle (V0.3 : 62 à 71 % à 2 joueurs). La difficulté baisse de façon sûre (−20 points au bot fort, −8 au contrôle), mais le bot de contrôle garde encore 93 à 95 % de la forêt à 3, 5 et 6 joueurs : verdict non stable entre les bots.
+- **Recommandation de Claude : adopter la variante A comme V0.4.** Code d'atelier `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5,A4|p:escalade=5,lunes=3`, plus les réglages `{"regles": {"cercle_par_joueur": {"2": 4, "4": 3}, "machines_en_jeu": 5, "ordres_par_etape": {"2": 1, "4": 2}, "reves_par_pas": 2}}`. Cela fait 2 éléments propres au nombre de joueurs (Cercle 4/4/3/3/3, ordres 1/1/2/2/2).
+- **Ce que l'auteur doit accepter explicitement** (formes de règles) :
+  1. le sablier des rêves (2 rêves pour un pas de l'esprit) ;
+  2. les ordres supplémentaires du Méchant et leur modélisation (dés neufs ; ni présage, ni Voir, ni Hanter, ni embuscade ; barrages oui) ;
+  3. le module A4, escalade du soir dès le tour 5.
+- **Alertes de conception.**
+  - A (rêve payé trop tard) : à lever, la durée est corrigée par les paramètres.
+  - **E (nouvelle)** : à 2 et 3 joueurs, le rêve n'aboutit presque plus (96 à 100 % de fins par la nuit). Le dilemme est à remesurer en priorité.
+  - **D (nouvelle)** : le jeu reste trop facile pour un joueur qui adapte son rythme de rêve.
+  - Ni D ni E ne demande encore de règle nouvelle.
+- **Alternatives** : la variante B (7 tours, 6 cartes, 1 trace) ; ou refuser les ordres supplémentaires, ce qui laisserait la difficulté sans son premier levier.
+- **Après l'adoption (étape a du cycle 2)** :
+  - écrire `maquettes/v0.4.json` et les tests ;
+  - recalibrer le bot fort sur la V0.4 (MC64R, MCP64, MC 64 à rêve 0,5, MC 256 à portefeuille), décision technique de Claude ;
+  - protocole P3 avec les mesures des objectifs 1 à 3 et l'ancre V0.3 ;
+  - recaler le coût de MC 256 ;
+  - lancer le cycle 2. Priorités : intérêt des choix et profondeur, dilemme du rêve à 2 et 3 joueurs, difficulté à 3, 5 et 6 joueurs.
 
 **Incident GitHub (13 oct.).** Le groupe de concurrence des fusions (`publication-resultats`) ne garde qu'une tâche en attente et annule les autres : les fusions des campagnes 12 et 13 ont été annulées, puis relancées avec `gh api -X POST repos/antoineacquaviva/Projet_Jeu/actions/runs/<id>/rerun-failed-jobs` (une seule à la fois). Corrigé pour les lancements suivants : plus de groupe, la publication réessaie. Les lots de campagne sont gardés 3 jours (1 jour avant la correction).
 
@@ -192,12 +213,11 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
-EN COURS depuis le 2026-10-13 23:10 (heure de Paris) : analyse de fin de cycle 1 (Opus).
 
 ## 7. Compteur de passages
 
 - Semaine en cours : depuis le lundi 12 oct. 2026, 22 h (heure de Paris).
-- Passages ayant réellement travaillé cette semaine : **0** (plafond : 12, décision du 13 oct.).
+- Passages ayant réellement travaillé cette semaine : **1** (plafond : 12, décision du 13 oct.).
 - Règle : le compteur est remis à zéro au premier passage qui suit un lundi 22 h. Un passage qui s'arrête aussitôt (décision attendue, verrou, campagne en cours, plafond) ne compte pas.
 
 ## 8. Réponses de l'auteur
@@ -247,7 +267,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Cycle « essai » | essai du pipeline (étape 0.10) : criblage, 2 générations, 2 manches, contrôle, rapport ; glouton, très petit | 4 | 4 min (7 lancements enchaînés seuls) | < 1 min | réussi ; issue n° 1 fermée |
 | Campagne 16 | ligne_base_p2 (V0.3, 2 à 6 joueurs) : MC64R contre MCP64, témoins, coordination ; 544 parties | 14 | 48 min | 48 min (228 s-cœur par partie en moyenne) | réussi ; traité (ligne de base P2) |
 | Campagne 17 | ligne_base_p2_v02 (V0.2) : MCP64 contre MC64, choix morts (mammifères sans pouvoir) ; 108 parties | 6 | 17 min | 17 min | réussi ; traité (ligne de base P2) |
-| Cycle 1 | c1 : criblage (336 variantes, gloutons, 2 à 6 joueurs), exploration MAP-Elites, confirmation MC64R, contrôle | 20 | – | – | lancé le 13 oct. vers 16 h 35 ; s'enchaîne seul ; réveil armé vers 22 h 40 |
+| Cycle 1 | c1 : criblage (336 variantes, gloutons, 2 à 6 joueurs), exploration MAP-Elites (10 générations), confirmation MC64R (2 manches), contrôle MC 256 à portefeuille | 20 | 6 h 45 (estimé 5 h 20) | contrôle : 2 h 25 | réussi ; traité (bilan du cycle 1) |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
@@ -259,6 +279,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | 13 oct. 2026 | 08:27 | 3 h 35 | terminé | Session interactive avec l'auteur : décisions de fin de phase 2 (section 8), planification revue ; étapes 3.1 à 3.6 faites (moteur 1.7.1, bot fort de la V2 qui rêve, mesures du bot fort, jeu restreint, options de la v2, robustesse ; campagnes 9 à 15 et batteries 3 à 6). Livrable : `projet/4-bilans/diagnostic-v1-options-v2.md`. Étape suivante : 3.7, décision de l'auteur. Pas compté dans le plafond. |
 | 13 oct. 2026 | 13:00 | 3 h 35 | terminé | Session interactive avec l'auteur : point de situation ; plan vers la V1 (`projet/3-pilotage/plan-vers-v1.md`), versions renommées, règle de décision, critère des tailles de table ; trois tâches planifiées (Sonnet courant, Opus fin de cycle, réveil) ; étape 0 faite en entier (0.1 à 0.11, moteur 1.8, pipeline autonome essayé) ; ligne de base P2 ; cycle 1 lancé. Pas compté dans le plafond. |
 | 13 oct. 2026 | 23:08 | 5 min | arrêté | Réveil : rapport du cycle 1 prêt (`cycles/c1/rapport.md`, branche resultats). Le déclenchement de la tâche « analyse de fin de cycle » (fire_trigger) a été refusé par le classificateur d'autorisations ; rien contourné. Analyse à lancer à la main. Pas compté. |
+| 13 oct. 2026 | 23:10 | 35 min | terminé | Analyse de fin de cycle 1 (Opus, tâche « analyse de fin de cycle » lancée à la main) : bilan `projet/4-bilans/cycle-1-bilan.md`. Durée réglée (0 % de fins précoces, deux bots) ; difficulté −20 points au bot fort et −8 au contrôle (sûrs), verdict non stable ; nouvelles alertes D et E ; alerte A à lever. Décision technique : bot fort recalibré en ouverture du cycle 2. Proposition : V0.4 = variante A. DÉCISION UTILISATEUR : adopter la V0.4. README à jour. |
 
 ## 11. Reprendre la main
 

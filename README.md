@@ -63,6 +63,8 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Batterie d'évaluation (phase 1)](projet/4-bilans/batterie-evaluation-phase1.md) | **Le livrable de la phase 1** : les mesures, les témoins, les verdicts |
 | | [Bots : échelle et validation (phase 2)](projet/4-bilans/bots-echelle-validation.md) | **Le livrable de la phase 2** : le bot fort, l'échelle des bots, défendre ou rêver, le devin, le chef unique |
 | | [Diagnostic de la v1 et options de la v2 (phase 3)](projet/4-bilans/diagnostic-v1-options-v2.md) | **Le livrable de la phase 3** : verdicts du bot fort, jeu restreint, options de la v2, robustesse, recommandations |
+| | [Ligne de base P2 : la V0.3 de 2 à 6 joueurs](projet/4-bilans/ligne-de-base-p2.md) | Étape 0.11 du plan vers la V1 |
+| | [Bilan du cycle 1 : de la V0.3 à la V0.4 proposée](projet/4-bilans/cycle-1-bilan.md) | Durée réglée, difficulté selon le bot, proposition de V0.4, alertes D et E |
 
 Les fichiers HTML s'ouvrent dans un navigateur, après téléchargement. Les documents citent parfois des chemins `claude/moteur-v1/…` : ce sont ceux de l'espace de travail d'origine, qui correspondent ici à la racine du dépôt.
 
