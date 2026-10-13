@@ -203,6 +203,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
+EN COURS depuis le 2026-10-13 23:34 (heure de Paris) : cycle 2, étape a.1, V0.4 dans le moteur (session interactive).
 
 ## 7. Compteur de passages
 
