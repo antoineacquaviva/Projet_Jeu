@@ -85,16 +85,15 @@ jobs:
         with:
           name: lot-${{ matrix.lot }}
           path: lots/
-          retention-days: 1
+          retention-days: 3
           if-no-files-found: error
 
   fusion:
     needs: lot
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    concurrency:
-      group: publication-resultats
-      cancel-in-progress: false
+    # Pas de groupe de concurrence : GitHub n'y garde qu'une tâche en attente et annule les autres
+    # (13 oct. : la fusion d'une campagne a été annulée ainsi). La publication réessaie à la place.
     permissions:
       contents: write        # pour publier la synthèse sur la branche « resultats »
     steps:
@@ -132,18 +131,26 @@ jobs:
           python scripts/resume_campagne.py resultats/fusion > "/tmp/publie/$DEST/resume.md"
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          if git ls-remote --exit-code --heads origin resultats >/dev/null 2>&1; then
-            git fetch --depth=1 origin resultats
-            git checkout -q -B resultats FETCH_HEAD
-          else
-            git checkout -q --orphan resultats
-            git rm -rq --cached . ; git clean -fdq -e lots -e resultats
-          fi
-          mkdir -p "$DEST"
-          cp -r "/tmp/publie/$DEST/." "$DEST/"
-          git add "$DEST"
-          git commit -q -m "Campagne ${CAMPAGNE} (échelle ${ECHELLE}, ${LOTS} lots), run ${RUN}"
-          git push origin resultats
+          publier() {
+            if git ls-remote --exit-code --heads origin resultats >/dev/null 2>&1; then
+              git fetch -q --depth=1 origin resultats && git checkout -q -f -B resultats FETCH_HEAD
+            else
+              git checkout -q --orphan resultats
+              git rm -rq --cached . ; git clean -fdq -e lots -e resultats
+            fi
+            mkdir -p "$DEST"
+            cp -r "/tmp/publie/$DEST/." "$DEST/"
+            git add "$DEST"
+            git commit -q -m "Campagne ${CAMPAGNE} (échelle ${ECHELLE}, ${LOTS} lots), run ${RUN}"
+            git push -q origin resultats
+          }
+          # Deux publications en même temps : la seconde est refusée, elle reprend la branche et réessaie.
+          for essai in 1 2 3 4 5 6 7 8; do
+            if publier; then exit 0; fi
+            echo "publication refusée (essai $essai), nouvel essai"
+            sleep $((RANDOM % 20 + 10))
+          done
+          exit 1
       - uses: actions/upload-artifact@v7
         with:
           name: synthese-${{ inputs.campagne }}-${{ github.run_number }}
