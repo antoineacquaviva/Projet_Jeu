@@ -1,7 +1,7 @@
 {
  "cycle": "essai",
  "etape": "confirmation",
- "gen": 1,
+ "gen": 2,
  "statut": "en cours",
  "historique": [
   {
@@ -18,10 +18,15 @@
    "etape": "confirmation",
    "gen": 1,
    "date": "2026-10-13T13:25:03+00:00"
+  },
+  {
+   "etape": "confirmation",
+   "gen": 2,
+   "date": "2026-10-13T13:25:48+00:00"
   }
  ],
  "debut": "2026-10-13T13:23:14+00:00",
  "fin_estimee": "2026-10-13T13:29:14+00:00",
  "parties": 8,
- "maj": "2026-10-13T13:25:14+00:00"
+ "maj": "2026-10-13T13:25:48+00:00"
 }

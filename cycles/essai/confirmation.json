@@ -1,0 +1,518 @@
+{
+ "m1": {
+  "metriques": {
+   "defaut": {
+    "tailles": {
+     "2": {
+      "foret": 80.95,
+      "precoces": 100.0,
+      "parties": 1,
+      "tour": 3.0,
+      "fins": {
+       "reveil": 100.0
+      }
+     },
+     "3": {
+      "foret": 90.48,
+      "precoces": 100.0,
+      "parties": 1,
+      "tour": 3.0,
+      "fins": {
+       "sommeil": 100.0
+      }
+     }
+    },
+    "score_duree": 0.0,
+    "score_difficulte": 0.301,
+    "qualite": 0.0,
+    "tour_moyen": 3.0,
+    "ecart_tailles": 9.53,
+    "foret_min": 80.95,
+    "precoces_max": 100.0
+   },
+   "patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2},\"tours\":7}": {
+    "tailles": {
+     "2": {
+      "foret": 52.38,
+      "precoces": 0.0,
+      "parties": 1,
+      "tour": 6.0,
+      "fins": {
+       "reveil": 100.0
+      }
+     },
+     "3": {
+      "foret": 76.19,
+      "precoces": 0.0,
+      "parties": 1,
+      "tour": 7.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 1.0,
+    "qualite": 1.0,
+    "tour_moyen": 6.5,
+    "ecart_tailles": 23.81,
+    "foret_min": 52.38,
+    "precoces_max": 0.0
+   },
+   "patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2}}": {
+    "tailles": {
+     "2": {
+      "foret": 52.38,
+      "precoces": 0.0,
+      "parties": 1,
+      "tour": 6.0,
+      "fins": {
+       "reveil": 100.0
+      }
+     },
+     "3": {
+      "foret": 80.95,
+      "precoces": 0.0,
+      "parties": 1,
+      "tour": 6.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.937,
+    "qualite": 0.937,
+    "tour_moyen": 6.0,
+    "ecart_tailles": 28.57,
+    "foret_min": 52.38,
+    "precoces_max": 0.0
+   },
+   "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"lunes\":1}}": {
+    "tailles": {
+     "2": {
+      "foret": 57.14,
+      "precoces": 0.0,
+      "parties": 1,
+      "tour": 6.0,
+      "fins": {
+       "nuit": 100.0
+      }
+     },
+     "3": {
+      "foret": 85.71,
+      "precoces": 0.0,
+      "parties": 1,
+      "tour": 6.0,
+      "fins": {
+       "sommeil": 100.0
+      }
+     }
+    },
+    "score_duree": 1.0,
+    "score_difficulte": 0.619,
+    "qualite": 0.619,
+    "tour_moyen": 6.0,
+    "ecart_tailles": 28.57,
+    "foret_min": 57.14,
+    "precoces_max": 0.0
+   }
+  },
+  "apparie": {
+   "confirmation | glouton | {\"reves_par_tour\": 1.0}": {
+    "reference": "defaut",
+    "ecarts": {
+     "patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2},\"tours\":7}": {
+      "paires": 2,
+      "ecart": -21.43,
+      "ic95": [
+       -28.57,
+       -14.29
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -34.25,
+       -8.61
+      ]
+     },
+     "patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2}}": {
+      "paires": 2,
+      "ecart": -19.05,
+      "ic95": [
+       -28.57,
+       -9.52
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -34.11,
+       -3.99
+      ]
+     },
+     "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"lunes\":1}}": {
+      "paires": 2,
+      "ecart": -14.29,
+      "ic95": [
+       -23.81,
+       -4.76
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -29.34,
+       0.77
+      ]
+     }
+    }
+   }
+  },
+  "usage": {
+   "confirmation | defaut | glouton | {\"reves_par_tour\": 1.0}": {
+    "action:barrer": {
+     "offert": 15,
+     "pris": 10,
+     "taux": 66.7
+    },
+    "action:saboter": {
+     "offert": 13,
+     "pris": 5,
+     "taux": 38.5
+    },
+    "aller": {
+     "offert": 18,
+     "pris": 3,
+     "taux": 16.7
+    },
+    "embuscade:aller": {
+     "offert": 4,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "embuscade:barrer": {
+     "offert": 4,
+     "pris": 2,
+     "taux": 50.0
+    },
+    "embuscade:immobiliser": {
+     "offert": 2,
+     "pris": 2,
+     "taux": 100.0
+    },
+    "moitie:attendre": {
+     "offert": 9,
+     "pris": 7,
+     "taux": 77.8
+    },
+    "moitie:enrayer": {
+     "offert": 9,
+     "pris": 6,
+     "taux": 66.7
+    },
+    "moitie:parler": {
+     "offert": 9,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:renverser": {
+     "offert": 9,
+     "pris": 7,
+     "taux": 77.8
+    },
+    "moitie:s_unir": {
+     "offert": 9,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:se_fondre": {
+     "offert": 9,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:tenir": {
+     "offert": 9,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:tromper": {
+     "offert": 9,
+     "pris": 7,
+     "taux": 77.8
+    },
+    "moitie:voir": {
+     "offert": 7,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:voler": {
+     "offert": 7,
+     "pris": 4,
+     "taux": 57.1
+    },
+    "reve": {
+     "offert": 12,
+     "pris": 12,
+     "taux": 100.0
+    }
+   },
+   "confirmation | patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2},\"tours\":7} | glouton | {\"reves_par_tour\": 1.0}": {
+    "action:barrer": {
+     "offert": 44,
+     "pris": 25,
+     "taux": 56.8
+    },
+    "action:saboter": {
+     "offert": 33,
+     "pris": 19,
+     "taux": 57.6
+    },
+    "aller": {
+     "offert": 55,
+     "pris": 10,
+     "taux": 18.2
+    },
+    "embuscade:aller": {
+     "offert": 15,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "embuscade:barrer": {
+     "offert": 15,
+     "pris": 12,
+     "taux": 80.0
+    },
+    "embuscade:immobiliser": {
+     "offert": 3,
+     "pris": 3,
+     "taux": 100.0
+    },
+    "moitie:attendre": {
+     "offert": 18,
+     "pris": 15,
+     "taux": 83.3
+    },
+    "moitie:enrayer": {
+     "offert": 18,
+     "pris": 10,
+     "taux": 55.6
+    },
+    "moitie:parler": {
+     "offert": 19,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:renverser": {
+     "offert": 18,
+     "pris": 13,
+     "taux": 72.2
+    },
+    "moitie:s_unir": {
+     "offert": 18,
+     "pris": 5,
+     "taux": 27.8
+    },
+    "moitie:se_fondre": {
+     "offert": 18,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:tenir": {
+     "offert": 18,
+     "pris": 2,
+     "taux": 11.1
+    },
+    "moitie:tromper": {
+     "offert": 19,
+     "pris": 16,
+     "taux": 84.2
+    },
+    "moitie:voir": {
+     "offert": 14,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:voler": {
+     "offert": 14,
+     "pris": 11,
+     "taux": 78.6
+    },
+    "reve": {
+     "offert": 15,
+     "pris": 15,
+     "taux": 100.0
+    }
+   },
+   "confirmation | patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2}} | glouton | {\"reves_par_tour\": 1.0}": {
+    "action:barrer": {
+     "offert": 40,
+     "pris": 24,
+     "taux": 60.0
+    },
+    "action:saboter": {
+     "offert": 29,
+     "pris": 16,
+     "taux": 55.2
+    },
+    "aller": {
+     "offert": 51,
+     "pris": 10,
+     "taux": 19.6
+    },
+    "embuscade:aller": {
+     "offert": 13,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "embuscade:barrer": {
+     "offert": 13,
+     "pris": 11,
+     "taux": 84.6
+    },
+    "embuscade:immobiliser": {
+     "offert": 2,
+     "pris": 2,
+     "taux": 100.0
+    },
+    "moitie:attendre": {
+     "offert": 16,
+     "pris": 13,
+     "taux": 81.2
+    },
+    "moitie:enrayer": {
+     "offert": 18,
+     "pris": 10,
+     "taux": 55.6
+    },
+    "moitie:parler": {
+     "offert": 17,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:renverser": {
+     "offert": 16,
+     "pris": 11,
+     "taux": 68.8
+    },
+    "moitie:s_unir": {
+     "offert": 18,
+     "pris": 5,
+     "taux": 27.8
+    },
+    "moitie:se_fondre": {
+     "offert": 16,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:tenir": {
+     "offert": 16,
+     "pris": 2,
+     "taux": 12.5
+    },
+    "moitie:tromper": {
+     "offert": 17,
+     "pris": 14,
+     "taux": 82.4
+    },
+    "moitie:voir": {
+     "offert": 14,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:voler": {
+     "offert": 14,
+     "pris": 11,
+     "taux": 78.6
+    },
+    "reve": {
+     "offert": 15,
+     "pris": 15,
+     "taux": 100.0
+    }
+   },
+   "confirmation | patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"lunes\":1}} | glouton | {\"reves_par_tour\": 1.0}": {
+    "action:barrer": {
+     "offert": 46,
+     "pris": 33,
+     "taux": 71.7
+    },
+    "action:saboter": {
+     "offert": 34,
+     "pris": 13,
+     "taux": 38.2
+    },
+    "aller": {
+     "offert": 57,
+     "pris": 10,
+     "taux": 17.5
+    },
+    "embuscade:aller": {
+     "offert": 13,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "embuscade:barrer": {
+     "offert": 13,
+     "pris": 9,
+     "taux": 69.2
+    },
+    "embuscade:immobiliser": {
+     "offert": 4,
+     "pris": 4,
+     "taux": 100.0
+    },
+    "moitie:attendre": {
+     "offert": 18,
+     "pris": 16,
+     "taux": 88.9
+    },
+    "moitie:enrayer": {
+     "offert": 18,
+     "pris": 15,
+     "taux": 83.3
+    },
+    "moitie:parler": {
+     "offert": 18,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:renverser": {
+     "offert": 18,
+     "pris": 16,
+     "taux": 88.9
+    },
+    "moitie:s_unir": {
+     "offert": 18,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:se_fondre": {
+     "offert": 18,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:tenir": {
+     "offert": 18,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:tromper": {
+     "offert": 18,
+     "pris": 16,
+     "taux": 88.9
+    },
+    "moitie:voir": {
+     "offert": 14,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:voler": {
+     "offert": 14,
+     "pris": 11,
+     "taux": 78.6
+    },
+    "reve": {
+     "offert": 12,
+     "pris": 12,
+     "taux": 100.0
+    }
+   }
+  }
+ }
+}

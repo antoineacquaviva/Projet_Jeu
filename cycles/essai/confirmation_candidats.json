@@ -1,5 +1,4 @@
 [
  "patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2},\"tours\":7}",
- "patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2}}",
- "patch:{\"regles\":{\"cercle_par_joueur\":{\"2\":4,\"4\":3},\"lunes\":1}}"
+ "patch:{\"regles\":{\"lunes\":\"n-1\",\"reves_par_pas\":2}}"
 ]
