@@ -103,13 +103,13 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
   - chef unique : MC tout contre MC soi.
 - **Fin d'étape.** `python -m foret.conformite --mesures` ne liste plus de mesure en attente ; lancer leur campagne (v1 et V2, duos).
 
-**3.4 Le jeu restreint et les options de la v2** (EN COURS, session interactive du 13 oct.)
+**3.4 Le jeu restreint et les options de la v2** (FAIT le 13 oct. : règle `interdits`, variantes « interdire:… » et « regles:… » ; campagnes `jeu_restreint`, `jeu_restreint_v2`, `v2_options_mc` lancées, et la robustesse de 3.5 aussi, `robustesse_v1` et `robustesse_v2`)
 - **Quoi.** Écrire deux campagnes :
   - `campagnes/jeu_restreint.json` : interdire au bot une action ou un pouvoir à la fois (Saboter d'abord, puis Barrer, Aller et chaque règle brisée), avec un paramètre du bot `mc` qui retire des options ;
   - `campagnes/v2_options_mc.json` : les variantes à une option près autour de « V2 proposée » (codes d'atelier de `campagnes/v2_options.json`), jouées par le bot de référence sur les duos.
 - **Fin d'étape.** Tests verts ; lancer les deux campagnes. Si leur durée estimée dépasse 6 h par lot, les découper.
 
-**3.5 Diagnostic : batterie, mesures, jeu restreint** (À FAIRE)
+**3.5 Diagnostic : batterie, mesures, jeu restreint** (EN COURS, session interactive du 13 oct. ; la robustesse est déjà lancée)
 - **Quoi.** Traiter les résultats de la batterie phase3 (3.2), des mesures (3.3) et du jeu restreint (3.4). Comparer chaque verdict à celui du glouton : une mesure qui change de verdict décrit les bots, pas le jeu.
 - **Fin d'étape.** Lancer la vérification de robustesse : les campagnes clés rejouées avec un bonus de fin de 10 et de 25 % (réglage `bonus` de l'atelier).
 - **Livrable.** `projet/4-bilans/diagnostic-v1-options-v2.md` (créer le fichier), sections v1, V2, mesures du bot fort, jeu restreint.
@@ -169,7 +169,9 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 
 ## 5. Étape suivante
 
-**3.4 Le jeu restreint et les options de la v2** (en cours dans la session interactive du 13 oct. ; si le Verrou est vidé sans que l'étape soit marquée FAIT, reprendre là). Les batteries 3 et 4 seront traitées en 3.5.
+**3.5 Diagnostic** (en cours dans la session interactive du 13 oct. ; si le Verrou est vidé sans que l'étape soit marquée FAIT, reprendre là). Données : batteries 3 à 6, campagnes 11 et 12 (jeu restreint) ; puis 3.6 avec les campagnes 13 à 15.
+
+**Bot fort de la V2 (13 oct., décision technique de Claude, signalée à l'auteur).** En V2, le bot de référence MC 64 dont les suites ne rêvent pas rêve peu et perd contre le glouton qui rêve (tape-taupe −5 points). Le bot fort de la V2 est donc MC 64 chacun pour soi dont les suites rêvent une carte par tour (`MC64R` dans `foret/batterie.py`) : configurations `p3_v2r` et `m3_v2r`, campagnes de la V2 de l'étape 3.4 et de la robustesse. En v1, la référence reste MC 64 (ses suites ne rêvent pas : c'est là qu'il est le plus fort).
 
 ## 6. Verrou
 
@@ -210,8 +212,11 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Batterie 2 | batterie phase 1, 4 configurations principales, échelle 0,05 (essai des workflows Node 24) | 4 | 0,7 min | 0,3 min | réussi |
 | Campagne 9 | coordination_mc_2, v1 : MC 64 soi qui annonce × 3 communications + central, 240 parties | 20 | 19,2 min | 11,9 min | réussi ; traité (bilan des bots, section 5 bis) |
 | Campagne 10 | coordination_mc_2, v2 | 20 | 31,5 min | 13,3 min | réussi, 1 partie en erreur (corrigée : moteur 1.7.1) ; traité |
-| Batterie 3 | batterie phase3 (plan réduit), MC 64 soi, p3_v1 et p3_v2, 676 parties ; résultats dans `batterie/run3_phase3/` | 20 | – | – | lancée le 13 oct. 09:25, durée estimée 1 à 2 h (attend les campagnes 9 et 10) ; à traiter en 3.5 |
-| Batterie 4 | programme mesures3 : tape-taupe, dilemmes (v1, V2), témoins (une tactique, sans rêve, essoufflement), 1 020 parties dont 330 de MC 64 environ ; résultats et parties dans `batterie/run4_mesures3/` | 20 | – | – | lancée le 13 oct. 09:40 (attend la Batterie 3), durée estimée 1 h ; à traiter en 3.5 (tape-taupe : comparer aussi le glouton par table aux valeurs d'équipe de la Batterie 3 ; témoins ; seuils des dilemmes à faire confirmer par l'auteur) |
+| Batterie 3 | batterie phase3 (plan réduit), MC 64 soi, p3_v1 et p3_v2, 676 parties ; résultats dans `batterie/run3_phase3/` | 20 | 29,1 min | 13 min | réussi ; à traiter en 3.5 |
+| Batterie 4 | programme mesures3 : tape-taupe, dilemmes (v1, V2), témoins (une tactique, sans rêve, essoufflement), 1 020 parties dont 330 de MC 64 environ ; résultats et parties dans `batterie/run4_mesures3/` | 20 | 17,9 min | 8 min | réussi (témoins : 2 sur 3) ; à traiter en 3.5 (tape-taupe : comparer aussi le glouton par table aux valeurs d'équipe de la Batterie 3 ; témoins ; seuils des dilemmes à faire confirmer par l'auteur) |
+| Batterie 5 | phase3, p3_v2r (V2, bot fort qui rêve), 338 parties | 10 | – | – | lancée le 13 oct. 10:02 ; à traiter en 3.5 |
+| Batterie 6 | mesures3, m3_v2r, 300 parties | 10 | 8 min environ | 1,3 min | réussi ; à traiter en 3.5 |
+| Campagnes 11 à 15 | jeu_restreint (v1, 480 parties), jeu_restreint_v2 (480), v2_options_mc (960), robustesse_v1 (720), robustesse_v2 (1 920), dans l'ordre de lancement probable (vérifier le nom des dossiers `campagnes/<nom>_run<n>`) | 20 chacune | – | – | lancées le 13 oct. entre 10:08 et 10:10 ; jeu restreint en 3.5, le reste en 3.6 |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
