@@ -1,0 +1,15 @@
+{
+ "lots": 20,
+ "parties": 676,
+ "erreurs": 0,
+ "duree_max_s": 808,
+ "duree_cumulee_coeurs_s": 46898,
+ "parties_par_s_par_coeur": 0.0,
+ "configurations": [
+  "p3_v1",
+  "p3_v2"
+ ],
+ "echelle": 1.0,
+ "empreinte": "28cdf28547707a00",
+ "moteur": "1.7"
+}
