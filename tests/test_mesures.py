@@ -291,7 +291,7 @@ class TestConformiteMesures(unittest.TestCase):
         _, _, sans_test, sans_temoin, orphelins, attente, sans_code = matrice_mesures(
             os.path.join(RACINE, "foret"), os.path.join(RACINE, "tests"))
         self.assertEqual((sans_test, sans_temoin, orphelins, sans_code), ([], [], [], []))
-        self.assertEqual(sorted(attente), ["chef", "dilemmes", "gain_libre", "tape_taupe"])
+        self.assertEqual(sorted(attente), [])          # étape 3.3 : plus aucune mesure n'attend le bot fort
 
 
 class TestBatterie(unittest.TestCase):

@@ -308,6 +308,142 @@ def shapley_restreint(v, joueurs):
     return out
 
 
+# =================================================================== mesures du bot fort (phase 3)
+def _ecart(a, b):
+    """Écart des moyennes de deux échantillons (a - b) et sa marge à 95 %."""
+    a, b = list(a), list(b)
+    marge = 1.96 * ((variance(a) / len(a)) + (variance(b) / len(b))) ** 0.5 if len(a) > 1 and len(b) > 1 else None
+    return moyenne(a) - moyenne(b), marge
+
+
+def _meilleur(par_taux):
+    """Le taux dont la moyenne est la plus haute : (taux, échantillon)."""
+    t = max(par_taux, key=lambda k: moyenne(par_taux[k]))
+    return t, par_taux[t]
+
+
+def tape_taupe(fort, taupe_par_taux):
+    """[mesure:tape_taupe] Écart, en points de forêt, entre le bot fort et un bot qui pare toujours
+    la menace la plus probable : le glouton (saboter si possible, sinon barrer la zone la plus
+    menacée), pris à son meilleur taux de rêve fixe, sur les mêmes tables.
+    fort : forêts (%) du bot fort ; taupe_par_taux : {taux: forêts (%) du glouton}.
+    Petit écart : parer au plus probable suffit, les critères du Méchant ne sont pas en tension."""
+    t, taupe = _meilleur(taupe_par_taux)
+    d, marge = _ecart(fort, taupe)
+    return {"fort": moyenne(fort), "taupe": moyenne(taupe), "taux_taupe": t, "ecart": d, "marge": marge,
+            "verdict": verdict("tape_taupe", d)}
+
+
+def gain_libre(libre, par_taux):
+    """[mesure:gain_libre] Gain (%) du bot fort libre sur le même bot à son meilleur taux de rêve
+    fixe : 100 (libre − meilleur fixe) / meilleur fixe. Petit gain : une stratégie pure
+    (toujours rêver autant) vaut le jeu au cas par cas, le dilemme est tranché d'avance."""
+    t, fixe = _meilleur(par_taux)
+    d, marge = _ecart(libre, fixe)
+    m = moyenne(fixe)
+    g = 100 * d / m if m else None
+    return {"libre": moyenne(libre), "meilleur_fixe": m, "taux": t, "gain": g,
+            "marge": 100 * marge / m if (marge is not None and m) else None,
+            "verdict": verdict("gain_libre", g) if g is not None else None}
+
+
+def chef_unique(central, soi):
+    """[mesure:chef] Gain (%) d'un chef unique (bot fort central, qui voit tout et décide pour
+    tous) sur « chacun pour soi » (le même bot, qui ne sait que ce que sait son siège et
+    communique selon la maquette) : 100 (central − soi) / soi."""
+    d, marge = _ecart(central, soi)
+    m = moyenne(soi)
+    g = 100 * d / m if m else None
+    return {"central": moyenne(central), "soi": m, "gain": g,
+            "marge": 100 * marge / m if (marge is not None and m) else None,
+            "verdict": verdict("chef", g) if g is not None else None}
+
+
+def _bloc(syn, bloc, variante):
+    """L'agrégat d'une synthèse de campagne (foret.sim) pour un bloc et une variante (un seul bot)."""
+    for k, a in syn.get("detail", {}).items():
+        morceaux = k.split(" | ")
+        if morceaux[0] == bloc and morceaux[1] == variante:
+            return a
+    return None
+
+
+def _moy_ic(a):
+    return a.get("resultat_pct", a["foret_pct"]), a.get("foret_pct_ic95") or 0.0
+
+
+def chef_depuis_synthese(syn, variante="defaut"):
+    """[mesure:chef] Gain du chef unique dans une campagne à deux blocs, « central » (variante
+    defaut) et « soi » (la variante demandée : defaut pour la mesure, comm_tout_dire pour le
+    témoin), comme coordination_mc_2. La marge combine les demi-intervalles à 95 % des deux."""
+    c, s = _bloc(syn, "central", "defaut"), _bloc(syn, "soi", variante)
+    if not c or not s:
+        return None
+    (mc, ic_c), (ms, ic_s) = _moy_ic(c), _moy_ic(s)
+    g = 100 * (mc - ms) / ms
+    return {"central": mc, "soi": ms, "gain": round(g, 2),
+            "marge": round(100 * (ic_c ** 2 + ic_s ** 2) ** 0.5 / ms, 2), "verdict": verdict("chef", g)}
+
+
+def coordination_depuis_synthese(syn, bloc="soi"):
+    """[mesure:coordination] Part de l'écart « aucun signe → tout dire » récupérée par la
+    communication de la maquette, dans une campagne qui joue les trois (bloc « soi »)."""
+    a, f, t = (_bloc(syn, bloc, v) for v in ("comm_aucun_signe", "defaut", "comm_tout_dire"))
+    if not (a and f and t):
+        return None
+    (ma, ia), (mf, _), (mt, it) = _moy_ic(a), _moy_ic(f), _moy_ic(t)
+    ecart, marge = mt - ma, (ia ** 2 + it ** 2) ** 0.5
+    part = 100 * (mf - ma) / ecart if ecart > marge else None
+    return {"aucun_signe": ma, "forme": mf, "tout_dire": mt, "ecart": round(ecart, 2), "marge": round(marge, 2),
+            "part": None if part is None else round(part, 1),
+            "verdict": verdict("coordination", part) if part is not None else "non mesurable"}
+
+
+# [mesure:dilemmes] Seuils de classement des décisions, en points de forêt (% de la forêt
+# initiale). Provisoires (13 oct.) : à confirmer par l'auteur avec les premiers résultats.
+PROCHE, NET = 1.0, 3.0
+
+
+def classer_decision(valeurs, proche=PROCHE, net=NET):
+    """[mesure:dilemmes] Classe une décision d'après la valeur estimée de chaque option (forêt
+    finale moyenne, en %, quand on la prend) :
+    - forcée : une seule option ;
+    - indifférente : la meilleure et la pire sont à moins de `net` points (tout se vaut) ;
+    - dilemme : au moins deux options à moins de `proche` points de la meilleure ;
+    - évidente : sinon (une option écrase les autres)."""
+    if len(valeurs) < 2:
+        return "forcee"
+    haut = max(valeurs)
+    if haut - min(valeurs) < net:
+        return "indifferente"
+    if sum(1 for v in valeurs if v >= haut - proche) >= 2:
+        return "dilemme"
+    return "evidente"
+
+
+def part_dilemmes(jugements, proche=PROCHE, net=NET):
+    """[mesure:dilemmes] Part (%) des dilemmes parmi les décisions non forcées jugées, et le détail
+    par classe et par type de décision. jugements : [{"type": ..., "valeurs": [...]}, ...].
+    La mise en place (placer sa présence) est détaillée par type mais hors de la part : elle
+    n'est pas un choix du jeu en cours."""
+    classes = Counter()
+    par_type = defaultdict(Counter)
+    for j in jugements:
+        c = classer_decision(j["valeurs"], proche, net)
+        par_type[j["type"]][c] += 1
+        if j["type"] not in MISE_EN_PLACE:
+            classes[c] += 1
+    n = sum(v for k, v in classes.items() if k != "forcee")
+    part = 100 * classes["dilemme"] / n if n else None
+    return {"decisions": n, "part": part,
+            "classes": {k: round(100 * classes[k] / n, 1) if n else None
+                        for k in ("dilemme", "evidente", "indifferente")},
+            "par_type": {t: {"n": sum(c.values()), "dilemme": round(100 * c["dilemme"] / sum(c.values()), 1)}
+                         for t, c in sorted(par_type.items())},
+            "seuils": {"proche": proche, "net": net},
+            "verdict": verdict("dilemmes", part) if part is not None else None}
+
+
 def synergies(v, joueurs):
     """[mesure:synergies] v(i, j) - v(i) - v(j) + v(∅), pour chaque paire."""
     vide = v[frozenset()]
@@ -444,7 +580,9 @@ MESURES = {
                  ("v2", "temoin_une_tactique", "glouton", "rouge (aucune surprise)")]),
     "tape_taupe": dict(
         niveau=3, objectif="1", nom="Tape-taupe : écart entre parer la menace la plus probable et le bot fort",
-        etiquette="indice", unite="points de forêt", bot="fort", temoins=[]),
+        etiquette="indice", unite="points de forêt", bot="fort (MC 64) et glouton",
+        vert=(10, None), rouge=[(None, 3 - E)],
+        temoins=[("v1", "temoin_une_tactique", "MC 64 et glouton", "écart plus petit que dans la v1")]),
     # ---------------------------------------------------------------- objectif 2
     "reve_fixe": dict(
         niveau=2, objectif="2", nom="Meilleur taux de rêve fixe",
@@ -452,10 +590,14 @@ MESURES = {
         temoins=[("v1", "retour_v0_reves_illimites", "glouton", "rouge (le maximum)")]),
     "gain_libre": dict(
         niveau=2, objectif="2", nom="Gain du bot libre sur le meilleur taux fixe",
-        etiquette="indice", unite="%", bot="fort", temoins=[]),
+        etiquette="indice", unite="%", bot="fort (MC 64)",
+        vert=(5, None), rouge=[(None, 1 - E)],
+        temoins=[("v1", "temoin_sans_reve", "MC 64", "rouge (aucun rêve possible : tous les taux se valent)")]),
     "dilemmes": dict(
         niveau=3, objectif="2", nom="Dilemmes parmi les décisions non forcées",
-        etiquette="indice", unite="%", bot="fort", temoins=[]),
+        etiquette="indice", unite="%", bot="fort (MC 64, sur échantillon)",
+        vert=(30, None), rouge=[(None, 10 - E)],
+        temoins=[("v1", "temoin_essoufflement", "MC 64", "plus de décisions indifférentes que la v1 (supposé)")]),
     # ---------------------------------------------------------------- objectif 3
     "shapley": dict(
         niveau=2, objectif="3", nom="Contributions de Shapley des six peuples (rapport à la moyenne)",
@@ -486,7 +628,9 @@ MESURES = {
                  ("v1", "comm_tout_dire", "glouton", "100 % par définition")]),
     "chef": dict(
         niveau=3, objectif="3", nom="Gain d'un chef unique sur « chacun pour soi »",
-        etiquette="indice", unite="%", bot="fort", temoins=[]),
+        etiquette="indice", unite="%", bot="fort (MC 64 central et chacun pour soi)",
+        vert=(5, 20), rouge=[(None, 2 - E), (35 + E, None)],
+        temoins=[("v1", "comm_tout_dire", "MC 64", "rouge (tout se dit : un chef n'apporte rien)")]),
     "fins": dict(
         niveau=2, objectif="lecture", nom="Équilibre des fins",
         etiquette="indice", unite="% des parties", bot="glouton (puis fort)", descriptive=True,

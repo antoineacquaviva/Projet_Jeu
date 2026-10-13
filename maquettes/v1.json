@@ -110,6 +110,7 @@
     "temoin_une_tactique":   {"piste": {"disposition": ["Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite"]}},
     "temoin_des_fixes":      {"regles": {"des_fixes": [3, 4]}},
     "temoin_sans_apprentissage": {"regles": {"apprentissage": false}},
+    "temoin_sans_reve":      {"regles": {"reves_par_joueur_et_tour": 0}},
     "temoin_essoufflement":  {"piste": {"disposition": ["Cupidite", "Opportunisme", "Percee", "Represailles", "Opportunisme",
                                                         "Cupidite", "Opportunisme", "Represailles", "Percee", "Cupidite", "Cupidite"]}},
     "temoin_assaut":         {"machines": {"en_jeu": [

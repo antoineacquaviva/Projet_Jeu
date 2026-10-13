@@ -33,6 +33,11 @@ Une politique de jeu meilleure que le glouton rendrait le bot plus fort ; le
 bot est par construction au moins aussi bon que sa politique, à la variance des
 suites près (amélioration de politique en un coup).
 
+Mesure des dilemmes (phase 3, réglage « juger ») : sur une part tirée au sort des
+décisions qu'il cherche, il estime toutes les options avec le même nombre de
+suites (« suites_juge », mêmes hasards), note les valeurs dans self.jugements et
+prend la meilleure ; l'analyse les classe (mesures.classer_decision).
+
 Le bot ne lit pas l'avenir : chaque suite tire de nouveaux dés. Le « devin »
 (valeur de l'information) sera la variante qui joue les suites avec le vrai
 hasard de la partie.
@@ -57,6 +62,8 @@ class MonteCarlo(Bot):
         "devin": False,                   # True : les suites gardent les vrais dés à venir (valeur de l'information)
         "reves_par_tour": None,           # None = libre ; un nombre = taux de rêve imposé (comme le glouton)
         "annonces": False,                # True : il annonce (traces, jetons) comme sa politique et s'y tient
+        "juger": 0.0,                     # part des décisions cherchées qu'il juge en entier (mesure des dilemmes)
+        "suites_juge": 16,                # suites par option pour juger une décision
     }
 
     def __init__(self, graine=0, **params):
@@ -71,6 +78,7 @@ class MonteCarlo(Bot):
         self._quota = {}                  # (lignée, tour, siège) -> [rêves à faire, rêves faits]
         self._siege = None
         self.stats = {"recherches": 0, "suites": 0}
+        self.jugements = []               # [mesure:dilemmes] {"type", "valeurs"} des décisions jugées
 
     # ------------------------------------------------------------------ décision
     def decider(self, partie, siege, type_, options, ctx):
@@ -130,7 +138,24 @@ class MonteCarlo(Bot):
             autres = [i for i in permis if i != prefere]
             self.rng.shuffle(autres)
             permis = [prefere] + autres[:self.p["max_options"] - 1]
+        if self.p["juger"] and self.rng.random() < self.p["juger"]:
+            return self._juger(partie, type_, permis)
         return self._halving(partie, permis)
+
+    def _juger(self, partie, type_, cands):
+        """[mesure:dilemmes] Estime chaque option avec le même nombre de suites, sur les mêmes
+        hasards (nombres aléatoires communs), note les valeurs (forêt finale en %) et prend la
+        meilleure. Le classement (dilemme, évidente, indifférente) se fait à l'analyse."""
+        self.stats["recherches"] += 1
+        somme = {i: 0.0 for i in cands}
+        for _ in range(self.p["suites_juge"]):
+            hasard = self.rng.randrange(1 << 30)
+            for i in cands:
+                somme[i] += self._suite(partie, i, hasard)
+        k = self.p["suites_juge"]
+        self.jugements.append({"type": type_, "tour": partie.tour,
+                               "valeurs": [round(100 * somme[i] / k, 2) for i in cands]})
+        return max(cands, key=lambda i: somme[i])
 
     def _prefere(self, partie, siege, type_, options, ctx, permis):
         """Le choix de la politique (sans effet sur les compteurs), s'il est permis ; sinon le premier permis."""

@@ -8,6 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from foret.comparer import INDICATEURS, valeur, _f  # noqa: E402
+from foret.mesures import chef_depuis_synthese, coordination_depuis_synthese  # noqa: E402
 
 
 def main(dossier):
@@ -26,7 +27,25 @@ def main(dossier):
             "|---|" + "---|" * len(INDICATEURS)]
     for bloc, agg in S["campagnes"].items():
         out.append(f"| {bloc} | " + " | ".join(_f(valeur(agg, cle), dec) for cle, _, dec in INDICATEURS) + " |")
+    out += mesures_coordination(S)
     print("\n".join(out))
+
+
+def mesures_coordination(S):
+    """Campagnes de coordination (blocs « soi » et « central ») : part récupérée et chef unique."""
+    lignes = []
+    co = coordination_depuis_synthese(S)
+    if co:
+        lignes.append(f"- **Coordination** (part de l'écart récupérée) : {_f(co['part'], 1)} % "
+                      f"(aucun signe {_f(co['aucun_signe'], 1)}, maquette {_f(co['forme'], 1)}, "
+                      f"tout dire {_f(co['tout_dire'], 1)} ; écart {_f(co['ecart'], 1)} ± {_f(co['marge'], 1)}) : "
+                      f"{co['verdict']}")
+    for var, lib in (("defaut", "Chef unique"), ("comm_tout_dire", "Chef unique, témoin « tout dire »")):
+        ch = chef_depuis_synthese(S, var)
+        if ch:
+            lignes.append(f"- **{lib}** : {_f(ch['gain'], 1)} % ± {_f(ch['marge'], 1)} "
+                          f"(central {_f(ch['central'], 1)}, chacun pour soi {_f(ch['soi'], 1)}) : {ch['verdict']}")
+    return ["", *lignes] if lignes else []
 
 
 if __name__ == "__main__":

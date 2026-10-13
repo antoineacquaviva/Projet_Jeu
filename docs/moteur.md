@@ -261,6 +261,8 @@ Paramètres du bot `mc` :
 - `devin` (false) : les suites gardent les vrais dés à venir (valeur de l'information).
 - `reves_par_tour` (null) : taux de rêve imposé, comme le glouton (garde 2 cartes) ; le bot choisit les étapes.
 - `max_options` (24), `ignorer` ([]) : au-delà de 24 options, le choix de la politique et un tirage ; types de décision laissés à la politique.
+- `annonces` (false) : il pose les traces et jetons de sa politique (le glouton annonce ce qu'il compte faire) et s'y tient en programmant ; ses tirages au sort (`savoir = "soi"`) respectent les annonces des autres (`Partie.annonces`).
+- `juger` (0) et `suites_juge` (16) : mesure des dilemmes (étape 3.3). Sur cette part des décisions qu'il cherche, il estime chaque option avec `suites_juge` suites sur les mêmes hasards, note les valeurs dans `jugements` (la batterie les recopie dans la partie) et prend la meilleure. À 0, aucun tirage de plus : le bot joue exactement comme avant.
 
 Coût mesuré (un cœur) : une suite coûte 5 à 15 ms ; une partie de duo demande 100 à 150 recherches. Ordres de grandeur avec le moteur 1.7 : MC 32 environ 30 s (v1) à 1 min 30 (v2) par partie de duo, MC 128 environ 2 min (v1) à 6 min (v2). La batterie complète (96 200 parties) est hors de portée du bot fort : la phase 3 utilise un plan réduit.
 

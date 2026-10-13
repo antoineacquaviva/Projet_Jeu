@@ -1,4 +1,4 @@
-# Batterie d'évaluation : les mesures (moteur 1.6)
+# Batterie d'évaluation : les mesures (moteur 1.7)
 
 *Bandes définitives depuis le 12 oct. (décisions B1 à B4 de l'auteur, fin de la phase 1) : les bandes provisoires de la phase 0 sont gelées, sauf la synergie, redéfinie (B2).*
 
@@ -33,11 +33,12 @@ Ce document décrit les mesures que calcule le moteur (`foret/mesures.py`, `fore
 ## Objectif 1 : la menace est lisible mais jamais résolue
 - **Concentration** (mesure). Avant chaque étape, la menace de chaque zone est l'espérance de forêts abattues par l'ordre à venir, sans compter les barrages (`partie.prevision()` : 11 cases de la piste en v1, 21 paires de dés en v2). On prend la part portée par les *k* zones les plus menacées (*k* = nombre de joueurs), moyenne sur les étapes de la partie. Vert 50 à 80 %, rouge sous 35 % ou au-dessus de 90 %.
 - **Surprise** (mesure). Part des ordres tirés dont la tuile n'est pas l'une des deux plus probables au moment du tirage (ex aequo du deuxième rang compris). En v2, la même part pour la Machine désignée, à titre d'information. Vert 20 à 45 %.
-- **Tape-taupe** : attend le bot fort (phase 2).
+- **Tape-taupe** (indice, bot fort et glouton, étape 3.3). Écart, en points de forêt, entre le bot fort (MC 64 chacun pour soi) et le glouton, qui pare toujours la menace la plus probable (saboter si possible, sinon barrer la zone la plus menacée), pris à son meilleur taux de rêve fixe (0 ; 0,5 ; 1), sur les mêmes tables. Vert ≥ 10 points, rouge < 3. Petit écart : parer au plus probable suffit, les critères du Méchant ne sont pas en tension. Programme `mesures3` : sur les duos (2 parties du bot fort, 4 du glouton par taux) ; le glouton joue aussi les 5 trios, pour comparer aux tables du plan réduit.
 
 ## Objectif 2 : défendre ou rêver reste un dilemme
 - **Meilleur taux de rêve fixe** (indice). Le glouton à taux fixes (0 ; 0,25 ; 0,5 ; 0,75 ; 1 carte par tour, la limite des maquettes ; 0 à 3 sans limite), duos et trios. En v2, aussi par voie (sommeil seul, réveil seul). Rouge si le meilleur taux est 0 ou le plus haut permis.
-- **Gain du bot libre, dilemmes** : attendent le bot fort.
+- **Gain du bot libre** (indice, bot fort, étape 3.3). 100 (libre − meilleur fixe) / meilleur fixe : le bot fort libre contre le même bot à taux de rêve fixe (0 ; 0,5 ; 1, réglage `reves_par_tour` du bot MC), sur les mêmes tables. Vert ≥ 5 %, rouge < 1 %. Calculé dans le plan réduit (« tables » contre « reves ») et sur le témoin sans rêve.
+- **Dilemmes** (indice, bot fort, sur échantillon, étape 3.3). Le bot MC juge en entier une décision cherchée sur quatre (réglage `juger` = 0,25) : chaque option est estimée par 16 suites, sur les mêmes hasards (forêt finale moyenne, en %). Classement (`classer_decision`) : *forcée* (une option) ; *indifférente* (la meilleure et la pire à moins de 3 points) ; *dilemme* (au moins deux options à moins de 1 point de la meilleure) ; *évidente* (sinon). Part des dilemmes parmi les décisions non forcées, hors mise en place ; détail par type de décision. Vert ≥ 30 %, rouge < 10 %. **Les seuils de 1 et 3 points sont provisoires** (13 oct.) : à confirmer par l'auteur au vu des premiers résultats. Programme `mesures3` : les 15 duos, 2 parties.
 
 ## Objectif 3 : chaque peuple compte, aucun ne suffit
 - **Shapley** (mesure, avec ce bot). Valeur de Shapley exacte à partir des 64 valeurs d'équipe ; rapport de chaque peuple à la moyenne. Intervalle à 95 % par rééchantillonnage des parties (200 tirages). Vert : tous entre 0,7 et 1,3 ; rouge : un hors de 0,5 à 1,5.
@@ -45,7 +46,7 @@ Ce document décrit les mesures que calcule le moteur (`foret/mesures.py`, `fore
 - **Pire table** (mesure). Forêt de la pire équipe / celle de la meilleure, parmi les duos et parmi les trios ; on garde le plus faible des deux rapports. Vert ≥ 70 %.
 - **Aucun spectateur** (indice, décision B3). Pour chaque duo et trio, un siège est tenu par le bot inerte, qui ne fait rien ; l'impact d'un peuple est la perte moyenne de forêt. Rapport à l'impact moyen. Vert : chaque peuple ≥ 0,5. Le remplacement par le bot aléatoire (prévu par le plan) reste affiché pour information : ce bot rêve, ce qui rapporte en soi.
 - **Coordination** (indice). Mêmes tables avec la communication « aucun signe », celle de la maquette (conseil parlé en v1, traces en v2) et « tout dire ». Part de l'écart récupérée = (forme − aucun signe) / (tout dire − aucun signe). Calculée seulement si l'écart est positif et plus grand que sa marge à 95 % ; sinon « non mesurable avec ce bot ». Le glouton y joue en « annonce » (il annonce sans lire) et en « complet » (il s'appuie sur les annonces des autres).
-- **Chef unique** : attend les modes de coopération (phase 2).
+- **Chef unique** (indice, bot fort, étape 3.3). 100 (central − chacun pour soi) / chacun pour soi : le bot MC 64 qui voit tout et décide pour tous, contre le même bot qui ne sait que ce que sait son siège, annonce ses intentions et lit celles des autres, avec la communication de la maquette. Vert 5 à 20 %, rouge < 2 % (solitaire à plusieurs) ou > 35 % (effet leader). Calculé sur la campagne `coordination_mc_2` (`chef_depuis_synthese`, résumé de la campagne), avec la part de l'écart récupérée (`coordination_depuis_synthese`). Témoin : avec « tout dire », chacun pour soi sait tout ce que sait le chef, le gain doit être rouge.
 
 ## Objectif 4 : la bataille se joue jusqu'au dénouement
 - **Partie jouée d'avance** (mesure, avec ce bot). Sur les duos (8 parties par duo), au début du tour 3, 16 copies de la partie sont jouées jusqu'au bout avec un autre hasard ; leur moyenne prédit l'issue. Exactitude équilibrée de la règle « prédiction au-dessus de la médiane des issues » ; AUC donnée en plus. Une partie finie avant le tour 3 est prédite exactement. Vert < 65 %, rouge > 80 %.
@@ -70,6 +71,14 @@ Décisions de l'auteur du 13 oct. : bot de référence MC 64 chacun pour soi ; 1
 - Ni coordination ni échelle des bots : elles ont leurs campagnes (`coordination_mc_2`, `echelle_bots`).
 - Coût estimé : environ 4 heures-cœur pour la v1 et 10 pour la V2 (moteur 1.7).
 
+## Les mesures du bot fort (programme mesures3, étape 3.3)
+`python -m foret.batterie mesures3` (par lots comme les autres ; sur GitHub, workflow Batterie avec `programme = mesures3`). Configurations (`PLAN_M3`), 1 020 parties :
+- `m3_v1`, `m3_v2` : le bot fort libre sur les duos (2 parties), le glouton à taux fixes sur les duos et les 5 trios (4 parties) pour le tape-taupe, le bot fort qui juge (2 parties par duo) pour les dilemmes ;
+- `m3_v1_une_tactique` : témoin du tape-taupe ; la menace est résolue, parer au plus probable doit suffire : écart plus petit que dans la v1 ;
+- `m3_v1_sans_reve` : témoin du gain du bot libre (variante `temoin_sans_reve`, aucun rêve programmable) : tous les taux se valent, gain rouge ;
+- `m3_v1_essoufflement` : témoin des dilemmes ; le Méchant s'essouffle, on *suppose* que les choix comptent moins : plus de décisions indifférentes que dans la v1. C'est une attente non démontrée : si le témoin rate, on regarde la mesure avant de conclure.
+Le chef unique a sa campagne (`coordination_mc_2`). Depuis l'étape 3.3, le workflow publie aussi les parties (`parties.tar.gz`, sauf pour la phase 1) avec le rapport, pour refaire l'analyse sans rejouer.
+
 ## Témoins
 Variantes cassées exprès (préfixe `temoin_`, dans `maquettes/v1.json` et `v2.json`), jamais proposées comme règles :
 
@@ -86,7 +95,8 @@ Variantes cassées exprès (préfixe `temoin_`, dans `maquettes/v1.json` et `v2.
 | `retour_v0_reves_illimites` (v1), glouton qui rêve 3 cartes | Limite de rêves retirée | Meilleur taux de rêve (rouge), fins précoces (rouge) |
 | `retour_v0_barrage` (v1) | Barrage contourné | Robustesse (incohérence) |
 | `sans_pouvoirs` (v1) | Aucun pouvoir | Couverture (pouvoirs à 0 %) |
-| `comm_aucun_signe`, `comm_tout_dire` | Les deux bouts de l'échelle de communication | Coordination |
+| `comm_aucun_signe`, `comm_tout_dire` | Les deux bouts de l'échelle de communication | Coordination ; chef unique (rouge avec « tout dire ») |
+| `temoin_sans_reve` (v1) | Aucun rêve programmable (limite de rêves à 0) | Gain du bot libre (rouge) |
 
 Un témoin qui ne tombe pas là où il doit signale une mesure à revoir (ou un bot qui ne sait pas exploiter le défaut), pas un seuil à déplacer (A5).
 
@@ -98,5 +108,6 @@ python -m foret.batterie phase1 --echelle 0.2      # essai
 python -m foret.batterie rapport                   # resultats/batterie/rapport.json
 python -m foret.batterie phase1 --lot 3/8 --sortie lots/   # le lot 3 sur 8 (une machine par lot)
 python -m foret.batterie phase1 --fusionner lots/          # rassemble les lots, puis le rapport
+python -m foret.batterie plan --programme mesures3         # les autres programmes : phase3, mesures3
 ```
 Sur GitHub : onglet **Actions** → **Batterie** → **Run workflow** (échelle, nombre de lots, configurations).

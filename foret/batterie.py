@@ -45,7 +45,7 @@ from multiprocessing import Pool
 from .bots import fabriquer
 from .maquette import charger, lire
 from .mesures import (MESURES, Mesureur, Sondeur, auc, distance_pistes, duo_contre_meilleur_seul, duos_complets,
-                      shapley_restreint,
+                      shapley_restreint, gain_libre, part_dilemmes, tape_taupe,
                       exactitude_equilibree, synergies_relatives,
                       ic95, moyenne, quantile, shapley, synergies, variance, verdict)
 from .moteur import Partie, VERSION
@@ -103,10 +103,32 @@ PLAN3 = {
 }
 TAUX3 = [0.0, 0.5, 1.0]
 
+# --------------------------------------------------------------------------- les mesures du bot fort (étape 3.3)
+# Programme « mesures3 » : les quatre mesures qui attendaient le bot fort, et leurs témoins.
+# - tape-taupe : le glouton (il pare la menace la plus probable) à taux de rêve fixes, contre le
+#   bot fort, sur les mêmes duos ;
+# - gain du bot libre : le bot fort libre contre le même bot à taux fixes (dans le plan réduit, et
+#   ici pour le témoin sans rêve) ;
+# - dilemmes : le bot fort juge en entier une décision sur quatre (réglage « juger ») ;
+# - chef unique : campagne coordination_mc_2 (central contre chacun pour soi), pas ici.
+JUGE3 = 0.25
+PLAN_M3 = {
+    "m3_v1": ("v1", "defaut", MC64, ("tables_duos", "taupe", "dilemmes"), 4),
+    "m3_v2": ("v2", "defaut", MC64, ("tables_duos", "taupe", "dilemmes"), 4),
+    # témoins
+    "m3_v1_une_tactique": ("v1", "temoin_une_tactique", MC64, ("tables_duos", "taupe"), 4),
+    "m3_v1_sans_reve": ("v1", "temoin_sans_reve", MC64, ("tables_duos", "reves_duos"), 4),
+    "m3_v1_essoufflement": ("v1", "temoin_essoufflement", MC64, ("dilemmes",), 4),
+}
+PROGRAMMES = {"phase1": PLAN, "phase3": PLAN3, "mesures3": PLAN_M3}
+
 
 def _config(nom):
-    """(maquette, variante, bot, expériences, parties) d'une configuration du plan de la phase 1 ou 3."""
-    return PLAN[nom] if nom in PLAN else PLAN3[nom]
+    """(maquette, variante, bot, expériences, parties) d'une configuration de l'un des programmes."""
+    for plan in (PLAN, PLAN3, PLAN_M3):          # lus à l'appel (les tests les remplacent)
+        if nom in plan:
+            return plan[nom]
+    raise KeyError(nom)
 SONDES = {("conseil", 3): "t2", ("conseil", 5): "t5"}
 
 
@@ -123,6 +145,9 @@ def jouer(tache):
             obs.append(Sondeur(SONDES, copies=t.get("copies", 16), graine=t["graine"],
                                politique=t.get("politique_sondes")))
         b = Partie(m, list(t["peuples"]), bots, graine=t["graine"], observateurs=obs).jouer()
+        jug = [dict(j, siege=i) for i, bot in enumerate(bots) for j in getattr(bot, "jugements", ())]
+        if jug:                                                   # [mesure:dilemmes]
+            out["jugements"] = jug
         out.update({
             "fin": b["fin"], "tour": b["tour"], "foret": b["foret"], "foret_initiale": b["foret_initiale"],
             "pct": round(100 * b["resultat"] / b["foret_initiale"], 3),
@@ -221,6 +246,26 @@ def taches(nom, echelle=1.0):
             b = {"type": bot["type"], "params": dict(bot.get("params", {}), reves_par_tour=taux)}
             for eq in list(itertools.combinations(PEUPLES, 2)) + TRIOS3:
                 ajouter("reves", eq, [b] * len(eq), range(nr), f"taux:{taux}")
+    duos = list(itertools.combinations(PEUPLES, 2))
+    nd = max(2, round(n / 2))
+    if "tables_duos" in exps:                 # le bot de la configuration, libre, sur les 15 duos
+        for eq in duos:
+            ajouter("tables", eq, [bot] * 2, range(nd), "equipe")
+    if "taupe" in exps or "taupe_duos" in exps:   # [mesure:tape_taupe] le glouton à taux fixes
+        tables = duos + (TRIOS3 if "taupe" in exps else [])
+        for taux in TAUX3:
+            b = {"type": "glouton", "params": {"reves_par_tour": taux}}
+            for eq in tables:
+                ajouter("taupe", eq, [b] * len(eq), range(n), f"taux:{taux}")
+    if "reves_duos" in exps:                  # [mesure:gain_libre] le bot de la configuration à taux fixes
+        for taux in TAUX3:
+            b = {"type": bot["type"], "params": dict(bot.get("params", {}), reves_par_tour=taux)}
+            for eq in duos:
+                ajouter("reves", eq, [b] * 2, range(nd), f"taux:{taux}")
+    if "dilemmes" in exps:                    # [mesure:dilemmes] le bot fort juge une décision sur quatre
+        b = {"type": bot["type"], "params": dict(bot.get("params", {}), juger=JUGE3)}
+        for eq in duos:
+            ajouter("dilemmes", eq, [b] * 2, range(nd), "juge")
     if "echelle" in exps:
         for b, et in ((ALEA, "aleatoire"), (bot, "glouton")):
             for k in (2, 3):
@@ -783,6 +828,80 @@ def mesures_reves(parties, maquette, variante):
     return out
 
 
+def _fort(bot):
+    """Le bot de la configuration est-il le bot fort (Monte-Carlo) ?"""
+    return bot.get("type") == "mc"
+
+
+def _par_table(parties, exp, etiquette=None):
+    """{table: [forêts %]} des parties d'une expérience (et d'une étiquette)."""
+    g = defaultdict(list)
+    for r in parties:
+        if r["exp"] == exp and "erreur" not in r and (etiquette is None or r["etiquette"] == etiquette):
+            g[_cle(r["peuples"])].append(r["pct"])
+    return g
+
+
+def mesures_gain_libre(parties, bot):
+    """[mesure:gain_libre] Le bot fort libre (« tables », équipes) contre lui-même à taux de rêve
+    fixes (« reves »), sur les tables jouées des deux façons."""
+    if not _fort(bot):
+        return {}
+    libre = _par_table(parties, "tables", "equipe")
+    taux = defaultdict(lambda: defaultdict(list))
+    for r in parties:
+        if r["exp"] == "reves" and "erreur" not in r and r["etiquette"].startswith("taux:"):
+            taux[float(r["etiquette"].split(":")[1])][_cle(r["peuples"])].append(r["pct"])
+    communes = set(libre).intersection(*[set(t) for t in taux.values()]) if taux else set()
+    if not communes:
+        return {}
+    a = [x for k in communes for x in libre[k]]
+    par_taux = {t: [x for k in communes for x in g[k]] for t, g in taux.items()}
+    res = gain_libre(a, par_taux)
+    return {"gain_libre": {"valeur": _r(res["gain"], 2), "libre": _r(res["libre"]), "meilleur_fixe": _r(res["meilleur_fixe"]),
+                           "taux": res["taux"], "marge": _r(res["marge"], 2), "tables": len(communes),
+                           "verdict": res["verdict"]}}
+
+
+def mesures_taupe(parties, bot):
+    """[mesure:tape_taupe] Le bot fort (« tables », équipes) contre le glouton à son meilleur taux
+    fixe (« taupe »), sur les tables jouées des deux façons."""
+    if not _fort(bot):
+        return {}
+    fort = _par_table(parties, "tables", "equipe")
+    taux = defaultdict(lambda: defaultdict(list))
+    for r in parties:
+        if r["exp"] == "taupe" and "erreur" not in r:
+            taux[float(r["etiquette"].split(":")[1])][_cle(r["peuples"])].append(r["pct"])
+    if not taux:
+        return {}
+    glouton = {t: {"/".join(sorted(k)): _r(moyenne(v)) for k, v in sorted(g.items(), key=lambda kv: sorted(kv[0]))}
+               for t, g in taux.items()}
+    out = {"tape_taupe": {"glouton_par_taux": {str(t): _r(moyenne([x for v in g.values() for x in v]))
+                                               for t, g in sorted(taux.items())},
+                          "glouton_par_table": {str(t): v for t, v in sorted(glouton.items())}}}
+    communes = set(fort).intersection(*[set(g) for g in taux.values()])
+    if not communes:
+        out["tape_taupe"]["verdict"] = "non mesurable (pas de table jouée par le bot fort)"
+        return out
+    a = [x for k in communes for x in fort[k]]
+    res = tape_taupe(a, {t: [x for k in communes for x in g[k]] for t, g in taux.items()})
+    out["tape_taupe"].update({"valeur": _r(res["ecart"], 2), "fort": _r(res["fort"]), "taupe": _r(res["taupe"]),
+                              "taux_taupe": res["taux_taupe"], "marge": _r(res["marge"], 2),
+                              "tables": len(communes), "verdict": res["verdict"]})
+    return out
+
+
+def mesures_dilemmes(parties):
+    """[mesure:dilemmes] Les décisions jugées par le bot fort (réglage « juger »)."""
+    jug = [j for r in parties if r["exp"] == "dilemmes" and "erreur" not in r for j in r.get("jugements", ())]
+    if not jug:
+        return {}
+    res = part_dilemmes(jug)
+    parties_d = sum(1 for r in parties if r["exp"] == "dilemmes" and "erreur" not in r)
+    return {"dilemmes": dict(res, valeur=_r(res["part"]), part=_r(res["part"]), parties=parties_d)}
+
+
 def mesures_coordination(parties, variante_nom):
     """[mesure:coordination]"""
     g = defaultdict(list)
@@ -837,6 +956,9 @@ def evaluer_config(nom, parties=None):
     out.update(mesures_equipes(parties, maquette, variante))
     out.update(mesures_spectateur(parties))
     out.update(mesures_reves(parties, maquette, variante))
+    out.update(mesures_gain_libre(parties, bot))
+    out.update(mesures_taupe(parties, bot))
+    out.update(mesures_dilemmes(parties))
     out.update(mesures_coordination(parties, variante))
     out.update(mesures_echelle(parties))
     return out
@@ -898,6 +1020,13 @@ TEMOINS = [
      lambda t, r: (_g(t, "fins", "nuit") or 0) < 10),
     ("robustesse", "v1_barrage_v0", "v1_g0", "beaucoup plus d'incohérences (barrage contourné)",
      lambda t, r: _g(t, "robustesse", "incoherences_par_partie") > 3 * _g(r, "robustesse", "incoherences_par_partie")),
+    # Étape 3.3 (bot fort, programme mesures3)
+    ("tape_taupe", "m3_v1_une_tactique", "m3_v1", "écart plus petit que dans la v1 (menace résolue : parer suffit)",
+     lambda t, r: _g(t, "tape_taupe", "valeur") < _g(r, "tape_taupe", "valeur")),
+    ("gain_libre", "m3_v1_sans_reve", None, "rouge (aucun rêve possible : tous les taux se valent)",
+     lambda t, r: _g(t, "gain_libre", "verdict") == "rouge"),
+    ("dilemmes", "m3_v1_essoufflement", "m3_v1", "plus de décisions indifférentes que la v1 (supposé)",
+     lambda t, r: _g(t, "dilemmes", "classes", "indifferente") > _g(r, "dilemmes", "classes", "indifferente")),
     ("couverture", "v1_sans_pouvoirs", "v1_g0", "aucun pouvoir appliqué",
      lambda t, r: not any(k.startswith("pouvoir_") and v > 0 for k, v in (_g(t, "couverture") or {}).items())),
 ]
@@ -948,25 +1077,26 @@ def _lot(texte):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("quoi", choices=["phase1", "phase3", "rapport", "plan"])
-    ap.add_argument("--programme", choices=["phase1", "phase3"], default=None,
-                    help="plan et rapport : le programme (phase1 par défaut ; phase3 : plan réduit du bot fort)")
+    ap.add_argument("quoi", choices=list(PROGRAMMES) + ["rapport", "plan"])
+    ap.add_argument("--programme", choices=list(PROGRAMMES), default=None,
+                    help="plan et rapport : le programme (phase1 par défaut ; phase3 : plan réduit du bot fort ; "
+                         "mesures3 : les mesures du bot fort et leurs témoins)")
     ap.add_argument("--echelle", type=float, default=1.0)
     ap.add_argument("--seulement", nargs="+")
     ap.add_argument("--processus", type=int)
-    ap.add_argument("--lot", type=_lot, help="phase1 ou phase3 : ne jouer que le lot i/n et l'écrire dans --sortie")
+    ap.add_argument("--lot", type=_lot, help="un programme : ne jouer que le lot i/n et l'écrire dans --sortie")
     ap.add_argument("--fusionner", metavar="DOSSIER",
-                    help="phase1 ou phase3 : rassembler les lots de ce dossier, puis le rapport")
+                    help="un programme : rassembler les lots de ce dossier, puis le rapport")
     ap.add_argument("--sortie", default="lots", help="dossier des lots (avec --lot)")
     a = ap.parse_args()
-    programme = a.quoi if a.quoi in ("phase1", "phase3") else (a.programme or "phase1")
-    plan = PLAN3 if programme == "phase3" else PLAN
+    programme = a.quoi if a.quoi in PROGRAMMES else (a.programme or "phase1")
+    plan = {"phase1": PLAN, "phase3": PLAN3, "mesures3": PLAN_M3}[programme]
     noms = a.seulement or list(plan)
     inconnus = [x for x in noms if x not in plan]
     if inconnus:
         ap.error(f"configuration(s) inconnue(s) pour {programme} : {', '.join(inconnus)}")
-    if (a.lot or a.fusionner) and a.quoi not in ("phase1", "phase3"):
-        ap.error("--lot et --fusionner vont avec phase1 ou phase3")
+    if (a.lot or a.fusionner) and a.quoi not in PROGRAMMES:
+        ap.error("--lot et --fusionner vont avec un programme (" + ", ".join(PROGRAMMES) + ")")
     if a.lot and a.fusionner:
         ap.error("--lot et --fusionner s'excluent")
     if a.quoi == "plan":
@@ -979,7 +1109,7 @@ def main():
         return
     if a.fusionner:
         fusionner(a.fusionner, noms, a.echelle)
-    elif a.quoi in ("phase1", "phase3"):
+    elif a.quoi in PROGRAMMES:
         for nom in noms:
             executer(nom, a.echelle, a.processus)
     r = rapport(list(plan))
