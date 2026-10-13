@@ -1,0 +1,1002 @@
+{
+ "moteur": "1.7.1",
+ "date": "2026-10-13 08:04",
+ "mesures": {
+  "robustesse": {
+   "niveau": 1,
+   "objectif": "filtre",
+   "nom": "Robustesse : parties plantées et incohérences",
+   "etiquette": "mesure",
+   "unite": "par partie",
+   "bot": "tous",
+   "vert": [
+    0,
+    0
+   ],
+   "rouge": [
+    [
+     1e-09,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "retour_v0_barrage",
+     "glouton",
+     "incoherences > 0 (barrage contourné)"
+    ]
+   ]
+  },
+  "lacunes": {
+   "niveau": 1,
+   "objectif": "filtre",
+   "nom": "Lacunes : questions que la table se posera",
+   "etiquette": "mesure",
+   "unite": "par partie",
+   "bot": "tous",
+   "descriptive": true,
+   "temoins": []
+  },
+  "couverture": {
+   "niveau": 1,
+   "objectif": "filtre",
+   "nom": "Couverture : part des parties où chaque règle s'applique",
+   "etiquette": "indice",
+   "unite": "% des parties",
+   "bot": "glouton",
+   "descriptive": true,
+   "temoins": [
+    [
+     "v1",
+     "sans_pouvoirs",
+     "glouton",
+     "aucun pouvoir appliqué"
+    ]
+   ]
+  },
+  "charge": {
+   "niveau": 1,
+   "objectif": "filtre",
+   "nom": "Charge de règles : départages et cas particuliers",
+   "etiquette": "mesure",
+   "unite": "par partie",
+   "bot": "tous",
+   "descriptive": true,
+   "temoins": []
+  },
+  "duree": {
+   "niveau": 1,
+   "objectif": "lecture",
+   "nom": "Durée estimée",
+   "etiquette": "indice",
+   "unite": "min",
+   "bot": "glouton",
+   "descriptive": true,
+   "temoins": []
+  },
+  "attente": {
+   "niveau": 1,
+   "objectif": "lecture",
+   "nom": "Attente et densité",
+   "etiquette": "indice",
+   "unite": "% du temps ; décisions par heure",
+   "bot": "glouton",
+   "descriptive": true,
+   "temoins": []
+  },
+  "forcees": {
+   "niveau": 1,
+   "objectif": "lecture",
+   "nom": "Choix forcés",
+   "etiquette": "indice",
+   "unite": "% des décisions",
+   "bot": "glouton",
+   "descriptive": true,
+   "temoins": []
+  },
+  "concentration": {
+   "niveau": 2,
+   "objectif": "1",
+   "nom": "Concentration de la menace sur les k zones les plus menacées",
+   "etiquette": "mesure",
+   "unite": "%",
+   "bot": "tous",
+   "vert": [
+    50,
+    80
+   ],
+   "rouge": [
+    [
+     null,
+     34.999999999
+    ],
+    [
+     90.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_une_tactique",
+     "glouton",
+     "rouge (résolue)"
+    ],
+    [
+     "v2",
+     "temoin_une_tactique",
+     "glouton",
+     "rouge (résolue)"
+    ]
+   ]
+  },
+  "surprise": {
+   "niveau": 2,
+   "objectif": "1",
+   "nom": "Surprise : ordres hors des deux tactiques les plus probables",
+   "etiquette": "mesure",
+   "unite": "%",
+   "bot": "tous",
+   "vert": [
+    20,
+    45
+   ],
+   "rouge": [
+    [
+     null,
+     9.999999999
+    ],
+    [
+     60.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_une_tactique",
+     "glouton",
+     "rouge (aucune surprise)"
+    ],
+    [
+     "v2",
+     "temoin_une_tactique",
+     "glouton",
+     "rouge (aucune surprise)"
+    ]
+   ]
+  },
+  "tape_taupe": {
+   "niveau": 3,
+   "objectif": "1",
+   "nom": "Tape-taupe : écart entre parer la menace la plus probable et le bot fort",
+   "etiquette": "indice",
+   "unite": "points de forêt",
+   "bot": "fort (MC 64) et glouton",
+   "vert": [
+    10,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     2.999999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_une_tactique",
+     "MC 64 et glouton",
+     "écart plus petit que dans la v1"
+    ]
+   ]
+  },
+  "reve_fixe": {
+   "niveau": 2,
+   "objectif": "2",
+   "nom": "Meilleur taux de rêve fixe",
+   "etiquette": "indice",
+   "unite": "cartes par tour",
+   "bot": "glouton (puis fort)",
+   "categorique": true,
+   "temoins": [
+    [
+     "v1",
+     "retour_v0_reves_illimites",
+     "glouton",
+     "rouge (le maximum)"
+    ]
+   ]
+  },
+  "gain_libre": {
+   "niveau": 2,
+   "objectif": "2",
+   "nom": "Gain du bot libre sur le meilleur taux fixe",
+   "etiquette": "indice",
+   "unite": "%",
+   "bot": "fort (MC 64)",
+   "vert": [
+    5,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     0.999999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_sans_reve",
+     "MC 64",
+     "rouge (aucun rêve possible : tous les taux se valent)"
+    ]
+   ]
+  },
+  "dilemmes": {
+   "niveau": 3,
+   "objectif": "2",
+   "nom": "Dilemmes parmi les décisions non forcées",
+   "etiquette": "indice",
+   "unite": "%",
+   "bot": "fort (MC 64, sur échantillon)",
+   "vert": [
+    30,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     9.999999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_essoufflement",
+     "MC 64",
+     "plus de décisions indifférentes que la v1 (supposé)"
+    ]
+   ]
+  },
+  "shapley": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Contributions de Shapley des six peuples (rapport à la moyenne)",
+   "etiquette": "mesure",
+   "unite": "× la moyenne",
+   "bot": "glouton (puis fort)",
+   "temoins": [
+    [
+     "v1",
+     "temoin_hanter_illimite",
+     "glouton",
+     "rouge (les entités gagnent seules)"
+    ],
+    [
+     "v2",
+     "temoin_hanter_illimite",
+     "glouton",
+     "rouge (les entités gagnent seules)"
+    ],
+    [
+     "v1",
+     "temoin_mammiferes_sans_pouvoir",
+     "glouton",
+     "mammifères sous la moyenne"
+    ]
+   ]
+  },
+  "synergies": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Synergies : duos qui battent leur meilleur peuple seul (décision B2)",
+   "etiquette": "mesure",
+   "unite": "duos sur 15",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    12,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     7.999999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_hanter_illimite",
+     "glouton",
+     "rouge (un peuple suffit : saturation)"
+    ]
+   ]
+  },
+  "pire_table": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Pire table / meilleure table (duos et trios)",
+   "etiquette": "mesure",
+   "unite": "%",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    70,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     49.999999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_hanter_illimite",
+     "glouton",
+     "hors du vert"
+    ]
+   ]
+  },
+  "spectateur": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Aucun spectateur : perte quand un peuple ne fait rien",
+   "etiquette": "indice",
+   "unite": "× l'impact moyen",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    0.5,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     0.249999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_spectateur",
+     "glouton",
+     "rouge (les humains ne font rien)"
+    ]
+   ]
+  },
+  "coordination": {
+   "niveau": 2,
+   "objectif": "3",
+   "nom": "Coordination : part de l'écart « aucun signe → tout dire » récupérée",
+   "etiquette": "indice",
+   "unite": "%",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    40,
+    80
+   ],
+   "rouge": [
+    [
+     null,
+     19.999999999
+    ],
+    [
+     95.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "comm_aucun_signe",
+     "glouton",
+     "0 % par définition"
+    ],
+    [
+     "v1",
+     "comm_tout_dire",
+     "glouton",
+     "100 % par définition"
+    ]
+   ]
+  },
+  "chef": {
+   "niveau": 3,
+   "objectif": "3",
+   "nom": "Gain d'un chef unique sur « chacun pour soi »",
+   "etiquette": "indice",
+   "unite": "%",
+   "bot": "fort (MC 64 central et chacun pour soi)",
+   "vert": [
+    5,
+    20
+   ],
+   "rouge": [
+    [
+     null,
+     1.999999999
+    ],
+    [
+     35.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "comm_tout_dire",
+     "MC 64",
+     "rouge (tout se dit : un chef n'apporte rien)"
+    ]
+   ]
+  },
+  "fins": {
+   "niveau": 2,
+   "objectif": "lecture",
+   "nom": "Équilibre des fins",
+   "etiquette": "indice",
+   "unite": "% des parties",
+   "bot": "glouton (puis fort)",
+   "descriptive": true,
+   "temoins": [
+    [
+     "v1",
+     "retour_v0_reves_illimites",
+     "glouton rêve 3",
+     "la nuit disparaît"
+    ]
+   ]
+  },
+  "tactiques": {
+   "niveau": 2,
+   "objectif": "lecture",
+   "nom": "Tactiques et Machines du Méchant : réussite et dégâts",
+   "etiquette": "indice",
+   "unite": "% réussis ; forêts par ordre",
+   "bot": "glouton (puis fort)",
+   "descriptive": true,
+   "temoins": [
+    [
+     "v1",
+     "temoin_une_tactique",
+     "glouton",
+     "une seule tactique tirée"
+    ]
+   ]
+  },
+  "predictibilite": {
+   "niveau": 2,
+   "objectif": "4",
+   "nom": "Partie jouée d'avance : issue prédite à la fin du tour 2",
+   "etiquette": "mesure",
+   "unite": "% (exactitude équilibrée)",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    null,
+    65
+   ],
+   "rouge": [
+    [
+     80.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_des_fixes",
+     "glouton",
+     "rouge (tout est joué)"
+    ],
+    [
+     "v2",
+     "temoin_des_fixes",
+     "glouton",
+     "rouge (tout est joué)"
+    ]
+   ]
+  },
+  "incertitude": {
+   "niveau": 2,
+   "objectif": "4",
+   "nom": "Incertitude restante au début du dernier tiers",
+   "etiquette": "mesure",
+   "unite": "part de l'incertitude initiale",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    0.5,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     0.249999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_des_fixes",
+     "glouton",
+     "rouge (plus rien à décider)"
+    ],
+    [
+     "v2",
+     "temoin_des_fixes",
+     "glouton",
+     "rouge (plus rien à décider)"
+    ]
+   ]
+  },
+  "fins_precoces": {
+   "niveau": 2,
+   "objectif": "4",
+   "nom": "Fins avant la mi-partie (tours 1 à 3)",
+   "etiquette": "mesure",
+   "unite": "% des parties",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    null,
+    20
+   ],
+   "rouge": [
+    [
+     40.000000001,
+     null
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "retour_v0_reves_illimites",
+     "glouton rêve 3",
+     "rouge"
+    ]
+   ]
+  },
+  "menace_croissante": {
+   "niveau": 2,
+   "objectif": "4",
+   "nom": "Menace croissante : dernier tiers / premier tiers",
+   "etiquette": "mesure",
+   "unite": "rapport",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    1,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     0.6666666656666667
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_essoufflement",
+     "glouton",
+     "rouge (le Méchant s'essouffle)"
+    ],
+    [
+     "v2",
+     "temoin_essoufflement",
+     "glouton",
+     "rouge (le Méchant s'essouffle)"
+    ]
+   ]
+  },
+  "plancher": {
+   "niveau": 2,
+   "objectif": "garde-fou",
+   "nom": "Plancher : forêt gardée par le pire décile",
+   "etiquette": "mesure",
+   "unite": "%",
+   "bot": "glouton (puis fort)",
+   "vert": [
+    40,
+    null
+   ],
+   "rouge": [
+    [
+     null,
+     24.999999999
+    ]
+   ],
+   "temoins": [
+    [
+     "v1",
+     "temoin_assaut",
+     "glouton",
+     "plus bas que la v1"
+    ]
+   ]
+  },
+  "echelle_bots": {
+   "niveau": 2,
+   "objectif": "garde-fou",
+   "nom": "Échelle des bots : aléatoire < glouton (< MCTS en phase 2)",
+   "etiquette": "mesure",
+   "unite": "points de forêt",
+   "bot": "aléatoire, glouton",
+   "categorique": true,
+   "phase2": true,
+   "temoins": []
+  },
+  "apprentissage": {
+   "niveau": 3,
+   "objectif": "lecture",
+   "nom": "Le Méchant apprend-il cette équipe ? (pistes finales)",
+   "etiquette": "indice",
+   "unite": "cases",
+   "bot": "glouton (puis fort)",
+   "descriptive": true,
+   "temoins": [
+    [
+     "v1",
+     "temoin_sans_apprentissage",
+     "glouton",
+     "distance nulle"
+    ],
+    [
+     "v2",
+     "temoin_sans_apprentissage",
+     "glouton",
+     "distance nulle"
+    ]
+   ]
+  }
+ },
+ "configs": {
+  "m3_v2r": {
+   "config": "m3_v2r",
+   "maquette": "v2",
+   "variante": "defaut",
+   "bot": "mc budget=64,politique={'type': 'glouton', 'params': {'reves_par_tour': 1.0}},savoir=soi",
+   "parties_jouees": 300,
+   "erreurs": 0,
+   "parties": 30,
+   "foret_pct": 90.0,
+   "foret_ic95": 1.75,
+   "robustesse": {
+    "incoherences_par_partie": 0.0,
+    "incoherences": {},
+    "verdict": "vert"
+   },
+   "lacunes": {
+    "par_partie": 0.53,
+    "principales": {
+     "egalite_rayon": 0.4,
+     "ordre_contre_immobile": 0.13
+    }
+   },
+   "couverture": {
+    "rondes_conseil": 100.0,
+    "traces_posees": 100.0,
+    "ordres": 100.0,
+    "ordres_echoues": 100.0,
+    "echanges_piste": 100.0,
+    "echanges_piste_machines": 100.0,
+    "presages": 100.0,
+    "bloquee_par_barrage": 96.7,
+    "ordres_reussis": 93.3,
+    "cercle_carte": 80.0,
+    "apprentissage_machines_sans_mouvement": 73.3,
+    "entrees": 46.7,
+    "apprentissage_sans_mouvement": 43.3,
+    "voir": 33.3,
+    "presage_deja_vu": 33.3,
+    "tenir_zones": 33.3,
+    "zones_rasees": 33.3,
+    "embuscades": 33.3,
+    "pouvoir_hanter": 30.0,
+    "ordres_hantes": 30.0,
+    "tromperies": 23.3,
+    "oubli_tactique": 20.0,
+    "esprits_carte": 20.0,
+    "organes_neutralises": 16.7,
+    "machines_hs": 13.3,
+    "voir_detourne": 10.0,
+    "immobilisations": 10.0,
+    "remorquages": 6.7,
+    "reves_tires": 6.7,
+    "machines_egarees": 6.7,
+    "esprits_egarer": 3.3,
+    "echec_bloque_par_esprit": 3.3,
+    "cercle_egarer": 3.3
+   },
+   "charge": {
+    "par_partie": 0.4
+   },
+   "duree": {
+    "minutes": 24.5,
+    "minutes_q90": 27.0,
+    "tours": 3.2,
+    "decisions_non_forcees_par_joueur": 39.5
+   },
+   "attente": {
+    "attente_pct": 9.8,
+    "decisions_par_heure": 96.4
+   },
+   "forcees": {
+    "total_pct": 0.0,
+    "par_type": {
+     "action": 0.8,
+     "aller": 0.0,
+     "embuscade": 0.0,
+     "hote": 0.0,
+     "pouvoir": 0.0,
+     "presence": 0.0,
+     "programmer_carte": 0.0,
+     "programmer_mode": 0.0,
+     "reve": 0.0,
+     "trace": 0.0,
+     "tromper": 0.0,
+     "voir": 0.0
+    }
+   },
+   "concentration": {
+    "valeur": 72.8,
+    "ic95": 2.39,
+    "verdict": "vert"
+   },
+   "surprise": {
+    "valeur": 34.7,
+    "ordres": 176,
+    "machines": 48.3,
+    "verdict": "vert"
+   },
+   "fins": {
+    "reveil": 80.0,
+    "sommeil": 20.0,
+    "tour_moyen": 3.2
+   },
+   "fins_precoces": {
+    "valeur": 86.7,
+    "verdict": "rouge"
+   },
+   "menace_croissante": {
+    "ordres_reussis": 0.0,
+    "machines_actives": 1.45,
+    "valeur": 0.0,
+    "parties_au_tour_5_pct": 6.7,
+    "verdict": "rouge"
+   },
+   "plancher": {
+    "valeur": 82.5,
+    "verdict": "vert"
+   },
+   "tactiques": {
+    "tactiques": {
+     "Opportunisme": {
+      "tires_pct": 30.7,
+      "reussis_pct": 57.4,
+      "forets_par_ordre": 0.48
+     },
+     "Represailles": {
+      "tires_pct": 29.5,
+      "reussis_pct": 44.2,
+      "forets_par_ordre": 0.31
+     },
+     "Cupidite": {
+      "tires_pct": 22.7,
+      "reussis_pct": 32.5,
+      "forets_par_ordre": 0.3
+     },
+     "Percee": {
+      "tires_pct": 17.0,
+      "reussis_pct": 46.7,
+      "forets_par_ordre": 0.3
+     }
+    },
+    "machines": {
+     "Mâchoire": {
+      "tires_pct": 37.5,
+      "reussis_pct": 45.5,
+      "forets_par_ordre": 0.42
+     },
+     "Grosse Gueule": {
+      "tires_pct": 30.7,
+      "reussis_pct": 46.3,
+      "forets_par_ordre": 0.41
+     },
+     "Rapiat": {
+      "tires_pct": 16.5,
+      "reussis_pct": 41.4,
+      "forets_par_ordre": 0.41
+     },
+     "Tonton Débard": {
+      "tires_pct": 13.1,
+      "reussis_pct": 47.8,
+      "forets_par_ordre": 0.0
+     },
+     "Ripaille": {
+      "tires_pct": 2.3,
+      "reussis_pct": 75.0,
+      "forets_par_ordre": 0.25
+     }
+    }
+   },
+   "apprentissage": {
+    "depuis_le_depart": 5.13,
+    "entre_equipes": 5.45,
+    "meme_equipe": 5.8,
+    "propre_a_l_equipe": -0.35
+   },
+   "pire_table": {
+    "duos": {
+     "rapport": 81.0,
+     "pire": [
+      [
+       "humains",
+       "insectes"
+      ],
+      81.0
+     ],
+     "meilleure": [
+      [
+       "oiseaux",
+       "reptiles"
+      ],
+      100.0
+     ]
+    },
+    "valeur": 81.0,
+    "verdict": "vert"
+   },
+   "tape_taupe": {
+    "glouton_par_taux": {
+     "0.0": 74.6,
+     "0.5": 79.0,
+     "1.0": 86.7
+    },
+    "glouton_par_table": {
+     "0.0": {
+      "entites/humains": 60.7,
+      "entites/humains/insectes": 77.4,
+      "entites/humains/oiseaux": 77.4,
+      "entites/insectes": 66.7,
+      "entites/mammiferes": 75.0,
+      "entites/mammiferes/oiseaux": 86.9,
+      "entites/oiseaux": 65.5,
+      "entites/reptiles": 70.2,
+      "humains/insectes": 66.7,
+      "humains/mammiferes": 76.2,
+      "humains/oiseaux": 64.3,
+      "humains/oiseaux/reptiles": 75.0,
+      "humains/reptiles": 84.5,
+      "insectes/mammiferes": 72.6,
+      "insectes/mammiferes/reptiles": 84.5,
+      "insectes/oiseaux": 70.2,
+      "insectes/reptiles": 70.2,
+      "mammiferes/oiseaux": 66.7,
+      "mammiferes/reptiles": 91.7,
+      "oiseaux/reptiles": 90.5
+     },
+     "0.5": {
+      "entites/humains": 79.8,
+      "entites/humains/insectes": 92.9,
+      "entites/humains/oiseaux": 90.5,
+      "entites/insectes": 65.5,
+      "entites/mammiferes": 77.4,
+      "entites/mammiferes/oiseaux": 90.5,
+      "entites/oiseaux": 72.6,
+      "entites/reptiles": 78.6,
+      "humains/insectes": 75.0,
+      "humains/mammiferes": 75.0,
+      "humains/oiseaux": 67.9,
+      "humains/oiseaux/reptiles": 84.5,
+      "humains/reptiles": 81.0,
+      "insectes/mammiferes": 72.6,
+      "insectes/mammiferes/reptiles": 82.1,
+      "insectes/oiseaux": 70.2,
+      "insectes/reptiles": 77.4,
+      "mammiferes/oiseaux": 76.2,
+      "mammiferes/reptiles": 86.9,
+      "oiseaux/reptiles": 84.5
+     },
+     "1.0": {
+      "entites/humains": 84.5,
+      "entites/humains/insectes": 88.1,
+      "entites/humains/oiseaux": 90.5,
+      "entites/insectes": 81.0,
+      "entites/mammiferes": 83.3,
+      "entites/mammiferes/oiseaux": 88.1,
+      "entites/oiseaux": 83.3,
+      "entites/reptiles": 89.3,
+      "humains/insectes": 84.5,
+      "humains/mammiferes": 89.3,
+      "humains/oiseaux": 84.5,
+      "humains/oiseaux/reptiles": 92.9,
+      "humains/reptiles": 89.3,
+      "insectes/mammiferes": 83.3,
+      "insectes/mammiferes/reptiles": 91.7,
+      "insectes/oiseaux": 83.3,
+      "insectes/reptiles": 89.3,
+      "mammiferes/oiseaux": 79.8,
+      "mammiferes/reptiles": 90.5,
+      "oiseaux/reptiles": 88.1
+     }
+    },
+    "valeur": 4.44,
+    "fort": 90.0,
+    "taupe": 85.6,
+    "taux_taupe": 1.0,
+    "marge": 2.28,
+    "tables": 15,
+    "verdict": "orange"
+   },
+   "dilemmes": {
+    "decisions": 563,
+    "part": 14.9,
+    "classes": {
+     "dilemme": 14.9,
+     "evidente": 23.1,
+     "indifferente": 62.0
+    },
+    "par_type": {
+     "action": {
+      "n": 42,
+      "dilemme": 4.8
+     },
+     "aller": {
+      "n": 43,
+      "dilemme": 23.3
+     },
+     "embuscade": {
+      "n": 10,
+      "dilemme": 80.0
+     },
+     "hote": {
+      "n": 4,
+      "dilemme": 0.0
+     },
+     "pouvoir": {
+      "n": 11,
+      "dilemme": 0.0
+     },
+     "presence": {
+      "n": 60,
+      "dilemme": 28.3
+     },
+     "programmer_carte": {
+      "n": 115,
+      "dilemme": 48.7
+     },
+     "programmer_mode": {
+      "n": 116,
+      "dilemme": 3.4
+     },
+     "reve": {
+      "n": 41,
+      "dilemme": 0.0
+     },
+     "trace": {
+      "n": 158,
+      "dilemme": 0.0
+     },
+     "tromper": {
+      "n": 4,
+      "dilemme": 0.0
+     },
+     "voir": {
+      "n": 19,
+      "dilemme": 21.1
+     }
+    },
+    "seuils": {
+     "proche": 1.0,
+     "net": 3.0
+    },
+    "verdict": "orange",
+    "valeur": 14.9,
+    "parties": 30
+   }
+  }
+ },
+ "temoins": []
+}
