@@ -177,6 +177,7 @@ Bot de référence : MC 64 chacun pour soi (`{"type": "mc", "params": {"budget":
 
 ## 6. Verrou
 
+PAUSE (13 oct. 2026, 13 h 15) : conversation interactive avec l'auteur en cours. À vider à la fin de la conversation.
 
 
 ## 7. Compteur de passages
