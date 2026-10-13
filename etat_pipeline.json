@@ -1,9 +1,9 @@
 {
  "cycle": "c1",
- "etape": "exploration",
- "gen": 10,
+ "etape": "confirmation",
+ "gen": 1,
  "statut": "en cours",
  "fin_estimee": "2026-10-13T15:01:19+00:00",
  "rapport": null,
- "maj": "2026-10-13T14:54:51+00:00"
+ "maj": "2026-10-13T14:58:01+00:00"
 }
