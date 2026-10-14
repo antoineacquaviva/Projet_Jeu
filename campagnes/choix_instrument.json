@@ -1,0 +1,120 @@
+{
+ "nom": "choix_instrument",
+ "maquette": "v0.4",
+ "description": "Étape 3 quater c (14 oct. 2026) : le profil de Δ dépend-il de l'instrument ? Même campagne que choix_temoins, mais les suites du bot MC ne rêvent jamais (politique glouton rêve 0) au lieu d'une carte par tour (MC64R). Si le signe de Δ (rêver ou défendre) change avec la politique des suites, la mesure décrit le bot autant que le jeu (règle de méthode 4). À jouer sur v0.3, v0.4 et v0.4rd ; comparer aux campagnes 22 à 24.",
+ "blocs": [
+  {
+   "nom": "juge",
+   "variantes": [
+    "defaut"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 0.0
+       }
+      },
+      "juger": 0.25
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "insectes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 2
+    }
+   ]
+  }
+ ]
+}

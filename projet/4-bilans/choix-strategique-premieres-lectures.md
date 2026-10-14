@@ -9,7 +9,11 @@
   - T4 et T5 : le profil de Δ et la lisibilité, à partir des décisions que le bot fort juge en entier pendant la dernière manche de confirmation.
 - **T1 confirme le défaut et montre que le rêve disputé le corrige.** Avec le bot fort, le tir à la corde se produit 0,03 fois par partie (V0.3) et 0,05 fois (V0.4). Avec la règle du cauchemar (V0.4rd), la bibliothèque le voit 1,35 fois par partie, contre 0,21 sur la V0.4 avec les mêmes bots. Le présage détourné par un rêve reste rare partout (0,05 à 0,25) : alerte maintenue.
 - **T3 léger : aucune règle simple de rêve ne bat la meilleure politique d'horloge**, ni en V0.3, ni en V0.4, ni en V0.4rd, à aucune taille de table. Les écarts vont de 0 à −32 points. Pour un joueur moyen, juger quand rêver ne rapporte rien aujourd'hui, ce qui est cohérent avec la leçon du rêve. Sur la V0.4rd, ce verdict ne vaut que pour ces bots ; le bot fort tranchera (T3 complet et T4).
-- **T4 et T5 attendent leurs témoins** : la campagne `choix_temoins` (MC64R qui juge une décision sur quatre) est lancée sur v0.3, v0.4 et v0.4rd (ETAT.md, section 9).
+- **T4 et T5 (bot fort, campagnes 22 à 24)** :
+  - le témoin V0.3 donne le bon sens (rêver l'emporte trois fois plus souvent), mais un régime « indifférent » : le seuil par décision est trop haut ;
+  - le témoin V0.4 rate, à cause de l'instrument : MC64R rêve dans ses suites, ce qui pousse à rêver ; une vérification est lancée ;
+  - **le rêve disputé, joué par le bot fort, redevient un rêve dominant** : sommeil au tour 3,7 dans 81 % des parties, tir à la corde 0,16 par partie ;
+  - saboter ou barrer en V0.4 est le choix le plus proche d'un vrai choix, et il se lit sur la menace de l'étape.
 
 ## 1. T1 : fréquence des mécanismes voulus (par partie)
 | Mécanisme (idée notée 8) | V0.3, MC64R (C16) | V0.4, bots forts (C18) | V0.3, bibliothèque | V0.4, bibliothèque | **V0.4rd**, bibliothèque |
@@ -41,15 +45,31 @@ Meilleure règle de rêve qui lit la situation, moins meilleure politique d'horl
 - Les règles simples rêvent moins souvent que l'horloge. Une partie de l'écart vient donc du rythme, pas seulement de la lecture.
 - Sur la V0.4, les **horaires** (rêver à partir du tour 2 ou 3) sont la meilleure boucle à 5 joueurs (79,2 %, à 10 points du bot fort). Le moment compte plus que la situation : c'est le signe d'un choix d'horloge (principe 7).
 
-## 3. T4 et T5 : en attente
-Le code est prêt et testé :
-- le bot `mc` note, pour chaque décision jugée, le nom des options, les 16 suites appariées et dix indices publics ;
-- la synthèse calcule le profil de Δ et la lisibilité pour trois choix (rêver ou défendre, saboter ou barrer, moitié haute ou basse).
+## 3. T4 et T5 : les témoins avec le bot fort (campagnes 22 à 24)
+MC64R juge une décision sur quatre (16 suites appariées par option), sur l'échantillon P2, 2 parties par table, 32 parties par version. Une situation compte pour une option si elle gagne de plus de 2 points **et** de plus de deux erreurs types ; sinon elle est neutre ou incertaine.
 
-Les témoins seront lus dès que la campagne `choix_temoins` aura tourné :
-- V0.3 : rêver doit dominer ;
-- V0.4 : défendre doit dominer, ou le choix doit être indifférent ;
-- V0.4rd : le résultat que la proposition espère, un choix disputé.
+| Version (forêt, fin) | Choix | Situations | A gagne | B gagne | Neutre | Δ moyen | Régime calculé | Lisibilité : hasard → 1 indice → 2 indices |
+|---|---|---|---|---|---|---|---|---|
+| V0.3 (94 %, tour 4,2) | rêver ou défendre | 66 | 27 % | 9 % | 64 % | +1,0 | indifférent | 75 → 71 → 71 % |
+| | saboter ou barrer | 51 | 12 % | 18 % | 71 % | −0,9 | indifférent | 60 → 40 → 33 % (n = 15) |
+| | moitié haute ou basse | 154 | 9 % | 7 % | 84 % | +0,3 | indifférent | 58 → 75 → 58 % |
+| V0.4 (67 %, tour 5,9) | rêver ou défendre | 64 | 22 % | 8 % | 70 % | +1,0 | indifférent | 74 → 63 → 63 % |
+| | **saboter ou barrer** | 111 | **24 %** | **14 %** | 61 % | +0,6 | indifférent, le plus proche d'un choix disputé | **63 → 79 → 77 %** (menace maximale ≤ 0,6 : saboter) |
+| | moitié haute ou basse | 295 | 6 % | 7 % | 88 % | 0,0 | indifférent | 46 → 62 → 62 % |
+| **V0.4rd** (90 %, tour 3,7, sommeil 81 %) | rêver ou défendre | 44 | **50 %** | **2 %** | 48 % | +4,0 | **dominé par rêver** | 96 → 83 → 83 % |
+| | saboter ou barrer | 37 | 16 % | 14 % | 70 % | −0,4 | indifférent | – (n = 11) |
+| | moitié haute ou basse | 152 | 13 % | 5 % | 82 % | +0,6 | indifférent | 70 → 70 → 70 % |
+
+**Les témoins.**
+- **V0.3 : témoin à moitié réussi.** Le sens est juste : quand le choix compte, rêver l'emporte trois fois plus souvent que défendre (27 % contre 9 %). Mais le régime calculé est « indifférent », parce que deux décisions sur trois changent le résultat de moins de 2 points. La domination du rêve en V0.3 (7 points sur une partie) s'accumule sur cinq rêves environ, d'à peu près un point chacun. **Le seuil de 2 points par décision est trop haut pour un seul choix** : à recalibrer (choix technique de Claude, à faire sur les témoins, pas sur la version jugée).
+- **V0.4 : témoin raté, et l'explication est l'instrument.** À l'échelle de la partie, ne jamais rêver vaut un peu mieux (73,3 % contre 70,6 %, protocole P3). Pourtant, décision par décision, MC64R juge rêver meilleur dans 22 % des situations et défendre dans 8 % seulement. Or les suites de MC64R rêvent une carte par tour : elles estiment la valeur d'un rêve *en supposant qu'on rêvera ensuite*, ce qui compte avec le sablier (deux rêves pour un pas). C'est la règle de méthode 4 (l'instrument contient la réponse), observée. **Vérification lancée** : les mêmes campagnes avec des suites qui ne rêvent jamais (`choix_instrument`, lancements 25 à 27). Si le signe change, le profil de Δ du bot fort n'est lisible qu'avec deux politiques de suites.
+- **V0.4rd : le rêve disputé, joué par le bot fort, redevient un rêve dominant.** Rêver l'emporte dans 50 % des situations et défendre dans 2 %. La forêt remonte à 90 %, et la partie finit par le sommeil au tour 3,7 dans 81 % des cas : c'est le régime de la V0.3. Le tir à la corde et le cauchemar se produisent 0,16 fois par partie avec le bot fort, contre 1,35 avec la bibliothèque. Le bot fort court au sommeil avant que le cauchemar ait le temps de jouer. La campagne 21 (ligne de base sur la V0.4rd) dit la même chose : 87,5 %, tour 4,0, sommeil 67 %. **Cet indice pèse contre l'adoption du rêve disputé dans ses réglages actuels** (étape 3 ter d'ETAT.md). Il désigne aussi les leviers à essayer : moins de lunes, ou un cauchemar plus fort.
+
+**Les autres choix.**
+- *Saboter ou barrer* en V0.4 est le choix le plus proche d'un vrai choix. Chaque option gagne nettement dans une part notable des situations (24 % et 14 %), et une seule règle lisible bat le hasard de 16 points : « saboter si la menace maximale de l'étape est faible, barrer sinon ». Un deuxième indice n'ajoute rien. Ce choix est lisible, mais il n'offre pas encore de profondeur.
+- *Moitié haute ou basse* est indifférente partout (82 à 88 % de situations neutres). Cela confirme le constat des « choix morts » : la plupart des pouvoirs ne changent pas assez le résultat d'une décision.
+
+**T1 avec le bot fort (mêmes campagnes).** Tir à la corde : 0 (V0.3), 0,22 (V0.4), 0,16 (V0.4rd) ; présage détourné par un rêve : 0,28, 0,09, 0. Les deux mécanismes restent sous le seuil d'alerte pour le bot fort, y compris avec le cauchemar.
 
 ## 4. Ce qui reste (étape 3 quater, d)
 - Les fiches du choix.
