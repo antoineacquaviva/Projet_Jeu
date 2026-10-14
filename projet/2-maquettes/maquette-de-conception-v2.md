@@ -2,7 +2,7 @@
 
 > **13 oct. 2026 : la v2 fixée s'appelle désormais V0.3** (`maquettes/v0.3.json`) ; voir le [plan vers la V1](../3-pilotage/plan-vers-v1.md).
 
-*Statut (12 oct. 2026) : propositions de Claude sur les quatre demandes de l'auteur, rangées dans l'« Atelier de la Forêt qui rêve » (artefact HTML : https://claude.ai/artifact/WJiQMwXDJEDwVvAERsDWss ; source : `claude/maquette-html/atelier_v2.html`). La décision 7 (bonus) est tranchée ; les autres restent ouvertes et seront éclairées par la simulation (voir la dernière section). La maquette v1 reste la référence publiée du moteur.*
+*Statut (12 oct. 2026) : propositions de Claude sur les quatre demandes de l'auteur, rangées dans l'« Atelier de la Forêt qui rêve » (artefact HTML : https://claude.ai/artifact/WJiQMwXDJEDwVvAERsDWss ; source : `claude/maquette-html/atelier_v2.html`). **Toutes les décisions (D1 à D9) ont été tranchées le 13 oct. 2026** après le diagnostic de la phase 3 (voir la section « Décision de l'auteur du 13 oct. » et le [journal des décisions](../3-pilotage/journal-des-decisions.md)). Ce document est conservé pour l'historique des propositions. La maquette v1 reste la référence publiée du moteur.*
 
 ## 1. Le plan du Méchant : deux pistes, « qui » et « où »
 **Demande** : rendre lisibles le mouvement et l'action des Machines ; ajouter une seconde piste 0-5 lue par l'écart des dés, qui apprend comme la première ; le plan combine les deux tuiles.
