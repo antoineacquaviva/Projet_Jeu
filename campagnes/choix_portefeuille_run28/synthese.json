@@ -1,0 +1,3627 @@
+{
+ "meta": {
+  "campagne": "choix_portefeuille",
+  "maquette": {
+   "nom": "v0.3",
+   "variante": "defaut",
+   "herite_de": "v2",
+   "zones": 7,
+   "foret": 21,
+   "machines": 3,
+   "reserve": 2
+  },
+  "moteur": "1.8",
+  "date": "2026-10-14T14:02:38",
+  "parties": 32,
+  "erreurs": 0,
+  "duree_s": 569,
+  "variantes_ignorees": [],
+  "spec": {
+   "nom": "choix_portefeuille",
+   "maquette": "v0.4",
+   "description": "Étape 3 quater c (14 oct. 2026) : le profil de Δ du choix « rêver ou défendre » dépend de la politique des suites (campagnes 22 à 27 : suites qui rêvent une carte par tour → le rêve semble meilleur ; suites qui ne rêvent jamais → le bot ne prend plus de lune et le choix ne se pose plus). Instrument retenu (choix technique) : le bot à portefeuille (MCP64), dont les suites suivent la politique de rêve qu'il juge la meilleure pour la situation. Témoins : v0.3 (rêver doit dominer), v0.4 (défendre doit dominer ou indifférent) ; et v0.4rd.",
+   "blocs": [
+    {
+     "nom": "juge",
+     "variantes": [
+      "defaut"
+     ],
+     "bots": [
+      {
+       "type": "mc",
+       "params": {
+        "budget": 64,
+        "savoir": "soi",
+        "portefeuille": [
+         {
+          "nom": "reve0",
+          "type": "glouton",
+          "params": {
+           "reves_par_tour": 0.0
+          }
+         },
+         {
+          "nom": "reve05",
+          "type": "glouton",
+          "params": {
+           "reves_par_tour": 0.5
+          }
+         },
+         {
+          "nom": "reve1",
+          "type": "glouton",
+          "params": {
+           "reves_par_tour": 1.0
+          }
+         },
+         {
+          "nom": "reve1_sommeil",
+          "type": "glouton",
+          "params": {
+           "reves_par_tour": 1.0,
+           "voie": "sommeil"
+          }
+         },
+         {
+          "nom": "reve1_reveil",
+          "type": "glouton",
+          "params": {
+           "reves_par_tour": 1.0,
+           "voie": "reveil"
+          }
+         }
+        ],
+        "juger": 0.25
+       }
+      }
+     ],
+     "tables": [
+      {
+       "liste": [
+        [
+         "humains",
+         "entites"
+        ],
+        [
+         "reptiles",
+         "humains"
+        ],
+        [
+         "oiseaux",
+         "mammiferes"
+        ],
+        [
+         "insectes",
+         "entites"
+        ],
+        [
+         "mammiferes",
+         "insectes"
+        ],
+        [
+         "mammiferes",
+         "reptiles"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "humains"
+        ],
+        [
+         "reptiles",
+         "insectes",
+         "entites"
+        ],
+        [
+         "mammiferes",
+         "reptiles",
+         "insectes"
+        ],
+        [
+         "oiseaux",
+         "insectes",
+         "entites"
+        ],
+        [
+         "reptiles",
+         "insectes",
+         "humains",
+         "entites"
+        ],
+        [
+         "mammiferes",
+         "reptiles",
+         "humains",
+         "entites"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "insectes",
+         "entites"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "reptiles",
+         "humains",
+         "entites"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "reptiles",
+         "insectes",
+         "entites"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "reptiles",
+         "insectes",
+         "humains",
+         "entites"
+        ]
+       ],
+       "parties": 2
+      }
+     ]
+    }
+   ]
+  },
+  "lots": 16,
+  "duree_cumulee_coeurs_s": 16977,
+  "parties_par_s_par_coeur": 0.0
+ },
+ "campagnes": {
+  "juge": {
+   "parties": 32,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 50.0,
+    "sommeil": 34.4,
+    "reveil": 15.6
+   },
+   "tour_fin_moyen": 4.844,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "3": 7,
+    "4": 7,
+    "5": 2,
+    "6": 16
+   },
+   "foret_moyenne": 19.375,
+   "foret_initiale": 21,
+   "foret_pct": 92.3,
+   "foret_pct_ic95": 1.91,
+   "resultat_pct": 92.3,
+   "cartes_en_reve_moy": 3.281,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.719,
+   "ordres_reussis_pct": 31.9,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 53.1,
+     "par_partie": 0.781
+    },
+    "ordre_contre_immobile": {
+     "pct_parties": 46.9,
+     "par_partie": 0.656
+    },
+    "unir_sans_hote": {
+     "pct_parties": 3.1,
+     "par_partie": 0.031
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.969,
+    "apprentissage_sans_mouvement": 1.688,
+    "bloquee_par_barrage": 6.125,
+    "cercle_carte": 0.906,
+    "cercle_egarer": 0.031,
+    "echanges_piste": 11.562,
+    "echanges_piste_machines": 9.688,
+    "echec_bloque_par_esprit": 0.25,
+    "embuscades": 6.0,
+    "entrees": 1.562,
+    "esprits_carte": 2.375,
+    "esprits_egarer": 0.094,
+    "immobilisations": 0.531,
+    "lunes_prises": 4.656,
+    "lunes_reprises": 0.469,
+    "machines_egarees": 0.125,
+    "machines_hs": 0.781,
+    "ordres": 11.656,
+    "ordres_echoues": 7.938,
+    "ordres_hantes": 1.031,
+    "ordres_reussis": 3.719,
+    "organes_neutralises": 2.25,
+    "oubli_tactique": 0.625,
+    "portefeuille_reve0": 9.75,
+    "portefeuille_reve05": 1.875,
+    "portefeuille_reve1": 7.594,
+    "portefeuille_reve1_reveil": 0.125,
+    "portefeuille_reve1_sommeil": 0.406,
+    "pouvoir_hanter": 1.031,
+    "presage_deja_vu": 0.625,
+    "presage_detourne": 0.062,
+    "presages": 4.219,
+    "remorquages": 0.531,
+    "reves_tires": 0.344,
+    "rondes_conseil": 4.844,
+    "sabotage_sans_allie": 0.062,
+    "tenir_zones": 6.344,
+    "traces_posees": 16.281,
+    "tromperies": 0.719,
+    "voir": 2.344,
+    "voir_detourne": 0.406,
+    "zones_rasees": 0.25
+   },
+   "decisions_par_partie": {
+    "action": 9.84,
+    "aller": 16.53,
+    "embuscade": 6.0,
+    "hote": 1.53,
+    "lune": 28.53,
+    "parler": 0.03,
+    "pouvoir": 1.59,
+    "presence": 9.75,
+    "programmer_carte": 47.12,
+    "programmer_mode": 23.75,
+    "reve": 3.41,
+    "trace": 65.56,
+    "tromper": 1.78,
+    "voir": 6.38
+   },
+   "decisions_forcees_pct": {
+    "action": 1.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 312,
+     "pris": 238,
+     "taux": 76.3
+    },
+    "action:saboter": {
+     "offert": 262,
+     "pris": 74,
+     "taux": 28.2
+    },
+    "aller": {
+     "offert": 529,
+     "pris": 221,
+     "taux": 41.8
+    },
+    "embuscade:aller": {
+     "offert": 192,
+     "pris": 25,
+     "taux": 13.0
+    },
+    "embuscade:barrer": {
+     "offert": 192,
+     "pris": 150,
+     "taux": 78.1
+    },
+    "embuscade:immobiliser": {
+     "offert": 135,
+     "pris": 17,
+     "taux": 12.6
+    },
+    "moitie:attendre": {
+     "offert": 221,
+     "pris": 194,
+     "taux": 87.8
+    },
+    "moitie:egarer": {
+     "offert": 120,
+     "pris": 34,
+     "taux": 28.3
+    },
+    "moitie:enrayer": {
+     "offert": 102,
+     "pris": 26,
+     "taux": 25.5
+    },
+    "moitie:hanter": {
+     "offert": 120,
+     "pris": 61,
+     "taux": 50.8
+    },
+    "moitie:parler": {
+     "offert": 100,
+     "pris": 17,
+     "taux": 17.0
+    },
+    "moitie:renverser": {
+     "offert": 169,
+     "pris": 73,
+     "taux": 43.2
+    },
+    "moitie:s_unir": {
+     "offert": 102,
+     "pris": 49,
+     "taux": 48.0
+    },
+    "moitie:se_fondre": {
+     "offert": 221,
+     "pris": 22,
+     "taux": 10.0
+    },
+    "moitie:tenir": {
+     "offert": 169,
+     "pris": 77,
+     "taux": 45.6
+    },
+    "moitie:tromper": {
+     "offert": 100,
+     "pris": 66,
+     "taux": 66.0
+    },
+    "moitie:voir": {
+     "offert": 252,
+     "pris": 110,
+     "taux": 43.7
+    },
+    "moitie:voler": {
+     "offert": 48,
+     "pris": 1,
+     "taux": 2.1
+    },
+    "pouvoir:hanter": {
+     "offert": 51,
+     "pris": 33,
+     "taux": 64.7
+    },
+    "pouvoir:parler": {
+     "offert": 1,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 49,
+     "pris": 8,
+     "taux": 16.3
+    },
+    "pouvoir:tromper": {
+     "offert": 57,
+     "pris": 23,
+     "taux": 40.4
+    },
+    "reve": {
+     "offert": 164,
+     "pris": 105,
+     "taux": 64.0
+    }
+   }
+  }
+ },
+ "detail": {
+  "juge | defaut | mc | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}": {
+   "parties": 32,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 50.0,
+    "sommeil": 34.4,
+    "reveil": 15.6
+   },
+   "tour_fin_moyen": 4.844,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "3": 7,
+    "4": 7,
+    "5": 2,
+    "6": 16
+   },
+   "foret_moyenne": 19.375,
+   "foret_initiale": 21,
+   "foret_pct": 92.3,
+   "foret_pct_ic95": 1.91,
+   "resultat_pct": 92.3,
+   "cartes_en_reve_moy": 3.281,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.719,
+   "ordres_reussis_pct": 31.9,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 53.1,
+     "par_partie": 0.781
+    },
+    "ordre_contre_immobile": {
+     "pct_parties": 46.9,
+     "par_partie": 0.656
+    },
+    "unir_sans_hote": {
+     "pct_parties": 3.1,
+     "par_partie": 0.031
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.969,
+    "apprentissage_sans_mouvement": 1.688,
+    "bloquee_par_barrage": 6.125,
+    "cercle_carte": 0.906,
+    "cercle_egarer": 0.031,
+    "echanges_piste": 11.562,
+    "echanges_piste_machines": 9.688,
+    "echec_bloque_par_esprit": 0.25,
+    "embuscades": 6.0,
+    "entrees": 1.562,
+    "esprits_carte": 2.375,
+    "esprits_egarer": 0.094,
+    "immobilisations": 0.531,
+    "lunes_prises": 4.656,
+    "lunes_reprises": 0.469,
+    "machines_egarees": 0.125,
+    "machines_hs": 0.781,
+    "ordres": 11.656,
+    "ordres_echoues": 7.938,
+    "ordres_hantes": 1.031,
+    "ordres_reussis": 3.719,
+    "organes_neutralises": 2.25,
+    "oubli_tactique": 0.625,
+    "portefeuille_reve0": 9.75,
+    "portefeuille_reve05": 1.875,
+    "portefeuille_reve1": 7.594,
+    "portefeuille_reve1_reveil": 0.125,
+    "portefeuille_reve1_sommeil": 0.406,
+    "pouvoir_hanter": 1.031,
+    "presage_deja_vu": 0.625,
+    "presage_detourne": 0.062,
+    "presages": 4.219,
+    "remorquages": 0.531,
+    "reves_tires": 0.344,
+    "rondes_conseil": 4.844,
+    "sabotage_sans_allie": 0.062,
+    "tenir_zones": 6.344,
+    "traces_posees": 16.281,
+    "tromperies": 0.719,
+    "voir": 2.344,
+    "voir_detourne": 0.406,
+    "zones_rasees": 0.25
+   },
+   "decisions_par_partie": {
+    "action": 9.84,
+    "aller": 16.53,
+    "embuscade": 6.0,
+    "hote": 1.53,
+    "lune": 28.53,
+    "parler": 0.03,
+    "pouvoir": 1.59,
+    "presence": 9.75,
+    "programmer_carte": 47.12,
+    "programmer_mode": 23.75,
+    "reve": 3.41,
+    "trace": 65.56,
+    "tromper": 1.78,
+    "voir": 6.38
+   },
+   "decisions_forcees_pct": {
+    "action": 1.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 312,
+     "pris": 238,
+     "taux": 76.3
+    },
+    "action:saboter": {
+     "offert": 262,
+     "pris": 74,
+     "taux": 28.2
+    },
+    "aller": {
+     "offert": 529,
+     "pris": 221,
+     "taux": 41.8
+    },
+    "embuscade:aller": {
+     "offert": 192,
+     "pris": 25,
+     "taux": 13.0
+    },
+    "embuscade:barrer": {
+     "offert": 192,
+     "pris": 150,
+     "taux": 78.1
+    },
+    "embuscade:immobiliser": {
+     "offert": 135,
+     "pris": 17,
+     "taux": 12.6
+    },
+    "moitie:attendre": {
+     "offert": 221,
+     "pris": 194,
+     "taux": 87.8
+    },
+    "moitie:egarer": {
+     "offert": 120,
+     "pris": 34,
+     "taux": 28.3
+    },
+    "moitie:enrayer": {
+     "offert": 102,
+     "pris": 26,
+     "taux": 25.5
+    },
+    "moitie:hanter": {
+     "offert": 120,
+     "pris": 61,
+     "taux": 50.8
+    },
+    "moitie:parler": {
+     "offert": 100,
+     "pris": 17,
+     "taux": 17.0
+    },
+    "moitie:renverser": {
+     "offert": 169,
+     "pris": 73,
+     "taux": 43.2
+    },
+    "moitie:s_unir": {
+     "offert": 102,
+     "pris": 49,
+     "taux": 48.0
+    },
+    "moitie:se_fondre": {
+     "offert": 221,
+     "pris": 22,
+     "taux": 10.0
+    },
+    "moitie:tenir": {
+     "offert": 169,
+     "pris": 77,
+     "taux": 45.6
+    },
+    "moitie:tromper": {
+     "offert": 100,
+     "pris": 66,
+     "taux": 66.0
+    },
+    "moitie:voir": {
+     "offert": 252,
+     "pris": 110,
+     "taux": 43.7
+    },
+    "moitie:voler": {
+     "offert": 48,
+     "pris": 1,
+     "taux": 2.1
+    },
+    "pouvoir:hanter": {
+     "offert": 51,
+     "pris": 33,
+     "taux": 64.7
+    },
+    "pouvoir:parler": {
+     "offert": 1,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 49,
+     "pris": 8,
+     "taux": 16.3
+    },
+    "pouvoir:tromper": {
+     "offert": 57,
+     "pris": 23,
+     "taux": 40.4
+    },
+    "reve": {
+     "offert": 164,
+     "pris": 105,
+     "taux": 64.0
+    }
+   }
+  }
+ },
+ "par_peuples": {
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 50.0,
+    "reveil": 50.0
+   },
+   "tour_fin_moyen": 4.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "3": 1,
+    "5": 1
+   },
+   "foret_moyenne": 18.0,
+   "foret_initiale": 21,
+   "foret_pct": 85.7,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 85.7,
+   "cartes_en_reve_moy": 5.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 80.0,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.5,
+    "apprentissage_sans_mouvement": 1.5,
+    "bloquee_par_barrage": 1.5,
+    "cercle_carte": 3.0,
+    "echanges_piste": 8.5,
+    "echanges_piste_machines": 6.0,
+    "entrees": 2.5,
+    "esprits_carte": 2.5,
+    "esprits_egarer": 0.5,
+    "lunes_prises": 8.5,
+    "machines_egarees": 0.5,
+    "machines_hs": 1.0,
+    "ordres": 7.5,
+    "ordres_echoues": 1.5,
+    "ordres_hantes": 1.5,
+    "ordres_reussis": 6.0,
+    "organes_neutralises": 2.5,
+    "oubli_tactique": 0.5,
+    "portefeuille_reve1": 8.5,
+    "portefeuille_reve1_sommeil": 1.5,
+    "pouvoir_hanter": 1.5,
+    "presages": 4.0,
+    "remorquages": 0.5,
+    "rondes_conseil": 4.0,
+    "traces_posees": 8.0,
+    "tromperies": 0.5,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 9.0,
+    "aller": 13.5,
+    "lune": 24.0,
+    "parler": 0.5,
+    "pouvoir": 1.5,
+    "presence": 6.0,
+    "programmer_carte": 24.0,
+    "programmer_mode": 19.0,
+    "reve": 6.0,
+    "trace": 32.0,
+    "tromper": 3.5
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 18,
+     "pris": 13,
+     "taux": 72.2
+    },
+    "action:saboter": {
+     "offert": 16,
+     "pris": 5,
+     "taux": 31.2
+    },
+    "aller": {
+     "offert": 27,
+     "pris": 9,
+     "taux": 33.3
+    },
+    "moitie:egarer": {
+     "offert": 18,
+     "pris": 7,
+     "taux": 38.9
+    },
+    "moitie:hanter": {
+     "offert": 18,
+     "pris": 6,
+     "taux": 33.3
+    },
+    "moitie:parler": {
+     "offert": 20,
+     "pris": 6,
+     "taux": 30.0
+    },
+    "moitie:tromper": {
+     "offert": 20,
+     "pris": 8,
+     "taux": 40.0
+    },
+    "pouvoir:hanter": {
+     "offert": 3,
+     "pris": 3,
+     "taux": 100.0
+    },
+    "pouvoir:parler": {
+     "offert": 1,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:tromper": {
+     "offert": 7,
+     "pris": 1,
+     "taux": 14.3
+    },
+    "reve": {
+     "offert": 25,
+     "pris": 11,
+     "taux": 44.0
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"reptiles\", \"humains\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 50.0,
+    "nuit": 50.0
+   },
+   "tour_fin_moyen": 5.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "4": 1,
+    "6": 1
+   },
+   "foret_moyenne": 18.5,
+   "foret_initiale": 21,
+   "foret_pct": 88.1,
+   "foret_pct_ic95": 14.0,
+   "resultat_pct": 88.1,
+   "cartes_en_reve_moy": 3.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 26.9,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 2.0
+    },
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 2.0
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 2.0,
+    "apprentissage_sans_mouvement": 2.0,
+    "bloquee_par_barrage": 5.5,
+    "echanges_piste": 13.5,
+    "echanges_piste_machines": 11.0,
+    "embuscades": 9.5,
+    "entrees": 1.0,
+    "esprits_carte": 3.0,
+    "immobilisations": 1.0,
+    "lunes_prises": 3.0,
+    "ordres": 13.0,
+    "ordres_echoues": 9.5,
+    "ordres_reussis": 3.5,
+    "oubli_tactique": 0.5,
+    "portefeuille_reve0": 8.5,
+    "portefeuille_reve1": 2.5,
+    "portefeuille_reve1_sommeil": 1.0,
+    "presages": 5.0,
+    "reves_tires": 0.5,
+    "rondes_conseil": 5.0,
+    "traces_posees": 10.0,
+    "tromperies": 3.0,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 4.5,
+    "aller": 7.5,
+    "embuscade": 9.5,
+    "lune": 16.0,
+    "presence": 6.0,
+    "programmer_carte": 30.0,
+    "programmer_mode": 20.0,
+    "reve": 3.0,
+    "trace": 40.0,
+    "tromper": 4.5
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 9,
+     "pris": 9,
+     "taux": 100.0
+    },
+    "action:saboter": {
+     "offert": 4,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "aller": {
+     "offert": 15,
+     "pris": 6,
+     "taux": 40.0
+    },
+    "embuscade:aller": {
+     "offert": 19,
+     "pris": 4,
+     "taux": 21.1
+    },
+    "embuscade:barrer": {
+     "offert": 19,
+     "pris": 13,
+     "taux": 68.4
+    },
+    "embuscade:immobiliser": {
+     "offert": 12,
+     "pris": 2,
+     "taux": 16.7
+    },
+    "moitie:attendre": {
+     "offert": 26,
+     "pris": 19,
+     "taux": 73.1
+    },
+    "moitie:parler": {
+     "offert": 14,
+     "pris": 2,
+     "taux": 14.3
+    },
+    "moitie:se_fondre": {
+     "offert": 26,
+     "pris": 4,
+     "taux": 15.4
+    },
+    "moitie:tromper": {
+     "offert": 14,
+     "pris": 9,
+     "taux": 64.3
+    },
+    "pouvoir:tromper": {
+     "offert": 9,
+     "pris": 6,
+     "taux": 66.7
+    },
+    "reve": {
+     "offert": 8,
+     "pris": 6,
+     "taux": 75.0
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 50.0,
+    "reveil": 50.0
+   },
+   "tour_fin_moyen": 4.5,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "3": 1,
+    "6": 1
+   },
+   "foret_moyenne": 19.5,
+   "foret_initiale": 21,
+   "foret_pct": 92.9,
+   "foret_pct_ic95": 4.67,
+   "resultat_pct": 92.9,
+   "cartes_en_reve_moy": 4.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.0,
+   "ordres_reussis_pct": 26.1,
+   "lacunes": {},
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.5,
+    "apprentissage_sans_mouvement": 1.5,
+    "bloquee_par_barrage": 6.5,
+    "cercle_carte": 3.0,
+    "echanges_piste": 10.5,
+    "echanges_piste_machines": 10.0,
+    "entrees": 1.5,
+    "esprits_carte": 1.5,
+    "lunes_prises": 4.5,
+    "machines_hs": 0.5,
+    "ordres": 11.5,
+    "ordres_echoues": 8.5,
+    "ordres_reussis": 3.0,
+    "organes_neutralises": 1.5,
+    "oubli_tactique": 1.0,
+    "portefeuille_reve0": 2.0,
+    "portefeuille_reve05": 1.0,
+    "portefeuille_reve1": 7.5,
+    "portefeuille_reve1_sommeil": 0.5,
+    "presage_deja_vu": 3.0,
+    "presages": 1.5,
+    "reves_tires": 0.5,
+    "rondes_conseil": 4.5,
+    "tenir_zones": 11.5,
+    "traces_posees": 8.5,
+    "voir": 8.0,
+    "voir_detourne": 1.5,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 8.5,
+    "aller": 16.0,
+    "lune": 18.0,
+    "presence": 6.0,
+    "programmer_carte": 19.0,
+    "programmer_mode": 12.5,
+    "reve": 4.5,
+    "trace": 35.0,
+    "voir": 13.5
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 17,
+     "pris": 14,
+     "taux": 82.4
+    },
+    "action:saboter": {
+     "offert": 11,
+     "pris": 3,
+     "taux": 27.3
+    },
+    "aller": {
+     "offert": 32,
+     "pris": 15,
+     "taux": 46.9
+    },
+    "moitie:renverser": {
+     "offert": 19,
+     "pris": 5,
+     "taux": 26.3
+    },
+    "moitie:tenir": {
+     "offert": 19,
+     "pris": 9,
+     "taux": 47.4
+    },
+    "moitie:voir": {
+     "offert": 33,
+     "pris": 18,
+     "taux": 54.5
+    },
+    "moitie:voler": {
+     "offert": 6,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "reve": {
+     "offert": 9,
+     "pris": 9,
+     "taux": 100.0
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 50.0,
+    "reveil": 50.0
+   },
+   "tour_fin_moyen": 3.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "3": 2
+   },
+   "foret_moyenne": 19.0,
+   "foret_initiale": 21,
+   "foret_pct": 90.5,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 90.5,
+   "cartes_en_reve_moy": 5.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 87.5,
+   "lacunes": {},
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 0.5,
+    "apprentissage_sans_mouvement": 0.5,
+    "cercle_carte": 2.5,
+    "cercle_egarer": 0.5,
+    "echanges_piste": 6.0,
+    "echanges_piste_machines": 3.5,
+    "entrees": 1.5,
+    "esprits_carte": 3.0,
+    "lunes_prises": 6.0,
+    "machines_egarees": 0.5,
+    "machines_hs": 0.5,
+    "ordres": 4.0,
+    "ordres_echoues": 0.5,
+    "ordres_hantes": 2.0,
+    "ordres_reussis": 3.5,
+    "organes_neutralises": 1.5,
+    "oubli_tactique": 0.5,
+    "portefeuille_reve1": 5.5,
+    "portefeuille_reve1_sommeil": 2.5,
+    "pouvoir_hanter": 2.0,
+    "presages": 3.0,
+    "rondes_conseil": 3.0,
+    "traces_posees": 6.0,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 3.5,
+    "aller": 6.5,
+    "hote": 1.0,
+    "lune": 18.0,
+    "pouvoir": 2.0,
+    "presence": 6.0,
+    "programmer_carte": 18.0,
+    "programmer_mode": 12.0,
+    "reve": 6.0,
+    "trace": 24.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 7,
+     "pris": 4,
+     "taux": 57.1
+    },
+    "action:saboter": {
+     "offert": 7,
+     "pris": 3,
+     "taux": 42.9
+    },
+    "aller": {
+     "offert": 13,
+     "pris": 6,
+     "taux": 46.2
+    },
+    "moitie:egarer": {
+     "offert": 13,
+     "pris": 3,
+     "taux": 23.1
+    },
+    "moitie:enrayer": {
+     "offert": 11,
+     "pris": 3,
+     "taux": 27.3
+    },
+    "moitie:hanter": {
+     "offert": 13,
+     "pris": 5,
+     "taux": 38.5
+    },
+    "moitie:s_unir": {
+     "offert": 11,
+     "pris": 2,
+     "taux": 18.2
+    },
+    "pouvoir:hanter": {
+     "offert": 4,
+     "pris": 4,
+     "taux": 100.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 2,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "reve": {
+     "offert": 14,
+     "pris": 11,
+     "taux": 78.6
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"mammiferes\", \"insectes\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "reveil": 100.0
+   },
+   "tour_fin_moyen": 4.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "4": 2
+   },
+   "foret_moyenne": 18.0,
+   "foret_initiale": 21,
+   "foret_pct": 85.7,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 85.7,
+   "cartes_en_reve_moy": 6.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 61.1,
+   "lacunes": {
+    "unir_sans_hote": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    },
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 2.5,
+    "apprentissage_sans_mouvement": 2.5,
+    "bloquee_par_barrage": 3.0,
+    "cercle_carte": 6.0,
+    "echanges_piste": 6.5,
+    "echanges_piste_machines": 6.5,
+    "entrees": 1.5,
+    "lunes_prises": 6.5,
+    "machines_hs": 1.0,
+    "ordres": 9.0,
+    "ordres_echoues": 3.5,
+    "ordres_reussis": 5.5,
+    "organes_neutralises": 2.0,
+    "portefeuille_reve1": 9.5,
+    "portefeuille_reve1_sommeil": 0.5,
+    "presages": 4.0,
+    "remorquages": 1.0,
+    "rondes_conseil": 4.0,
+    "tenir_zones": 10.5,
+    "traces_posees": 8.0,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 5.0,
+    "aller": 10.0,
+    "hote": 4.5,
+    "lune": 21.0,
+    "presence": 6.0,
+    "programmer_carte": 24.0,
+    "programmer_mode": 16.0,
+    "reve": 6.0,
+    "trace": 32.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 10,
+     "pris": 6,
+     "taux": 60.0
+    },
+    "action:saboter": {
+     "offert": 6,
+     "pris": 4,
+     "taux": 66.7
+    },
+    "aller": {
+     "offert": 20,
+     "pris": 10,
+     "taux": 50.0
+    },
+    "moitie:enrayer": {
+     "offert": 16,
+     "pris": 1,
+     "taux": 6.2
+    },
+    "moitie:renverser": {
+     "offert": 16,
+     "pris": 3,
+     "taux": 18.8
+    },
+    "moitie:s_unir": {
+     "offert": 16,
+     "pris": 9,
+     "taux": 56.2
+    },
+    "moitie:tenir": {
+     "offert": 16,
+     "pris": 7,
+     "taux": 43.8
+    },
+    "pouvoir:s_unir": {
+     "offert": 9,
+     "pris": 1,
+     "taux": 11.1
+    },
+    "reve": {
+     "offert": 19,
+     "pris": 12,
+     "taux": 63.2
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"mammiferes\", \"reptiles\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 20.5,
+   "foret_initiale": 21,
+   "foret_pct": 97.6,
+   "foret_pct_ic95": 4.67,
+   "resultat_pct": 97.6,
+   "cartes_en_reve_moy": 0.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 19.4,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 2.0
+    },
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 1.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.5,
+    "apprentissage_sans_mouvement": 2.0,
+    "bloquee_par_barrage": 10.5,
+    "echanges_piste": 16.0,
+    "echanges_piste_machines": 14.5,
+    "embuscades": 13.5,
+    "entrees": 1.5,
+    "immobilisations": 1.0,
+    "machines_hs": 1.5,
+    "ordres": 18.0,
+    "ordres_echoues": 14.5,
+    "ordres_reussis": 3.5,
+    "organes_neutralises": 4.0,
+    "portefeuille_reve0": 13.0,
+    "portefeuille_reve1": 0.5,
+    "portefeuille_reve1_sommeil": 0.5,
+    "presages": 6.0,
+    "remorquages": 1.5,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 15.0,
+    "traces_posees": 11.5
+   },
+   "decisions_par_partie": {
+    "action": 10.5,
+    "aller": 16.0,
+    "embuscade": 13.5,
+    "lune": 12.0,
+    "presence": 6.0,
+    "programmer_carte": 36.0,
+    "programmer_mode": 29.5,
+    "trace": 47.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 21,
+     "pris": 13,
+     "taux": 61.9
+    },
+    "action:saboter": {
+     "offert": 17,
+     "pris": 8,
+     "taux": 47.1
+    },
+    "aller": {
+     "offert": 32,
+     "pris": 11,
+     "taux": 34.4
+    },
+    "embuscade:aller": {
+     "offert": 27,
+     "pris": 1,
+     "taux": 3.7
+    },
+    "embuscade:barrer": {
+     "offert": 27,
+     "pris": 24,
+     "taux": 88.9
+    },
+    "embuscade:immobiliser": {
+     "offert": 20,
+     "pris": 2,
+     "taux": 10.0
+    },
+    "moitie:attendre": {
+     "offert": 31,
+     "pris": 27,
+     "taux": 87.1
+    },
+    "moitie:renverser": {
+     "offert": 28,
+     "pris": 16,
+     "taux": 57.1
+    },
+    "moitie:se_fondre": {
+     "offert": 31,
+     "pris": 4,
+     "taux": 12.9
+    },
+    "moitie:tenir": {
+     "offert": 28,
+     "pris": 12,
+     "taux": 42.9
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"humains\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 100.0
+   },
+   "tour_fin_moyen": 3.5,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "3": 1,
+    "4": 1
+   },
+   "foret_moyenne": 20.0,
+   "foret_initiale": 21,
+   "foret_pct": 95.2,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 95.2,
+   "cartes_en_reve_moy": 6.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 33.3,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 2.0,
+    "apprentissage_sans_mouvement": 0.5,
+    "bloquee_par_barrage": 4.5,
+    "echanges_piste": 11.5,
+    "echanges_piste_machines": 5.5,
+    "echec_bloque_par_esprit": 0.5,
+    "entrees": 1.0,
+    "esprits_carte": 6.0,
+    "lunes_prises": 7.0,
+    "lunes_reprises": 1.0,
+    "machines_hs": 0.5,
+    "ordres": 7.5,
+    "ordres_echoues": 5.0,
+    "ordres_reussis": 2.5,
+    "organes_neutralises": 1.5,
+    "oubli_tactique": 1.0,
+    "portefeuille_reve05": 2.0,
+    "portefeuille_reve1": 11.5,
+    "presage_deja_vu": 2.0,
+    "presages": 1.5,
+    "remorquages": 0.5,
+    "rondes_conseil": 3.5,
+    "tenir_zones": 3.0,
+    "traces_posees": 10.0,
+    "tromperies": 1.0,
+    "voir": 5.0,
+    "voir_detourne": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 7.5,
+    "aller": 12.0,
+    "lune": 28.5,
+    "presence": 9.0,
+    "programmer_carte": 26.5,
+    "programmer_mode": 13.0,
+    "reve": 6.0,
+    "trace": 41.0,
+    "tromper": 3.5,
+    "voir": 10.5
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 15,
+     "pris": 12,
+     "taux": 80.0
+    },
+    "action:saboter": {
+     "offert": 14,
+     "pris": 3,
+     "taux": 21.4
+    },
+    "aller": {
+     "offert": 24,
+     "pris": 9,
+     "taux": 37.5
+    },
+    "moitie:parler": {
+     "offert": 11,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:renverser": {
+     "offert": 11,
+     "pris": 3,
+     "taux": 27.3
+    },
+    "moitie:tenir": {
+     "offert": 11,
+     "pris": 2,
+     "taux": 18.2
+    },
+    "moitie:tromper": {
+     "offert": 11,
+     "pris": 7,
+     "taux": 63.6
+    },
+    "moitie:voir": {
+     "offert": 25,
+     "pris": 12,
+     "taux": 48.0
+    },
+    "moitie:voler": {
+     "offert": 4,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:tromper": {
+     "offert": 7,
+     "pris": 2,
+     "taux": 28.6
+    },
+    "reve": {
+     "offert": 14,
+     "pris": 12,
+     "taux": 85.7
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"reptiles\", \"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 100.0
+   },
+   "tour_fin_moyen": 3.5,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "3": 1,
+    "4": 1
+   },
+   "foret_moyenne": 21.0,
+   "foret_initiale": 21,
+   "foret_pct": 100.0,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 100.0,
+   "cartes_en_reve_moy": 6.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 36.4,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_sans_mouvement": 2.0,
+    "bloquee_par_barrage": 3.0,
+    "echanges_piste": 7.5,
+    "echanges_piste_machines": 5.5,
+    "echec_bloque_par_esprit": 1.0,
+    "embuscades": 5.0,
+    "entrees": 2.0,
+    "esprits_carte": 6.0,
+    "immobilisations": 0.5,
+    "lunes_prises": 7.5,
+    "ordres": 5.5,
+    "ordres_echoues": 3.5,
+    "ordres_hantes": 0.5,
+    "ordres_reussis": 2.0,
+    "oubli_tactique": 1.0,
+    "portefeuille_reve05": 1.5,
+    "portefeuille_reve1": 12.0,
+    "pouvoir_hanter": 0.5,
+    "presage_detourne": 0.5,
+    "presages": 3.5,
+    "reves_tires": 1.5,
+    "rondes_conseil": 3.5,
+    "traces_posees": 10.5
+   },
+   "decisions_par_partie": {
+    "action": 4.0,
+    "aller": 4.0,
+    "embuscade": 5.0,
+    "hote": 1.5,
+    "lune": 28.5,
+    "pouvoir": 1.5,
+    "presence": 9.0,
+    "programmer_carte": 31.5,
+    "programmer_mode": 16.0,
+    "reve": 6.0,
+    "trace": 42.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 8,
+     "pris": 8,
+     "taux": 100.0
+    },
+    "action:saboter": {
+     "offert": 5,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "aller": {
+     "offert": 8,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "embuscade:aller": {
+     "offert": 10,
+     "pris": 1,
+     "taux": 10.0
+    },
+    "embuscade:barrer": {
+     "offert": 10,
+     "pris": 8,
+     "taux": 80.0
+    },
+    "embuscade:immobiliser": {
+     "offert": 6,
+     "pris": 1,
+     "taux": 16.7
+    },
+    "moitie:attendre": {
+     "offert": 15,
+     "pris": 12,
+     "taux": 80.0
+    },
+    "moitie:egarer": {
+     "offert": 8,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:enrayer": {
+     "offert": 9,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:hanter": {
+     "offert": 8,
+     "pris": 3,
+     "taux": 37.5
+    },
+    "moitie:s_unir": {
+     "offert": 9,
+     "pris": 3,
+     "taux": 33.3
+    },
+    "moitie:se_fondre": {
+     "offert": 15,
+     "pris": 2,
+     "taux": 13.3
+    },
+    "pouvoir:hanter": {
+     "offert": 3,
+     "pris": 1,
+     "taux": 33.3
+    },
+    "pouvoir:s_unir": {
+     "offert": 3,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "reve": {
+     "offert": 16,
+     "pris": 12,
+     "taux": 75.0
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"mammiferes\", \"reptiles\", \"insectes\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 19.0,
+   "foret_initiale": 21,
+   "foret_pct": 90.5,
+   "foret_pct_ic95": 9.33,
+   "resultat_pct": 90.5,
+   "cartes_en_reve_moy": 0.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 25.0,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 1.0
+    },
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 1.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.5,
+    "apprentissage_sans_mouvement": 4.0,
+    "bloquee_par_barrage": 10.5,
+    "echanges_piste": 14.0,
+    "echanges_piste_machines": 14.5,
+    "embuscades": 12.0,
+    "entrees": 1.5,
+    "immobilisations": 1.0,
+    "machines_hs": 1.0,
+    "ordres": 18.0,
+    "ordres_echoues": 13.5,
+    "ordres_reussis": 4.5,
+    "organes_neutralises": 3.5,
+    "portefeuille_reve0": 17.5,
+    "portefeuille_reve05": 0.5,
+    "portefeuille_reve1": 3.0,
+    "presages": 6.0,
+    "remorquages": 1.0,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 15.5,
+    "traces_posees": 18.0,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 14.0,
+    "aller": 22.5,
+    "embuscade": 12.0,
+    "hote": 5.5,
+    "lune": 18.0,
+    "presence": 9.0,
+    "programmer_carte": 54.0,
+    "programmer_mode": 36.0,
+    "trace": 72.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 28,
+     "pris": 21,
+     "taux": 75.0
+    },
+    "action:saboter": {
+     "offert": 21,
+     "pris": 7,
+     "taux": 33.3
+    },
+    "aller": {
+     "offert": 45,
+     "pris": 20,
+     "taux": 44.4
+    },
+    "embuscade:aller": {
+     "offert": 24,
+     "pris": 5,
+     "taux": 20.8
+    },
+    "embuscade:barrer": {
+     "offert": 24,
+     "pris": 17,
+     "taux": 70.8
+    },
+    "embuscade:immobiliser": {
+     "offert": 18,
+     "pris": 2,
+     "taux": 11.1
+    },
+    "moitie:attendre": {
+     "offert": 32,
+     "pris": 24,
+     "taux": 75.0
+    },
+    "moitie:enrayer": {
+     "offert": 16,
+     "pris": 5,
+     "taux": 31.2
+    },
+    "moitie:renverser": {
+     "offert": 24,
+     "pris": 13,
+     "taux": 54.2
+    },
+    "moitie:s_unir": {
+     "offert": 16,
+     "pris": 11,
+     "taux": 68.8
+    },
+    "moitie:se_fondre": {
+     "offert": 32,
+     "pris": 8,
+     "taux": 25.0
+    },
+    "moitie:tenir": {
+     "offert": 24,
+     "pris": 11,
+     "taux": 45.8
+    },
+    "pouvoir:s_unir": {
+     "offert": 11,
+     "pris": 3,
+     "taux": 27.3
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"oiseaux\", \"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 100.0
+   },
+   "tour_fin_moyen": 4.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "4": 2
+   },
+   "foret_moyenne": 20.0,
+   "foret_initiale": 21,
+   "foret_pct": 95.2,
+   "foret_pct_ic95": 9.33,
+   "resultat_pct": 95.2,
+   "cartes_en_reve_moy": 5.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 29.4,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 1.0
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.0,
+    "apprentissage_sans_mouvement": 2.5,
+    "bloquee_par_barrage": 6.0,
+    "echanges_piste": 11.0,
+    "echanges_piste_machines": 7.5,
+    "entrees": 1.5,
+    "esprits_carte": 5.5,
+    "esprits_egarer": 0.5,
+    "lunes_prises": 8.0,
+    "lunes_reprises": 1.5,
+    "machines_egarees": 0.5,
+    "machines_hs": 0.5,
+    "ordres": 8.5,
+    "ordres_echoues": 6.0,
+    "ordres_hantes": 0.5,
+    "ordres_reussis": 2.5,
+    "organes_neutralises": 1.0,
+    "oubli_tactique": 1.0,
+    "portefeuille_reve1": 15.0,
+    "pouvoir_hanter": 0.5,
+    "presage_deja_vu": 1.0,
+    "presages": 3.0,
+    "rondes_conseil": 4.0,
+    "traces_posees": 11.0,
+    "voir": 5.0,
+    "voir_detourne": 1.5
+   },
+   "decisions_par_partie": {
+    "action": 9.5,
+    "aller": 15.0,
+    "hote": 2.5,
+    "lune": 33.0,
+    "pouvoir": 0.5,
+    "presence": 9.0,
+    "programmer_carte": 31.0,
+    "programmer_mode": 15.5,
+    "reve": 6.0,
+    "trace": 46.0,
+    "voir": 12.0
+   },
+   "decisions_forcees_pct": {
+    "action": 5.3,
+    "aller": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 18,
+     "pris": 16,
+     "taux": 88.9
+    },
+    "action:saboter": {
+     "offert": 15,
+     "pris": 2,
+     "taux": 13.3
+    },
+    "aller": {
+     "offert": 30,
+     "pris": 11,
+     "taux": 36.7
+    },
+    "moitie:egarer": {
+     "offert": 12,
+     "pris": 7,
+     "taux": 58.3
+    },
+    "moitie:enrayer": {
+     "offert": 12,
+     "pris": 2,
+     "taux": 16.7
+    },
+    "moitie:hanter": {
+     "offert": 12,
+     "pris": 1,
+     "taux": 8.3
+    },
+    "moitie:s_unir": {
+     "offert": 12,
+     "pris": 5,
+     "taux": 41.7
+    },
+    "moitie:voir": {
+     "offert": 31,
+     "pris": 15,
+     "taux": 48.4
+    },
+    "moitie:voler": {
+     "offert": 7,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:hanter": {
+     "offert": 1,
+     "pris": 1,
+     "taux": 100.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 5,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "reve": {
+     "offert": 18,
+     "pris": 11,
+     "taux": 61.1
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"reptiles\", \"insectes\", \"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 17.5,
+   "foret_initiale": 21,
+   "foret_pct": 83.3,
+   "foret_pct_ic95": 4.67,
+   "resultat_pct": 83.3,
+   "cartes_en_reve_moy": 3.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 3.5,
+   "ordres_reussis_pct": 40.0,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 1.5
+    },
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 1.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.5,
+    "apprentissage_sans_mouvement": 1.0,
+    "bloquee_par_barrage": 6.0,
+    "echanges_piste": 13.5,
+    "echanges_piste_machines": 11.5,
+    "echec_bloque_par_esprit": 2.0,
+    "embuscades": 12.0,
+    "entrees": 2.0,
+    "esprits_carte": 3.0,
+    "immobilisations": 1.5,
+    "lunes_prises": 7.5,
+    "machines_hs": 0.5,
+    "ordres": 15.0,
+    "ordres_echoues": 9.0,
+    "ordres_hantes": 2.5,
+    "ordres_reussis": 6.0,
+    "organes_neutralises": 2.0,
+    "oubli_tactique": 1.5,
+    "portefeuille_reve0": 9.5,
+    "portefeuille_reve05": 6.0,
+    "portefeuille_reve1": 12.0,
+    "portefeuille_reve1_reveil": 0.5,
+    "pouvoir_hanter": 2.5,
+    "presage_detourne": 0.5,
+    "presages": 6.0,
+    "remorquages": 0.5,
+    "reves_tires": 0.5,
+    "rondes_conseil": 6.0,
+    "sabotage_sans_allie": 0.5,
+    "traces_posees": 24.0,
+    "tromperies": 3.0
+   },
+   "decisions_par_partie": {
+    "action": 11.5,
+    "aller": 21.0,
+    "embuscade": 12.0,
+    "hote": 2.0,
+    "lune": 44.0,
+    "pouvoir": 5.0,
+    "presence": 12.0,
+    "programmer_carte": 71.5,
+    "programmer_mode": 37.0,
+    "reve": 3.0,
+    "trace": 96.0,
+    "tromper": 5.5
+   },
+   "decisions_forcees_pct": {
+    "action": 4.3,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 22,
+     "pris": 17,
+     "taux": 77.3
+    },
+    "action:saboter": {
+     "offert": 22,
+     "pris": 5,
+     "taux": 22.7
+    },
+    "aller": {
+     "offert": 42,
+     "pris": 21,
+     "taux": 50.0
+    },
+    "embuscade:aller": {
+     "offert": 24,
+     "pris": 5,
+     "taux": 20.8
+    },
+    "embuscade:barrer": {
+     "offert": 24,
+     "pris": 16,
+     "taux": 66.7
+    },
+    "embuscade:immobiliser": {
+     "offert": 14,
+     "pris": 3,
+     "taux": 21.4
+    },
+    "moitie:attendre": {
+     "offert": 26,
+     "pris": 24,
+     "taux": 92.3
+    },
+    "moitie:egarer": {
+     "offert": 19,
+     "pris": 5,
+     "taux": 26.3
+    },
+    "moitie:enrayer": {
+     "offert": 9,
+     "pris": 5,
+     "taux": 55.6
+    },
+    "moitie:hanter": {
+     "offert": 19,
+     "pris": 12,
+     "taux": 63.2
+    },
+    "moitie:parler": {
+     "offert": 20,
+     "pris": 3,
+     "taux": 15.0
+    },
+    "moitie:s_unir": {
+     "offert": 9,
+     "pris": 4,
+     "taux": 44.4
+    },
+    "moitie:se_fondre": {
+     "offert": 26,
+     "pris": 1,
+     "taux": 3.8
+    },
+    "moitie:tromper": {
+     "offert": 20,
+     "pris": 14,
+     "taux": 70.0
+    },
+    "pouvoir:hanter": {
+     "offert": 10,
+     "pris": 5,
+     "taux": 50.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 4,
+     "pris": 2,
+     "taux": 50.0
+    },
+    "pouvoir:tromper": {
+     "offert": 11,
+     "pris": 6,
+     "taux": 54.5
+    },
+    "reve": {
+     "offert": 11,
+     "pris": 6,
+     "taux": 54.5
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"mammiferes\", \"reptiles\", \"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 20.0,
+   "foret_initiale": 21,
+   "foret_pct": 95.2,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 95.2,
+   "cartes_en_reve_moy": 0.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.5,
+   "ordres_reussis_pct": 26.7,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 1.0
+    },
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 1.0
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.5,
+    "apprentissage_sans_mouvement": 1.5,
+    "bloquee_par_barrage": 8.0,
+    "echanges_piste": 13.0,
+    "echanges_piste_machines": 11.5,
+    "echec_bloque_par_esprit": 0.5,
+    "embuscades": 12.5,
+    "entrees": 1.5,
+    "esprits_carte": 0.5,
+    "immobilisations": 1.0,
+    "lunes_prises": 1.0,
+    "machines_hs": 1.5,
+    "ordres": 15.0,
+    "ordres_echoues": 11.0,
+    "ordres_hantes": 2.5,
+    "ordres_reussis": 4.0,
+    "organes_neutralises": 3.5,
+    "oubli_tactique": 0.5,
+    "portefeuille_reve0": 21.5,
+    "portefeuille_reve05": 3.0,
+    "portefeuille_reve1": 3.5,
+    "pouvoir_hanter": 2.5,
+    "presages": 6.0,
+    "remorquages": 1.5,
+    "reves_tires": 0.5,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 16.5,
+    "traces_posees": 24.0,
+    "tromperies": 1.5
+   },
+   "decisions_par_partie": {
+    "action": 13.5,
+    "aller": 21.5,
+    "embuscade": 12.5,
+    "lune": 28.0,
+    "pouvoir": 3.0,
+    "presence": 12.0,
+    "programmer_carte": 72.0,
+    "programmer_mode": 34.5,
+    "reve": 0.5,
+    "trace": 96.0,
+    "tromper": 4.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 27,
+     "pris": 20,
+     "taux": 74.1
+    },
+    "action:saboter": {
+     "offert": 25,
+     "pris": 7,
+     "taux": 28.0
+    },
+    "aller": {
+     "offert": 43,
+     "pris": 16,
+     "taux": 37.2
+    },
+    "embuscade:aller": {
+     "offert": 25,
+     "pris": 2,
+     "taux": 8.0
+    },
+    "embuscade:barrer": {
+     "offert": 25,
+     "pris": 21,
+     "taux": 84.0
+    },
+    "embuscade:immobiliser": {
+     "offert": 16,
+     "pris": 2,
+     "taux": 12.5
+    },
+    "moitie:attendre": {
+     "offert": 26,
+     "pris": 25,
+     "taux": 96.2
+    },
+    "moitie:egarer": {
+     "offert": 10,
+     "pris": 3,
+     "taux": 30.0
+    },
+    "moitie:hanter": {
+     "offert": 10,
+     "pris": 7,
+     "taux": 70.0
+    },
+    "moitie:parler": {
+     "offert": 14,
+     "pris": 4,
+     "taux": 28.6
+    },
+    "moitie:renverser": {
+     "offert": 19,
+     "pris": 7,
+     "taux": 36.8
+    },
+    "moitie:se_fondre": {
+     "offert": 26,
+     "pris": 1,
+     "taux": 3.8
+    },
+    "moitie:tenir": {
+     "offert": 19,
+     "pris": 12,
+     "taux": 63.2
+    },
+    "moitie:tromper": {
+     "offert": 14,
+     "pris": 9,
+     "taux": 64.3
+    },
+    "pouvoir:hanter": {
+     "offert": 6,
+     "pris": 5,
+     "taux": 83.3
+    },
+    "pouvoir:tromper": {
+     "offert": 8,
+     "pris": 3,
+     "taux": 37.5
+    },
+    "reve": {
+     "offert": 3,
+     "pris": 1,
+     "taux": 33.3
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 100.0
+   },
+   "tour_fin_moyen": 4.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "3": 1,
+    "5": 1
+   },
+   "foret_moyenne": 20.0,
+   "foret_initiale": 21,
+   "foret_pct": 95.2,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 95.2,
+   "cartes_en_reve_moy": 5.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 40.0,
+   "lacunes": {},
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.0,
+    "apprentissage_sans_mouvement": 1.0,
+    "bloquee_par_barrage": 4.5,
+    "echanges_piste": 11.5,
+    "echanges_piste_machines": 6.5,
+    "entrees": 1.5,
+    "esprits_carte": 5.5,
+    "esprits_egarer": 0.5,
+    "lunes_prises": 7.5,
+    "lunes_reprises": 3.0,
+    "machines_egarees": 0.5,
+    "machines_hs": 1.0,
+    "ordres": 7.5,
+    "ordres_echoues": 4.5,
+    "ordres_hantes": 1.5,
+    "ordres_reussis": 3.0,
+    "organes_neutralises": 4.0,
+    "oubli_tactique": 1.0,
+    "portefeuille_reve0": 1.5,
+    "portefeuille_reve05": 5.5,
+    "portefeuille_reve1": 13.0,
+    "pouvoir_hanter": 1.5,
+    "presage_deja_vu": 1.0,
+    "presages": 3.0,
+    "remorquages": 0.5,
+    "rondes_conseil": 4.0,
+    "tenir_zones": 7.0,
+    "traces_posees": 15.5,
+    "voir": 4.5,
+    "voir_detourne": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 8.5,
+    "aller": 18.5,
+    "lune": 40.0,
+    "pouvoir": 2.5,
+    "presence": 12.0,
+    "programmer_carte": 43.5,
+    "programmer_mode": 19.5,
+    "reve": 6.0,
+    "trace": 63.0,
+    "voir": 12.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 17,
+     "pris": 9,
+     "taux": 52.9
+    },
+    "action:saboter": {
+     "offert": 11,
+     "pris": 8,
+     "taux": 72.7
+    },
+    "aller": {
+     "offert": 37,
+     "pris": 20,
+     "taux": 54.1
+    },
+    "moitie:egarer": {
+     "offert": 10,
+     "pris": 2,
+     "taux": 20.0
+    },
+    "moitie:enrayer": {
+     "offert": 9,
+     "pris": 5,
+     "taux": 55.6
+    },
+    "moitie:hanter": {
+     "offert": 10,
+     "pris": 5,
+     "taux": 50.0
+    },
+    "moitie:renverser": {
+     "offert": 14,
+     "pris": 7,
+     "taux": 50.0
+    },
+    "moitie:s_unir": {
+     "offert": 9,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:tenir": {
+     "offert": 14,
+     "pris": 5,
+     "taux": 35.7
+    },
+    "moitie:voir": {
+     "offert": 30,
+     "pris": 13,
+     "taux": 43.3
+    },
+    "moitie:voler": {
+     "offert": 6,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:hanter": {
+     "offert": 5,
+     "pris": 3,
+     "taux": 60.0
+    },
+    "reve": {
+     "offert": 14,
+     "pris": 11,
+     "taux": 78.6
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"reptiles\", \"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 20.0,
+   "foret_initiale": 21,
+   "foret_pct": 95.2,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 95.2,
+   "cartes_en_reve_moy": 0.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.5,
+   "ordres_reussis_pct": 17.2,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    },
+    "ordre_contre_immobile": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.0,
+    "apprentissage_sans_mouvement": 1.0,
+    "bloquee_par_barrage": 10.0,
+    "echanges_piste": 13.5,
+    "echanges_piste_machines": 13.5,
+    "embuscades": 12.0,
+    "entrees": 1.5,
+    "esprits_carte": 0.5,
+    "immobilisations": 0.5,
+    "lunes_prises": 3.5,
+    "machines_hs": 0.5,
+    "ordres": 14.5,
+    "ordres_echoues": 12.0,
+    "ordres_hantes": 2.5,
+    "ordres_reussis": 2.5,
+    "organes_neutralises": 1.0,
+    "oubli_tactique": 0.5,
+    "portefeuille_reve0": 25.5,
+    "portefeuille_reve05": 2.5,
+    "portefeuille_reve1": 7.0,
+    "pouvoir_hanter": 2.5,
+    "presage_deja_vu": 1.5,
+    "presages": 4.5,
+    "reves_tires": 1.0,
+    "rondes_conseil": 6.0,
+    "sabotage_sans_allie": 0.5,
+    "tenir_zones": 4.5,
+    "traces_posees": 29.5,
+    "tromperies": 1.0,
+    "voir": 6.5,
+    "voir_detourne": 1.0,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 16.0,
+    "aller": 26.0,
+    "embuscade": 12.0,
+    "lune": 42.5,
+    "pouvoir": 3.5,
+    "presence": 15.0,
+    "programmer_carte": 83.5,
+    "programmer_mode": 32.0,
+    "reve": 0.5,
+    "trace": 119.0,
+    "tromper": 3.5,
+    "voir": 18.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 32,
+     "pris": 29,
+     "taux": 90.6
+    },
+    "action:saboter": {
+     "offert": 29,
+     "pris": 3,
+     "taux": 10.3
+    },
+    "aller": {
+     "offert": 52,
+     "pris": 20,
+     "taux": 38.5
+    },
+    "embuscade:aller": {
+     "offert": 24,
+     "pris": 4,
+     "taux": 16.7
+    },
+    "embuscade:barrer": {
+     "offert": 24,
+     "pris": 19,
+     "taux": 79.2
+    },
+    "embuscade:immobiliser": {
+     "offert": 16,
+     "pris": 1,
+     "taux": 6.2
+    },
+    "moitie:attendre": {
+     "offert": 24,
+     "pris": 24,
+     "taux": 100.0
+    },
+    "moitie:egarer": {
+     "offert": 13,
+     "pris": 4,
+     "taux": 30.8
+    },
+    "moitie:hanter": {
+     "offert": 13,
+     "pris": 8,
+     "taux": 61.5
+    },
+    "moitie:parler": {
+     "offert": 9,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:renverser": {
+     "offert": 12,
+     "pris": 8,
+     "taux": 66.7
+    },
+    "moitie:se_fondre": {
+     "offert": 24,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:tenir": {
+     "offert": 12,
+     "pris": 4,
+     "taux": 33.3
+    },
+    "moitie:tromper": {
+     "offert": 9,
+     "pris": 9,
+     "taux": 100.0
+    },
+    "moitie:voir": {
+     "offert": 42,
+     "pris": 19,
+     "taux": 45.2
+    },
+    "moitie:voler": {
+     "offert": 6,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:hanter": {
+     "offert": 7,
+     "pris": 5,
+     "taux": 71.4
+    },
+    "pouvoir:tromper": {
+     "offert": 7,
+     "pris": 2,
+     "taux": 28.6
+    },
+    "reve": {
+     "offert": 4,
+     "pris": 1,
+     "taux": 25.0
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"reptiles\", \"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 19.0,
+   "foret_initiale": 21,
+   "foret_pct": 90.5,
+   "foret_pct_ic95": 9.33,
+   "resultat_pct": 90.5,
+   "cartes_en_reve_moy": 0.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.5,
+   "ordres_reussis_pct": 30.0,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 1.5
+    },
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 1.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.0,
+    "apprentissage_sans_mouvement": 2.0,
+    "bloquee_par_barrage": 7.5,
+    "echanges_piste": 13.0,
+    "echanges_piste_machines": 12.0,
+    "embuscades": 10.5,
+    "entrees": 1.5,
+    "esprits_carte": 0.5,
+    "immobilisations": 1.5,
+    "lunes_prises": 2.0,
+    "lunes_reprises": 1.0,
+    "machines_hs": 1.5,
+    "ordres": 15.0,
+    "ordres_echoues": 10.5,
+    "ordres_hantes": 2.5,
+    "ordres_reussis": 4.5,
+    "organes_neutralises": 4.0,
+    "oubli_tactique": 0.5,
+    "portefeuille_reve0": 23.0,
+    "portefeuille_reve05": 3.5,
+    "portefeuille_reve1": 7.5,
+    "portefeuille_reve1_reveil": 1.0,
+    "pouvoir_hanter": 2.5,
+    "presage_deja_vu": 1.5,
+    "presages": 4.5,
+    "remorquages": 1.0,
+    "reves_tires": 0.5,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 11.5,
+    "traces_posees": 30.0,
+    "voir": 5.0,
+    "voir_detourne": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 12.5,
+    "aller": 26.5,
+    "embuscade": 10.5,
+    "hote": 4.0,
+    "lune": 40.0,
+    "pouvoir": 4.5,
+    "presence": 15.0,
+    "programmer_carte": 85.0,
+    "programmer_mode": 33.0,
+    "reve": 0.5,
+    "trace": 120.0,
+    "voir": 18.0
+   },
+   "decisions_forcees_pct": {
+    "action": 4.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 24,
+     "pris": 16,
+     "taux": 66.7
+    },
+    "action:saboter": {
+     "offert": 20,
+     "pris": 8,
+     "taux": 40.0
+    },
+    "aller": {
+     "offert": 53,
+     "pris": 29,
+     "taux": 54.7
+    },
+    "embuscade:aller": {
+     "offert": 21,
+     "pris": 1,
+     "taux": 4.8
+    },
+    "embuscade:barrer": {
+     "offert": 21,
+     "pris": 17,
+     "taux": 81.0
+    },
+    "embuscade:immobiliser": {
+     "offert": 16,
+     "pris": 3,
+     "taux": 18.8
+    },
+    "moitie:attendre": {
+     "offert": 23,
+     "pris": 21,
+     "taux": 91.3
+    },
+    "moitie:egarer": {
+     "offert": 12,
+     "pris": 2,
+     "taux": 16.7
+    },
+    "moitie:enrayer": {
+     "offert": 9,
+     "pris": 1,
+     "taux": 11.1
+    },
+    "moitie:hanter": {
+     "offert": 12,
+     "pris": 10,
+     "taux": 83.3
+    },
+    "moitie:renverser": {
+     "offert": 16,
+     "pris": 7,
+     "taux": 43.8
+    },
+    "moitie:s_unir": {
+     "offert": 9,
+     "pris": 8,
+     "taux": 88.9
+    },
+    "moitie:se_fondre": {
+     "offert": 23,
+     "pris": 2,
+     "taux": 8.7
+    },
+    "moitie:tenir": {
+     "offert": 16,
+     "pris": 9,
+     "taux": 56.2
+    },
+    "moitie:voir": {
+     "offert": 42,
+     "pris": 15,
+     "taux": 35.7
+    },
+    "moitie:voler": {
+     "offert": 6,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:hanter": {
+     "offert": 9,
+     "pris": 5,
+     "taux": 55.6
+    },
+    "pouvoir:s_unir": {
+     "offert": 8,
+     "pris": 1,
+     "taux": 12.5
+    },
+    "reve": {
+     "offert": 4,
+     "pris": 1,
+     "taux": 25.0
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"reptiles\", \"insectes\", \"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 20.0,
+   "foret_initiale": 21,
+   "foret_pct": 95.2,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 95.2,
+   "cartes_en_reve_moy": 0.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.5,
+   "ordres_reussis_pct": 17.6,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    },
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.5,
+    "apprentissage_sans_mouvement": 1.5,
+    "bloquee_par_barrage": 11.0,
+    "echanges_piste": 15.5,
+    "echanges_piste_machines": 15.5,
+    "embuscades": 9.0,
+    "entrees": 1.5,
+    "esprits_carte": 0.5,
+    "immobilisations": 0.5,
+    "lunes_prises": 2.0,
+    "lunes_reprises": 1.0,
+    "machines_hs": 1.0,
+    "ordres": 17.0,
+    "ordres_echoues": 14.0,
+    "ordres_hantes": 0.5,
+    "ordres_reussis": 3.0,
+    "organes_neutralises": 4.0,
+    "oubli_tactique": 0.5,
+    "portefeuille_reve0": 34.0,
+    "portefeuille_reve05": 4.5,
+    "portefeuille_reve1": 3.0,
+    "portefeuille_reve1_reveil": 0.5,
+    "pouvoir_hanter": 0.5,
+    "presages": 6.0,
+    "remorquages": 0.5,
+    "reves_tires": 0.5,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 6.5,
+    "traces_posees": 36.0,
+    "tromperies": 1.5,
+    "voir": 3.5,
+    "voir_detourne": 1.0,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 19.5,
+    "aller": 28.0,
+    "embuscade": 9.0,
+    "hote": 3.5,
+    "lune": 45.0,
+    "pouvoir": 1.5,
+    "presence": 18.0,
+    "programmer_carte": 104.5,
+    "programmer_mode": 34.5,
+    "reve": 0.5,
+    "trace": 144.0,
+    "tromper": 4.0,
+    "voir": 18.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 39,
+     "pris": 31,
+     "taux": 79.5
+    },
+    "action:saboter": {
+     "offert": 39,
+     "pris": 8,
+     "taux": 20.5
+    },
+    "aller": {
+     "offert": 56,
+     "pris": 18,
+     "taux": 32.1
+    },
+    "embuscade:aller": {
+     "offert": 18,
+     "pris": 2,
+     "taux": 11.1
+    },
+    "embuscade:barrer": {
+     "offert": 18,
+     "pris": 15,
+     "taux": 83.3
+    },
+    "embuscade:immobiliser": {
+     "offert": 17,
+     "pris": 1,
+     "taux": 5.9
+    },
+    "moitie:attendre": {
+     "offert": 18,
+     "pris": 18,
+     "taux": 100.0
+    },
+    "moitie:egarer": {
+     "offert": 5,
+     "pris": 1,
+     "taux": 20.0
+    },
+    "moitie:enrayer": {
+     "offert": 11,
+     "pris": 4,
+     "taux": 36.4
+    },
+    "moitie:hanter": {
+     "offert": 5,
+     "pris": 4,
+     "taux": 80.0
+    },
+    "moitie:parler": {
+     "offert": 12,
+     "pris": 2,
+     "taux": 16.7
+    },
+    "moitie:renverser": {
+     "offert": 10,
+     "pris": 4,
+     "taux": 40.0
+    },
+    "moitie:s_unir": {
+     "offert": 11,
+     "pris": 7,
+     "taux": 63.6
+    },
+    "moitie:se_fondre": {
+     "offert": 18,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "moitie:tenir": {
+     "offert": 10,
+     "pris": 6,
+     "taux": 60.0
+    },
+    "moitie:tromper": {
+     "offert": 12,
+     "pris": 10,
+     "taux": 83.3
+    },
+    "moitie:voir": {
+     "offert": 49,
+     "pris": 18,
+     "taux": 36.7
+    },
+    "moitie:voler": {
+     "offert": 13,
+     "pris": 1,
+     "taux": 7.7
+    },
+    "pouvoir:hanter": {
+     "offert": 3,
+     "pris": 1,
+     "taux": 33.3
+    },
+    "pouvoir:s_unir": {
+     "offert": 7,
+     "pris": 1,
+     "taux": 14.3
+    },
+    "pouvoir:tromper": {
+     "offert": 8,
+     "pris": 3,
+     "taux": 37.5
+    },
+    "reve": {
+     "offert": 5,
+     "pris": 1,
+     "taux": 20.0
+    }
+   }
+  }
+ },
+ "apparie": {},
+ "parties_compactes": {
+  "colonnes": [
+   "campagne",
+   "variante",
+   "bot",
+   "peuples",
+   "graine",
+   "foret_pct",
+   "tour",
+   "fin",
+   "cartes_en_reve",
+   "tours_max",
+   "bot_params"
+  ],
+  "lignes": [
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "humains+entites",
+    0,
+    85.71,
+    5,
+    "sommeil",
+    5,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "humains+entites",
+    1,
+    85.71,
+    3,
+    "reveil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+humains",
+    0,
+    95.24,
+    4,
+    "sommeil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+humains",
+    1,
+    80.95,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes",
+    0,
+    90.48,
+    6,
+    "nuit",
+    3,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes",
+    1,
+    95.24,
+    3,
+    "reveil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "insectes+entites",
+    0,
+    90.48,
+    3,
+    "sommeil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "insectes+entites",
+    1,
+    90.48,
+    3,
+    "reveil",
+    5,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+insectes",
+    0,
+    85.71,
+    4,
+    "reveil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+insectes",
+    1,
+    85.71,
+    4,
+    "reveil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles",
+    0,
+    95.24,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles",
+    1,
+    100.0,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+humains",
+    0,
+    95.24,
+    4,
+    "sommeil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+humains",
+    1,
+    95.24,
+    3,
+    "sommeil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+insectes+entites",
+    0,
+    100.0,
+    4,
+    "sommeil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+insectes+entites",
+    1,
+    100.0,
+    3,
+    "sommeil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles+insectes",
+    0,
+    85.71,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles+insectes",
+    1,
+    95.24,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+insectes+entites",
+    0,
+    90.48,
+    4,
+    "sommeil",
+    5,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+insectes+entites",
+    1,
+    100.0,
+    4,
+    "sommeil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+insectes+humains+entites",
+    0,
+    80.95,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+insectes+humains+entites",
+    1,
+    85.71,
+    6,
+    "nuit",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles+humains+entites",
+    0,
+    95.24,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles+humains+entites",
+    1,
+    95.24,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+insectes+entites",
+    0,
+    95.24,
+    5,
+    "sommeil",
+    5,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+insectes+entites",
+    1,
+    95.24,
+    3,
+    "sommeil",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+humains+entites",
+    0,
+    95.24,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+humains+entites",
+    1,
+    95.24,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+insectes+entites",
+    0,
+    95.24,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+insectes+entites",
+    1,
+    85.71,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+insectes+humains+entites",
+    0,
+    95.24,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+insectes+humains+entites",
+    1,
+    95.24,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"portefeuille\": [{\"nom\": \"reve0\", \"params\": {\"reves_par_tour\": 0.0}, \"type\": \"glouton\"}, {\"nom\": \"reve05\", \"params\": {\"reves_par_tour\": 0.5}, \"type\": \"glouton\"}, {\"nom\": \"reve1\", \"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, {\"nom\": \"reve1_sommeil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"sommeil\"}, \"type\": \"glouton\"}, {\"nom\": \"reve1_reveil\", \"params\": {\"reves_par_tour\": 1.0, \"voie\": \"reveil\"}, \"type\": \"glouton\"}], \"savoir\": \"soi\"}"
+   ]
+  ]
+ },
+ "choix": {
+  "defaut": {
+   "rever_ou_defendre": {
+    "profil": {
+     "n": 43,
+     "part_a": 27.9,
+     "part_b": 4.7,
+     "neutre": 67.4,
+     "delta_moyen": 1.63,
+     "ecart_absolu_moyen": 2.82,
+     "erreur_type_moyenne": 1.07,
+     "regime": "indifférent"
+    },
+    "lisibilite": {
+     "n": 14,
+     "hasard": 85.7,
+     "un_indice": 71.4,
+     "deux_indices": 71.4,
+     "regle": {
+      "indice": "tour",
+      "seuil": 1.5,
+      "si_inferieur": "A",
+      "si_superieur": "A"
+     }
+    }
+   },
+   "saboter_ou_barrer": {
+    "profil": {
+     "n": 70,
+     "part_a": 8.6,
+     "part_b": 20.0,
+     "neutre": 71.4,
+     "delta_moyen": -0.75,
+     "ecart_absolu_moyen": 1.71,
+     "erreur_type_moyenne": 0.53,
+     "regime": "indifférent"
+    },
+    "lisibilite": {
+     "n": 20,
+     "hasard": 70.0,
+     "un_indice": 65.0,
+     "deux_indices": 65.0,
+     "regle": {
+      "indice": "main",
+      "seuil": 3.5,
+      "si_inferieur": "B",
+      "si_superieur": "A"
+     }
+    }
+   },
+   "moitie_haute_ou_basse": {
+    "profil": {
+     "n": 188,
+     "part_a": 15.4,
+     "part_b": 2.7,
+     "neutre": 81.9,
+     "delta_moyen": 0.63,
+     "ecart_absolu_moyen": 1.36,
+     "erreur_type_moyenne": 0.63,
+     "regime": "indifférent"
+    },
+    "lisibilite": {
+     "n": 34,
+     "hasard": 85.3,
+     "un_indice": 82.4,
+     "deux_indices": 82.4,
+     "regle": {
+      "indice": "pas_esprit",
+      "seuil": 3.5,
+      "si_inferieur": "B",
+      "si_superieur": "A"
+     }
+    }
+   }
+  }
+ }
+}
