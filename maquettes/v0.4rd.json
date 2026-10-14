@@ -1,0 +1,10 @@
+{
+  "nom": "v0.4rd",
+  "base": "v0.4",
+  "description": "Variante d'essai « le rêve disputé » (14 oct. 2026, accord de l'auteur pour la tester ; non adoptée) : la V0.4 plus deux changements, proposition `projet/2-maquettes/proposition-le-reve-dispute.md`. (1) Un rêve, un pas : retrait du sablier (reves_par_pas = 1). (2) Le cauchemar repousse le rêve : quand une tactique du côté du rêve (cases 8 à 12) réussit, l'esprit le plus avancé recule d'une case.",
+  "document": "projet/2-maquettes/proposition-le-reve-dispute.md",
+  "regles": {
+    "reves_par_pas": 1,
+    "cauchemar": true
+  }
+}

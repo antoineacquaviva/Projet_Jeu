@@ -154,12 +154,17 @@ PLAN_P3 = {
     "pro3_v04": ("v0.4", "defaut", MC64R, PROTO3_EXPS, 4),
     "pro3_v03": ("v0.3", "defaut", MC64R, PROTO3_EXPS, 4),
 }
-PROGRAMMES = {"phase1": PLAN, "phase3": PLAN3, "mesures3": PLAN_M3, "p3": PLAN_P3}
+# --------------------------------------------------------------------------- essai « le rêve disputé » (14 oct. 2026)
+# Variante v0.4rd (proposition projet/2-maquettes/proposition-le-reve-dispute.md, accord de l'auteur pour l'essai) :
+# mêmes expériences et mêmes graines que pro3_v04 (batterie 7) ; le moteur joue la V0.4 à l'identique
+# (règle cauchemar fausse par défaut), donc la comparaison avec la batterie 7 est appariée.
+PLAN_RD = {"rd_v04rd": ("v0.4rd", "defaut", MC64R, PROTO3_EXPS, 4)}
+PROGRAMMES = {"phase1": PLAN, "phase3": PLAN3, "mesures3": PLAN_M3, "p3": PLAN_P3, "rd": PLAN_RD}
 
 
 def _config(nom):
     """(maquette, variante, bot, expériences, parties) d'une configuration de l'un des programmes."""
-    for plan in (PLAN, PLAN3, PLAN_M3, PLAN_P3):   # lus à l'appel (les tests les remplacent)
+    for plan in (PLAN, PLAN3, PLAN_M3, PLAN_P3, PLAN_RD):   # lus à l'appel (les tests les remplacent)
         if nom in plan:
             return plan[nom]
     raise KeyError(nom)

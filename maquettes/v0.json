@@ -101,6 +101,7 @@
     "departage_machines": ["avancee", "numero"],
     "premier_joueur_tournant": true,
     "bruit": false,
+    "cauchemar": false,
     "dernier_sursaut": false,
     "sursaut_max": 3,
     "communication": "aucun_signe",

@@ -869,7 +869,19 @@ class Partie(Plans):
                 self.incoherence("esprit_pousse_par_echec")
                 if case == CENTRE:
                     self.incoherence("sommeil_par_echec")
+        elif reussite and case > CENTRE and self.R.get("cauchemar"):
+            self.cauchemar(case)
         self.verifier_sommeil()
+
+    def cauchemar(self, case):
+        """[reve_dispute:cauchemar] Proposition « le rêve disputé » (14 oct. 2026) : quand une tactique du
+        côté du rêve (cases 8 à 12) réussit, l'esprit le plus avancé recule d'une case. Si la tactique a
+        déjà repoussé un esprit en apprenant (tir à la corde, R5.2), il n'y a pas de second recul. La
+        réussite est celle qu'apprend le Méchant (après Tromper, R6.9)."""
+        if self.reculer_esprit("cauchemar_recul"):
+            self.log(f"  cauchemar : une tactique du côté du rêve a réussi (case {case}), l'esprit le plus avancé recule")
+        else:
+            self.stat("cauchemar_sans_effet")
 
     # =================================================================== fins
     def verifier_sommeil(self):
@@ -951,12 +963,20 @@ class Partie(Plans):
 
     def bruit(self):
         """Hors maquette v1 : une Machine mise HS bruyamment fait reculer l'esprit le plus avancé."""
+        self.reculer_esprit("bruit_recul")
+
+    def reculer_esprit(self, stat):
+        """L'esprit le plus avancé (le plus proche du 7, côté rêve) recule d'une case vers le 12, en
+        échangeant sa place avec la tuile voisine ; il ne recule pas sur un autre esprit ni au-delà
+        du 12. Rend True s'il a reculé."""
         es = [c for c in self.esprits() if c > CENTRE]
         if es:
             c = min(es)
             if c < 12 and self.piste[c + 1].genre != "esprit":
                 self.echanger(c, c + 1)
-                self.stat("bruit_recul")
+                self.stat(stat)
+                return True
+        return False
 
     # =================================================================== conseil
     def poser(self, siege, carte, mode, etape, hote=None, voir=False):
