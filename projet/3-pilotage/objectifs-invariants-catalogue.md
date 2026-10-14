@@ -194,23 +194,5 @@ Dans l'ordre (A13) :
 7. **Tableau de bord** : la v1 et « V2 proposée » côte à côte.
 
 ## 8. Décisions de l'auteur
-| N° | Date | Question | Décision |
-|---|---|---|---|
-| A1 | 11 oct. | Règle de passage notes → statuts | 9-10 invariant ; 8 invariant de principe (réglages libres) ; 6-7 libre ; 5 module ; 1-4 libre prioritaire sur une forme, hors recherche sur une piste écartée ; 0 hors recherche ; statut *témoin* ajouté |
-| A2 | 11 oct. | La v1 de référence a-t-elle un présage ? | Oui : aligner moteur et règle R2.1 sur le livret ; variante `sans_presage` pour la référence publiée |
-| A3 | 11 oct. | Bonus de fin | +10 % pour sommeil et silence. **Remplacée par A12** |
-| A4 | 11 oct. | Communication | Volet coordination de l'objectif 3, pas de cinquième objectif |
-| A5 | 11 oct. | Méthode des seuils | Bandes provisoires, recalées une fois en fin de phase 1 sur les témoins, puis gelées pour le cycle |
-| A6 | 11 oct. | Bandes de l'objectif 1 | Validées telles que proposées |
-| A7 | 11 oct. | Bandes de l'objectif 2 | Validées telles que proposées |
-| A8 | 11 oct. | Bandes de l'objectif 3 et du volet coordination | Validées telles que proposées |
-| A9 | 11 oct. | Bandes de l'objectif 4 et du garde-fou | Validées, avec des fins avant la mi-partie tolérées jusqu'à 20 % (rouge au-dessus de 40 %) |
-| A10 | 11 oct. | Rôle et seuils des profils | Lecture seule, seuils proposés |
-| A11 | 11 oct. | Réglages fixés | Décisions du 11 oct. = invariants (forme v0 = témoin) ; détails techniques = hors recherche |
-| A12 | 12 oct. | Bonus de fin, pour la v1 et la v2 | 0 : le résultat est la forêt restante ; robustesse vérifiée à 10 et 25 %. Tranche aussi la décision 7 de la maquette v2 |
-| A13 | 12 oct. | Place de la v2 dans le plan | La simulation éclaire les décisions ouvertes de la v2 : outils puis v2 dans le moteur en phase 1 ; diagnostic de la v1 et comparaison des options de la v2 en phase 3 ; l'auteur fixe la v2 ; la recherche de la phase 4 porte sur la v2 |
-| B1 | 12 oct. | Bandes définitives (A5), fin de la phase 1 | Les bandes provisoires sont gelées telles quelles pour le cycle, sauf la synergie (B2) |
-| B2 | 12 oct. | Définition des synergies | La synergie additive est négative par construction (le jeu s'adapte au nombre de joueurs). « Aucun ne suffit » : le duo bat son meilleur peuple seul (vert ≥ 12 duos sur 15, rouge < 8) ; le tétraèdre : les 3 duos complets dans le premier tiers de la synergie relative entre duos |
-| B3 | 12 oct. | Siège spectateur | Le siège est remplacé par le bot inerte (il ne fait rien), et non par le bot aléatoire, qui rêve |
-| B4 | 12 oct. | Deux incohérences du moteur | « voir_trahi » (R6.2) et « barrage_contourne » en v1 (R4.3) deviennent des cas permis, comptés à part ; le barrage contourné reste une incohérence pour le témoin v0. Moteur 1.5 |
-| C1 | 14 oct. | Stratégies répétées | Garde-fou « aucune boucle gagnante », y compris les conventions à plusieurs sièges ; lu seulement (aucune bande ne juge) dès le cycle 2, bandes à confirmer par l'auteur avant la campagne de profondeur. Spécification : `garde-fou-boucles-gagnantes.md` |
+
+Les décisions A1 à A13 (phase 0), B1 à B4 (phase 1), C1 (garde-fou « aucune boucle gagnante ») et D1 à D9 (v2 fixée) sont réunies dans le [journal des décisions](journal-des-decisions.md) (14 oct. 2026). Toute nouvelle décision s'y ajoute, en une ligne.

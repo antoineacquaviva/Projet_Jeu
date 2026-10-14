@@ -58,6 +58,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | `3-pilotage` | [Plan d'action](projet/3-pilotage/plan-d-action.md) | Les six phases : cadrer, mesurer, bots, diagnostic, exploration, validation |
 | | [Objectifs, invariants et catalogue](projet/3-pilotage/objectifs-invariants-catalogue.md) | Les quatre objectifs d'expérience, leurs bandes, ce qui ne change pas, les variables |
 | | [Cahier des charges du calcul](projet/3-pilotage/cahier-des-charges-calcul.md) | Où faire tourner les campagnes : GitHub Actions (décision 10) |
+| | [Journal des décisions](projet/3-pilotage/journal-des-decisions.md) | Toutes les décisions de l'auteur (A1 à A13, B1 à B4, C1, D1 à D9, plan vers la V1) |
 | | [Garde-fou « aucune boucle gagnante »](projet/3-pilotage/garde-fou-boucles-gagnantes.md) | Aucune action ni suite d'actions répétée, ni convention de table, ne doit gagner (décision C1, 14 oct.) |
 | `4-bilans` | [Moteur v0 : lacunes et incohérences](projet/4-bilans/moteur-v0-lacunes.md) | Le premier moteur et ce qu'il a révélé |
 | | [Moteur v1 : conformité et campagne de référence](projet/4-bilans/moteur-v1-conformite.md) | L'audit règle par règle, v0 contre v1 |
@@ -68,6 +69,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Ligne de base P2 : la V0.3 de 2 à 6 joueurs](projet/4-bilans/ligne-de-base-p2.md) | Étape 0.11 du plan vers la V1 |
 | | [Bilan du cycle 1 : de la V0.3 à la V0.4 proposée](projet/4-bilans/cycle-1-bilan.md) | Durée réglée, difficulté selon le bot, proposition de V0.4, alertes D et E |
 | | [Garde-fou « aucune boucle gagnante » : première lecture](projet/4-bilans/garde-fou-boucles-ligne-de-base.md) | V0.3 rouge (une boucle égale le bot fort), V0.4 orange (6 points à 4 joueurs) |
+| | [Historique des campagnes et des passages](projet/4-bilans/campagnes-et-passages-historique.md) | Tableau complet des lancements GitHub et journal des passages (hors `ETAT.md`) |
 
 Les fichiers HTML s'ouvrent dans un navigateur, après téléchargement. Les documents citent parfois des chemins `claude/moteur-v1/…` : ce sont ceux de l'espace de travail d'origine, qui correspondent ici à la racine du dépôt.
 
