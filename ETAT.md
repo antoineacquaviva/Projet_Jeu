@@ -221,6 +221,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
+EN COURS 2026-10-14 20:31 (session interactive, Opus : lecture de la campagne 31)
 
 ## 7. Compteur de passages
 
