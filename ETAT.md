@@ -275,6 +275,7 @@ Durées de référence, mesurées de la création du lancement à la fin de la d
 | Campagnes 25, 26, 27 | **choix_instrument** sur v0.3, v0.4 et v0.4rd : suites du bot qui ne rêvent jamais | 16 | 25 et 26 : environ 15 min ; 27 en cours | – | 25 et 26 réussies, traitées (bilan, section 3 : sans rêve dans ses suites, le bot ne rêve plus du tout ; le profil du rêve dépend de l'instrument) ; 27 à lire avec les suivantes |
 | Campagne 27 | choix_instrument sur v0.4rd | 16 | environ 20 min | – | réussi ; traité (bilan, section 3) |
 | Campagnes 28, 29, 30 | **choix_portefeuille** sur v0.3, v0.4 et v0.4rd : MCP64 qui juge une décision sur quatre | 16 | 15 à 25 min | – | réussi ; traité : le profil du rêve décision par décision ne sépare pas les témoins ; T3 complet (rêve 1, rêve 0, libre, apparié) les sépare : V0.3 dominé par rêver +5,8, V0.4 dominé par défendre −7,4, V0.4rd dominé par rêver +11,5 |
+| Campagne 31 | **reve_dispute_grille** sur v0.4rd : grille 2 × 2 × 2 (lunes 3 ou 2, cauchemar d'une ou deux cases, un ou deux rêves pour un pas) × trois instruments du test T3 complet (MC64R, MC 64 sans rêve dans ses suites, MCP64), échantillon P2, 2 parties : 768 parties ; lancée le 14 oct., 18 h 12 (run 38596118170, 128 lots) | 128 | estimée 3 à 4 h (fin vers 22 h 15) ; réveil armé pour 22 h 30 (20:30 UTC) | – | en cours ; à lire au passage suivant (étape 3 ter, « grille de réglage ») |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
@@ -299,6 +300,7 @@ Les trois derniers passages. Les précédents (13 et 14 oct.) sont dans [`projet
 | 14 oct. 2026 | 15:21 | 10 min | terminé | Reprise programmée (Opus) : témoins T4 et T5 lus (campagnes 22 à 24) ; V0.4rd dominé par rêver avec le bot fort ; lancements 25 à 27 (`choix_instrument`). Pas compté dans le plafond. |
 | 14 oct. 2026 | 15:51 | 10 min | terminé | Reprise programmée (Opus) : campagnes 25 et 26 lues (instrument) ; choix technique : bot à portefeuille pour T4 du rêve ; lancements 28 à 30 (`choix_portefeuille`). Pas compté dans le plafond. |
 | 14 oct. 2026 | 16:21 | 15 min | terminé | Reprise programmée (Opus) : campagnes 27 à 30 lues ; T3 complet pour le rêve (`gain_jugement`, campagne `jugement_reve`) validé sur les témoins ; V0.4rd dominé par rêver (+11,5) ; étape 3 quater c FAITE. Pas compté dans le plafond. |
+| 14 oct. 2026 | 17:47 | 30 min | terminé | Session interactive (Opus, avec l'auteur) : grille de réglage du rêve disputé décidée et mise en œuvre (paramètre `cauchemar_cases`, campagne `reve_dispute_grille`, `scripts/analyse_grille_reve.py`, bilan `projet/4-bilans/essai-reve-dispute.md` commencé) ; 403 tests verts, conformité OK ; campagne 31 lancée, réveil armé pour 22 h 30. Pas compté dans le plafond. |
 
 ## 11. Reprendre la main
 
