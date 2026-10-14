@@ -65,6 +65,22 @@ MC64R juge une décision sur quatre (16 suites appariées par option), sur l'éc
 - **V0.4 : témoin raté, et l'explication est l'instrument.** À l'échelle de la partie, ne jamais rêver vaut un peu mieux (73,3 % contre 70,6 %, protocole P3). Pourtant, décision par décision, MC64R juge rêver meilleur dans 22 % des situations et défendre dans 8 % seulement. Or les suites de MC64R rêvent une carte par tour : elles estiment la valeur d'un rêve *en supposant qu'on rêvera ensuite*, ce qui compte avec le sablier (deux rêves pour un pas). C'est la règle de méthode 4 (l'instrument contient la réponse), observée. **Vérification lancée** : les mêmes campagnes avec des suites qui ne rêvent jamais (`choix_instrument`, lancements 25 à 27). Si le signe change, le profil de Δ du bot fort n'est lisible qu'avec deux politiques de suites.
 - **V0.4rd : le rêve disputé, joué par le bot fort, redevient un rêve dominant.** Rêver l'emporte dans 50 % des situations et défendre dans 2 %. La forêt remonte à 90 %, et la partie finit par le sommeil au tour 3,7 dans 81 % des cas : c'est le régime de la V0.3. Le tir à la corde et le cauchemar se produisent 0,16 fois par partie avec le bot fort, contre 1,35 avec la bibliothèque. Le bot fort court au sommeil avant que le cauchemar ait le temps de jouer. La campagne 21 (ligne de base sur la V0.4rd) dit la même chose : 87,5 %, tour 4,0, sommeil 67 %. **Cet indice pèse contre l'adoption du rêve disputé dans ses réglages actuels** (étape 3 ter d'ETAT.md). Il désigne aussi les leviers à essayer : moins de lunes, ou un cauchemar plus fort.
 
+**L'instrument : vérification faite (campagnes 25 et 26, suites du bot qui ne rêvent jamais).**
+| Version | Suites qui rêvent une carte par tour (MC64R) | Suites qui ne rêvent jamais |
+|---|---|---|
+| V0.3 | forêt 94,3 % ; rêve à 4,2 tours en moyenne ; rêver l'emporte dans 27 % des situations, défendre dans 9 % | forêt 88,5 % ; **le bot ne rêve plus du tout** (0 carte, 100 % de fins par la nuit) |
+| V0.4 | forêt 67,0 % ; rêver l'emporte dans 22 % des situations, défendre dans 8 % | forêt 74,4 % ; **le bot ne rêve plus du tout** |
+
+- **Le choix « rêver ou défendre » vu par le bot fort dépend entièrement de ce que ses suites supposent pour la suite de la partie.** Avec des suites qui rêvent, rêver paraît souvent meilleur, même en V0.4 où ne pas rêver vaut mieux. Avec des suites qui ne rêvent pas, le bot ne prend plus de lune, et le choix ne se pose même plus. Un rêve isolé ne vaut que par les rêves qui suivent (le sablier, puis la course vers le sommeil). C'est exactement la règle de méthode 4 : l'instrument contient la réponse.
+- Les deux versions, jouées sans rêver, confirment au passage le sens attendu des témoins : ne jamais rêver coûte 6 points en V0.3 (rêver domine) et en rapporte 7 en V0.4.
+- *Saboter ou barrer* et *moitié haute ou basse*, qui ne dépendent pas d'un rythme, gardent à peu près le même profil avec les deux instruments. Pour ces choix, la mesure est donc fiable.
+
+**Choix technique (Claude, 14 oct., 15 h 55).**
+- Pour un choix dont la valeur dépend de ce qu'on fera ensuite, comme le rêve, T4 se mesure avec le **bot à portefeuille** (MCP64). Ses suites suivent la politique de rêve qu'il juge la meilleure pour la situation, au lieu d'une politique imposée. Les deux bots à politique fixe (rêve 0 et rêve 1) sont gardés comme bornes.
+- Campagne `choix_portefeuille` lancée sur v0.3, v0.4 et v0.4rd (lancements 28 à 30).
+- Le seuil par décision et la règle des régimes seront recalibrés sur ces témoins, pas sur la version jugée.
+- Pour les choix sans rythme (saboter ou barrer, moitié), MC64R reste l'instrument du cycle.
+
 **Les autres choix.**
 - *Saboter ou barrer* en V0.4 est le choix le plus proche d'un vrai choix. Chaque option gagne nettement dans une part notable des situations (24 % et 14 %), et une seule règle lisible bat le hasard de 16 points : « saboter si la menace maximale de l'étape est faible, barrer sinon ». Un deuxième indice n'ajoute rien. Ce choix est lisible, mais il n'offre pas encore de profondeur.
 - *Moitié haute ou basse* est indifférente partout (82 à 88 % de situations neutres). Cela confirme le constat des « choix morts » : la plupart des pouvoirs ne changent pas assez le résultat d'une décision.

@@ -1,0 +1,153 @@
+{
+ "nom": "choix_portefeuille",
+ "maquette": "v0.4",
+ "description": "Étape 3 quater c (14 oct. 2026) : le profil de Δ du choix « rêver ou défendre » dépend de la politique des suites (campagnes 22 à 27 : suites qui rêvent une carte par tour → le rêve semble meilleur ; suites qui ne rêvent jamais → le bot ne prend plus de lune et le choix ne se pose plus). Instrument retenu (choix technique) : le bot à portefeuille (MCP64), dont les suites suivent la politique de rêve qu'il juge la meilleure pour la situation. Témoins : v0.3 (rêver doit dominer), v0.4 (défendre doit dominer ou indifférent) ; et v0.4rd.",
+ "blocs": [
+  {
+   "nom": "juge",
+   "variantes": [
+    "defaut"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "portefeuille": [
+       {
+        "nom": "reve0",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.0
+        }
+       },
+       {
+        "nom": "reve05",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.5
+        }
+       },
+       {
+        "nom": "reve1",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0
+        }
+       },
+       {
+        "nom": "reve1_sommeil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "sommeil"
+        }
+       },
+       {
+        "nom": "reve1_reveil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "reveil"
+        }
+       }
+      ],
+      "juger": 0.25
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "insectes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 2
+    }
+   ]
+  }
+ ]
+}
