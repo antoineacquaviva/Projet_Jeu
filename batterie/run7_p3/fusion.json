@@ -1,0 +1,15 @@
+{
+ "lots": 16,
+ "parties": 1336,
+ "erreurs": 0,
+ "duree_max_s": 1773,
+ "duree_cumulee_coeurs_s": 91484,
+ "parties_par_s_par_coeur": 0.0,
+ "configurations": [
+  "pro3_v04",
+  "pro3_v03"
+ ],
+ "echelle": 1.0,
+ "empreinte": "f3f1dc1bc8e4e30f",
+ "moteur": "1.8"
+}
