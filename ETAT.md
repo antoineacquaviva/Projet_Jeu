@@ -186,14 +186,14 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 5. Étape suivante
 
-**Cycle 2, étape a : préparer (EN COURS : a.1 FAIT, a.2 lancée).** La V0.4 est adoptée (section 8, 13 oct., 23 h 27). Détail des priorités et des alertes : `projet/4-bilans/cycle-1-bilan.md`, sections 4, 6 et 8. Une sous-étape par passage, dans cet ordre :
+**Cycle 2, étape a : préparer (EN COURS : a.1 et a.2 FAITES ; reste a.3 puis a.4).** La V0.4 est adoptée (section 8, 13 oct., 23 h 27). Détail des priorités et des alertes : `projet/4-bilans/cycle-1-bilan.md`, sections 4, 6 et 8. Une sous-étape par passage, dans cet ordre :
 
 1. **V0.4 dans le moteur** (FAIT le 13 oct., 23 h 45 : `maquettes/v0.4.json`, `tests/test_v04.py`, `docs/noeuds_v2.md`, plan et README à jour ; conformité et 361 tests verts) :
    - `maquettes/v0.4.json` (base `v0.3`, code d'atelier et réglages de la section 8) ;
    - tests citant la décision (`tests/test_v04.py`), documents (`docs/noeuds_v2.md` : la modélisation des ordres supplémentaires n'est plus « à confirmer ») ;
    - `projet/3-pilotage/plan-vers-v1.md` (section 1 : V0.4 adoptée ; section 6 : alerte A levée pour la durée, alertes D et E) ;
    - contrôles complets.
-2. **Recalibrer le bot fort sur la V0.4** (LANCÉE le 13 oct., 23 h 45 : Campagne 18, `campagnes/calibration_v04.json`, 256 parties, 20 lots ; durée estimée 1 h environ, le lot le plus lent fixe la fin. *À faire au passage suivant* : lire `campagnes/calibration_v04_run18/synthese.json` sur la branche resultats ; comparer les quatre bots en apparié par taille de table (forêt, fins, tour ; `scripts/analyse_ligne_base.py` sert de modèle) ; retenir le plus fort à coût raisonnable comme bot fort du cycle 2, l'écrire dans le futur `cycles/c2.json` et dans `foret/batterie.py` si besoin ; recaler `COUT["mc256"]` dans `foret/cycle.py` sur la durée mesurée ; consigner la décision au journal) (décision technique de Claude, bilan section 4) : campagne appariée de 2 à 6 joueurs opposant MC64R, MCP64, MC 64 à rêve 0,5 et MC 256 à portefeuille. Le meilleur à coût raisonnable devient le bot fort du cycle 2. Recaler aussi le coût de MC 256 dans `foret/cycle.py`.
+2. **Recalibrer le bot fort sur la V0.4** (FAIT le 14 oct., passage planifié : MC 256 à portefeuille +13,8 ± 3,8 points sur MC64R, les autres bots à égalité ; MC64R reste le bot fort, MC 256 le contrôle ; `COUT["mc256"]` 600 → 3 700 s ; `projet/4-bilans/calibration-bot-fort-v04.md`. Rappel de la consigne : (LANCÉE le 13 oct., 23 h 45 : Campagne 18, `campagnes/calibration_v04.json`, 256 parties, 20 lots ; durée estimée 1 h environ, le lot le plus lent fixe la fin. *À faire au passage suivant* : lire `campagnes/calibration_v04_run18/synthese.json` sur la branche resultats ; comparer les quatre bots en apparié par taille de table (forêt, fins, tour ; `scripts/analyse_ligne_base.py` sert de modèle) ; retenir le plus fort à coût raisonnable comme bot fort du cycle 2, l'écrire dans le futur `cycles/c2.json` et dans `foret/batterie.py` si besoin ; recaler `COUT["mc256"]` dans `foret/cycle.py` sur la durée mesurée ; consigner la décision au journal) (décision technique de Claude, bilan section 4) : campagne appariée de 2 à 6 joueurs opposant MC64R, MCP64, MC 64 à rêve 0,5 et MC 256 à portefeuille. Le meilleur à coût raisonnable devient le bot fort du cycle 2. Recaler aussi le coût de MC 256 dans `foret/cycle.py`.
 3. **Protocole P3 et sa ligne de base** : P2 rejoué sur la V0.4 avec l'ancre V0.3, plus les mesures des objectifs 1 à 3 (concentration, surprise, tape-taupe, meilleur taux de rêve fixe et gain du bot libre, Shapley, duos). Le meilleur taux de rêve fixe tranche l'alerte E : s'il vaut 0 à 2 et 3 joueurs, l'alerte est confirmée et devient une DÉCISION UTILISATEUR.
 3 bis. **Garde-fou « aucune boucle gagnante », en lecture seule** (FAIT le 14 oct., 8 h 30, session interactive ; décision de l'auteur, section 8 ; spécification `projet/3-pilotage/garde-fou-boucles-gagnantes.md`) : bot `repete`, `foret/boucles.py` (130 stratégies par taille de table, campagne appariée, analyse), quatre mesures descriptives, **étape `boucles` du cycle** entre le contrôle et le rapport (rien à faire pour l'activer au cycle 2 : elle est jouée par défaut ; `"boucles": false` dans le plan la saute). Première lecture, appariée aux Campagnes 16 et 18 : V0.3 rouge, V0.4 orange (+6 points à 4 joueurs) ; `projet/4-bilans/garde-fou-boucles-ligne-de-base.md`. Les bandes restent à confirmer par l'auteur : les mesures ne jugent pas et n'entrent pas dans la qualité.
 4. **Plan `cycles/c2.json` et lancement du cycle 2** (V0.4 → V0.5). Priorités : l'intérêt des choix et la profondeur ; le dilemme du rêve à 2 et 3 joueurs (alerte E) ; la difficulté à 3, 5 et 6 joueurs (alerte D), avec un réglage taille par taille et au plus 4 éléments propres au nombre de joueurs.
@@ -204,13 +204,11 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
-EN COURS depuis 2026-10-14 09:36 (Paris) : passage planifié, étape a.2.
-
 
 ## 7. Compteur de passages
 
 - Semaine en cours : depuis le lundi 12 oct. 2026, 22 h (heure de Paris).
-- Passages ayant réellement travaillé cette semaine : **1** (plafond : 12, décision du 13 oct.).
+- Passages ayant réellement travaillé cette semaine : **2** (plafond : 12, décision du 13 oct.).
 - Règle : le compteur est remis à zéro au premier passage qui suit un lundi 22 h. Un passage qui s'arrête aussitôt (décision attendue, verrou, campagne en cours, plafond) ne compte pas.
 
 ## 8. Réponses de l'auteur
@@ -264,7 +262,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | Campagne 16 | ligne_base_p2 (V0.3, 2 à 6 joueurs) : MC64R contre MCP64, témoins, coordination ; 544 parties | 14 | 48 min | 48 min (228 s-cœur par partie en moyenne) | réussi ; traité (ligne de base P2) |
 | Campagne 17 | ligne_base_p2_v02 (V0.2) : MCP64 contre MC64, choix morts (mammifères sans pouvoir) ; 108 parties | 6 | 17 min | 17 min | réussi ; traité (ligne de base P2) |
 | Cycle 1 | c1 : criblage (336 variantes, gloutons, 2 à 6 joueurs), exploration MAP-Elites (10 générations), confirmation MC64R (2 manches), contrôle MC 256 à portefeuille | 20 | 6 h 45 (estimé 5 h 20) | contrôle : 2 h 25 | réussi ; traité (bilan du cycle 1) |
-| Campagne 18 | calibration_v04 (V0.4, 2 à 6 joueurs) : MC64R, MCP64, MC 64 rêve 0,5, MC 256 à portefeuille ; 256 parties, échantillon P2 | 20 | – | – | lancée le 13 oct. à 23 h 45 (Paris) ; à traiter en étape a.2 |
+| Campagne 18 | calibration_v04 (V0.4, 2 à 6 joueurs) : MC64R, MCP64, MC 64 rêve 0,5, MC 256 à portefeuille ; 256 parties, échantillon P2 | 20 | 86 min | 86 min | réussi (5 184 s pour le lot le plus lent ; 282 549 s-cœur) ; traité (a.2) |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
@@ -280,6 +278,7 @@ Durées mesurées de la création du lancement à la fin de la dernière tâche.
 | 13 oct. 2026 | 23:27 | 20 min | terminé | Session interactive avec l'auteur : V0.4 adoptée (section 8). Étape a.1 faite : `maquettes/v0.4.json` (égale à la variante A jouée au cycle 1), `tests/test_v04.py`, docs, plan (alerte A levée, alertes D et E), README ; contrôles verts (361 tests). Étape a.2 lancée : Campagne 18, `calibration_v04`. Réveil non armé : le passage quotidien de 9 h 35 traitera les résultats. Pas compté dans le plafond. |
 | 14 oct. 2026 | 08:00 | 20 min | terminé | Session interactive avec l'auteur : garde-fou « aucune boucle gagnante » adopté (section 8) et spécifié (`projet/3-pilotage/garde-fou-boucles-gagnantes.md`), catalogue (C1), plan (alerte F), étape 3 bis ajoutée à la section 5. Documents seulement : aucun code, aucun lancement. Pas compté dans le plafond. |
 | 14 oct. 2026 | 08:08 | 35 min | terminé | Session interactive (Opus) : relecture et correction de la spécification ; garde-fou codé (`foret/bots/repete.py`, `foret/boucles.py`, mesures, étape `boucles` du cycle, `tests/test_boucles.py`) ; première lecture locale (2 × 8 512 parties, 1 min) appariée aux Campagnes 16 et 18 : V0.3 rouge, V0.4 orange ; étape 3 bis FAITE. Les étapes 2 à 4 du cycle 2 restent pour les passages suivants. Pas compté dans le plafond. |
+| 14 oct. 2026 | 09:36 | 25 min | terminé | Passage planifié (Sonnet) : étape a.2. Campagne 18 lue et analysée en apparié (`projet/4-bilans/calibration-bot-fort-v04.md`) : MC 256 à portefeuille nettement plus fort (+13,8 ± 3,8), MCP64 et MC 64 rêve 0,5 indiscernables de MC64R. Décision technique : MC64R reste le bot fort, MC 256 le contrôle ; `COUT["mc256"]` recalé à 3 700 s (estimation). Étape suivante : a.3 (P3). |
 
 ## 11. Reprendre la main
 

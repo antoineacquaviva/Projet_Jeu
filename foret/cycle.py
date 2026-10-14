@@ -53,7 +53,7 @@ GLOUTONS = [{"type": "glouton", "params": {"reves_par_tour": r}} for r in (0.0, 
 TABLES_GLOUTON = [{"tailles": [2], "parties": 1}, {"tailles": [3], "parties": 1}, {"tailles": [4], "parties": 1},
                   {"tailles": [5], "parties": 3}, {"tailles": [6], "parties": 15}]
 # coût estimé d'une partie, en secondes-cœur (sert à prévoir la fin d'une étape et à armer le réveil)
-COUT = {"glouton": 0.1, "mc64": 150.0, "mc256": 600.0}       # MC64R mesuré le 13 oct. : 228 s en moyenne (2 à 6 joueurs)
+COUT = {"glouton": 0.1, "mc64": 150.0, "mc256": 3700.0}      # MC64R mesuré le 13 oct. : 228 s en moyenne (2 à 6 joueurs) ; MC 256 à portefeuille : ~3 700 s (Campagne 18, déduit : 282 549 s-cœur / 64 jeux de 4 bots, moins 3 bots de budget 64 à ~230 s)
 MAX_PAR_TABLE = 4            # décision de l'auteur du 13 oct. : au plus 4 éléments propres au nombre de joueurs
 
 
