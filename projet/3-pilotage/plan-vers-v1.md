@@ -139,6 +139,11 @@ L'alerte nomme alors l'objectif, ce qui a été essayé et la piste de conceptio
 - *Mesuré* : le chef unique n'apporte rien en V0.3 (0,2 %), mais avec un bot qui ne rêve pas.
 - La mesure sera refaite au bot fort à l'étape 0.11. La réponse définitive appartient aux tests humains.
 
+**F. Une boucle gagnante ?** À surveiller (14 oct.).
+- *Mesuré (indices)* : le rêve à chaque tour domine en V2 ; en V2, « parer au plus probable » reste à 4,4 points du bot fort (tape-taupe orange).
+- *Non mesuré* : les autres actions répétées, les motifs sur plusieurs tours et les conventions de table à plusieurs sièges.
+- Le bloc « boucles » du cycle 2 (lecture seule) répond à la question ; sa spécification est dans `garde-fou-boucles-gagnantes.md`.
+
 ## 7. Améliorer le jeu : objectifs, mesures, leviers (souhait 6)
 | Ce que l'auteur veut | Mesures (étiquette) | Leviers explorés | État de la V0.3 |
 |---|---|---|---|
@@ -155,6 +160,8 @@ L'alerte nomme alors l'objectif, ce qui a été essayé et la piste de conceptio
 - Cycle 3 : l'équilibre fin des peuples et du Méchant.
 
 La qualité d'une variante reste le plus faible de ses objectifs normalisés (plan d'action, section 5).
+
+**Garde-fou ajouté le 14 oct. : aucune boucle gagnante** ([spécification](garde-fou-boucles-gagnantes.md)). Dès le cycle 2, un bloc « boucles » est ajouté au rapport, en lecture seule : une bibliothèque de stratégies répétées (une action partout, motifs de rêve, motifs sur les trois étapes, conventions de table à plusieurs sièges) jouée au coût d'un glouton sur la version candidate, avec l'écart à la meilleure boucle par taille de table. Il ne juge pas et n'entre pas dans le score de la recherche tant que l'auteur n'a pas confirmé les bandes ; une alerte de conception est levée si l'écart tombe sous 3 points.
 
 ## 7 bis. Toutes les tailles de table, de 2 à 6 joueurs (critère ajouté le 13 oct., 14 h 27)
 **Le critère.** Le jeu doit tenir tous ses objectifs à 2, 3, 4, 5 et 6 joueurs. La qualité d'une variante devient **le plus faible de ses objectifs, pris à la taille de table où il est le plus faible**. Une variante excellente à 3 joueurs et rouge à 6 est donc rouge.

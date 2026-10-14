@@ -71,6 +71,9 @@ Bandes : **vert** (sain), **orange** (entre les deux), **rouge** (défaut). Éti
 | Plancher : forêt gardée par le pire décile, bot fort | mesure | ≥ 40 % | < 25 % |
 | Échelle des bots : aléatoire < glouton < MCTS faible < MCTS fort | mesure | chaque marche significative | une marche nulle ou inversée |
 
+### Garde-fou : aucune boucle gagnante (C1, 14 oct.)
+Une action, une suite d'actions répétée, ou une convention de table appliquée sans lire le jeu, ne doit pas constituer une stratégie gagnante. Définitions, bibliothèque de stratégies, mesures, témoins et mise en œuvre : [garde-fou-boucles-gagnantes.md](garde-fou-boucles-gagnantes.md). **Lecture seule jusqu'à confirmation des bandes par l'auteur** (écart à la meilleure boucle : vert ≥ 10 points, rouge < 3 ; indice).
+
 **La durée** n'est jamais un filtre. Elle est mesurée (tours joués, décisions par joueur, temps estimé) et sert d'axe de lecture de la carte. Elle ne pèse contre une variante que si le jeu ne se termine pas, ou si le temps est vide (attente élevée, densité de décisions faible). Le temps estimé est un *indice* : un temps par décision non forcée, un temps par décision forcée, et un temps de conseil par tour qui dépend du nombre de traces ou d'annonces, à recaler sur les premiers tests humains.
 
 ## 3. Échelle de résultats (A12, remplace A3)
@@ -210,3 +213,4 @@ Dans l'ordre (A13) :
 | B2 | 12 oct. | Définition des synergies | La synergie additive est négative par construction (le jeu s'adapte au nombre de joueurs). « Aucun ne suffit » : le duo bat son meilleur peuple seul (vert ≥ 12 duos sur 15, rouge < 8) ; le tétraèdre : les 3 duos complets dans le premier tiers de la synergie relative entre duos |
 | B3 | 12 oct. | Siège spectateur | Le siège est remplacé par le bot inerte (il ne fait rien), et non par le bot aléatoire, qui rêve |
 | B4 | 12 oct. | Deux incohérences du moteur | « voir_trahi » (R6.2) et « barrage_contourne » en v1 (R4.3) deviennent des cas permis, comptés à part ; le barrage contourné reste une incohérence pour le témoin v0. Moteur 1.5 |
+| C1 | 14 oct. | Stratégies répétées | Garde-fou « aucune boucle gagnante », y compris les conventions à plusieurs sièges ; lu seulement (aucune bande ne juge) dès le cycle 2, bandes à confirmer par l'auteur avant la campagne de profondeur. Spécification : `garde-fou-boucles-gagnantes.md` |
