@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       programme:
-        description: "phase1 (glouton, 20 configurations), phase3 (plan réduit, bot fort) ou mesures3 (mesures du bot fort et témoins)"
+        description: "phase1 (glouton, 20 configurations), phase3 (plan réduit, bot fort), mesures3 (mesures du bot fort et témoins) ou p3 (protocole P3 : V0.4 et son ancre V0.3, objectifs 1 à 3)"
         default: "phase1"
         required: true
       echelle:

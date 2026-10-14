@@ -121,7 +121,7 @@ def test_le_programme_mesures3():
     assert {x["etiquette"] for x in B.taches("m3_v1_sans_reve") if x["exp"] == "reves"} == \
         {"taux:0.0", "taux:0.5", "taux:1.0"}
     assert len(B.plan_complet([k for k in B.PLAN_M3 if k != "m3_v2r"])) == 1020
-    assert set(B.PROGRAMMES) == {"phase1", "phase3", "mesures3"}
+    assert set(B.PROGRAMMES) == {"phase1", "phase3", "mesures3", "p3"}   # p3 : protocole P3 (étape a.3)
 
 
 @pytest.fixture

@@ -143,12 +143,23 @@ PLAN_M3 = {
     "m3_v1_sans_reve": ("v1", "temoin_sans_reve", MC64, ("tables_duos", "reves_duos"), 4),
     "m3_v1_essoufflement": ("v1", "temoin_essoufflement", MC64, ("dilemmes",), 4),
 }
-PROGRAMMES = {"phase1": PLAN, "phase3": PLAN3, "mesures3": PLAN_M3}
+# --------------------------------------------------------------------------- le protocole P3 (plan vers la V1, étape a.3)
+# Décision technique de Claude (14 oct. 2026, consignée au journal) : P3 rejoue la V0.4 et son ancre V0.3 sous le
+# même bot fort (MC64R, retenu après la calibration de la V0.4, campagne 18) et mesure les objectifs 1 à 3 :
+# tape-taupe, meilleur taux de rêve fixe et gain du bot libre sur les 15 duos, tables de 2 et 3 peuples et
+# Shapley (dérivé des tables), spectateur. La ligne de base P2 (campagne ligne_base_p2) se rejoue séparément
+# par la campagne, avec le paramètre maquette.
+PROTO3_EXPS = ("tables3", "spectateur3", "reves3", "taupe", "reves_duos")
+PLAN_P3 = {
+    "pro3_v04": ("v0.4", "defaut", MC64R, PROTO3_EXPS, 4),
+    "pro3_v03": ("v0.3", "defaut", MC64R, PROTO3_EXPS, 4),
+}
+PROGRAMMES = {"phase1": PLAN, "phase3": PLAN3, "mesures3": PLAN_M3, "p3": PLAN_P3}
 
 
 def _config(nom):
     """(maquette, variante, bot, expériences, parties) d'une configuration de l'un des programmes."""
-    for plan in (PLAN, PLAN3, PLAN_M3):          # lus à l'appel (les tests les remplacent)
+    for plan in (PLAN, PLAN3, PLAN_M3, PLAN_P3):   # lus à l'appel (les tests les remplacent)
         if nom in plan:
             return plan[nom]
     raise KeyError(nom)
@@ -1113,7 +1124,7 @@ def main():
     ap.add_argument("--sortie", default="lots", help="dossier des lots (avec --lot)")
     a = ap.parse_args()
     programme = a.quoi if a.quoi in PROGRAMMES else (a.programme or "phase1")
-    plan = {"phase1": PLAN, "phase3": PLAN3, "mesures3": PLAN_M3}[programme]
+    plan = PROGRAMMES[programme]
     noms = a.seulement or list(plan)
     inconnus = [x for x in noms if x not in plan]
     if inconnus:
