@@ -1,0 +1,183 @@
+{
+ "nom": "reve_somnambule",
+ "maquette": "v0.4rd",
+ "description": "Essai « le somnambule » (14 oct. 2026, 23 h, accord de l'auteur pour coder et tester ; pistes : projet/2-maquettes/reve-dispute-problematique-et-pistes.md). Sur v0.4rd : quand un esprit avance, la tuile qu'il dépasse s'exécute (le favori agit, après les barrages de l'étape) ; avec ou sans apprentissage de cet ordre ; avec 1, 2 ou 3 étapes annoncées par le présage. « defaut » = v0.4rd telle quelle, référence appariée. Chaque réglage est joué par les trois instruments du test T3 complet (MC64R, MC 64 dont les suites ne rêvent jamais, MCP64 à portefeuille) ; échantillon P2, 2 parties, mêmes tables et graines. Lecture : python scripts/analyse_grille_reve.py <synthese>. Critères : gain du jugement (libre − meilleur fixe) sûr et ≥ 5 points ; riposte (reculs d'esprit + ordres du somnambule) au moins une fois par partie ; sommeil avant le tour 4 dans moins de 20 % des parties.",
+ "blocs": [
+  {
+   "nom": "somnambule",
+   "variantes": [
+    "defaut",
+    "regles:somnambule=true",
+    "regles:somnambule=true,presages=2",
+    "regles:somnambule=true,presages=3",
+    "regles:somnambule=true,somnambule_apprend=true",
+    "regles:somnambule=true,somnambule_apprend=true,presages=3"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 0.0
+       }
+      }
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "portefeuille": [
+       {
+        "nom": "reve0",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.0
+        }
+       },
+       {
+        "nom": "reve05",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.5
+        }
+       },
+       {
+        "nom": "reve1",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0
+        }
+       },
+       {
+        "nom": "reve1_sommeil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "sommeil"
+        }
+       },
+       {
+        "nom": "reve1_reveil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "reveil"
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "insectes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 2
+    }
+   ]
+  }
+ ]
+}

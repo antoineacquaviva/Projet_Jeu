@@ -91,6 +91,9 @@ REGLES = {
     "bruit": _bool,
     "cauchemar": _bool,                # [reve_dispute:cauchemar] proposition du 14 oct. 2026, à tester
     "cauchemar_cases": _entier_pos,    # [reve_dispute:grille] cases de recul par cauchemar (absent = 1) ; grille du 14 oct.
+    "somnambule": _bool,               # [reve_dispute:somnambule] la tuile dépassée par un esprit s'exécute (essai du 14 oct.)
+    "somnambule_apprend": _bool,       # [reve_dispute:somnambule] cette exécution fait apprendre la tuile
+    "presages": _entier_pos,           # [reve_dispute:presages] étapes annoncées par le présage (R2.6 : 1)
     "dernier_sursaut": _bool,
     "sursaut_max": _entier_ou_rien,
     # R2.5, R2.6 (moteur 1.2) : communication au conseil et présage

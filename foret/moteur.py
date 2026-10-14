@@ -214,6 +214,7 @@ class Partie(Plans):
         self.etape = 0
         self.etapes = tuple(range(1, M["etapes"] + 1))
         self.esprit_vu_au_centre = False
+        self.somn_attente = []            # [reve_dispute:somnambule] tuiles dépassées par un esprit, à exécuter
         self.sablier = 0                  # [v2:D1] rêves accumulés vers le prochain pas de l'esprit (reves_par_pas)
         self.derniere_attaque = None      # (zone, tour, étape)
         self.attaques = []                # [(zone, tour, étape)] : Représailles dans le rayon [v2:A3]
@@ -808,9 +809,52 @@ class Partie(Plans):
             self.sablier = 0
         self.rever(choix)
         self.stat("esprits_" + source)
-        self.verifier_sommeil()
+        if self.R.get("somnambule") and choix[0] == "avancer":
+            self.somn_attente.append(self.piste[choix[1]])   # la tuile dépassée, passée derrière l'esprit
+            self.stat("somnambule_reveils")
+        else:
+            self.verifier_sommeil()
         if voies == "deux":                                # [v2:D2v_deux] les deux voies à la fois
             self.rejoindre_cercle(siege, source)
+
+    def somnambule(self):
+        """[reve_dispute:somnambule] Piste « le somnambule » (14 oct. 2026, accord de l'auteur pour l'essai ;
+        projet/2-maquettes/reve-dispute-problematique-et-pistes.md) : quand un esprit avance, la tuile qu'il
+        dépasse s'exécute : le Méchant agit dans son sommeil. Choix de modélisation (Claude, 14 oct.) :
+        - les tuiles dépassées pendant l'étape s'exécutent après les barrages et les sabotages de l'étape
+          (étape 4 bis), avant l'ordre du Méchant : la défense de l'étape peut les contrer ;
+        - avec deux pistes (qui et où), c'est le favori qui agit (la Machine en case 1 de la piste des
+          Machines), comme pour le doublé « favori » ; avec la piste unique, la Machine la plus proche ;
+        - pas de dés, donc ni présage, ni embuscade, ni Hanter, ni tromperie ; l'ordre n'apprend que si
+          `somnambule_apprend` (une réussite fait alors reculer l'esprit qui vient de passer : tir à la corde) ;
+        - un esprit qui atteint le 7 endort le Méchant après l'exécution de la tuile qu'il a dépassée."""
+        while self.somn_attente:
+            tuile = self.somn_attente.pop(0)
+            case = next((c for c in CASES if self.piste[c] is tuile), None)
+            if case is None:
+                self.stat("somnambule_sans_tuile")
+                continue
+            if self.R["plan"] == "une_piste":
+                info = {"tuile": tuile, "case": case, "cible": None, "machine": None}
+                if tuile.genre == "tactique":
+                    info["cible"] = self.cible(tuile)
+                    info["machine"] = self.machine_pour(info["cible"])
+                reussite = self.executer(info)
+            elif self.R["plan"] == "qui_ou":
+                info = {"des": None, "case": case, "tuile": tuile, "ecart": 1, "action": None,
+                        "machine": None, "cible": None, "machines": []}
+                self._interpreter_qui_ou(info, True)
+                reussite = self.executer_v2(info)
+            else:
+                self.lacune("somnambule_sans_modele", self.R["plan"])
+                continue
+            self.stat("somnambule_ordres")
+            self.stat("somnambule_reussis" if reussite else "somnambule_echoues")
+            self.log(f"  somnambule : {tuile} ({case}) s'exécute dans le sommeil du Méchant : "
+                     f"{'réussite' if reussite else 'échec'}")
+            if reussite is not None and self.R.get("somnambule_apprend"):
+                self.apprendre(case, bool(reussite))
+        self.verifier_sommeil()
 
     def capacite_cercle(self):
         """[v2:D2] le Cercle compte cercle_par_joueur cases par joueur."""
@@ -1376,16 +1420,16 @@ class Partie(Plans):
         """R2.6 : quand la communication est close, on lance les dés de la
         première étape ; ils serviront à cette étape. S'ils sont déjà lancés
         (Voir), on ne relance pas."""
-        e = self.etapes[0]
-        if e in self.des_vus:
-            self.stat("presage_deja_vu")
-            return
-        d = self.lancer_des()
-        self.des_vus[e] = d
-        self.tuile_vue[e] = self.piste[sum(d)]
-        self.des_source[e] = "presage"
-        self.stat("presages")
-        self.log(f"Présage : étape {e}, dés {sum(d)} -> {self.piste[sum(d)]}")
+        for e in self.etapes[:self.R.get("presages", 1)]:   # [reve_dispute:presages] plus d'étapes annoncées
+            if e in self.des_vus:
+                self.stat("presage_deja_vu")
+                continue
+            d = self.lancer_des()
+            self.des_vus[e] = d
+            self.tuile_vue[e] = self.piste[sum(d)]
+            self.des_source[e] = "presage"
+            self.stat("presages")
+            self.log(f"Présage : étape {e}, dés {sum(d)} -> {self.piste[sum(d)]}")
 
     def ordre_connu(self, etape):
         """Ce que les dés déjà vus (Voir, présage) annoncent pour cette étape, lu
@@ -1530,6 +1574,8 @@ class Partie(Plans):
         for j in list(self.ee.actifs):
             if j.action == "saboter":
                 self.resoudre_sabotage(j)
+        # 4 bis. [reve_dispute:somnambule] les tuiles dépassées par les rêves de l'étape s'exécutent
+        self.somnambule()
         # 5. L'ordre du Méchant
         info = self.ee.info = self.tirer_ordre(e)
         # 6. Embuscades
@@ -1538,12 +1584,14 @@ class Partie(Plans):
         # 7. Exécution et apprentissage
         if info is not None:
             self.executer_et_apprendre(info)
+        self.somnambule()                                  # [reve_dispute:somnambule] rêves venus d'Égarer
         # 8. Ordres supplémentaires (plan vers la V1, 7 bis : nombre d'ordres selon la taille de la table)
         for _ in range(1, self.R.get("ordres_par_etape", 1)):
             info = self.ee.info = self.tirer_ordre(e, supplementaire=True)
             if info is not None:
                 self.stat("ordres_supplementaires")
                 self.executer_et_apprendre(info)
+        self.somnambule()
 
     def options_aller(self, jeu):
         """R3.2 (+ Voler, Se fondre)"""
