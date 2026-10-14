@@ -96,6 +96,9 @@ La phase 4 cherche d'abord à freiner le rêve (seuil du Cercle, nombre de lunes
 | 14 oct., 8 h 06 | Claude relit et vérifie, tranche seul les questions ouvertes : garde-fou codé tout de suite ; « Campagne P3 » renommée « Campagne de profondeur » |
 | 14 oct., 9 h 14 | **Nettoyage du contexte du projet** : archivage (dépôt Git = historique, sinon `claude/archive/`), verdicts validés y compris quatre suppressions, instructions du projet (droits sans confirmation, grouper les validations), index unique et journal unique |
 
+## 7 bis. Visuels (14 oct.)
+- **Choix techniques de Claude** (14 oct., révision de « Visuels : méthode et techniques », `projet/5-visuels/methode-et-techniques.md`) : aucune image du jeu dans le dépôt public tant que l'auteur ne l'a pas décidé (verser une image ici reviendrait à la publier) ; seuls les documents, la charte, la nomenclature, les scripts et les gabarits vides y vont. Mise en page du prototype par les données : Python + SVG, export PDF de planches et PNG. Les choix de direction artistique restent à l'auteur.
+
 ## 8. Annexe : effet de chaque décision du 11 oct. (v1 contre v0)
 La maquette v1 a été rejouée en ramenant une seule décision à sa forme v0 (gloutons, 15 duos, 72 000 parties). Écarts par rapport à la v1 :
 

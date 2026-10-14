@@ -70,6 +70,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Bilan du cycle 1 : de la V0.3 à la V0.4 proposée](projet/4-bilans/cycle-1-bilan.md) | Durée réglée, difficulté selon le bot, proposition de V0.4, alertes D et E |
 | | [Garde-fou « aucune boucle gagnante » : première lecture](projet/4-bilans/garde-fou-boucles-ligne-de-base.md) | V0.3 rouge (une boucle égale le bot fort), V0.4 orange (6 points à 4 joueurs) |
 | | [Historique des campagnes et des passages](projet/4-bilans/campagnes-et-passages-historique.md) | Tableau complet des lancements GitHub et journal des passages (hors `ETAT.md`) |
+| `5-visuels` | [Visuels : méthode et techniques](projet/5-visuels/methode-et-techniques.md) | Flux hybride (fait main, 3D, code, IA guidée) : principes, pièces, flux par famille, impression, provenance, phasage (14 oct.) |
 
 Les fichiers HTML s'ouvrent dans un navigateur, après téléchargement. Les documents citent parfois des chemins `claude/moteur-v1/…` : ce sont ceux de l'espace de travail d'origine, qui correspondent ici à la racine du dépôt.
 
