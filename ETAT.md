@@ -217,7 +217,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 **Bot fort de la V2 (13 oct., décision technique de Claude, signalée à l'auteur).** En V2, le bot de référence MC 64 dont les suites ne rêvent pas rêve peu et perd contre le glouton qui rêve (tape-taupe −5 points). Le bot fort de la V2 est donc MC 64 chacun pour soi dont les suites rêvent une carte par tour (`MC64R` dans `foret/batterie.py`) : configurations `p3_v2r` et `m3_v2r`, campagnes de la V2 de l'étape 3.4 et de la robustesse. En v1, la référence reste MC 64 (ses suites ne rêvent pas : c'est là qu'il est le plus fort).
 
 ## 6. Verrou
-EN COURS 2026-10-14 14:20 (session interactive : étape 3 quater, sous-étapes a à c, code)
+
 
 ## 7. Compteur de passages
 
@@ -267,6 +267,7 @@ Durées de référence, mesurées de la création du lancement à la fin de la d
 | Batterie 7 | programme **p3** (pro3_v04 et pro3_v03, 1 336 parties : tables de 2 et 3, spectateur, taux de rêve, tape-taupe, gain du bot libre sur les duos) | 16 | réussi, traité (a.3) | 30 min | lancée le 14 oct. 9 h 30 UTC ; résultats dans `batterie/run7_p3/` (rapport.json, resume.md). Première lecture (14 oct., 13 h 25) : V0.4 foret 72,4 % contre 91,9 % en V0.3 ; meilleur taux de rêve fixe 0 en V0.4 (écart non significatif avec 1,0), 1,0 en V0.3 ; alerte E à trancher par l'auteur après l'analyse en apparié |
 | Batterie 8 | programme **rd** (rd_v04rd : V0.4 + rêve disputé, 668 parties, mêmes graines que pro3_v04 de la batterie 7) | 16 | en cours | – | lancée le 14 oct. 12 h 02 UTC ; résultats attendus dans `batterie/run8_rd/` |
 | Campagne 21 | ligne_base_p2 sur **v0.4rd** (rêve disputé), MC64R et portefeuille, témoins ; environ 480 parties ; appariée à la campagne 19 | 14 | en cours | – | lancée le 14 oct. 12 h 02 UTC ; fin estimée vers 14 h UTC (30 lots pour 20 emplacements) |
+| Campagnes 22, 23, 24 | **choix_temoins** sur v0.3, v0.4 et v0.4rd : MC64R qui juge une décision sur quatre (jugements étiquetés), échantillon P2, 2 parties, 32 parties chacune ; témoins de T4 et T5 (étape 3 quater c) | 16 | en cours | – | lancées le 14 oct. 12 h 33 UTC ; *à faire* : `syn["choix"]` de chaque synthèse, section 3 de `projet/4-bilans/choix-strategique-premieres-lectures.md` |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
