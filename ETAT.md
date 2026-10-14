@@ -201,6 +201,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
    - comparer `batterie/run8_rd/rapport.json` (config `rd_v04rd`) à `batterie/run7_p3/rapport.json` (config `pro3_v04`) : **gain du bot libre**, meilleur taux de rêve fixe, tape-taupe, Shapley, surprise ;
    - dans les synthèses : `tir_a_la_corde`, `cauchemar_recul`, fins (sommeil avant le tour 4), rêves par voie ;
    - juger sur les critères de la proposition (section 6) : gain du bot libre ≥ 5 points, meilleur taux fixe intermédiaire, au moins un recul d'esprit par partie, sommeil avant le tour 4 dans moins de 20 % des parties ;
+   - **lectures complémentaires** (14 oct., 14 h 30, choix techniques de Claude ; `projet/3-pilotage/choix-strategique.md`, sections 6 et 7) : signaler dans le bilan que MC64R rêve à horloge fixe dans ses suites (l'instrument peut écraser le gain du bot libre) ; si le gain libre est sous 5 points, le remesurer avec MC 256 à portefeuille sur un échantillon (duos et trios, 2 parties) avant de conclure ; ajouter au garde-fou « boucles » une famille d'horaires (rêver à partir du tour *k*, jusqu'au tour *k*) ; enregistrer dans les jugements du bot `mc` le nom des options et quelques indices publics (tour, case de l'esprit le plus avancé, tactiques en 8 à 12, menace maximale, présage connu), pour le profil de Δ (T4) et la lisibilité (T5), en lecture seule ;
    - écrire `projet/4-bilans/essai-reve-dispute.md`, puis **DÉCISION UTILISATEUR** : adopter la règle pour le cycle 2, la régler, ou l'écarter.
 4. **Plan `cycles/c2.json` et lancement du cycle 2** (V0.4 → V0.5), après la décision sur l'essai. Priorités : l'intérêt des choix et la profondeur ; le dilemme du rêve à 2 et 3 joueurs (alerte E) ; la difficulté à 3, 5 et 6 joueurs (alerte D), avec un réglage taille par taille et au plus 4 éléments propres au nombre de joueurs.
 
@@ -209,7 +210,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 **Bot fort de la V2 (13 oct., décision technique de Claude, signalée à l'auteur).** En V2, le bot de référence MC 64 dont les suites ne rêvent pas rêve peu et perd contre le glouton qui rêve (tape-taupe −5 points). Le bot fort de la V2 est donc MC 64 chacun pour soi dont les suites rêvent une carte par tour (`MC64R` dans `foret/batterie.py`) : configurations `p3_v2r` et `m3_v2r`, campagnes de la V2 de l'étape 3.4 et de la robustesse. En v1, la référence reste MC 64 (ses suites ne rêvent pas : c'est là qu'il est le plus fort).
 
 ## 6. Verrou
-EN COURS 2026-10-14 14:10 (session interactive : leçon sur le choix stratégique, documents seulement)
+
 
 ## 7. Compteur de passages
 
@@ -276,6 +277,7 @@ Les trois derniers passages. Les précédents (13 et 14 oct.) sont dans [`projet
 | 14 oct. 2026 | 13:30 | 30 min | terminé | Session interactive (avec l'auteur) : analyse de a.3 faite (`scripts/analyse_p3.py`, `projet/4-bilans/protocole-p3-analyse.md`). V0.4 garde 17 à 31 points de moins que V0.3, écart sûr à chaque taille ; alerte E confirmée. Décision de l'auteur : baisse acceptable. Étape a.4 (plan du cycle 2) non lancée : elle attend la décision sur l'alerte E. Pas compté dans le plafond. |
 | 14 oct. 2026 | 13:45 | 30 min | terminé | Session interactive (Opus, avec l'auteur) : proposition de conception pour l'alerte E, `projet/2-maquettes/proposition-le-reve-dispute.md`. Constat : le tir à la corde ne joue que 0,05 à 0,09 fois par partie ; le rêve est une course séparée, sans lien avec la situation. Aucun code, aucune règle modifiée. Pas compté dans le plafond. |
 | 14 oct. 2026 | 13:55 | 25 min | terminé | Session interactive (Opus, avec l'auteur) : essai du rêve disputé accepté par l'auteur. Règle `cauchemar` (fausse par défaut), maquette `v0.4rd`, programme batterie `rd`, `tests/test_reve_dispute.py` ; 387 tests verts, conformité OK, V0.4 inchangée (non-régression). Essai local au glouton (duos, indice) : reculs d'esprit 2,8 par partie en rêvant contre 0,03. Lancés : batterie 8 et campagne 21. Réveil armé pour 16 h 20 (heure de Paris). Pas compté dans le plafond. |
+| 14 oct. 2026 | 14:10 | 25 min | terminé | Session interactive (Opus) : leçon sur le choix stratégique, tirée de l'alerte E (`projet/3-pilotage/choix-strategique.md`) ; lectures complémentaires techniques ajoutées à l'étape 3 ter ; trois propositions soumises à l'auteur (principes et règles de méthode, profil de Δ et lisibilité, fréquence des mécanismes). Documents seulement. Pas compté dans le plafond. |
 
 ## 11. Reprendre la main
 

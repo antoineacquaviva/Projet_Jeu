@@ -59,6 +59,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Objectifs, invariants et catalogue](projet/3-pilotage/objectifs-invariants-catalogue.md) | Les quatre objectifs d'expérience, leurs bandes, ce qui ne change pas, les variables |
 | | [Cahier des charges du calcul](projet/3-pilotage/cahier-des-charges-calcul.md) | Où faire tourner les campagnes : GitHub Actions (décision 10) |
 | | [Journal des décisions](projet/3-pilotage/journal-des-decisions.md) | Toutes les décisions de l'auteur (A1 à A13, B1 à B4, C1, D1 à D9, plan vers la V1) |
+| | [Ce qui fait un choix stratégique](projet/3-pilotage/choix-strategique.md) | La leçon du rêve (14 oct.) : choix dominé, indifférent ou disputé ; principes de conception, tests T1 à T5, règles de méthode |
 | | [Garde-fou « aucune boucle gagnante »](projet/3-pilotage/garde-fou-boucles-gagnantes.md) | Aucune action ni suite d'actions répétée, ni convention de table, ne doit gagner (décision C1, 14 oct.) |
 | `4-bilans` | [Moteur v0 : lacunes et incohérences](projet/4-bilans/moteur-v0-lacunes.md) | Le premier moteur et ce qu'il a révélé |
 | | [Moteur v1 : conformité et campagne de référence](projet/4-bilans/moteur-v1-conformite.md) | L'audit règle par règle, v0 contre v1 |
