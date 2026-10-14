@@ -11,8 +11,8 @@
 - **T3 léger : aucune règle simple de rêve ne bat la meilleure politique d'horloge**, ni en V0.3, ni en V0.4, ni en V0.4rd, à aucune taille de table. Les écarts vont de 0 à −32 points. Pour un joueur moyen, juger quand rêver ne rapporte rien aujourd'hui, ce qui est cohérent avec la leçon du rêve. Sur la V0.4rd, ce verdict ne vaut que pour ces bots ; le bot fort tranchera (T3 complet et T4).
 - **T4 et T5 (bot fort, campagnes 22 à 24)** :
   - le témoin V0.3 donne le bon sens (rêver l'emporte trois fois plus souvent), mais un régime « indifférent » : le seuil par décision est trop haut ;
-  - le témoin V0.4 rate, à cause de l'instrument : MC64R rêve dans ses suites, ce qui pousse à rêver ; une vérification est lancée ;
-  - **le rêve disputé, joué par le bot fort, redevient un rêve dominant** : sommeil au tour 3,7 dans 81 % des parties, tir à la corde 0,16 par partie ;
+  - le témoin V0.4 rate, à cause de l'instrument ; avec trois instruments (campagnes 22 à 30), le profil décision par décision du rêve ne sépare toujours pas les témoins : **pour un choix de rythme, le test qui fait foi est T3 complet, au niveau de la partie**, et il réussit les deux témoins (V0.3 dominé par rêver, +5,8 ; V0.4 dominé par défendre, −7,4) ;
+  - **le rêve disputé, joué par le bot fort, redevient un rêve dominant** : +11,5 points pour rêver, juger ne rapporte rien, sommeil au tour 3,7 à 4,0 ;
   - saboter ou barrer en V0.4 est le choix le plus proche d'un vrai choix, et il se lit sur la menace de l'étape.
 
 ## 1. T1 : fréquence des mécanismes voulus (par partie)
@@ -80,6 +80,30 @@ MC64R juge une décision sur quatre (16 suites appariées par option), sur l'éc
 - Campagne `choix_portefeuille` lancée sur v0.3, v0.4 et v0.4rd (lancements 28 à 30).
 - Le seuil par décision et la règle des régimes seront recalibrés sur ces témoins, pas sur la version jugée.
 - Pour les choix sans rythme (saboter ou barrer, moitié), MC64R reste l'instrument du cycle.
+
+**Le bot à portefeuille (campagnes 28 à 30) et la conclusion technique.**
+| Version | Forêt, MCP64 | Rêver l'emporte (situations) | Défendre l'emporte | Neutre |
+|---|---|---|---|---|
+| V0.3 | 92,3 % | 28 % | 5 % | 67 % |
+| V0.4 | 76,0 % | 33 % | 7 % | 60 % |
+| V0.4rd | 86,2 % | 43 % | 16 % | 41 % |
+
+**Décision par décision, même avec le meilleur instrument, la V0.3 et la V0.4 donnent le même profil.** Aucun seuil ne sépare les deux témoins : le profil de Δ d'une décision isolée ne voit pas la domination d'un rythme, qui se joue sur l'enchaînement des rêves. Il n'y a donc rien à recalibrer pour le rêve. Le test qui fait foi pour un choix de rythme est **T3 complet, au niveau de la partie** : les deux politiques fixes et le bot qui juge, sur les mêmes tables et graines.
+
+| Version | Rêve 1 − rêve 0 (une option domine-t-elle ?) | Libre − meilleur fixe (juger rapporte-t-il ?) | Régime |
+|---|---|---|---|
+| V0.3 | **+5,8** [2,1 ; 9,7] sûr | −2,1 [−4,8 ; 0,6] incertain | **dominé par rêver** (témoin réussi) |
+| V0.4 | **−7,4** [−12,7 ; −1,8] sûr | +1,6 [−4,3 ; 8,2] incertain | **dominé par défendre** (témoin réussi) |
+| **V0.4rd** | **+11,5** [6,4 ; 16,4] sûr | −3,4 [−7,6 ; 0,5] incertain | **dominé par rêver**, plus nettement que la V0.3 |
+
+*« Rêve 1 » : MC64R, dont les suites rêvent une carte par tour (campagnes 22 à 24) ; « rêve 0 » : suites qui ne rêvent jamais (25 à 27) ; « libre » : MCP64 (28 à 30). Mêmes 16 tables, 2 graines : 32 paires par version.*
+
+**Choix techniques (Claude, 14 oct., 16 h 30).**
+1. Pour un **choix de rythme** (rêver ou défendre), la mesure de référence est T3 complet, au niveau de la partie (`foret.choix.gain_jugement`, campagne réutilisable `jugement_reve`). Elle est validée par les deux témoins. Le profil de Δ du rêve reste calculé, avec la mention « non applicable ».
+2. Pour les **choix sans rythme** (saboter ou barrer, moitié de carte), T4 garde son seuil de 2 points et sa règle des régimes. Leur profil ne dépend pas de l'instrument. Il leur manque encore des témoins propres : une variante où saboter domine, par exemple. Ils restent en lecture.
+3. Le cycle garde sa configuration : la dernière manche de confirmation juge une décision sur dix avec le bot fort, pour les choix sans rythme. Pour le rêve, `jugement_reve` se joue une fois par version adoptée et pour chaque essai de règle.
+
+**Ce que cela dit du rêve disputé, dans ses réglages actuels.** Avec le bot fort, rêver domine encore plus nettement qu'en V0.3 (+11,5 points), et juger ne rapporte rien. Le critère de la proposition (gain du bot libre d'au moins 5 points) n'est pas atteint. La règle du cauchemar existe bien (T1 : le tir à la corde se produit avec les bots simples), mais le bot fort court au sommeil avant qu'elle ne joue. Les leviers à essayer avant de juger la règle elle-même sont moins de lunes, un cauchemar qui repousse de deux cases, ou un retour du sablier à deux rêves pour un pas. La décision revient à l'auteur (étape 3 ter d'ETAT.md).
 
 **Les autres choix.**
 - *Saboter ou barrer* en V0.4 est le choix le plus proche d'un vrai choix. Chaque option gagne nettement dans une part notable des situations (24 % et 14 %), et une seule règle lisible bat le hasard de 16 points : « saboter si la menace maximale de l'étape est faible, barrer sinon ». Un deuxième indice n'ajoute rien. Ce choix est lisible, mais il n'offre pas encore de profondeur.

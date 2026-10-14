@@ -25,6 +25,12 @@ S = 2.0                   # points de forêt : en deçà, la situation est neutr
 SEUIL_MENACE = 0.15       # comme le glouton (seuil_menace)
 
 # choix étudiés : (type de décision, étiquettes de A, étiquettes de B, nom de A, nom de B)
+# Le choix « rêver ou défendre » est un choix de RYTHME : un rêve ne vaut que par ceux qui suivent, si bien que son
+# profil décision par décision dépend de la politique des suites du bot (campagnes 22 à 30, 14 oct.) et ne sépare
+# pas les témoins V0.3 et V0.4. Il reste calculé pour information ; le test qui fait foi est gain_jugement (T3
+# complet, au niveau de la partie). Les choix sans rythme (saboter ou barrer, moitié) gardent le même profil quel
+# que soit l'instrument : T4 s'y applique.
+RYTHME = {"rever_ou_defendre"}
 CHOIX = {
     "rever_ou_defendre": ("programmer_mode", {"reve"}, {"haut", "bas"}, "rêver", "défendre"),
     "saboter_ou_barrer": ("action", {"saboter"}, {"barrer"}, "saboter", "barrer"),
@@ -273,7 +279,77 @@ def markdown(analyse, titre="Choix stratégiques : profil de Δ et lisibilité (
             regle = li.get("regle")
             rg = (f"{regle['indice']} ≤ {_f(regle['seuil'], '.2f')} → {na if regle['si_inferieur'] == 'A' else nb}"
                   if regle else "–")
+            regime = p.get('regime', '–') + (" (choix de rythme : non applicable, voir T3)" if c in RYTHME else "")
             L.append(f"| {nv} | {na} ou {nb} | {p.get('n', 0)} | {_f(p.get('part_a'))} % | {_f(p.get('part_b'))} % | "
-                     f"{_f(p.get('neutre'))} % | {_f(p.get('delta_moyen'), '+.1f')} | {p.get('regime', '–')} | "
+                     f"{_f(p.get('neutre'))} % | {_f(p.get('delta_moyen'), '+.1f')} | {regime} | "
                      f"{_f(li.get('hasard'))} % | {_f(li.get('un_indice'))} % | {_f(li.get('deux_indices'))} % | {rg} |")
+    return "\n".join(L) + "\n"
+
+
+# ------------------------------------------------------------------ T3 complet : un choix de rythme (le rêve)
+def _role_bot(bot, params):
+    """« libre » (portefeuille), « fixe_<taux> » (taux de rêve imposé ou suites à taux fixe), ou None."""
+    if bot != "mc":
+        return None
+    if params.get("portefeuille"):
+        return "libre"
+    if "reves_par_tour" in params:
+        return f"fixe_{params['reves_par_tour']:g}"
+    r = (params.get("politique") or {}).get("params", {}).get("reves_par_tour")
+    return f"suites_{r:g}" if r is not None else None
+
+
+def gain_jugement(pc):
+    """[mesure:gain_libre] Test T3 complet, au niveau de la partie, pour un choix dont la valeur dépend du rythme
+    (le rêve) : la décision par décision (T4) ne s'y applique pas, parce qu'un rêve ne vaut que par ceux qui
+    suivent (étape 3 quater c, campagnes 22 à 30). On compare, sur les mêmes tables et graines :
+    - les deux politiques fixes (rêve 0 et rêve 1, imposés ou dans les suites) : leur écart dit si une option domine ;
+    - le bot libre à portefeuille, qui juge à chaque tour : son gain sur la meilleure politique fixe dit si juger rapporte.
+    Régime : « disputé » si le gain du jugement est sûr et positif ; sinon « dominé par rêver » ou « dominé par
+    défendre » si l'écart entre les deux politiques fixes est sûr ; sinon « indifférent »."""
+    import json as _json
+    from .stats import ecart_apparie
+    cols = pc["colonnes"]
+    vals = defaultdict(dict)
+    for l in pc["lignes"]:
+        r = dict(zip(cols, l))
+        role = _role_bot(r["bot"], _json.loads(r.get("bot_params") or "{}"))
+        if role:
+            vals[(r["variante"], role)][f"{r['peuples']}#{r['graine']}"] = r["foret_pct"]
+    out = {}
+    for v in sorted({v for v, _ in vals}):
+        roles = {role: x for (vv, role), x in vals.items() if vv == v}
+        fixes = {k: x for k, x in roles.items() if k.endswith(("_0", "_1"))}
+        zero = next((x for k, x in fixes.items() if k.endswith("_0")), None)
+        un = next((x for k, x in fixes.items() if k.endswith("_1")), None)
+        if zero is None or un is None:
+            continue
+        dom = ecart_apparie(zero, un)                           # rêve 1 − rêve 0
+        meilleur = un if sum(un.values()) / len(un) >= sum(zero.values()) / len(zero) else zero
+        res = {"reve1_moins_reve0": dom, "meilleur_fixe": "rêve 1" if meilleur is un else "rêve 0"}
+        if "libre" in roles:
+            g = ecart_apparie(meilleur, roles["libre"])         # libre − meilleur fixe
+            res["gain_du_jugement"] = g
+        g = res.get("gain_du_jugement")
+        if g and g["verdict"] == "sûr" and g["ecart"] > 0:
+            res["regime"] = "disputé (juger rapporte)"
+        elif dom["verdict"] == "sûr":
+            res["regime"] = "dominé par rêver" if dom["ecart"] > 0 else "dominé par défendre"
+        else:
+            res["regime"] = "indifférent"
+        out[v] = res
+    return out
+
+
+def markdown_jugement(res, titre="Rêver ou défendre : test T3 complet, au niveau de la partie"):
+    L = [f"## {titre}", "",
+         "*Mêmes tables et graines ; écarts appariés en points de forêt. Rêve 1 − rêve 0 : une option domine-t-elle ? "
+         "Libre − meilleur fixe : juger rapporte-t-il ? (étape 3 quater c, 14 oct.)*", "",
+         "| Variante | Rêve 1 − rêve 0 | Meilleur fixe | Libre − meilleur fixe | Régime |", "|---|---|---|---|---|"]
+    for v, r in res.items():
+        d, g = r["reve1_moins_reve0"], r.get("gain_du_jugement") or {}
+        fmt = lambda e: "–" if not e or e.get("ecart") is None else (  # noqa: E731
+            f"{_f(e['ecart'], '+.1f')} [{_f(e['ic95'][0], '.1f')} ; {_f(e['ic95'][1], '.1f')}] ({e['verdict']})")
+        nv = "l'ancre" if v == "defaut" else (v if len(v) < 40 else v[:37] + "…")
+        L.append(f"| {nv} | {fmt(d)} | {r['meilleur_fixe']} | {fmt(g)} | {r['regime']} |")
     return "\n".join(L) + "\n"

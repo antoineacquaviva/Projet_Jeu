@@ -1,0 +1,178 @@
+{
+ "nom": "jugement_reve",
+ "maquette": "v0.4",
+ "description": "Test T3 complet du choix « rêver ou défendre » (étape 3 quater c, 14 oct. 2026), validé sur les témoins V0.3 (dominé par rêver, +5,8 points, sûr) et V0.4 (dominé par défendre, −7,4 points, sûr) : trois instruments sur les mêmes tables et graines (échantillon P2, 2 parties) : MC64R (suites qui rêvent une carte par tour), MC 64 dont les suites ne rêvent jamais, MCP64 (portefeuille, juge à chaque tour). Lecture : foret.choix.gain_jugement(parties_compactes). À jouer une fois par version adoptée et pour chaque essai de règle sur le rêve.",
+ "blocs": [
+  {
+   "nom": "juge",
+   "variantes": [
+    "defaut"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 0.0
+       }
+      }
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "portefeuille": [
+       {
+        "nom": "reve0",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.0
+        }
+       },
+       {
+        "nom": "reve05",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.5
+        }
+       },
+       {
+        "nom": "reve1",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0
+        }
+       },
+       {
+        "nom": "reve1_sommeil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "sommeil"
+        }
+       },
+       {
+        "nom": "reve1_reveil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "reveil"
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "insectes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 2
+    }
+   ]
+  }
+ ]
+}

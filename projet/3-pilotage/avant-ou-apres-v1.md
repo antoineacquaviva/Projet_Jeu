@@ -16,7 +16,7 @@
 | **Après la V1** (campagne de profondeur) | demande des règles stables, des parties humaines, ou une grande précision | à faire plus tôt, ce serait à refaire à chaque changement de règle |
 
 ## 2. Maintenant : à intégrer au cycle 2 (choix techniques de Claude, sauf mention)
-**État au 14 oct., 15 h : M1 à M5 faits** (étape 3 quater, a à c ; premières lectures : [choix-strategique-premieres-lectures.md](../4-bilans/choix-strategique-premieres-lectures.md)) ; M4 attend ses témoins (campagne `choix_temoins`). M6 à M11 restent.
+**État au 14 oct., 15 h : M1 à M5 faits** (étape 3 quater, a à c ; premières lectures : [choix-strategique-premieres-lectures.md](../4-bilans/choix-strategique-premieres-lectures.md)) ; M4 : témoins lus le 14 oct. (campagnes 22 à 30) ; pour le rêve, choix de rythme, le test de référence est T3 complet au niveau de la partie (campagne `jugement_reve`), validé sur V0.3 et V0.4 ; T4 reste pour les choix sans rythme. M6 à M11 restent.
 
 Dans l'ordre de mise en œuvre. Ce sont toutes des **lectures** : elles alimentent le rapport et les alertes. Les bandes nouvelles ne jugent qu'après confirmation sur leurs témoins (décision C3).
 

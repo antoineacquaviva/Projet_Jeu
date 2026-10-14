@@ -167,3 +167,33 @@ class TestCycle(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestGainJugement(unittest.TestCase):
+    """[mesure:gain_libre] T3 complet du rêve, au niveau de la partie (étape 3 quater c)."""
+
+    def _pc(self, r1, r0, libre, n=12):
+        cols = ["campagne", "variante", "bot", "peuples", "graine", "foret_pct", "tour", "fin", "cartes_en_reve",
+                "tours_max", "bot_params"]
+        rng = random.Random(3)
+        L = []
+        for g in range(n):
+            base = 70 + rng.gauss(0, 5)
+            for params, d in (({"budget": 64, "politique": {"type": "glouton", "params": {"reves_par_tour": 1.0}}}, r1),
+                              ({"budget": 64, "politique": {"type": "glouton", "params": {"reves_par_tour": 0.0}}}, r0),
+                              ({"budget": 64, "portefeuille": [{"nom": "a"}]}, libre)):
+                L.append(["b", "defaut", "mc", "a+b", g, base + d + rng.gauss(0, 0.5), 6, "nuit", 0, 6,
+                          json.dumps(params, sort_keys=True)])
+        return {"colonnes": cols, "lignes": L}
+
+    def test_regimes(self):
+        self.assertEqual(choix.gain_jugement(self._pc(6, 0, 5))["defaut"]["regime"], "dominé par rêver")
+        self.assertEqual(choix.gain_jugement(self._pc(-7, 0, -1))["defaut"]["regime"], "dominé par défendre")
+        self.assertEqual(choix.gain_jugement(self._pc(0, 0, 0))["defaut"]["regime"], "indifférent")
+        self.assertTrue(choix.gain_jugement(self._pc(0, 0, 5))["defaut"]["regime"].startswith("disputé"))
+        self.assertIn("Régime", choix.markdown_jugement(choix.gain_jugement(self._pc(6, 0, 5))))
+
+    def test_campagne_jugement_reve(self):
+        c = json.load(open(os.path.join(RACINE, "campagnes", "jugement_reve.json"), encoding="utf-8"))
+        roles = {choix._role_bot(b["type"], b["params"]) for b in c["blocs"][0]["bots"]}
+        self.assertEqual(roles, {"suites_1", "suites_0", "libre"})
