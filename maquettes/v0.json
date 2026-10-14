@@ -102,6 +102,7 @@
     "premier_joueur_tournant": true,
     "bruit": false,
     "cauchemar": false,
+    "cauchemar_cases": 1,
     "dernier_sursaut": false,
     "sursaut_max": 3,
     "communication": "aucun_signe",

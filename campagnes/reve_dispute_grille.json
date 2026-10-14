@@ -1,0 +1,185 @@
+{
+ "nom": "reve_dispute_grille",
+ "maquette": "v0.4rd",
+ "description": "Grille de réglage du rêve disputé (14 oct. 2026, 17 h 50, accord de l'auteur ; bilan projet/4-bilans/essai-reve-dispute.md). Plan factoriel 2 × 2 × 2 sur v0.4rd : lunes 3 ou 2 ; cauchemar d'une ou de deux cases (cauchemar_cases) ; un rêve pour un pas ou deux (sablier, reves_par_pas). « defaut » = v0.4rd telle quelle. Chaque réglage est joué par les trois instruments du test T3 complet (campagne jugement_reve, validée sur V0.3 et V0.4) : MC64R, MC 64 dont les suites ne rêvent jamais, MCP64 à portefeuille ; échantillon P2, 2 parties, mêmes tables et graines. Lecture : python scripts/analyse_grille_reve.py <synthese>. Critères : gain du jugement (libre − meilleur fixe) sûr et ≥ 5 points ; recul d'esprit au moins une fois par partie ; sommeil avant le tour 4 dans moins de 20 % des parties.",
+ "blocs": [
+  {
+   "nom": "grille",
+   "variantes": [
+    "defaut",
+    "regles:lunes=2",
+    "regles:cauchemar_cases=2",
+    "regles:reves_par_pas=2",
+    "regles:lunes=2,cauchemar_cases=2",
+    "regles:lunes=2,reves_par_pas=2",
+    "regles:cauchemar_cases=2,reves_par_pas=2",
+    "regles:lunes=2,cauchemar_cases=2,reves_par_pas=2"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      }
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 0.0
+       }
+      }
+     }
+    },
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "portefeuille": [
+       {
+        "nom": "reve0",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.0
+        }
+       },
+       {
+        "nom": "reve05",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 0.5
+        }
+       },
+       {
+        "nom": "reve1",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0
+        }
+       },
+       {
+        "nom": "reve1_sommeil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "sommeil"
+        }
+       },
+       {
+        "nom": "reve1_reveil",
+        "type": "glouton",
+        "params": {
+         "reves_par_tour": 1.0,
+         "voie": "reveil"
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "insectes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 2
+    }
+   ]
+  }
+ ]
+}

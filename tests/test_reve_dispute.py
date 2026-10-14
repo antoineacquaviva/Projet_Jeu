@@ -119,3 +119,42 @@ def test_programme_rd_apparie_a_la_batterie_7():
     cle = lambda t: (t["exp"], tuple(t["peuples"]), t["graine"], t["etiquette"], str(t["bots"]))
     assert [cle(t) for t in a] == [cle(t) for t in b]
     assert {t["maquette"] for t in b} == {"v0.4rd"}
+
+
+# ------------------------------------------------------------------ grille de réglage (14 oct., 17 h 50)
+def test_grille_cauchemar_de_deux_cases():
+    """[reve_dispute:grille] cauchemar_cases = 2 : l'esprit le plus avancé recule de deux cases (8 → 10) ;
+    chaque case compte un cauchemar_recul. Sans le paramètre, une seule case (comportement de v0.4rd)."""
+    m = charger("v0.4rd", "regles:cauchemar_cases=2")
+    assert m["regles"]["cauchemar_cases"] == 2
+    p = Partie(m, PEUPLES[:2], fabriquer_table(G1, 2, 100), graine=1)
+    p.stats = Counter()
+    stat = p.stat
+    def compter(code, n=1):
+        p.stats[code] += n
+        stat(code, n)
+    p.stat = compter
+    piste_avec_esprit(p, 8)
+    p.apprendre(12, True)
+    assert p.piste[10].genre == "esprit"
+    assert p.piste[8].genre != "esprit" and p.piste[9].genre != "esprit"
+    assert p.stats["cauchemar_recul"] == 2
+
+
+def test_grille_de_reglage_du_reve_dispute():
+    """[reve_dispute:grille] Campagne `reve_dispute_grille` : 2 × 2 × 2 réglages (lunes 3 ou 2, cauchemar d'une
+    ou deux cases, un ou deux rêves pour un pas) sur v0.4rd, les trois instruments du test T3 complet."""
+    import json
+    import os
+    from foret.sim import taches
+    c = json.load(open(os.path.join(os.path.dirname(__file__), "..", "campagnes", "reve_dispute_grille.json")))
+    assert c["maquette"] == "v0.4rd"
+    vs = c["blocs"][0]["variantes"]
+    assert len(vs) == 8 and len(set(vs)) == 8 and "defaut" in vs
+    vus = set()
+    for v in vs:
+        r = charger("v0.4rd", v)["regles"]
+        vus.add((r["lunes"], r.get("cauchemar_cases", 1), r["reves_par_pas"]))
+    assert vus == {(l, k, s) for l in (3, 2) for k in (1, 2) for s in (1, 2)}
+    t, ignorees = taches(c, "v0.4rd")
+    assert not ignorees and len(t) == 8 * 3 * 32

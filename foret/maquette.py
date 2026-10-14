@@ -90,6 +90,7 @@ REGLES = {
     "premier_joueur_tournant": _bool,
     "bruit": _bool,
     "cauchemar": _bool,                # [reve_dispute:cauchemar] proposition du 14 oct. 2026, à tester
+    "cauchemar_cases": _entier_pos,    # [reve_dispute:grille] cases de recul par cauchemar (absent = 1) ; grille du 14 oct.
     "dernier_sursaut": _bool,
     "sursaut_max": _entier_ou_rien,
     # R2.5, R2.6 (moteur 1.2) : communication au conseil et présage

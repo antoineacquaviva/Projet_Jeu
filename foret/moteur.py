@@ -875,11 +875,19 @@ class Partie(Plans):
 
     def cauchemar(self, case):
         """[reve_dispute:cauchemar] Proposition « le rêve disputé » (14 oct. 2026) : quand une tactique du
-        côté du rêve (cases 8 à 12) réussit, l'esprit le plus avancé recule d'une case. Si la tactique a
+        côté du rêve (cases 8 à 12) réussit, l'esprit le plus avancé recule d'une case (de `cauchemar_cases`
+        cases dans la grille de réglage du 14 oct. ; chaque case compte un `cauchemar_recul`). Si la tactique a
         déjà repoussé un esprit en apprenant (tir à la corde, R5.2), il n'y a pas de second recul. La
         réussite est celle qu'apprend le Méchant (après Tromper, R6.9)."""
-        if self.reculer_esprit("cauchemar_recul"):
-            self.log(f"  cauchemar : une tactique du côté du rêve a réussi (case {case}), l'esprit le plus avancé recule")
+        n = self.R.get("cauchemar_cases", 1)              # [reve_dispute:grille] 1 par défaut ; 2 dans la grille
+        recul = 0
+        for _ in range(n):
+            if not self.reculer_esprit("cauchemar_recul"):
+                break
+            recul += 1
+        if recul:
+            self.log(f"  cauchemar : une tactique du côté du rêve a réussi (case {case}), l'esprit le plus avancé "
+                     f"recule de {recul} case{'s' if recul > 1 else ''}")
         else:
             self.stat("cauchemar_sans_effet")
 

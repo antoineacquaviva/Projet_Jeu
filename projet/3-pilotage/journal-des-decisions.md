@@ -97,6 +97,7 @@ La phase 4 cherche d'abord à freiner le rêve (seuil du Cercle, nombre de lunes
 | 14 oct., 14 h 10 | **C2 : principes du choix stratégique** : les sept principes de conception et les six règles de méthode de `choix-strategique.md` sont adoptés ; la fiche du choix est un préalable à toute nouvelle règle |
 | 14 oct., 14 h 10 | **C3 : profil de Δ et lisibilité** : la mesure des « dilemmes » est remplacée par le profil de Δ (T4) ; la lisibilité (T5) est ajoutée ; lecture seule jusqu'à confirmation des seuils sur leurs témoins |
 | 14 oct., 14 h 10 | **C4 : fréquence des mécanismes voulus** (T1) dans le rapport de chaque cycle, alerte sous 0,5 occurrence par partie pour un mécanisme noté 8 ou 9 |
+| 14 oct., 17 h 47 | **Rêve disputé : grille de réglage avant MAP-Elites** : les réglages de la règle (lunes 3 ou 2, cauchemar d'une ou deux cases, un ou deux rêves pour un pas) sont testés sur une grille complète avec le test T3 complet (bot fort, partie entière) ; MAP-Elites seulement ensuite, autour d'une zone où juger rapporte ; bilan `projet/4-bilans/essai-reve-dispute.md` |
 | 14 oct., 14 h 10 | Préférence de l'auteur : appliquer dès la phase de sélection (cycles en cours) tout ce qui peut l'être ; le tri est dans `avant-ou-apres-v1.md` |
 | 14 oct., 9 h 14 | **Nettoyage du contexte du projet** : archivage (dépôt Git = historique, sinon `claude/archive/`), verdicts validés y compris quatre suppressions, instructions du projet (droits sans confirmation, grouper les validations), index unique et journal unique |
 
