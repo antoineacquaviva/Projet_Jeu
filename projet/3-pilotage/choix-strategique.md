@@ -114,7 +114,8 @@ Sans ces deux points, un gain libre faible pourrait venir du bot et non de la r�
 | Voir, Hanter (pouvoirs limités) | moment où l'ordre compte le plus | à jouer dès que possible : horaire ? |
 | Où poser une trace | ce que l'autre ignore | coordination nulle chez les bots (alerte C) |
 
-## 8. Décisions proposées à l'auteur (un seul lot)
+## 8. Décisions (adoptées par l'auteur le 14 oct., 14 h 10 : C2, C3, C4)
+*Mise en œuvre : dès le cycle 2, selon [avant-ou-apres-v1.md](avant-ou-apres-v1.md) (M1 à M6, M10).*
 1. **Adopter les sept principes et les six règles de méthode**, et la fiche du choix comme préalable à toute nouvelle règle. *Recommandation : oui.* Ils ne changent aucune règle du jeu et auraient évité les deux tours de réglage du rêve.
 2. **Remplacer la mesure des « dilemmes » par le profil de Δ (T4) et ajouter la lisibilité (T5)**, d'abord en lecture seule, avec les seuils proposés ci-dessus. *Recommandation : oui, en lecture seule jusqu'à la confirmation des seuils sur les témoins*, comme pour le garde-fou C1.
 3. **Ajouter T1 (fréquence des mécanismes voulus) au rapport de chaque cycle**, avec un seuil d'alerte (moins de 0,5 occurrence par partie pour un mécanisme noté 8 ou 9). *Recommandation : oui.* C'est le test le moins cher, et il aurait révélé le défaut dès la phase 1.

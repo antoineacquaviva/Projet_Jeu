@@ -2,7 +2,7 @@
 
 *Journal unique des décisions de l'auteur, du 10 au 14 oct. 2026. Il remplace les tables de décisions qui étaient répétées dans « Objectifs, invariants et catalogue » (§8), « Plan d'action » (§10), « Maquette de conception v2 » (fin), « Moteur de règles v0 » (§6) et « Batterie d'évaluation » (§7). Les décisions les plus récentes et les consignes des passages automatiques restent dans `ETAT.md` du dépôt (§2 et §8) : **en cas d'écart, le dépôt fait foi.** À partir de maintenant, toute nouvelle décision s'écrit ici (une ligne) et, si elle concerne les passages automatiques, dans `ETAT.md` §8.*
 
-*Dernière mise à jour : 14 oct. 2026.*
+*Dernière mise à jour : 14 oct. 2026, 14 h 30.*
 
 ## 1. Règles de décision en vigueur
 - **Claude tranche seul** (13 oct., 14 h) : les choix techniques (outils, code, workflows, calibrage des mesures et des témoins, seuils techniques, axes de la carte, bots, budgets). Il applique sa recommandation et la consigne ici ou dans `ETAT.md`.
@@ -94,6 +94,10 @@ La phase 4 cherche d'abord à freiner le rêve (seuil du Cercle, nombre de lunes
 | 13 oct., 23 h 27 | **V0.4 adoptée** (variante A du bilan du cycle 1) : `c:A2a,d_fav,C2a,D2v_choix|m:C3,D5,A4|p:escalade=5,lunes=3` et `{"regles": {"cercle_par_joueur": {"2": 4, "4": 3}, "machines_en_jeu": 5, "ordres_par_etape": {"2": 1, "4": 2}, "reves_par_pas": 2}}`. Acceptés avec elle : le sablier des rêves, les ordres supplémentaires du Méchant, le module A4 (escalade du soir dès le tour 5). Alerte A levée ; alertes D et E à surveiller au cycle 2 |
 | 14 oct., 7 h 55 | **C1 : garde-fou « aucune boucle gagnante »** : une action ou une suite d'actions répétée, y compris à plusieurs joueurs, ne doit pas être une stratégie gagnante. Garde-fou (pas de cinquième objectif), bandes proposées (écart à la meilleure boucle : vert ≥ 10 points, rouge < 3), lecture seule dès le cycle 2. Bandes à confirmer par l'auteur avant qu'elles jugent. Spécification : `garde-fou-boucles-gagnantes.md` (dépôt) |
 | 14 oct., 8 h 06 | Claude relit et vérifie, tranche seul les questions ouvertes : garde-fou codé tout de suite ; « Campagne P3 » renommée « Campagne de profondeur » |
+| 14 oct., 14 h 10 | **C2 : principes du choix stratégique** : les sept principes de conception et les six règles de méthode de `choix-strategique.md` sont adoptés ; la fiche du choix est un préalable à toute nouvelle règle |
+| 14 oct., 14 h 10 | **C3 : profil de Δ et lisibilité** : la mesure des « dilemmes » est remplacée par le profil de Δ (T4) ; la lisibilité (T5) est ajoutée ; lecture seule jusqu'à confirmation des seuils sur leurs témoins |
+| 14 oct., 14 h 10 | **C4 : fréquence des mécanismes voulus** (T1) dans le rapport de chaque cycle, alerte sous 0,5 occurrence par partie pour un mécanisme noté 8 ou 9 |
+| 14 oct., 14 h 10 | Préférence de l'auteur : appliquer dès la phase de sélection (cycles en cours) tout ce qui peut l'être ; le tri est dans `avant-ou-apres-v1.md` |
 | 14 oct., 9 h 14 | **Nettoyage du contexte du projet** : archivage (dépôt Git = historique, sinon `claude/archive/`), verdicts validés y compris quatre suppressions, instructions du projet (droits sans confirmation, grouper les validations), index unique et journal unique |
 
 ## 7 bis. Visuels (14 oct.)
