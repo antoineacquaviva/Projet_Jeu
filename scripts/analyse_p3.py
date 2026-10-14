@@ -1,6 +1,9 @@
 """Analyse apparie du protocole P3 (plan vers la V1, étape a.3) : V0.4 contre son ancre V0.3.
 
-    python scripts/analyse_p3.py <synthese V0.4 (campagne ligne_base_p2 sur v0.4)> <synthese V0.3 (ancre)>
+    python scripts/analyse_p3.py <synthese V0.4 (campagne ligne_base_p2 sur v0.4)> <synthese V0.3 (ancre)> [nom_a nom_b]
+
+Les deux noms (facultatifs) étiquettent les versions : par défaut « V0.4 » (premier fichier) et « V0.3 (ancre) ».
+Essai du rêve disputé : python scripts/analyse_p3.py <synthese v0.4rd> <synthese v0.4> V0.4rd V0.4
 
 Écrit en Markdown sur la sortie standard : forêt gardée par taille de table (bot fort MC64R, les deux
 versions), écart apparié V0.4 − V0.3 (global puis par taille de table ; mêmes tables et mêmes graines).
@@ -61,16 +64,16 @@ def tableau(titre, mets):
     return L + [""]
 
 
-def main(p4, p3):
+def main(p4, p3, nom4="V0.4", nom3="V0.3 (ancre)"):
     V4, V3 = lire(p4), lire(p3)
     a, b = mc64r(V3), mc64r(V4)
-    out = ["# Protocole P3 : analyse apparie V0.4 contre l'ancre V0.3 (étape a.3)", "",
-           "*Généré par `scripts/analyse_p3.py` à partir des campagnes ligne_base_p2 sur v0.4 (run 19) et v0.3 (run 20). "
+    out = [f"# Analyse appariée : {nom4} contre {nom3}", "",
+           "*Généré par `scripts/analyse_p3.py` à partir de deux campagnes ligne_base_p2 (mêmes tables, mêmes graines). "
            "Bot fort : MC64R. Indices : 4 parties par table.*", ""]
     out += tableau("Forêt gardée par taille de table (bot fort MC64R)",
-                   {"V0.3 (ancre)": metriques_variantes(a, meilleur_bot=False)["defaut"],
-                    "V0.4": metriques_variantes(b, meilleur_bot=False)["defaut"]})
-    out += ["**Écart apparié V0.4 − V0.3 (points de forêt, intervalle à 95 % apparié)**", "",
+                   {nom3: metriques_variantes(a, meilleur_bot=False)["defaut"],
+                    nom4: metriques_variantes(b, meilleur_bot=False)["defaut"]})
+    out += [f"**Écart apparié {nom4} − {nom3} (points de forêt, intervalle à 95 % apparié)**", "",
             "| Taille | Paires | Écart | Intervalle 95 % | Verdict |", "|---|---|---|---|---|"]
     e = ecart_apparie(par_table(a), par_table(b))
     out.append(f"| toutes | {e['paires']} | {fr(e['ecart'], '+.1f')} | {e['ic95']} | {e['verdict']} |")
@@ -82,6 +85,6 @@ def main(p4, p3):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 5):
         sys.exit(__doc__)
-    sys.stdout.write(main(sys.argv[1], sys.argv[2]))
+    sys.stdout.write(main(*sys.argv[1:]))
