@@ -1,0 +1,308 @@
+{
+ "defaut": {
+  "fort": "fort:MC256P",
+  "tailles": {
+   "2": {
+    "meilleure": "reflexe:barrer|reves:0",
+    "foret_meilleure": 68.05,
+    "meilleure_ouverte": "tromper:toujours|reves:0",
+    "foret_ouverte": 51.79,
+    "meilleure_collective": "convention:barrage_sabotage|reves:0",
+    "foret_collective": 51.19,
+    "reflexe": "reflexe:barrer|reves:0",
+    "foret_reflexe": 68.05,
+    "foret_fort": 81.94,
+    "parties": 24,
+    "ecart": {
+     "paires": 24,
+     "ecart": 13.89,
+     "ic95": [
+      5.36,
+      22.22
+     ],
+     "verdict": "sûr",
+     "ic95_independant": [
+      6.37,
+      21.4
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": 16.27,
+     "reflexe_fort": 13.89
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:plateau|reves:0",
+      "foret": 50.2,
+      "part_du_fort": 0.613,
+      "ecart": 31.74
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:machines|reves:0",
+      "foret": 51.19,
+      "part_du_fort": 0.625,
+      "ecart": 30.75
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:machines|reves:0",
+      "foret": 51.19,
+      "part_du_fort": 0.625,
+      "ecart": 30.75
+     }
+    },
+    "pire_composition": {
+     "composition": "humains+entites",
+     "convention": "convention:saboteur_unique",
+     "ecart": 15.47,
+     "parties": 4
+    }
+   },
+   "3": {
+    "meilleure": "glouton:reves=0.0",
+    "foret_meilleure": 83.93,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:plateau|reves:0",
+    "foret_ouverte": 60.42,
+    "meilleure_collective": "convention:saboteur_unique",
+    "foret_collective": 54.46,
+    "reflexe": "glouton:reves=0.0",
+    "foret_reflexe": 83.93,
+    "foret_fort": 95.54,
+    "parties": 16,
+    "ecart": {
+     "paires": 16,
+     "ecart": 11.61,
+     "ic95": [
+      5.95,
+      17.86
+     ],
+     "verdict": "sûr",
+     "ic95_independant": [
+      6.02,
+      17.2
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": 23.51,
+     "reflexe_fort": 11.61
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:plateau|reves:0",
+      "foret": 60.42,
+      "part_du_fort": 0.632,
+      "ecart": 35.12
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:plateau|reves:0",
+      "foret": 59.52,
+      "part_du_fort": 0.623,
+      "ecart": 36.01
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:plateau|reves:0",
+      "foret": 59.52,
+      "part_du_fort": 0.623,
+      "ecart": 36.01
+     }
+    },
+    "pire_composition": {
+     "composition": "oiseaux+mammiferes+humains",
+     "convention": "convention:saboteur_unique",
+     "ecart": 28.57,
+     "parties": 4
+    }
+   },
+   "4": {
+    "meilleure": "reflexe:barrer|reves:1",
+    "foret_meilleure": 76.59,
+    "meilleure_ouverte": "action:barrer|zone:depart|mode:machines|reves:1",
+    "foret_ouverte": 68.65,
+    "meilleure_collective": "convention:barrage_sabotage|reves:1",
+    "foret_collective": 62.7,
+    "reflexe": "reflexe:barrer|reves:1",
+    "foret_reflexe": 76.59,
+    "foret_fort": 82.54,
+    "parties": 12,
+    "ecart": {
+     "paires": 12,
+     "ecart": 5.95,
+     "ic95": [
+      0.0,
+      12.3
+     ],
+     "verdict": "sûr",
+     "ic95_independant": [
+      0.06,
+      11.84
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": 7.94,
+     "reflexe_fort": 5.95
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:machines|reves:1",
+      "foret": 61.9,
+      "part_du_fort": 0.75,
+      "ecart": 20.64
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:machines|reves:1",
+      "foret": 68.65,
+      "part_du_fort": 0.832,
+      "ecart": 13.89
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:machines|reves:1",
+      "foret": 68.65,
+      "part_du_fort": 0.832,
+      "ecart": 13.89
+     }
+    },
+    "pire_composition": {
+     "composition": "oiseaux+mammiferes+insectes+entites",
+     "convention": "convention:alliance|zone:depart|reves:1",
+     "ecart": 15.48,
+     "parties": 4
+    }
+   },
+   "5": {
+    "meilleure": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_meilleure": 73.81,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_ouverte": 73.81,
+    "meilleure_collective": "convention:alliance|zone:depart|reves:1",
+    "foret_collective": 65.48,
+    "reflexe": "glouton:reves=1.0",
+    "foret_reflexe": 73.21,
+    "foret_fort": 89.29,
+    "parties": 8,
+    "ecart": {
+     "paires": 8,
+     "ecart": 15.48,
+     "ic95": [
+      1.78,
+      31.55
+     ],
+     "verdict": "sûr",
+     "ic95_independant": [
+      -0.92,
+      31.87
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": -0.6,
+     "reflexe_fort": 16.07
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:plateau|reves:1",
+      "foret": 73.81,
+      "part_du_fort": 0.827,
+      "ecart": 15.48
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:plateau|reves:1",
+      "foret": 55.95,
+      "part_du_fort": 0.627,
+      "ecart": 33.33
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:plateau|reves:1",
+      "foret": 55.95,
+      "part_du_fort": 0.627,
+      "ecart": 33.33
+     }
+    },
+    "pire_composition": {
+     "composition": "oiseaux+mammiferes+reptiles+humains+entites",
+     "convention": "convention:barrage_sabotage|reves:1",
+     "ecart": 19.05,
+     "parties": 4
+    }
+   },
+   "6": {
+    "meilleure": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_meilleure": 82.14,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_ouverte": 82.14,
+    "meilleure_collective": "convention:alliance|zone:depart|reves:1",
+    "foret_collective": 72.62,
+    "reflexe": "reflexe:saboter|reves:1",
+    "foret_reflexe": 80.95,
+    "foret_fort": 91.67,
+    "parties": 4,
+    "ecart": {
+     "paires": 4,
+     "ecart": 9.52,
+     "ic95": [
+      0.0,
+      19.05
+     ],
+     "verdict": "incertain",
+     "ic95_independant": [
+      -0.09,
+      19.14
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": -1.19,
+     "reflexe_fort": 10.71
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:plateau|reves:1",
+      "foret": 82.14,
+      "part_du_fort": 0.896,
+      "ecart": 9.52
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:plateau|reves:1",
+      "foret": 82.14,
+      "part_du_fort": 0.896,
+      "ecart": 9.52
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:plateau|reves:1",
+      "foret": 82.14,
+      "part_du_fort": 0.896,
+      "ecart": 9.52
+     }
+    },
+    "pire_composition": {
+     "composition": "oiseaux+mammiferes+reptiles+insectes+humains+entites",
+     "convention": "convention:alliance|zone:depart|reves:1",
+     "ecart": 19.05,
+     "parties": 4
+    }
+   }
+  },
+  "strategies": 138,
+  "ecart_pire_taille": {
+   "ecart": 5.95,
+   "taille": 4,
+   "bande_proposee": "orange"
+  },
+  "convention_pire": {
+   "composition": "humains+entites",
+   "convention": "convention:saboteur_unique",
+   "ecart": 15.47,
+   "parties": 4,
+   "bande_proposee": "vert"
+  },
+  "action_pire": {
+   "action": "saboter",
+   "taille": 6,
+   "strategie": "action:saboter|zone:depart|mode:plateau|reves:1",
+   "foret": 82.14,
+   "part_du_fort": 0.896,
+   "ecart": 9.52,
+   "bande_proposee": "vert"
+  },
+  "marche_min": {
+   "points": -1.19,
+   "bande_proposee": "rouge"
+  }
+ }
+}

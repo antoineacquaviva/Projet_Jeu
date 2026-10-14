@@ -14,7 +14,12 @@ GitHub (workflow `cycle.yml`), puis intégrée dans l'**état** du cycle (un dos
 3. `confirmation` (manches 1 et 2) : les meilleures variantes de la carte et l'ancre (la maquette de
    départ), au bot fort, en course d'élimination ; écarts appariés à l'ancre.
 4. `controle` : les finalistes et l'ancre avec le bot de contrôle.
-5. `rapport` : `rapport.md`, avec les alertes de conception.
+5. `boucles` : garde-fou « aucune boucle gagnante » (décision C1 de l'auteur, 14 oct. ; foret/boucles.py),
+   en lecture seule : la bibliothèque de stratégies répétées joue les finalistes et l'ancre sur les tables
+   et les graines de la dernière manche de confirmation, ce qui l'apparie au bot fort. Les mesures sont
+   rapportées et peuvent lever une alerte, mais n'entrent pas dans la qualité. `"boucles": false` dans le
+   plan saute l'étape.
+6. `rapport` : `rapport.md`, avec les alertes de conception.
 
 Qualité d'une variante (choix technique de Claude, plan vers la V1, sections 7 et 7 bis ; provisoire) :
 le plus faible de deux scores, chacun pris à la taille de table où il est le plus faible :
@@ -37,6 +42,7 @@ import os
 import random
 from collections import defaultdict
 
+from . import boucles as _boucles
 from .maquette import charger, est_par_table, valeur_table
 from .stats import ecart_apparie
 
@@ -363,6 +369,14 @@ def preparer(plan, etat_dir):
             "nom": e["etape"], "variantes": ["defaut"] + [c for c in cand if c != "defaut"], "bots": [bot],
             "tables": tables, "reference": "defaut", "graine0": graine0}],
             f"Cycle {plan['cycle']}, {e['etape']} (manche {e['gen']}) : {len(cand)} variantes et l'ancre, {parties} parties par table.")
+    if e["etape"] == "boucles":
+        cand = lire_json(os.path.join(etat_dir, "controle_candidats.json"), [])
+        manches = len(plan["confirmation"]["parties"])
+        variantes = ["defaut"] + [c for c in cand if c != "defaut"]
+        return _campagne(plan, "boucles", _boucles.blocs(variantes, _tables_echantillon(plan),
+                                                         plan["confirmation"]["parties"][-1], graine0=1000 * manches),
+                         f"Cycle {plan['cycle']}, garde-fou « aucune boucle gagnante » (C1, lecture seule) : "
+                         f"{len(variantes)} variantes, bibliothèque de stratégies répétées, tables et graines de la manche {manches}.")
     return None
 
 
@@ -415,6 +429,8 @@ def integrer(plan, etat_dir, syn):
         res = lire_json(os.path.join(etat_dir, "confirmation.json"), {})
         res[f"m{e['gen']}"] = {"metriques": mets, "apparie": syn.get("apparie"), "usage": _usage(syn)}
         ecrire_json(os.path.join(etat_dir, "confirmation.json"), res)
+        # parties de la manche, pour apparier le garde-fou « aucune boucle gagnante » au bot fort
+        ecrire_json(os.path.join(etat_dir, f"confirmation_parties_m{e['gen']}.json"), syn["parties_compactes"])
         manches = len(plan["confirmation"]["parties"])
         cand = lire_json(os.path.join(etat_dir, "confirmation_candidats.json"))
         garder = plan["confirmation"]["garder"][e["gen"] - 1]
@@ -427,6 +443,13 @@ def integrer(plan, etat_dir, syn):
     if e["etape"] == "controle":
         ecrire_json(os.path.join(etat_dir, "controle.json"), {"metriques": mets, "apparie": syn.get("apparie"),
                                                               "usage": _usage(syn)})
+        if plan.get("boucles", True):
+            return _suivante(plan, e, etape="boucles", gen=1)
+        return _suivante(plan, e, etape="rapport", gen=0)
+    if e["etape"] == "boucles":
+        manches = len(plan["confirmation"]["parties"])
+        fort = lire_json(os.path.join(etat_dir, f"confirmation_parties_m{manches}.json"))
+        ecrire_json(os.path.join(etat_dir, "boucles.json"), _boucles.analyser(syn["parties_compactes"], fort))
         return _suivante(plan, e, etape="rapport", gen=0)
     return e
 
@@ -492,6 +515,7 @@ def alertes(plan, etat_dir):
     for n, best in sorted(par_taille.items()):
         if best <= 0:
             out.append(f"**table de {n} joueurs** : aucune variante n'y est jouable dans les bandes (durée et difficulté).")
+    out += _boucles.alertes(lire_json(os.path.join(etat_dir, "boucles.json"), {}))
     return out
 
 
@@ -533,6 +557,9 @@ def rapport(plan, etat_dir):
             L.append(f"| {_nom_court(v)} | {fr(m['qualite'], '.2f')} | {fo} | {fr(m['precoces_max'], '.0f')} % | "
                      f"{fr(m['tour_moyen'], '.1f')} | {ea} |")
         L.append("")
+    bc = lire_json(os.path.join(etat_dir, "boucles.json"))
+    if bc:
+        L.append(_boucles.markdown({_nom_court(v): r for v, r in bc.items()}))
     L += ["## Étapes", ""] + [f"- {h['date']} : {h['etape']} {h.get('gen') or ''}" for h in e.get("historique", [])]
     return "\n".join(L) + "\n"
 

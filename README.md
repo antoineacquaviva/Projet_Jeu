@@ -58,6 +58,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | `3-pilotage` | [Plan d'action](projet/3-pilotage/plan-d-action.md) | Les six phases : cadrer, mesurer, bots, diagnostic, exploration, validation |
 | | [Objectifs, invariants et catalogue](projet/3-pilotage/objectifs-invariants-catalogue.md) | Les quatre objectifs d'expérience, leurs bandes, ce qui ne change pas, les variables |
 | | [Cahier des charges du calcul](projet/3-pilotage/cahier-des-charges-calcul.md) | Où faire tourner les campagnes : GitHub Actions (décision 10) |
+| | [Garde-fou « aucune boucle gagnante »](projet/3-pilotage/garde-fou-boucles-gagnantes.md) | Aucune action ni suite d'actions répétée, ni convention de table, ne doit gagner (décision C1, 14 oct.) |
 | `4-bilans` | [Moteur v0 : lacunes et incohérences](projet/4-bilans/moteur-v0-lacunes.md) | Le premier moteur et ce qu'il a révélé |
 | | [Moteur v1 : conformité et campagne de référence](projet/4-bilans/moteur-v1-conformite.md) | L'audit règle par règle, v0 contre v1 |
 | | [Phase 1 : avancement](projet/4-bilans/phase1-avancement.md) | Copie d'état, communication, v2 dans le moteur |
@@ -66,6 +67,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Diagnostic de la v1 et options de la v2 (phase 3)](projet/4-bilans/diagnostic-v1-options-v2.md) | **Le livrable de la phase 3** : verdicts du bot fort, jeu restreint, options de la v2, robustesse, recommandations |
 | | [Ligne de base P2 : la V0.3 de 2 à 6 joueurs](projet/4-bilans/ligne-de-base-p2.md) | Étape 0.11 du plan vers la V1 |
 | | [Bilan du cycle 1 : de la V0.3 à la V0.4 proposée](projet/4-bilans/cycle-1-bilan.md) | Durée réglée, difficulté selon le bot, proposition de V0.4, alertes D et E |
+| | [Garde-fou « aucune boucle gagnante » : première lecture](projet/4-bilans/garde-fou-boucles-ligne-de-base.md) | V0.3 rouge (une boucle égale le bot fort), V0.4 orange (6 points à 4 joueurs) |
 
 Les fichiers HTML s'ouvrent dans un navigateur, après téléchargement. Les documents citent parfois des chemins `claude/moteur-v1/…` : ce sont ceux de l'espace de travail d'origine, qui correspondent ici à la racine du dépôt.
 
@@ -90,6 +92,11 @@ python -m foret.batterie rapport
 # La même batterie par lots (une machine par lot), puis la fusion
 python -m foret.batterie phase1 --lot 0/8 --sortie lots/
 python -m foret.batterie phase1 --fusionner lots/
+
+# Garde-fou « aucune boucle gagnante » : la bibliothèque de stratégies répétées, appariée au bot fort
+python -m foret.boucles campagne --maquette v0.4 --tables-de campagnes/calibration_v04.json --sortie campagnes/boucles_v04.json
+python -m foret.sim campagnes/boucles_v04.json --sortie boucles_v04/
+python -m foret.boucles analyser --boucles boucles_v04/synthese.json --fort <synthese du bot fort>
 
 # Contrôles : conformité règles, nœuds et mesures ↔ code ↔ tests
 python -m foret.conformite

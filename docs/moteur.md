@@ -252,6 +252,7 @@ avec un `resume.md` écrit par `scripts/resume_batterie.py`).
 |---|---|
 | `mc` (`foret/bots/mc.py`) | Le bot fort. Pour chaque décision, il copie la partie, impose une option, joue la suite avec un autre hasard (déterminisation des dés) et une politique (le glouton à tous les sièges), et garde l'option qui laisse le plus de forêt. Budget (suites par décision) réparti par *sequential halving* sur des hasards communs. Il ne connaît aucune règle : il joue v1, v2 et toute variante. |
 | `bruite` (`foret/bots/bruite.py`) | Un bot de base qui choisit parfois au hasard (la novice du panel) |
+| `repete` (`foret/bots/repete.py`) | Une stratégie répétée décrite par un script (action, zone, motifs de rêve et d'étapes…) : garde-fou « aucune boucle gagnante » (`foret/boucles.py`, décision C1) |
 | table mixte | `{"type": "table", "params": {"sieges": [spec, …]}}` : un bot par siège (`fabriquer_table`) |
 
 Paramètres du bot `mc` :

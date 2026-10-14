@@ -61,7 +61,7 @@ def _etape(plan, etat, tmp):
 
 
 def test_cycle_complet(tmp_path):
-    """Criblage, exploration (deux générations), confirmation (deux manches), contrôle, puis rapport :
+    """Criblage, exploration (deux générations), confirmation (deux manches), contrôle, boucles, puis rapport :
     l'état avance seul d'une étape à l'autre, et le rapport porte les alertes et les tableaux."""
     etat = str(tmp_path / "etat")
     os.makedirs(etat)
@@ -73,12 +73,14 @@ def test_cycle_complet(tmp_path):
         e, camp = _etape(PLAN, etat, tmp_path)
         vues.append(camp["nom"])
     assert vues[0] == "essai_criblage" and vues[1] == "essai_exploration_g1"
-    assert "essai_confirmation_m1" in vues and "essai_confirmation_m2" in vues and vues[-1] == "essai_controle_m1"
+    assert "essai_confirmation_m1" in vues and "essai_confirmation_m2" in vues and vues[-2] == "essai_controle_m1"
+    assert vues[-1] == "essai_boucles"          # garde-fou C1 (14 oct.), lecture seule : entre le contrôle et le rapport
     cr = lire_json(os.path.join(etat, "criblage.json"))
     assert len(cr["retenues"]) == 3 and set(cr["rangs"]) <= {v["nom"] for v in ESPACE}
     assert lire_json(os.path.join(etat, "archive.json"))
     txt = rapport(PLAN, etat)
     assert "Alertes de conception" in txt and "Criblage" in txt and "Contrôle" in txt
+    assert "aucune boucle gagnante" in txt and lire_json(os.path.join(etat, "boucles.json"))
     assert isinstance(alertes(PLAN, etat), list)
 
 

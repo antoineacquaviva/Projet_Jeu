@@ -141,8 +141,8 @@ L'alerte nomme alors l'objectif, ce qui a été essayé et la piste de conceptio
 
 **F. Une boucle gagnante ?** À surveiller (14 oct.).
 - *Mesuré (indices)* : le rêve à chaque tour domine en V2 ; en V2, « parer au plus probable » reste à 4,4 points du bot fort (tape-taupe orange).
-- *Non mesuré* : les autres actions répétées, les motifs sur plusieurs tours et les conventions de table à plusieurs sièges.
-- Le bloc « boucles » du cycle 2 (lecture seule) répond à la question ; sa spécification est dans `garde-fou-boucles-gagnantes.md`.
+- *Mesuré le 14 oct. (indices, [première lecture](../4-bilans/garde-fou-boucles-ligne-de-base.md))* : sur la V0.3, une boucle ouverte (saboter dans la zone la plus menacée au départ, rêver une carte par tour) fait jeu égal avec le bot fort à 4 joueurs, et le glouton le dépasse à 4 et 5 joueurs (rouge) ; sur la V0.4, la meilleure boucle reste à 6 points du bot fort à 4 joueurs (orange), à plus de 9 points ailleurs.
+- L'étape `boucles` de chaque cycle (lecture seule) suit la question ; spécification : `garde-fou-boucles-gagnantes.md`.
 
 ## 7. Améliorer le jeu : objectifs, mesures, leviers (souhait 6)
 | Ce que l'auteur veut | Mesures (étiquette) | Leviers explorés | État de la V0.3 |
@@ -161,7 +161,7 @@ L'alerte nomme alors l'objectif, ce qui a été essayé et la piste de conceptio
 
 La qualité d'une variante reste le plus faible de ses objectifs normalisés (plan d'action, section 5).
 
-**Garde-fou ajouté le 14 oct. : aucune boucle gagnante** ([spécification](garde-fou-boucles-gagnantes.md)). Dès le cycle 2, un bloc « boucles » est ajouté au rapport, en lecture seule : une bibliothèque de stratégies répétées (une action partout, motifs de rêve, motifs sur les trois étapes, conventions de table à plusieurs sièges) jouée au coût d'un glouton sur la version candidate, avec l'écart à la meilleure boucle par taille de table. Il ne juge pas et n'entre pas dans le score de la recherche tant que l'auteur n'a pas confirmé les bandes ; une alerte de conception est levée si l'écart tombe sous 3 points.
+**Garde-fou ajouté le 14 oct. : aucune boucle gagnante** ([spécification](garde-fou-boucles-gagnantes.md)). Dès le cycle 2, l'étape `boucles` de `foret/cycle.py` (entre le contrôle et le rapport) joue, en lecture seule, une bibliothèque de 130 stratégies répétées par taille de table (une action partout, motifs de rêve, motifs sur les trois étapes, conventions de table à plusieurs sièges) sur les finalistes et l'ancre, appariée au bot fort de la dernière manche ; le rapport reçoit un bloc « Garde-fou » avec l'écart à la meilleure boucle par taille de table. Il ne juge pas et n'entre pas dans le score de la recherche tant que l'auteur n'a pas confirmé les bandes ; une alerte de conception est levée si l'écart tombe sous 3 points.
 
 ## 7 bis. Toutes les tailles de table, de 2 à 6 joueurs (critère ajouté le 13 oct., 14 h 27)
 **Le critère.** Le jeu doit tenir tous ses objectifs à 2, 3, 4, 5 et 6 joueurs. La qualité d'une variante devient **le plus faible de ses objectifs, pris à la taille de table où il est le plus faible**. Une variante excellente à 3 joueurs et rouge à 6 est donc rouge.

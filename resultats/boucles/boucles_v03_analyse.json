@@ -1,0 +1,308 @@
+{
+ "defaut": {
+  "fort": "fort:MC64R1",
+  "tailles": {
+   "2": {
+    "meilleure": "glouton:reves=1.0",
+    "foret_meilleure": 84.72,
+    "meilleure_ouverte": "voie:reveil|reves:1",
+    "foret_ouverte": 84.32,
+    "meilleure_collective": "convention:barrage_sabotage|reves:1",
+    "foret_collective": 70.44,
+    "reflexe": "glouton:reves=1.0",
+    "foret_reflexe": 84.72,
+    "foret_fort": 89.68,
+    "parties": 24,
+    "ecart": {
+     "paires": 24,
+     "ecart": 4.96,
+     "ic95": [
+      1.39,
+      8.73
+     ],
+     "verdict": "sûr",
+     "ic95_independant": [
+      1.59,
+      8.33
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": 0.4,
+     "reflexe_fort": 4.96
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:plateau|reves:1",
+      "foret": 76.59,
+      "part_du_fort": 0.854,
+      "ecart": 13.1
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:plateau|reves:1",
+      "foret": 75.0,
+      "part_du_fort": 0.836,
+      "ecart": 14.68
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:plateau|reves:1",
+      "foret": 75.0,
+      "part_du_fort": 0.836,
+      "ecart": 14.68
+     }
+    },
+    "pire_composition": {
+     "composition": "insectes+entites",
+     "convention": "convention:barrage_sabotage|reves:1",
+     "ecart": 10.71,
+     "parties": 4
+    }
+   },
+   "3": {
+    "meilleure": "glouton:reves=1.0",
+    "foret_meilleure": 91.37,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_ouverte": 90.18,
+    "meilleure_collective": "convention:alliance|zone:depart|reves:1",
+    "foret_collective": 88.1,
+    "reflexe": "glouton:reves=1.0",
+    "foret_reflexe": 91.37,
+    "foret_fort": 96.43,
+    "parties": 16,
+    "ecart": {
+     "paires": 16,
+     "ecart": 5.06,
+     "ic95": [
+      1.19,
+      9.23
+     ],
+     "verdict": "sûr",
+     "ic95_independant": [
+      1.46,
+      8.66
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": 1.19,
+     "reflexe_fort": 5.06
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:plateau|reves:1",
+      "foret": 90.18,
+      "part_du_fort": 0.935,
+      "ecart": 6.25
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:plateau|reves:1",
+      "foret": 89.58,
+      "part_du_fort": 0.929,
+      "ecart": 6.85
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:plateau|reves:1",
+      "foret": 89.58,
+      "part_du_fort": 0.929,
+      "ecart": 6.85
+     }
+    },
+    "pire_composition": {
+     "composition": "oiseaux+insectes+entites",
+     "convention": "convention:alliance|zone:depart|reves:1",
+     "ecart": 5.95,
+     "parties": 4
+    }
+   },
+   "4": {
+    "meilleure": "glouton:reves=0.5",
+    "foret_meilleure": 93.65,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_ouverte": 92.06,
+    "meilleure_collective": "convention:alliance|zone:depart|reves:1",
+    "foret_collective": 87.7,
+    "reflexe": "glouton:reves=0.5",
+    "foret_reflexe": 93.65,
+    "foret_fort": 92.46,
+    "parties": 12,
+    "ecart": {
+     "paires": 12,
+     "ecart": -1.19,
+     "ic95": [
+      -6.35,
+      3.57
+     ],
+     "verdict": "incertain",
+     "ic95_independant": [
+      -5.96,
+      3.58
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": 1.59,
+     "reflexe_fort": -1.19
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:plateau|reves:1",
+      "foret": 92.06,
+      "part_du_fort": 0.996,
+      "ecart": 0.4
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:plateau|reves:1",
+      "foret": 92.06,
+      "part_du_fort": 0.996,
+      "ecart": 0.4
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:plateau|reves:1",
+      "foret": 92.06,
+      "part_du_fort": 0.996,
+      "ecart": 0.4
+     }
+    },
+    "pire_composition": {
+     "composition": "mammiferes+reptiles+humains+entites",
+     "convention": "convention:alliance|zone:depart|reves:1",
+     "ecart": -1.19,
+     "parties": 4
+    }
+   },
+   "5": {
+    "meilleure": "glouton:reves=0.5",
+    "foret_meilleure": 96.43,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:machines|reves:1",
+    "foret_ouverte": 90.48,
+    "meilleure_collective": "convention:alliance|zone:depart|reves:1",
+    "foret_collective": 90.48,
+    "reflexe": "glouton:reves=0.5",
+    "foret_reflexe": 96.43,
+    "foret_fort": 93.45,
+    "parties": 8,
+    "ecart": {
+     "paires": 8,
+     "ecart": -2.98,
+     "ic95": [
+      -8.93,
+      4.17
+     ],
+     "verdict": "incertain",
+     "ic95_independant": [
+      -7.86,
+      1.91
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": 5.95,
+     "reflexe_fort": -2.98
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:machines|reves:1",
+      "foret": 90.48,
+      "part_du_fort": 0.968,
+      "ecart": 2.98
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:machines|reves:1",
+      "foret": 90.48,
+      "part_du_fort": 0.968,
+      "ecart": 2.98
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:machines|reves:1",
+      "foret": 90.48,
+      "part_du_fort": 0.968,
+      "ecart": 2.98
+     }
+    },
+    "pire_composition": {
+     "composition": "oiseaux+mammiferes+reptiles+insectes+entites",
+     "convention": "convention:alliance|zone:depart|reves:1",
+     "ecart": -0.0,
+     "parties": 4
+    }
+   },
+   "6": {
+    "meilleure": "glouton:reves=1.0",
+    "foret_meilleure": 98.81,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:machines|reves:1",
+    "foret_ouverte": 92.86,
+    "meilleure_collective": "convention:alliance|zone:depart|reves:1",
+    "foret_collective": 92.86,
+    "reflexe": "glouton:reves=1.0",
+    "foret_reflexe": 98.81,
+    "foret_fort": 98.81,
+    "parties": 4,
+    "ecart": {
+     "paires": 4,
+     "ecart": 0.0,
+     "ic95": [
+      -3.57,
+      3.57
+     ],
+     "verdict": "incertain",
+     "ic95_independant": [
+      -2.52,
+      2.52
+     ]
+    },
+    "marches": {
+     "ouverte_reflexe": 5.95,
+     "reflexe_fort": 0.0
+    },
+    "actions": {
+     "saboter": {
+      "strategie": "action:saboter|zone:depart|mode:machines|reves:1",
+      "foret": 92.86,
+      "part_du_fort": 0.94,
+      "ecart": 5.95
+     },
+     "barrer": {
+      "strategie": "action:barrer|zone:depart|mode:machines|reves:1",
+      "foret": 92.86,
+      "part_du_fort": 0.94,
+      "ecart": 5.95
+     },
+     "soutenir": {
+      "strategie": "action:soutenir|zone:depart|mode:machines|reves:1",
+      "foret": 92.86,
+      "part_du_fort": 0.94,
+      "ecart": 5.95
+     }
+    },
+    "pire_composition": {
+     "composition": "oiseaux+mammiferes+reptiles+insectes+humains+entites",
+     "convention": "convention:alliance|zone:depart|reves:1",
+     "ecart": 5.95,
+     "parties": 4
+    }
+   }
+  },
+  "strategies": 138,
+  "ecart_pire_taille": {
+   "ecart": -2.98,
+   "taille": 5,
+   "bande_proposee": "rouge"
+  },
+  "convention_pire": {
+   "composition": "mammiferes+reptiles+humains+entites",
+   "convention": "convention:alliance|zone:depart|reves:1",
+   "ecart": -1.19,
+   "parties": 4,
+   "bande_proposee": "rouge"
+  },
+  "action_pire": {
+   "action": "saboter",
+   "taille": 4,
+   "strategie": "action:saboter|zone:depart|mode:plateau|reves:1",
+   "foret": 92.06,
+   "part_du_fort": 0.996,
+   "ecart": 0.4,
+   "bande_proposee": "rouge"
+  },
+  "marche_min": {
+   "points": -2.98,
+   "bande_proposee": "rouge"
+  }
+ }
+}

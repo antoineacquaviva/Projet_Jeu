@@ -751,6 +751,26 @@ MESURES = {
         niveau=2, objectif="garde-fou", nom="Échelle des bots : aléatoire < glouton (< MCTS en phase 2)",
         etiquette="mesure", unite="points de forêt", bot="aléatoire, glouton", categorique=True, temoins=[],
         phase2=True),
+    # ---------------------------------------------------------------- garde-fou C1 (14 oct., lecture seule ; foret/boucles.py)
+    # Les quatre mesures sont descriptives tant que l'auteur n'a pas confirmé les bandes proposées.
+    "boucle_gagnante": dict(
+        niveau=3, objectif="garde-fou", nom="Écart entre le bot fort et la meilleure stratégie répétée (pire taille)",
+        etiquette="indice", unite="points de forêt", bot="bibliothèque (repete) et fort, appariés", descriptive=True,
+        bandes_proposees={"vert": (10, None), "rouge": [(None, 3 - E)]},
+        temoins=[("v2", "défaut (V2 proposée, sans lunes)", "bibliothèque et MC64R", "rouge (rêver à chaque tour domine)"),
+                 ("v1", "retour_v0_reves_illimites", "bibliothèque et MC 64", "rouge (rêver sans limite suffit)")]),
+    "convention_table": dict(
+        niveau=3, objectif="garde-fou", nom="Aucune convention de table ne suffit (pire composition)",
+        etiquette="indice", unite="points de forêt", bot="conventions (tables mixtes de repete) et fort", descriptive=True,
+        bandes_proposees={"vert": (10, None), "rouge": [(None, 3 - E)]}, temoins=[]),
+    "action_suffit": dict(
+        niveau=3, objectif="garde-fou", nom="Une action ne suffit pas (« X partout » rapporté au bot fort)",
+        etiquette="indice", unite="points de forêt ; part du bot fort", bot="bibliothèque et fort", descriptive=True,
+        bandes_proposees={"vert": "au plus 90 % du bot fort", "rouge": "à moins de 3 points du bot fort"}, temoins=[]),
+    "echelle_lecture": dict(
+        niveau=3, objectif="garde-fou", nom="Échelle de la lecture : boucle ouverte → réflexe → bot fort",
+        etiquette="indice", unite="points de forêt (plus petite marche)", bot="bibliothèque, gloutons, fort", descriptive=True,
+        bandes_proposees={"vert": (3, None), "rouge": [(None, 1 - E)]}, temoins=[]),
     "apprentissage": dict(
         niveau=3, objectif="lecture", nom="Le Méchant apprend-il cette équipe ? (pistes finales)",
         etiquette="indice", unite="cases", bot="glouton (puis fort)", descriptive=True,
