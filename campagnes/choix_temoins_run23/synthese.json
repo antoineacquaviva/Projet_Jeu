@@ -1,0 +1,3703 @@
+{
+ "meta": {
+  "campagne": "choix_temoins",
+  "maquette": {
+   "nom": "v0.4",
+   "variante": "defaut",
+   "herite_de": "v0.3",
+   "zones": 7,
+   "foret": 21,
+   "machines": 3,
+   "reserve": 2
+  },
+  "moteur": "1.8",
+  "date": "2026-10-14T12:46:26",
+  "parties": 32,
+  "erreurs": 0,
+  "duree_s": 565,
+  "variantes_ignorees": [],
+  "spec": {
+   "nom": "choix_temoins",
+   "maquette": "v0.4",
+   "description": "Étape 3 quater c (14 oct. 2026, décisions C2 et C3) : témoins du profil de Δ et de la lisibilité (T4, T5). MC64R juge une décision sur quatre en entier (16 suites par option, appariées), sur l'échantillon P2 (16 tables, 2 parties). À jouer sur v0.3 (attendu : rêver domine), v0.4 (attendu : défendre domine ou indifférent) et v0.4rd (le rêve disputé). Lecture : syn['choix'] (foret/choix.py).",
+   "blocs": [
+    {
+     "nom": "juge",
+     "variantes": [
+      "defaut"
+     ],
+     "bots": [
+      {
+       "type": "mc",
+       "params": {
+        "budget": 64,
+        "savoir": "soi",
+        "politique": {
+         "type": "glouton",
+         "params": {
+          "reves_par_tour": 1.0
+         }
+        },
+        "juger": 0.25
+       }
+      }
+     ],
+     "tables": [
+      {
+       "liste": [
+        [
+         "humains",
+         "entites"
+        ],
+        [
+         "reptiles",
+         "humains"
+        ],
+        [
+         "oiseaux",
+         "mammiferes"
+        ],
+        [
+         "insectes",
+         "entites"
+        ],
+        [
+         "mammiferes",
+         "insectes"
+        ],
+        [
+         "mammiferes",
+         "reptiles"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "humains"
+        ],
+        [
+         "reptiles",
+         "insectes",
+         "entites"
+        ],
+        [
+         "mammiferes",
+         "reptiles",
+         "insectes"
+        ],
+        [
+         "oiseaux",
+         "insectes",
+         "entites"
+        ],
+        [
+         "reptiles",
+         "insectes",
+         "humains",
+         "entites"
+        ],
+        [
+         "mammiferes",
+         "reptiles",
+         "humains",
+         "entites"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "insectes",
+         "entites"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "reptiles",
+         "humains",
+         "entites"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "reptiles",
+         "insectes",
+         "entites"
+        ],
+        [
+         "oiseaux",
+         "mammiferes",
+         "reptiles",
+         "insectes",
+         "humains",
+         "entites"
+        ]
+       ],
+       "parties": 2
+      }
+     ]
+    }
+   ]
+  },
+  "lots": 16,
+  "duree_cumulee_coeurs_s": 21127,
+  "parties_par_s_par_coeur": 0.0
+ },
+ "campagnes": {
+  "juge": {
+   "parties": 32,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 75.0,
+    "sommeil": 25.0
+   },
+   "tour_fin_moyen": 5.875,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "5": 4,
+    "6": 28
+   },
+   "foret_moyenne": 14.062,
+   "foret_initiale": 21,
+   "foret_pct": 67.0,
+   "foret_pct_ic95": 6.85,
+   "resultat_pct": 67.0,
+   "cartes_en_reve_moy": 4.531,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.812,
+   "ordres_reussis_pct": 42.0,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 81.2,
+     "par_partie": 1.812
+    },
+    "ordre_contre_immobile": {
+     "pct_parties": 53.1,
+     "par_partie": 1.125
+    },
+    "unir_sans_hote": {
+     "pct_parties": 12.5,
+     "par_partie": 0.156
+    },
+    "parler_conflit_glissee": {
+     "pct_parties": 9.4,
+     "par_partie": 0.094
+    },
+    "rayon_sans_foret": {
+     "pct_parties": 6.2,
+     "par_partie": 0.25
+    },
+    "percee_rasee": {
+     "pct_parties": 3.1,
+     "par_partie": 0.062
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "abattage_zone_rasee": 0.219,
+    "apprentissage_machines_sans_mouvement": 3.75,
+    "apprentissage_sans_mouvement": 3.0,
+    "bloquee_par_barrage": 9.969,
+    "branle_bas": 0.781,
+    "cercle_carte": 0.375,
+    "cercle_egarer": 0.031,
+    "echanges_piste": 18.094,
+    "echanges_piste_machines": 15.5,
+    "echec_bloque_par_esprit": 0.719,
+    "embuscades": 6.094,
+    "entrees": 0.656,
+    "esprits_carte": 1.938,
+    "esprits_egarer": 0.281,
+    "immobilisations": 0.844,
+    "lunes_prises": 7.656,
+    "lunes_reprises": 3.281,
+    "machines_egarees": 0.594,
+    "machines_hs": 1.875,
+    "ordres": 20.031,
+    "ordres_echoues": 11.625,
+    "ordres_hantes": 1.938,
+    "ordres_reussis": 8.406,
+    "ordres_supplementaires": 5.281,
+    "organes_neutralises": 5.438,
+    "oubli_tactique": 0.438,
+    "parler": 0.188,
+    "pouvoir_hanter": 1.938,
+    "presage_deja_vu": 1.75,
+    "presage_detourne": 0.094,
+    "presages": 4.125,
+    "remorquages": 1.031,
+    "reves_en_attente": 2.5,
+    "reves_tires": 0.594,
+    "rondes_conseil": 5.875,
+    "sabotage_sans_allie": 0.281,
+    "tenir_zones": 10.031,
+    "tir_a_la_corde": 0.219,
+    "traces_posees": 18.562,
+    "tromperies": 1.969,
+    "voir": 4.344,
+    "voir_detourne": 0.656,
+    "zones_rasees": 1.594
+   },
+   "decisions_par_partie": {
+    "action": 16.44,
+    "aller": 31.47,
+    "embuscade": 6.09,
+    "hote": 3.59,
+    "lune": 38.81,
+    "parler": 0.44,
+    "pouvoir": 2.69,
+    "presence": 9.75,
+    "programmer_carte": 52.31,
+    "programmer_mode": 38.66,
+    "reve": 5.12,
+    "trace": 75.06,
+    "tromper": 4.72,
+    "voir": 7.78
+   },
+   "decisions_forcees_pct": {
+    "action": 3.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 510,
+     "pris": 327,
+     "taux": 64.1
+    },
+    "action:saboter": {
+     "offert": 438,
+     "pris": 183,
+     "taux": 41.8
+    },
+    "aller": {
+     "offert": 1007,
+     "pris": 508,
+     "taux": 50.4
+    },
+    "embuscade:aller": {
+     "offert": 195,
+     "pris": 37,
+     "taux": 19.0
+    },
+    "embuscade:barrer": {
+     "offert": 195,
+     "pris": 131,
+     "taux": 67.2
+    },
+    "embuscade:immobiliser": {
+     "offert": 113,
+     "pris": 27,
+     "taux": 23.9
+    },
+    "moitie:attendre": {
+     "offert": 254,
+     "pris": 195,
+     "taux": 76.8
+    },
+    "moitie:egarer": {
+     "offert": 246,
+     "pris": 104,
+     "taux": 42.3
+    },
+    "moitie:enrayer": {
+     "offert": 220,
+     "pris": 79,
+     "taux": 35.9
+    },
+    "moitie:hanter": {
+     "offert": 246,
+     "pris": 111,
+     "taux": 45.1
+    },
+    "moitie:parler": {
+     "offert": 184,
+     "pris": 49,
+     "taux": 26.6
+    },
+    "moitie:renverser": {
+     "offert": 257,
+     "pris": 114,
+     "taux": 44.4
+    },
+    "moitie:s_unir": {
+     "offert": 220,
+     "pris": 115,
+     "taux": 52.3
+    },
+    "moitie:se_fondre": {
+     "offert": 254,
+     "pris": 40,
+     "taux": 15.7
+    },
+    "moitie:tenir": {
+     "offert": 257,
+     "pris": 115,
+     "taux": 44.7
+    },
+    "moitie:tromper": {
+     "offert": 184,
+     "pris": 111,
+     "taux": 60.3
+    },
+    "moitie:voir": {
+     "offert": 325,
+     "pris": 195,
+     "taux": 60.0
+    },
+    "moitie:voler": {
+     "offert": 76,
+     "pris": 3,
+     "taux": 3.9
+    },
+    "pouvoir:hanter": {
+     "offert": 86,
+     "pris": 62,
+     "taux": 72.1
+    },
+    "pouvoir:parler": {
+     "offert": 14,
+     "pris": 6,
+     "taux": 42.9
+    },
+    "pouvoir:s_unir": {
+     "offert": 115,
+     "pris": 32,
+     "taux": 27.8
+    },
+    "pouvoir:tromper": {
+     "offert": 151,
+     "pris": 63,
+     "taux": 41.7
+    },
+    "reve": {
+     "offert": 269,
+     "pris": 145,
+     "taux": 53.9
+    }
+   }
+  }
+ },
+ "detail": {
+  "juge | defaut | mc | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}": {
+   "parties": 32,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 75.0,
+    "sommeil": 25.0
+   },
+   "tour_fin_moyen": 5.875,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "5": 4,
+    "6": 28
+   },
+   "foret_moyenne": 14.062,
+   "foret_initiale": 21,
+   "foret_pct": 67.0,
+   "foret_pct_ic95": 6.85,
+   "resultat_pct": 67.0,
+   "cartes_en_reve_moy": 4.531,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.812,
+   "ordres_reussis_pct": 42.0,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 81.2,
+     "par_partie": 1.812
+    },
+    "ordre_contre_immobile": {
+     "pct_parties": 53.1,
+     "par_partie": 1.125
+    },
+    "unir_sans_hote": {
+     "pct_parties": 12.5,
+     "par_partie": 0.156
+    },
+    "parler_conflit_glissee": {
+     "pct_parties": 9.4,
+     "par_partie": 0.094
+    },
+    "rayon_sans_foret": {
+     "pct_parties": 6.2,
+     "par_partie": 0.25
+    },
+    "percee_rasee": {
+     "pct_parties": 3.1,
+     "par_partie": 0.062
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "abattage_zone_rasee": 0.219,
+    "apprentissage_machines_sans_mouvement": 3.75,
+    "apprentissage_sans_mouvement": 3.0,
+    "bloquee_par_barrage": 9.969,
+    "branle_bas": 0.781,
+    "cercle_carte": 0.375,
+    "cercle_egarer": 0.031,
+    "echanges_piste": 18.094,
+    "echanges_piste_machines": 15.5,
+    "echec_bloque_par_esprit": 0.719,
+    "embuscades": 6.094,
+    "entrees": 0.656,
+    "esprits_carte": 1.938,
+    "esprits_egarer": 0.281,
+    "immobilisations": 0.844,
+    "lunes_prises": 7.656,
+    "lunes_reprises": 3.281,
+    "machines_egarees": 0.594,
+    "machines_hs": 1.875,
+    "ordres": 20.031,
+    "ordres_echoues": 11.625,
+    "ordres_hantes": 1.938,
+    "ordres_reussis": 8.406,
+    "ordres_supplementaires": 5.281,
+    "organes_neutralises": 5.438,
+    "oubli_tactique": 0.438,
+    "parler": 0.188,
+    "pouvoir_hanter": 1.938,
+    "presage_deja_vu": 1.75,
+    "presage_detourne": 0.094,
+    "presages": 4.125,
+    "remorquages": 1.031,
+    "reves_en_attente": 2.5,
+    "reves_tires": 0.594,
+    "rondes_conseil": 5.875,
+    "sabotage_sans_allie": 0.281,
+    "tenir_zones": 10.031,
+    "tir_a_la_corde": 0.219,
+    "traces_posees": 18.562,
+    "tromperies": 1.969,
+    "voir": 4.344,
+    "voir_detourne": 0.656,
+    "zones_rasees": 1.594
+   },
+   "decisions_par_partie": {
+    "action": 16.44,
+    "aller": 31.47,
+    "embuscade": 6.09,
+    "hote": 3.59,
+    "lune": 38.81,
+    "parler": 0.44,
+    "pouvoir": 2.69,
+    "presence": 9.75,
+    "programmer_carte": 52.31,
+    "programmer_mode": 38.66,
+    "reve": 5.12,
+    "trace": 75.06,
+    "tromper": 4.72,
+    "voir": 7.78
+   },
+   "decisions_forcees_pct": {
+    "action": 3.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 510,
+     "pris": 327,
+     "taux": 64.1
+    },
+    "action:saboter": {
+     "offert": 438,
+     "pris": 183,
+     "taux": 41.8
+    },
+    "aller": {
+     "offert": 1007,
+     "pris": 508,
+     "taux": 50.4
+    },
+    "embuscade:aller": {
+     "offert": 195,
+     "pris": 37,
+     "taux": 19.0
+    },
+    "embuscade:barrer": {
+     "offert": 195,
+     "pris": 131,
+     "taux": 67.2
+    },
+    "embuscade:immobiliser": {
+     "offert": 113,
+     "pris": 27,
+     "taux": 23.9
+    },
+    "moitie:attendre": {
+     "offert": 254,
+     "pris": 195,
+     "taux": 76.8
+    },
+    "moitie:egarer": {
+     "offert": 246,
+     "pris": 104,
+     "taux": 42.3
+    },
+    "moitie:enrayer": {
+     "offert": 220,
+     "pris": 79,
+     "taux": 35.9
+    },
+    "moitie:hanter": {
+     "offert": 246,
+     "pris": 111,
+     "taux": 45.1
+    },
+    "moitie:parler": {
+     "offert": 184,
+     "pris": 49,
+     "taux": 26.6
+    },
+    "moitie:renverser": {
+     "offert": 257,
+     "pris": 114,
+     "taux": 44.4
+    },
+    "moitie:s_unir": {
+     "offert": 220,
+     "pris": 115,
+     "taux": 52.3
+    },
+    "moitie:se_fondre": {
+     "offert": 254,
+     "pris": 40,
+     "taux": 15.7
+    },
+    "moitie:tenir": {
+     "offert": 257,
+     "pris": 115,
+     "taux": 44.7
+    },
+    "moitie:tromper": {
+     "offert": 184,
+     "pris": 111,
+     "taux": 60.3
+    },
+    "moitie:voir": {
+     "offert": 325,
+     "pris": 195,
+     "taux": 60.0
+    },
+    "moitie:voler": {
+     "offert": 76,
+     "pris": 3,
+     "taux": 3.9
+    },
+    "pouvoir:hanter": {
+     "offert": 86,
+     "pris": 62,
+     "taux": 72.1
+    },
+    "pouvoir:parler": {
+     "offert": 14,
+     "pris": 6,
+     "taux": 42.9
+    },
+    "pouvoir:s_unir": {
+     "offert": 115,
+     "pris": 32,
+     "taux": 27.8
+    },
+    "pouvoir:tromper": {
+     "offert": 151,
+     "pris": 63,
+     "taux": 41.7
+    },
+    "reve": {
+     "offert": 269,
+     "pris": 145,
+     "taux": 53.9
+    }
+   }
+  }
+ },
+ "par_peuples": {
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 11.0,
+   "foret_initiale": 21,
+   "foret_pct": 52.4,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 52.4,
+   "cartes_en_reve_moy": 0.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 71.4,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 4.0
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 4.0,
+    "apprentissage_sans_mouvement": 2.0,
+    "bloquee_par_barrage": 4.5,
+    "branle_bas": 0.5,
+    "echanges_piste": 12.0,
+    "echanges_piste_machines": 9.5,
+    "lunes_prises": 1.0,
+    "ordres": 14.0,
+    "ordres_echoues": 4.0,
+    "ordres_hantes": 4.0,
+    "ordres_reussis": 10.0,
+    "organes_neutralises": 0.5,
+    "parler": 0.5,
+    "pouvoir_hanter": 4.0,
+    "presages": 6.0,
+    "reves_en_attente": 0.5,
+    "rondes_conseil": 6.0,
+    "traces_posees": 12.0,
+    "tromperies": 2.5,
+    "zones_rasees": 2.0
+   },
+   "decisions_par_partie": {
+    "action": 10.0,
+    "aller": 25.0,
+    "lune": 14.0,
+    "parler": 1.0,
+    "pouvoir": 5.0,
+    "presence": 6.0,
+    "programmer_carte": 36.0,
+    "programmer_mode": 25.5,
+    "reve": 0.5,
+    "trace": 48.0,
+    "tromper": 7.5
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 20,
+     "pris": 19,
+     "taux": 95.0
+    },
+    "action:saboter": {
+     "offert": 20,
+     "pris": 1,
+     "taux": 5.0
+    },
+    "aller": {
+     "offert": 50,
+     "pris": 30,
+     "taux": 60.0
+    },
+    "moitie:egarer": {
+     "offert": 23,
+     "pris": 11,
+     "taux": 47.8
+    },
+    "moitie:hanter": {
+     "offert": 23,
+     "pris": 12,
+     "taux": 52.2
+    },
+    "moitie:parler": {
+     "offert": 28,
+     "pris": 9,
+     "taux": 32.1
+    },
+    "moitie:tromper": {
+     "offert": 28,
+     "pris": 18,
+     "taux": 64.3
+    },
+    "pouvoir:hanter": {
+     "offert": 10,
+     "pris": 8,
+     "taux": 80.0
+    },
+    "pouvoir:parler": {
+     "offert": 2,
+     "pris": 1,
+     "taux": 50.0
+    },
+    "pouvoir:tromper": {
+     "offert": 15,
+     "pris": 5,
+     "taux": 33.3
+    },
+    "reve": {
+     "offert": 3,
+     "pris": 1,
+     "taux": 33.3
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"reptiles\", \"humains\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 14.5,
+   "foret_initiale": 21,
+   "foret_pct": 69.0,
+   "foret_pct_ic95": 14.0,
+   "resultat_pct": 69.0,
+   "cartes_en_reve_moy": 0.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 33.3,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 3.0
+    },
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 3.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 5.0,
+    "apprentissage_sans_mouvement": 2.5,
+    "bloquee_par_barrage": 10.0,
+    "branle_bas": 0.5,
+    "cercle_carte": 0.5,
+    "echanges_piste": 15.5,
+    "echanges_piste_machines": 12.5,
+    "embuscades": 10.5,
+    "immobilisations": 2.0,
+    "lunes_prises": 0.5,
+    "ordres": 18.0,
+    "ordres_echoues": 12.0,
+    "ordres_reussis": 6.0,
+    "presages": 6.0,
+    "rondes_conseil": 6.0,
+    "traces_posees": 12.0,
+    "tromperies": 2.5,
+    "zones_rasees": 1.5
+   },
+   "decisions_par_partie": {
+    "action": 10.0,
+    "aller": 15.0,
+    "embuscade": 10.5,
+    "lune": 13.0,
+    "presence": 6.0,
+    "programmer_carte": 36.0,
+    "programmer_mode": 26.0,
+    "reve": 0.5,
+    "trace": 48.0,
+    "tromper": 10.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 20,
+     "pris": 20,
+     "taux": 100.0
+    },
+    "action:saboter": {
+     "offert": 15,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "aller": {
+     "offert": 30,
+     "pris": 10,
+     "taux": 33.3
+    },
+    "embuscade:aller": {
+     "offert": 21,
+     "pris": 4,
+     "taux": 19.0
+    },
+    "embuscade:barrer": {
+     "offert": 21,
+     "pris": 13,
+     "taux": 61.9
+    },
+    "embuscade:immobiliser": {
+     "offert": 13,
+     "pris": 4,
+     "taux": 30.8
+    },
+    "moitie:attendre": {
+     "offert": 26,
+     "pris": 21,
+     "taux": 80.8
+    },
+    "moitie:parler": {
+     "offert": 26,
+     "pris": 6,
+     "taux": 23.1
+    },
+    "moitie:se_fondre": {
+     "offert": 26,
+     "pris": 4,
+     "taux": 15.4
+    },
+    "moitie:tromper": {
+     "offert": 26,
+     "pris": 20,
+     "taux": 76.9
+    },
+    "pouvoir:tromper": {
+     "offert": 20,
+     "pris": 5,
+     "taux": 25.0
+    },
+    "reve": {
+     "offert": 2,
+     "pris": 1,
+     "taux": 50.0
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 18.0,
+   "foret_initiale": 21,
+   "foret_pct": 85.7,
+   "foret_pct_ic95": 18.67,
+   "resultat_pct": 85.7,
+   "cartes_en_reve_moy": 0.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 25.0,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 1.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.5,
+    "apprentissage_sans_mouvement": 3.0,
+    "bloquee_par_barrage": 12.0,
+    "branle_bas": 0.5,
+    "cercle_carte": 0.5,
+    "echanges_piste": 15.0,
+    "echanges_piste_machines": 16.0,
+    "entrees": 0.5,
+    "lunes_prises": 2.0,
+    "machines_hs": 1.5,
+    "ordres": 18.0,
+    "ordres_echoues": 13.5,
+    "ordres_reussis": 4.5,
+    "organes_neutralises": 3.0,
+    "presage_deja_vu": 5.0,
+    "presages": 1.0,
+    "remorquages": 1.0,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 24.5,
+    "traces_posees": 10.0,
+    "voir": 11.5,
+    "voir_detourne": 1.0,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 14.0,
+    "aller": 31.5,
+    "lune": 16.0,
+    "presence": 6.0,
+    "programmer_carte": 24.5,
+    "programmer_mode": 20.5,
+    "reve": 0.5,
+    "trace": 44.0,
+    "voir": 18.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 28,
+     "pris": 22,
+     "taux": 78.6
+    },
+    "action:saboter": {
+     "offert": 25,
+     "pris": 6,
+     "taux": 24.0
+    },
+    "aller": {
+     "offert": 63,
+     "pris": 35,
+     "taux": 55.6
+    },
+    "moitie:renverser": {
+     "offert": 29,
+     "pris": 11,
+     "taux": 37.9
+    },
+    "moitie:tenir": {
+     "offert": 29,
+     "pris": 17,
+     "taux": 58.6
+    },
+    "moitie:voir": {
+     "offert": 48,
+     "pris": 35,
+     "taux": 72.9
+    },
+    "moitie:voler": {
+     "offert": 12,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "reve": {
+     "offert": 3,
+     "pris": 1,
+     "taux": 33.3
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 12.5,
+   "foret_initiale": 21,
+   "foret_pct": 59.5,
+   "foret_pct_ic95": 14.0,
+   "resultat_pct": 59.5,
+   "cartes_en_reve_moy": 1.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 65.4,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 2.5
+    },
+    "unir_sans_hote": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.0,
+    "apprentissage_sans_mouvement": 2.0,
+    "bloquee_par_barrage": 6.5,
+    "branle_bas": 0.5,
+    "cercle_carte": 0.5,
+    "echanges_piste": 11.0,
+    "echanges_piste_machines": 9.5,
+    "lunes_prises": 3.0,
+    "ordres": 13.0,
+    "ordres_echoues": 4.5,
+    "ordres_hantes": 5.0,
+    "ordres_reussis": 8.5,
+    "organes_neutralises": 2.0,
+    "pouvoir_hanter": 5.0,
+    "presages": 6.0,
+    "reves_en_attente": 0.5,
+    "rondes_conseil": 6.0,
+    "traces_posees": 12.0,
+    "zones_rasees": 3.0
+   },
+   "decisions_par_partie": {
+    "action": 13.0,
+    "aller": 28.0,
+    "hote": 10.5,
+    "lune": 18.0,
+    "pouvoir": 7.0,
+    "presence": 6.0,
+    "programmer_carte": 36.0,
+    "programmer_mode": 29.5,
+    "reve": 1.0,
+    "trace": 48.0
+   },
+   "decisions_forcees_pct": {
+    "action": 34.6,
+    "aller": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 17,
+     "pris": 13,
+     "taux": 76.5
+    },
+    "action:saboter": {
+     "offert": 15,
+     "pris": 4,
+     "taux": 26.7
+    },
+    "aller": {
+     "offert": 56,
+     "pris": 31,
+     "taux": 55.4
+    },
+    "moitie:egarer": {
+     "offert": 30,
+     "pris": 11,
+     "taux": 36.7
+    },
+    "moitie:enrayer": {
+     "offert": 29,
+     "pris": 6,
+     "taux": 20.7
+    },
+    "moitie:hanter": {
+     "offert": 30,
+     "pris": 19,
+     "taux": 63.3
+    },
+    "moitie:s_unir": {
+     "offert": 29,
+     "pris": 21,
+     "taux": 72.4
+    },
+    "pouvoir:hanter": {
+     "offert": 14,
+     "pris": 10,
+     "taux": 71.4
+    },
+    "pouvoir:s_unir": {
+     "offert": 21,
+     "pris": 2,
+     "taux": 9.5
+    },
+    "reve": {
+     "offert": 9,
+     "pris": 2,
+     "taux": 22.2
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"mammiferes\", \"insectes\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 18.0,
+   "foret_initiale": 21,
+   "foret_pct": 85.7,
+   "foret_pct_ic95": 0.0,
+   "resultat_pct": 85.7,
+   "cartes_en_reve_moy": 0.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 27.8,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.5,
+    "apprentissage_sans_mouvement": 2.0,
+    "bloquee_par_barrage": 10.0,
+    "branle_bas": 0.5,
+    "echanges_piste": 16.0,
+    "echanges_piste_machines": 14.0,
+    "entrees": 0.5,
+    "lunes_prises": 3.5,
+    "machines_hs": 2.5,
+    "ordres": 18.0,
+    "ordres_echoues": 13.0,
+    "ordres_reussis": 5.0,
+    "organes_neutralises": 7.0,
+    "presages": 6.0,
+    "remorquages": 1.5,
+    "rondes_conseil": 6.0,
+    "sabotage_sans_allie": 1.0,
+    "tenir_zones": 35.0,
+    "traces_posees": 12.0,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 17.0,
+    "aller": 28.5,
+    "hote": 10.0,
+    "lune": 19.0,
+    "presence": 6.0,
+    "programmer_carte": 36.0,
+    "programmer_mode": 31.0,
+    "trace": 48.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 34,
+     "pris": 18,
+     "taux": 52.9
+    },
+    "action:saboter": {
+     "offert": 27,
+     "pris": 16,
+     "taux": 59.3
+    },
+    "aller": {
+     "offert": 57,
+     "pris": 28,
+     "taux": 49.1
+    },
+    "moitie:enrayer": {
+     "offert": 28,
+     "pris": 8,
+     "taux": 28.6
+    },
+    "moitie:renverser": {
+     "offert": 34,
+     "pris": 10,
+     "taux": 29.4
+    },
+    "moitie:s_unir": {
+     "offert": 28,
+     "pris": 20,
+     "taux": 71.4
+    },
+    "moitie:tenir": {
+     "offert": 34,
+     "pris": 24,
+     "taux": 70.6
+    },
+    "pouvoir:s_unir": {
+     "offert": 20,
+     "pris": 5,
+     "taux": 25.0
+    },
+    "reve": {
+     "offert": 9,
+     "pris": 0,
+     "taux": 0.0
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"mammiferes\", \"reptiles\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 18.5,
+   "foret_initiale": 21,
+   "foret_pct": 88.1,
+   "foret_pct_ic95": 14.0,
+   "resultat_pct": 88.1,
+   "cartes_en_reve_moy": 0.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 33.3,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 1.0
+    },
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 1.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 2.0,
+    "apprentissage_sans_mouvement": 2.5,
+    "bloquee_par_barrage": 7.5,
+    "branle_bas": 0.5,
+    "echanges_piste": 15.5,
+    "echanges_piste_machines": 15.5,
+    "embuscades": 12.5,
+    "entrees": 0.5,
+    "immobilisations": 1.0,
+    "machines_hs": 3.5,
+    "ordres": 18.0,
+    "ordres_echoues": 12.0,
+    "ordres_reussis": 6.0,
+    "organes_neutralises": 8.5,
+    "presages": 6.0,
+    "remorquages": 3.0,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 6.0,
+    "traces_posees": 12.0,
+    "zones_rasees": 1.5
+   },
+   "decisions_par_partie": {
+    "action": 10.5,
+    "aller": 16.0,
+    "embuscade": 12.5,
+    "lune": 12.0,
+    "presence": 6.0,
+    "programmer_carte": 36.0,
+    "programmer_mode": 28.5,
+    "trace": 48.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 21,
+     "pris": 4,
+     "taux": 19.0
+    },
+    "action:saboter": {
+     "offert": 18,
+     "pris": 17,
+     "taux": 94.4
+    },
+    "aller": {
+     "offert": 32,
+     "pris": 11,
+     "taux": 34.4
+    },
+    "embuscade:aller": {
+     "offert": 25,
+     "pris": 1,
+     "taux": 4.0
+    },
+    "embuscade:barrer": {
+     "offert": 25,
+     "pris": 22,
+     "taux": 88.0
+    },
+    "embuscade:immobiliser": {
+     "offert": 20,
+     "pris": 2,
+     "taux": 10.0
+    },
+    "moitie:attendre": {
+     "offert": 29,
+     "pris": 25,
+     "taux": 86.2
+    },
+    "moitie:renverser": {
+     "offert": 28,
+     "pris": 24,
+     "taux": 85.7
+    },
+    "moitie:se_fondre": {
+     "offert": 29,
+     "pris": 4,
+     "taux": 13.8
+    },
+    "moitie:tenir": {
+     "offert": 28,
+     "pris": 4,
+     "taux": 14.3
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"humains\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 17.5,
+   "foret_initiale": 21,
+   "foret_pct": 83.3,
+   "foret_pct_ic95": 4.67,
+   "resultat_pct": 83.3,
+   "cartes_en_reve_moy": 1.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 33.3,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 3.5
+    },
+    "parler_conflit_glissee": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.5,
+    "apprentissage_sans_mouvement": 3.5,
+    "bloquee_par_barrage": 13.5,
+    "branle_bas": 1.0,
+    "echanges_piste": 14.5,
+    "echanges_piste_machines": 13.5,
+    "entrees": 1.0,
+    "lunes_prises": 3.0,
+    "machines_hs": 2.0,
+    "ordres": 18.0,
+    "ordres_echoues": 12.0,
+    "ordres_reussis": 6.0,
+    "organes_neutralises": 6.0,
+    "parler": 0.5,
+    "presage_deja_vu": 6.0,
+    "remorquages": 1.5,
+    "reves_en_attente": 1.0,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 15.5,
+    "traces_posees": 16.0,
+    "tromperies": 3.5,
+    "voir": 13.0,
+    "voir_detourne": 1.5,
+    "zones_rasees": 1.0
+   },
+   "decisions_par_partie": {
+    "action": 24.5,
+    "aller": 41.5,
+    "lune": 27.0,
+    "parler": 1.0,
+    "presence": 9.0,
+    "programmer_carte": 41.0,
+    "programmer_mode": 29.5,
+    "reve": 1.0,
+    "trace": 68.0,
+    "tromper": 7.0,
+    "voir": 18.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 49,
+     "pris": 37,
+     "taux": 75.5
+    },
+    "action:saboter": {
+     "offert": 36,
+     "pris": 12,
+     "taux": 33.3
+    },
+    "aller": {
+     "offert": 83,
+     "pris": 34,
+     "taux": 41.0
+    },
+    "moitie:parler": {
+     "offert": 24,
+     "pris": 8,
+     "taux": 33.3
+    },
+    "moitie:renverser": {
+     "offert": 27,
+     "pris": 16,
+     "taux": 59.3
+    },
+    "moitie:tenir": {
+     "offert": 27,
+     "pris": 11,
+     "taux": 40.7
+    },
+    "moitie:tromper": {
+     "offert": 24,
+     "pris": 14,
+     "taux": 58.3
+    },
+    "moitie:voir": {
+     "offert": 44,
+     "pris": 34,
+     "taux": 77.3
+    },
+    "moitie:voler": {
+     "offert": 8,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:parler": {
+     "offert": 2,
+     "pris": 1,
+     "taux": 50.0
+    },
+    "pouvoir:tromper": {
+     "offert": 14,
+     "pris": 7,
+     "taux": 50.0
+    },
+    "reve": {
+     "offert": 6,
+     "pris": 2,
+     "taux": 33.3
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"reptiles\", \"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 14.0,
+   "foret_initiale": 21,
+   "foret_pct": 66.7,
+   "foret_pct_ic95": 18.67,
+   "resultat_pct": 66.7,
+   "cartes_en_reve_moy": 0.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 55.6,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 2.0
+    },
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 2.0
+    },
+    "unir_sans_hote": {
+     "pct_parties": 50.0,
+     "par_partie": 1.0
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 1.0,
+    "apprentissage_sans_mouvement": 3.0,
+    "bloquee_par_barrage": 7.0,
+    "branle_bas": 1.0,
+    "cercle_egarer": 0.5,
+    "echanges_piste": 10.5,
+    "echanges_piste_machines": 11.5,
+    "embuscades": 11.0,
+    "entrees": 0.5,
+    "immobilisations": 1.5,
+    "lunes_prises": 3.0,
+    "machines_egarees": 0.5,
+    "machines_hs": 0.5,
+    "ordres": 13.5,
+    "ordres_echoues": 6.0,
+    "ordres_hantes": 4.5,
+    "ordres_reussis": 7.5,
+    "organes_neutralises": 4.0,
+    "pouvoir_hanter": 4.5,
+    "presages": 6.0,
+    "reves_en_attente": 0.5,
+    "rondes_conseil": 6.0,
+    "traces_posees": 18.0,
+    "zones_rasees": 1.0
+   },
+   "decisions_par_partie": {
+    "action": 15.5,
+    "aller": 28.5,
+    "embuscade": 11.0,
+    "hote": 8.0,
+    "lune": 25.5,
+    "pouvoir": 4.5,
+    "presence": 9.0,
+    "programmer_carte": 54.0,
+    "programmer_mode": 42.5,
+    "reve": 1.0,
+    "trace": 72.0
+   },
+   "decisions_forcees_pct": {
+    "action": 9.7,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 28,
+     "pris": 20,
+     "taux": 71.4
+    },
+    "action:saboter": {
+     "offert": 24,
+     "pris": 8,
+     "taux": 33.3
+    },
+    "aller": {
+     "offert": 57,
+     "pris": 31,
+     "taux": 54.4
+    },
+    "embuscade:aller": {
+     "offert": 22,
+     "pris": 9,
+     "taux": 40.9
+    },
+    "embuscade:barrer": {
+     "offert": 22,
+     "pris": 10,
+     "taux": 45.5
+    },
+    "embuscade:immobiliser": {
+     "offert": 11,
+     "pris": 3,
+     "taux": 27.3
+    },
+    "moitie:attendre": {
+     "offert": 29,
+     "pris": 22,
+     "taux": 75.9
+    },
+    "moitie:egarer": {
+     "offert": 29,
+     "pris": 12,
+     "taux": 41.4
+    },
+    "moitie:enrayer": {
+     "offert": 27,
+     "pris": 11,
+     "taux": 40.7
+    },
+    "moitie:hanter": {
+     "offert": 29,
+     "pris": 16,
+     "taux": 55.2
+    },
+    "moitie:s_unir": {
+     "offert": 27,
+     "pris": 16,
+     "taux": 59.3
+    },
+    "moitie:se_fondre": {
+     "offert": 29,
+     "pris": 7,
+     "taux": 24.1
+    },
+    "pouvoir:hanter": {
+     "offert": 9,
+     "pris": 9,
+     "taux": 100.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 16,
+     "pris": 7,
+     "taux": 43.8
+    },
+    "reve": {
+     "offert": 9,
+     "pris": 1,
+     "taux": 11.1
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"mammiferes\", \"reptiles\", \"insectes\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 17.5,
+   "foret_initiale": 21,
+   "foret_pct": 83.3,
+   "foret_pct_ic95": 4.67,
+   "resultat_pct": 83.3,
+   "cartes_en_reve_moy": 0.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 47.2,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 2.5
+    },
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 1.0
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.0,
+    "apprentissage_sans_mouvement": 2.5,
+    "bloquee_par_barrage": 6.0,
+    "branle_bas": 1.0,
+    "cercle_carte": 0.5,
+    "echanges_piste": 15.5,
+    "echanges_piste_machines": 14.0,
+    "embuscades": 10.5,
+    "entrees": 1.0,
+    "immobilisations": 2.0,
+    "lunes_prises": 0.5,
+    "machines_hs": 4.0,
+    "ordres": 18.0,
+    "ordres_echoues": 9.5,
+    "ordres_reussis": 8.5,
+    "organes_neutralises": 10.0,
+    "presages": 6.0,
+    "remorquages": 4.0,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 12.5,
+    "traces_posees": 18.0,
+    "zones_rasees": 0.5
+   },
+   "decisions_par_partie": {
+    "action": 17.5,
+    "aller": 28.0,
+    "embuscade": 10.5,
+    "hote": 5.0,
+    "lune": 19.5,
+    "presence": 9.0,
+    "programmer_carte": 54.0,
+    "programmer_mode": 39.0,
+    "reve": 0.5,
+    "trace": 72.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 35,
+     "pris": 15,
+     "taux": 42.9
+    },
+    "action:saboter": {
+     "offert": 30,
+     "pris": 20,
+     "taux": 66.7
+    },
+    "aller": {
+     "offert": 56,
+     "pris": 21,
+     "taux": 37.5
+    },
+    "embuscade:aller": {
+     "offert": 21,
+     "pris": 2,
+     "taux": 9.5
+    },
+    "embuscade:barrer": {
+     "offert": 21,
+     "pris": 15,
+     "taux": 71.4
+    },
+    "embuscade:immobiliser": {
+     "offert": 13,
+     "pris": 4,
+     "taux": 30.8
+    },
+    "moitie:attendre": {
+     "offert": 28,
+     "pris": 21,
+     "taux": 75.0
+    },
+    "moitie:enrayer": {
+     "offert": 20,
+     "pris": 9,
+     "taux": 45.0
+    },
+    "moitie:renverser": {
+     "offert": 30,
+     "pris": 21,
+     "taux": 70.0
+    },
+    "moitie:s_unir": {
+     "offert": 20,
+     "pris": 10,
+     "taux": 50.0
+    },
+    "moitie:se_fondre": {
+     "offert": 28,
+     "pris": 7,
+     "taux": 25.0
+    },
+    "moitie:tenir": {
+     "offert": 30,
+     "pris": 9,
+     "taux": 30.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 10,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "reve": {
+     "offert": 1,
+     "pris": 1,
+     "taux": 100.0
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"oiseaux\", \"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 12.5,
+   "foret_initiale": 21,
+   "foret_pct": 59.5,
+   "foret_pct_ic95": 23.33,
+   "resultat_pct": 59.5,
+   "cartes_en_reve_moy": 3.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.0,
+   "ordres_reussis_pct": 72.4,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 1.0
+    },
+    "unir_sans_hote": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.0,
+    "apprentissage_sans_mouvement": 4.0,
+    "bloquee_par_barrage": 5.5,
+    "branle_bas": 1.0,
+    "echanges_piste": 12.0,
+    "echanges_piste_machines": 10.5,
+    "entrees": 1.5,
+    "esprits_carte": 2.5,
+    "lunes_prises": 4.5,
+    "machines_egarees": 1.5,
+    "machines_hs": 2.5,
+    "ordres": 14.5,
+    "ordres_echoues": 4.0,
+    "ordres_hantes": 3.5,
+    "ordres_reussis": 10.5,
+    "organes_neutralises": 7.5,
+    "oubli_tactique": 1.0,
+    "pouvoir_hanter": 3.5,
+    "presage_deja_vu": 4.0,
+    "presages": 2.0,
+    "remorquages": 0.5,
+    "reves_en_attente": 2.5,
+    "rondes_conseil": 6.0,
+    "sabotage_sans_allie": 0.5,
+    "tir_a_la_corde": 0.5,
+    "traces_posees": 17.0,
+    "voir": 10.5,
+    "zones_rasees": 1.5
+   },
+   "decisions_par_partie": {
+    "action": 19.5,
+    "aller": 36.0,
+    "hote": 7.5,
+    "lune": 28.5,
+    "pouvoir": 3.5,
+    "presence": 9.0,
+    "programmer_carte": 43.5,
+    "programmer_mode": 30.5,
+    "reve": 5.0,
+    "trace": 70.0,
+    "voir": 18.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 39,
+     "pris": 23,
+     "taux": 59.0
+    },
+    "action:saboter": {
+     "offert": 36,
+     "pris": 16,
+     "taux": 44.4
+    },
+    "aller": {
+     "offert": 72,
+     "pris": 36,
+     "taux": 50.0
+    },
+    "moitie:egarer": {
+     "offert": 24,
+     "pris": 14,
+     "taux": 58.3
+    },
+    "moitie:enrayer": {
+     "offert": 29,
+     "pris": 11,
+     "taux": 37.9
+    },
+    "moitie:hanter": {
+     "offert": 24,
+     "pris": 8,
+     "taux": 33.3
+    },
+    "moitie:s_unir": {
+     "offert": 29,
+     "pris": 15,
+     "taux": 51.7
+    },
+    "moitie:voir": {
+     "offert": 44,
+     "pris": 27,
+     "taux": 61.4
+    },
+    "moitie:voler": {
+     "offert": 8,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:hanter": {
+     "offert": 7,
+     "pris": 7,
+     "taux": 100.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 15,
+     "pris": 4,
+     "taux": 26.7
+    },
+    "reve": {
+     "offert": 13,
+     "pris": 7,
+     "taux": 53.8
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"reptiles\", \"insectes\", \"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 100.0
+   },
+   "tour_fin_moyen": 5.5,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "5": 1,
+    "6": 1
+   },
+   "foret_moyenne": 11.5,
+   "foret_initiale": 21,
+   "foret_pct": 54.8,
+   "foret_pct_ic95": 4.67,
+   "resultat_pct": 54.8,
+   "cartes_en_reve_moy": 11.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 42.6,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 2.0
+    },
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 2.5
+    },
+    "parler_conflit_glissee": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    },
+    "rayon_sans_foret": {
+     "pct_parties": 50.0,
+     "par_partie": 2.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "abattage_zone_rasee": 2.5,
+    "apprentissage_machines_sans_mouvement": 5.5,
+    "apprentissage_sans_mouvement": 3.0,
+    "bloquee_par_barrage": 7.5,
+    "echanges_piste": 24.5,
+    "echanges_piste_machines": 18.0,
+    "echec_bloque_par_esprit": 1.0,
+    "embuscades": 9.5,
+    "entrees": 0.5,
+    "esprits_carte": 6.0,
+    "immobilisations": 2.0,
+    "lunes_prises": 16.0,
+    "lunes_reprises": 1.5,
+    "machines_egarees": 0.5,
+    "machines_hs": 1.0,
+    "ordres": 23.5,
+    "ordres_echoues": 13.5,
+    "ordres_hantes": 2.0,
+    "ordres_reussis": 10.0,
+    "ordres_supplementaires": 13.0,
+    "organes_neutralises": 3.0,
+    "oubli_tactique": 1.0,
+    "parler": 1.0,
+    "pouvoir_hanter": 2.0,
+    "presage_detourne": 1.0,
+    "presages": 5.5,
+    "reves_en_attente": 6.0,
+    "reves_tires": 1.5,
+    "rondes_conseil": 5.5,
+    "traces_posees": 22.0,
+    "tromperies": 6.0,
+    "zones_rasees": 2.0
+   },
+   "decisions_par_partie": {
+    "action": 13.0,
+    "aller": 26.5,
+    "embuscade": 9.5,
+    "hote": 3.5,
+    "lune": 56.0,
+    "parler": 2.0,
+    "pouvoir": 2.5,
+    "presence": 12.0,
+    "programmer_carte": 65.5,
+    "programmer_mode": 48.5,
+    "reve": 12.0,
+    "trace": 88.0,
+    "tromper": 12.0
+   },
+   "decisions_forcees_pct": {
+    "action": 3.8,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 25,
+     "pris": 19,
+     "taux": 76.0
+    },
+    "action:saboter": {
+     "offert": 22,
+     "pris": 6,
+     "taux": 27.3
+    },
+    "aller": {
+     "offert": 53,
+     "pris": 29,
+     "taux": 54.7
+    },
+    "embuscade:aller": {
+     "offert": 19,
+     "pris": 2,
+     "taux": 10.5
+    },
+    "embuscade:barrer": {
+     "offert": 19,
+     "pris": 13,
+     "taux": 68.4
+    },
+    "embuscade:immobiliser": {
+     "offert": 11,
+     "pris": 4,
+     "taux": 36.4
+    },
+    "moitie:attendre": {
+     "offert": 25,
+     "pris": 19,
+     "taux": 76.0
+    },
+    "moitie:egarer": {
+     "offert": 24,
+     "pris": 11,
+     "taux": 45.8
+    },
+    "moitie:enrayer": {
+     "offert": 21,
+     "pris": 7,
+     "taux": 33.3
+    },
+    "moitie:hanter": {
+     "offert": 24,
+     "pris": 7,
+     "taux": 29.2
+    },
+    "moitie:parler": {
+     "offert": 27,
+     "pris": 8,
+     "taux": 29.6
+    },
+    "moitie:s_unir": {
+     "offert": 21,
+     "pris": 7,
+     "taux": 33.3
+    },
+    "moitie:se_fondre": {
+     "offert": 25,
+     "pris": 1,
+     "taux": 4.0
+    },
+    "moitie:tromper": {
+     "offert": 27,
+     "pris": 14,
+     "taux": 51.9
+    },
+    "pouvoir:hanter": {
+     "offert": 5,
+     "pris": 4,
+     "taux": 80.0
+    },
+    "pouvoir:parler": {
+     "offert": 4,
+     "pris": 2,
+     "taux": 50.0
+    },
+    "pouvoir:s_unir": {
+     "offert": 7,
+     "pris": 2,
+     "taux": 28.6
+    },
+    "pouvoir:tromper": {
+     "offert": 24,
+     "pris": 12,
+     "taux": 50.0
+    },
+    "reve": {
+     "offert": 27,
+     "pris": 23,
+     "taux": 85.2
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"mammiferes\", \"reptiles\", \"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 100.0
+   },
+   "tour_fin_moyen": 5.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "5": 2
+   },
+   "foret_moyenne": 12.5,
+   "foret_initiale": 21,
+   "foret_pct": 59.5,
+   "foret_pct_ic95": 14.0,
+   "resultat_pct": 59.5,
+   "cartes_en_reve_moy": 10.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 39.5,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 1.5
+    },
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 1.0
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.5,
+    "apprentissage_sans_mouvement": 2.5,
+    "bloquee_par_barrage": 10.5,
+    "cercle_carte": 0.5,
+    "echanges_piste": 21.5,
+    "echanges_piste_machines": 18.0,
+    "echec_bloque_par_esprit": 2.5,
+    "embuscades": 8.5,
+    "esprits_carte": 4.5,
+    "esprits_egarer": 1.5,
+    "immobilisations": 1.0,
+    "lunes_prises": 14.5,
+    "lunes_reprises": 3.0,
+    "machines_egarees": 2.0,
+    "machines_hs": 2.0,
+    "ordres": 21.5,
+    "ordres_echoues": 13.0,
+    "ordres_hantes": 1.5,
+    "ordres_reussis": 8.5,
+    "ordres_supplementaires": 11.5,
+    "organes_neutralises": 5.0,
+    "oubli_tactique": 1.0,
+    "parler": 0.5,
+    "pouvoir_hanter": 1.5,
+    "presage_detourne": 0.5,
+    "presages": 5.0,
+    "reves_en_attente": 6.0,
+    "reves_tires": 1.0,
+    "rondes_conseil": 5.0,
+    "tenir_zones": 9.5,
+    "traces_posees": 20.0,
+    "tromperies": 4.0,
+    "zones_rasees": 1.5
+   },
+   "decisions_par_partie": {
+    "action": 12.5,
+    "aller": 24.5,
+    "embuscade": 8.5,
+    "lune": 50.0,
+    "parler": 1.5,
+    "pouvoir": 2.5,
+    "presence": 12.0,
+    "programmer_carte": 60.0,
+    "programmer_mode": 43.5,
+    "reve": 12.5,
+    "trace": 80.0,
+    "tromper": 11.0
+   },
+   "decisions_forcees_pct": {
+    "action": 4.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 24,
+     "pris": 14,
+     "taux": 58.3
+    },
+    "action:saboter": {
+     "offert": 21,
+     "pris": 10,
+     "taux": 47.6
+    },
+    "aller": {
+     "offert": 49,
+     "pris": 24,
+     "taux": 49.0
+    },
+    "embuscade:aller": {
+     "offert": 17,
+     "pris": 4,
+     "taux": 23.5
+    },
+    "embuscade:barrer": {
+     "offert": 17,
+     "pris": 11,
+     "taux": 64.7
+    },
+    "embuscade:immobiliser": {
+     "offert": 11,
+     "pris": 2,
+     "taux": 18.2
+    },
+    "moitie:attendre": {
+     "offert": 26,
+     "pris": 17,
+     "taux": 65.4
+    },
+    "moitie:egarer": {
+     "offert": 21,
+     "pris": 8,
+     "taux": 38.1
+    },
+    "moitie:hanter": {
+     "offert": 21,
+     "pris": 7,
+     "taux": 33.3
+    },
+    "moitie:parler": {
+     "offert": 22,
+     "pris": 6,
+     "taux": 27.3
+    },
+    "moitie:renverser": {
+     "offert": 18,
+     "pris": 5,
+     "taux": 27.8
+    },
+    "moitie:se_fondre": {
+     "offert": 26,
+     "pris": 4,
+     "taux": 15.4
+    },
+    "moitie:tenir": {
+     "offert": 18,
+     "pris": 7,
+     "taux": 38.9
+    },
+    "moitie:tromper": {
+     "offert": 22,
+     "pris": 12,
+     "taux": 54.5
+    },
+    "pouvoir:hanter": {
+     "offert": 5,
+     "pris": 3,
+     "taux": 60.0
+    },
+    "pouvoir:parler": {
+     "offert": 3,
+     "pris": 1,
+     "taux": 33.3
+    },
+    "pouvoir:tromper": {
+     "offert": 22,
+     "pris": 8,
+     "taux": 36.4
+    },
+    "reve": {
+     "offert": 34,
+     "pris": 21,
+     "taux": 61.8
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "sommeil": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 4.0,
+   "foret_initiale": 21,
+   "foret_pct": 19.0,
+   "foret_pct_ic95": 28.0,
+   "resultat_pct": 19.0,
+   "cartes_en_reve_moy": 11.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 5.0,
+   "ordres_reussis_pct": 65.4,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 1.5
+    },
+    "rayon_sans_foret": {
+     "pct_parties": 50.0,
+     "par_partie": 1.5
+    },
+    "unir_sans_hote": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "abattage_zone_rasee": 1.0,
+    "apprentissage_machines_sans_mouvement": 6.5,
+    "apprentissage_sans_mouvement": 4.0,
+    "bloquee_par_barrage": 4.5,
+    "branle_bas": 0.5,
+    "echanges_piste": 24.5,
+    "echanges_piste_machines": 19.0,
+    "echec_bloque_par_esprit": 3.0,
+    "entrees": 1.0,
+    "esprits_carte": 5.5,
+    "esprits_egarer": 1.0,
+    "lunes_prises": 16.5,
+    "lunes_reprises": 6.5,
+    "machines_egarees": 2.0,
+    "machines_hs": 2.5,
+    "ordres": 26.0,
+    "ordres_echoues": 9.0,
+    "ordres_hantes": 3.0,
+    "ordres_reussis": 17.0,
+    "ordres_supplementaires": 14.5,
+    "organes_neutralises": 8.0,
+    "oubli_tactique": 1.0,
+    "pouvoir_hanter": 3.0,
+    "presage_deja_vu": 5.0,
+    "presages": 1.0,
+    "remorquages": 0.5,
+    "reves_en_attente": 6.5,
+    "reves_tires": 1.0,
+    "rondes_conseil": 6.0,
+    "sabotage_sans_allie": 1.5,
+    "tenir_zones": 14.0,
+    "tir_a_la_corde": 0.5,
+    "traces_posees": 23.0,
+    "voir": 9.5,
+    "voir_detourne": 1.0,
+    "zones_rasees": 4.5
+   },
+   "decisions_par_partie": {
+    "action": 14.5,
+    "aller": 35.0,
+    "hote": 4.0,
+    "lune": 64.0,
+    "pouvoir": 4.5,
+    "presence": 12.0,
+    "programmer_carte": 62.0,
+    "programmer_mode": 37.5,
+    "reve": 13.0,
+    "trace": 94.0,
+    "voir": 18.0
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 29,
+     "pris": 10,
+     "taux": 34.5
+    },
+    "action:saboter": {
+     "offert": 29,
+     "pris": 19,
+     "taux": 65.5
+    },
+    "aller": {
+     "offert": 70,
+     "pris": 43,
+     "taux": 61.4
+    },
+    "moitie:egarer": {
+     "offert": 24,
+     "pris": 11,
+     "taux": 45.8
+    },
+    "moitie:enrayer": {
+     "offert": 21,
+     "pris": 7,
+     "taux": 33.3
+    },
+    "moitie:hanter": {
+     "offert": 24,
+     "pris": 9,
+     "taux": 37.5
+    },
+    "moitie:renverser": {
+     "offert": 20,
+     "pris": 4,
+     "taux": 20.0
+    },
+    "moitie:s_unir": {
+     "offert": 21,
+     "pris": 8,
+     "taux": 38.1
+    },
+    "moitie:tenir": {
+     "offert": 20,
+     "pris": 10,
+     "taux": 50.0
+    },
+    "moitie:voir": {
+     "offert": 46,
+     "pris": 23,
+     "taux": 50.0
+    },
+    "moitie:voler": {
+     "offert": 10,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:hanter": {
+     "offert": 9,
+     "pris": 6,
+     "taux": 66.7
+    },
+    "pouvoir:s_unir": {
+     "offert": 8,
+     "pris": 3,
+     "taux": 37.5
+    },
+    "reve": {
+     "offert": 32,
+     "pris": 22,
+     "taux": 68.8
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"reptiles\", \"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 50.0,
+    "sommeil": 50.0
+   },
+   "tour_fin_moyen": 5.5,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "5": 1,
+    "6": 1
+   },
+   "foret_moyenne": 12.0,
+   "foret_initiale": 21,
+   "foret_pct": 57.1,
+   "foret_pct_ic95": 28.0,
+   "resultat_pct": 57.1,
+   "cartes_en_reve_moy": 11.5,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.5,
+   "ordres_reussis_pct": 33.3,
+   "lacunes": {
+    "egalite_rayon": {
+     "pct_parties": 100.0,
+     "par_partie": 2.5
+    },
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 2.0
+    },
+    "percee_rasee": {
+     "pct_parties": 50.0,
+     "par_partie": 1.0
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 4.0,
+    "apprentissage_sans_mouvement": 3.5,
+    "bloquee_par_barrage": 15.0,
+    "branle_bas": 1.0,
+    "cercle_carte": 0.5,
+    "echanges_piste": 28.0,
+    "echanges_piste_machines": 23.5,
+    "echec_bloque_par_esprit": 2.0,
+    "embuscades": 12.0,
+    "entrees": 1.0,
+    "esprits_carte": 5.0,
+    "esprits_egarer": 1.0,
+    "immobilisations": 1.5,
+    "lunes_prises": 16.5,
+    "lunes_reprises": 10.5,
+    "machines_egarees": 1.5,
+    "machines_hs": 2.0,
+    "ordres": 28.5,
+    "ordres_echoues": 19.0,
+    "ordres_hantes": 1.0,
+    "ordres_reussis": 9.5,
+    "ordres_supplementaires": 14.5,
+    "organes_neutralises": 5.5,
+    "oubli_tactique": 1.0,
+    "pouvoir_hanter": 1.0,
+    "presage_deja_vu": 2.0,
+    "presages": 3.5,
+    "remorquages": 0.5,
+    "reves_en_attente": 6.5,
+    "reves_tires": 1.5,
+    "rondes_conseil": 5.5,
+    "sabotage_sans_allie": 0.5,
+    "tenir_zones": 7.0,
+    "tir_a_la_corde": 1.5,
+    "traces_posees": 27.5,
+    "tromperies": 6.0,
+    "voir": 7.5,
+    "voir_detourne": 2.5,
+    "zones_rasees": 2.0
+   },
+   "decisions_par_partie": {
+    "action": 22.0,
+    "aller": 39.0,
+    "embuscade": 12.0,
+    "lune": 77.5,
+    "pouvoir": 2.0,
+    "presence": 15.0,
+    "programmer_carte": 73.0,
+    "programmer_mode": 56.0,
+    "reve": 13.0,
+    "trace": 110.0,
+    "tromper": 10.5,
+    "voir": 16.5
+   },
+   "decisions_forcees_pct": {
+    "action": 0.0,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 44,
+     "pris": 32,
+     "taux": 72.7
+    },
+    "action:saboter": {
+     "offert": 40,
+     "pris": 12,
+     "taux": 30.0
+    },
+    "aller": {
+     "offert": 78,
+     "pris": 34,
+     "taux": 43.6
+    },
+    "embuscade:aller": {
+     "offert": 24,
+     "pris": 7,
+     "taux": 29.2
+    },
+    "embuscade:barrer": {
+     "offert": 24,
+     "pris": 14,
+     "taux": 58.3
+    },
+    "embuscade:immobiliser": {
+     "offert": 12,
+     "pris": 3,
+     "taux": 25.0
+    },
+    "moitie:attendre": {
+     "offert": 30,
+     "pris": 24,
+     "taux": 80.0
+    },
+    "moitie:egarer": {
+     "offert": 22,
+     "pris": 11,
+     "taux": 50.0
+    },
+    "moitie:hanter": {
+     "offert": 22,
+     "pris": 7,
+     "taux": 31.8
+    },
+    "moitie:parler": {
+     "offert": 26,
+     "pris": 6,
+     "taux": 23.1
+    },
+    "moitie:renverser": {
+     "offert": 21,
+     "pris": 9,
+     "taux": 42.9
+    },
+    "moitie:se_fondre": {
+     "offert": 30,
+     "pris": 3,
+     "taux": 10.0
+    },
+    "moitie:tenir": {
+     "offert": 21,
+     "pris": 5,
+     "taux": 23.8
+    },
+    "moitie:tromper": {
+     "offert": 26,
+     "pris": 14,
+     "taux": 53.8
+    },
+    "moitie:voir": {
+     "offert": 46,
+     "pris": 25,
+     "taux": 54.3
+    },
+    "moitie:voler": {
+     "offert": 13,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:hanter": {
+     "offert": 4,
+     "pris": 2,
+     "taux": 50.0
+    },
+    "pouvoir:tromper": {
+     "offert": 21,
+     "pris": 12,
+     "taux": 57.1
+    },
+    "reve": {
+     "offert": 34,
+     "pris": 23,
+     "taux": 67.6
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"reptiles\", \"insectes\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 50.0,
+    "sommeil": 50.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 16.0,
+   "foret_initiale": 21,
+   "foret_pct": 76.2,
+   "foret_pct_ic95": 37.33,
+   "resultat_pct": 76.2,
+   "cartes_en_reve_moy": 10.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.5,
+   "ordres_reussis_pct": 27.8,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 50.0,
+     "par_partie": 1.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 3.5,
+    "apprentissage_sans_mouvement": 3.5,
+    "bloquee_par_barrage": 16.0,
+    "branle_bas": 1.5,
+    "cercle_carte": 1.0,
+    "echanges_piste": 25.5,
+    "echanges_piste_machines": 22.0,
+    "echec_bloque_par_esprit": 2.0,
+    "embuscades": 10.5,
+    "entrees": 1.5,
+    "esprits_carte": 4.0,
+    "esprits_egarer": 1.0,
+    "immobilisations": 1.0,
+    "lunes_prises": 19.0,
+    "lunes_reprises": 13.0,
+    "machines_egarees": 1.5,
+    "machines_hs": 3.5,
+    "ordres": 27.0,
+    "ordres_echoues": 19.5,
+    "ordres_hantes": 4.0,
+    "ordres_reussis": 7.5,
+    "ordres_supplementaires": 15.5,
+    "organes_neutralises": 9.0,
+    "oubli_tactique": 1.0,
+    "pouvoir_hanter": 4.0,
+    "presage_deja_vu": 3.5,
+    "presages": 2.5,
+    "remorquages": 1.5,
+    "reves_en_attente": 5.5,
+    "reves_tires": 2.0,
+    "rondes_conseil": 6.0,
+    "sabotage_sans_allie": 1.0,
+    "tenir_zones": 20.0,
+    "tir_a_la_corde": 0.5,
+    "traces_posees": 29.5,
+    "voir": 8.5,
+    "voir_detourne": 2.5,
+    "zones_rasees": 1.0
+   },
+   "decisions_par_partie": {
+    "action": 21.5,
+    "aller": 45.5,
+    "embuscade": 10.5,
+    "hote": 5.0,
+    "lune": 85.0,
+    "pouvoir": 5.5,
+    "presence": 15.0,
+    "programmer_carte": 81.5,
+    "programmer_mode": 59.5,
+    "reve": 11.5,
+    "trace": 119.0,
+    "voir": 18.0
+   },
+   "decisions_forcees_pct": {
+    "action": 2.3,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 42,
+     "pris": 22,
+     "taux": 52.4
+    },
+    "action:saboter": {
+     "offert": 37,
+     "pris": 20,
+     "taux": 54.1
+    },
+    "aller": {
+     "offert": 91,
+     "pris": 52,
+     "taux": 57.1
+    },
+    "embuscade:aller": {
+     "offert": 21,
+     "pris": 2,
+     "taux": 9.5
+    },
+    "embuscade:barrer": {
+     "offert": 21,
+     "pris": 17,
+     "taux": 81.0
+    },
+    "embuscade:immobiliser": {
+     "offert": 11,
+     "pris": 2,
+     "taux": 18.2
+    },
+    "moitie:attendre": {
+     "offert": 30,
+     "pris": 21,
+     "taux": 70.0
+    },
+    "moitie:egarer": {
+     "offert": 25,
+     "pris": 8,
+     "taux": 32.0
+    },
+    "moitie:enrayer": {
+     "offert": 26,
+     "pris": 11,
+     "taux": 42.3
+    },
+    "moitie:hanter": {
+     "offert": 25,
+     "pris": 13,
+     "taux": 52.0
+    },
+    "moitie:renverser": {
+     "offert": 27,
+     "pris": 8,
+     "taux": 29.6
+    },
+    "moitie:s_unir": {
+     "offert": 26,
+     "pris": 10,
+     "taux": 38.5
+    },
+    "moitie:se_fondre": {
+     "offert": 30,
+     "pris": 6,
+     "taux": 20.0
+    },
+    "moitie:tenir": {
+     "offert": 27,
+     "pris": 15,
+     "taux": 55.6
+    },
+    "moitie:voir": {
+     "offert": 47,
+     "pris": 21,
+     "taux": 44.7
+    },
+    "moitie:voler": {
+     "offert": 11,
+     "pris": 3,
+     "taux": 27.3
+    },
+    "pouvoir:hanter": {
+     "offert": 11,
+     "pris": 8,
+     "taux": 72.7
+    },
+    "pouvoir:s_unir": {
+     "offert": 10,
+     "pris": 4,
+     "taux": 40.0
+    },
+    "reve": {
+     "offert": 42,
+     "pris": 20,
+     "taux": 47.6
+    }
+   }
+  },
+  "juge | {\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"} | [\"oiseaux\", \"mammiferes\", \"reptiles\", \"insectes\", \"humains\", \"entites\"]": {
+   "parties": 2,
+   "erreurs": 0,
+   "fin": {
+    "nuit": 100.0
+   },
+   "tour_fin_moyen": 6.0,
+   "fin_tour_1_pct": 0.0,
+   "tours": {
+    "6": 2
+   },
+   "foret_moyenne": 15.0,
+   "foret_initiale": 21,
+   "foret_pct": 71.4,
+   "foret_pct_ic95": 9.33,
+   "resultat_pct": 71.4,
+   "cartes_en_reve_moy": 10.0,
+   "tactiques_eveil_fin": 5.0,
+   "tactiques_reve_fin": 4.0,
+   "ordres_reussis_pct": 30.6,
+   "lacunes": {
+    "ordre_contre_immobile": {
+     "pct_parties": 100.0,
+     "par_partie": 2.5
+    },
+    "egalite_rayon": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    },
+    "parler_conflit_glissee": {
+     "pct_parties": 50.0,
+     "par_partie": 0.5
+    }
+   },
+   "incoherences": {},
+   "stats_par_partie": {
+    "apprentissage_machines_sans_mouvement": 7.5,
+    "apprentissage_sans_mouvement": 4.5,
+    "bloquee_par_barrage": 23.5,
+    "branle_bas": 2.5,
+    "cercle_carte": 2.0,
+    "echanges_piste": 28.0,
+    "echanges_piste_machines": 21.0,
+    "echec_bloque_par_esprit": 1.0,
+    "embuscades": 12.5,
+    "entrees": 1.0,
+    "esprits_carte": 3.5,
+    "immobilisations": 1.5,
+    "lunes_prises": 19.0,
+    "lunes_reprises": 18.0,
+    "machines_hs": 2.5,
+    "ordres": 31.0,
+    "ordres_echoues": 21.5,
+    "ordres_hantes": 2.5,
+    "ordres_reussis": 9.5,
+    "ordres_supplementaires": 15.5,
+    "organes_neutralises": 8.0,
+    "oubli_tactique": 1.0,
+    "parler": 0.5,
+    "pouvoir_hanter": 2.5,
+    "presage_deja_vu": 2.5,
+    "presages": 3.5,
+    "remorquages": 2.5,
+    "reves_en_attente": 4.5,
+    "reves_tires": 2.5,
+    "rondes_conseil": 6.0,
+    "tenir_zones": 16.5,
+    "tir_a_la_corde": 0.5,
+    "traces_posees": 36.0,
+    "tromperies": 7.0,
+    "voir": 9.0,
+    "voir_detourne": 2.0,
+    "zones_rasees": 1.5
+   },
+   "decisions_par_partie": {
+    "action": 28.0,
+    "aller": 55.0,
+    "embuscade": 12.5,
+    "hote": 4.0,
+    "lune": 96.0,
+    "parler": 1.5,
+    "pouvoir": 6.0,
+    "presence": 18.0,
+    "programmer_carte": 98.0,
+    "programmer_mode": 71.0,
+    "reve": 10.0,
+    "trace": 144.0,
+    "tromper": 17.5,
+    "voir": 18.0
+   },
+   "decisions_forcees_pct": {
+    "action": 1.8,
+    "aller": 0.0,
+    "embuscade": 0.0,
+    "hote": 0.0,
+    "lune": 0.0,
+    "parler": 0.0,
+    "pouvoir": 0.0,
+    "presence": 0.0,
+    "programmer_carte": 0.0,
+    "programmer_mode": 0.0,
+    "reve": 0.0,
+    "trace": 0.0,
+    "tromper": 0.0,
+    "voir": 0.0
+   },
+   "usage": {
+    "action:barrer": {
+     "offert": 55,
+     "pris": 39,
+     "taux": 70.9
+    },
+    "action:saboter": {
+     "offert": 43,
+     "pris": 16,
+     "taux": 37.2
+    },
+    "aller": {
+     "offert": 110,
+     "pris": 59,
+     "taux": 53.6
+    },
+    "embuscade:aller": {
+     "offert": 25,
+     "pris": 6,
+     "taux": 24.0
+    },
+    "embuscade:barrer": {
+     "offert": 25,
+     "pris": 16,
+     "taux": 64.0
+    },
+    "embuscade:immobiliser": {
+     "offert": 11,
+     "pris": 3,
+     "taux": 27.3
+    },
+    "moitie:attendre": {
+     "offert": 31,
+     "pris": 25,
+     "taux": 80.6
+    },
+    "moitie:egarer": {
+     "offert": 24,
+     "pris": 7,
+     "taux": 29.2
+    },
+    "moitie:enrayer": {
+     "offert": 19,
+     "pris": 9,
+     "taux": 47.4
+    },
+    "moitie:hanter": {
+     "offert": 24,
+     "pris": 13,
+     "taux": 54.2
+    },
+    "moitie:parler": {
+     "offert": 31,
+     "pris": 6,
+     "taux": 19.4
+    },
+    "moitie:renverser": {
+     "offert": 23,
+     "pris": 6,
+     "taux": 26.1
+    },
+    "moitie:s_unir": {
+     "offert": 19,
+     "pris": 8,
+     "taux": 42.1
+    },
+    "moitie:se_fondre": {
+     "offert": 31,
+     "pris": 4,
+     "taux": 12.9
+    },
+    "moitie:tenir": {
+     "offert": 23,
+     "pris": 13,
+     "taux": 56.5
+    },
+    "moitie:tromper": {
+     "offert": 31,
+     "pris": 19,
+     "taux": 61.3
+    },
+    "moitie:voir": {
+     "offert": 50,
+     "pris": 30,
+     "taux": 60.0
+    },
+    "moitie:voler": {
+     "offert": 14,
+     "pris": 0,
+     "taux": 0.0
+    },
+    "pouvoir:hanter": {
+     "offert": 12,
+     "pris": 5,
+     "taux": 41.7
+    },
+    "pouvoir:parler": {
+     "offert": 3,
+     "pris": 1,
+     "taux": 33.3
+    },
+    "pouvoir:s_unir": {
+     "offert": 8,
+     "pris": 5,
+     "taux": 62.5
+    },
+    "pouvoir:tromper": {
+     "offert": 35,
+     "pris": 14,
+     "taux": 40.0
+    },
+    "reve": {
+     "offert": 45,
+     "pris": 20,
+     "taux": 44.4
+    }
+   }
+  }
+ },
+ "apparie": {},
+ "parties_compactes": {
+  "colonnes": [
+   "campagne",
+   "variante",
+   "bot",
+   "peuples",
+   "graine",
+   "foret_pct",
+   "tour",
+   "fin",
+   "cartes_en_reve",
+   "tours_max",
+   "bot_params"
+  ],
+  "lignes": [
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "humains+entites",
+    0,
+    52.38,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "humains+entites",
+    1,
+    52.38,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+humains",
+    0,
+    76.19,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+humains",
+    1,
+    61.9,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes",
+    0,
+    76.19,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes",
+    1,
+    95.24,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "insectes+entites",
+    0,
+    66.67,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "insectes+entites",
+    1,
+    52.38,
+    6,
+    "nuit",
+    2,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+insectes",
+    0,
+    85.71,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+insectes",
+    1,
+    85.71,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles",
+    0,
+    80.95,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles",
+    1,
+    95.24,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+humains",
+    0,
+    85.71,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+humains",
+    1,
+    80.95,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+insectes+entites",
+    0,
+    76.19,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+insectes+entites",
+    1,
+    57.14,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles+insectes",
+    0,
+    85.71,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles+insectes",
+    1,
+    80.95,
+    6,
+    "nuit",
+    0,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+insectes+entites",
+    0,
+    47.62,
+    6,
+    "nuit",
+    6,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+insectes+entites",
+    1,
+    71.43,
+    6,
+    "nuit",
+    1,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+insectes+humains+entites",
+    0,
+    52.38,
+    6,
+    "sommeil",
+    12,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "reptiles+insectes+humains+entites",
+    1,
+    57.14,
+    5,
+    "sommeil",
+    11,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles+humains+entites",
+    0,
+    52.38,
+    5,
+    "sommeil",
+    10,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "mammiferes+reptiles+humains+entites",
+    1,
+    66.67,
+    5,
+    "sommeil",
+    11,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+insectes+entites",
+    0,
+    4.76,
+    6,
+    "sommeil",
+    10,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+insectes+entites",
+    1,
+    33.33,
+    6,
+    "sommeil",
+    12,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+humains+entites",
+    0,
+    42.86,
+    6,
+    "nuit",
+    11,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+humains+entites",
+    1,
+    71.43,
+    5,
+    "sommeil",
+    12,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+insectes+entites",
+    0,
+    57.14,
+    6,
+    "nuit",
+    8,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+insectes+entites",
+    1,
+    95.24,
+    6,
+    "sommeil",
+    12,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+insectes+humains+entites",
+    0,
+    76.19,
+    6,
+    "nuit",
+    10,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ],
+   [
+    "juge",
+    "defaut",
+    "mc",
+    "oiseaux+mammiferes+reptiles+insectes+humains+entites",
+    1,
+    66.67,
+    6,
+    "nuit",
+    10,
+    6,
+    "{\"budget\": 64, \"juger\": 0.25, \"politique\": {\"params\": {\"reves_par_tour\": 1.0}, \"type\": \"glouton\"}, \"savoir\": \"soi\"}"
+   ]
+  ]
+ },
+ "choix": {
+  "defaut": {
+   "rever_ou_defendre": {
+    "profil": {
+     "n": 64,
+     "part_a": 21.9,
+     "part_b": 7.8,
+     "neutre": 70.3,
+     "delta_moyen": 1.04,
+     "ecart_absolu_moyen": 3.34,
+     "erreur_type_moyenne": 2.21,
+     "regime": "indifférent"
+    },
+    "lisibilite": {
+     "n": 19,
+     "hasard": 73.7,
+     "un_indice": 63.2,
+     "deux_indices": 63.2,
+     "regle": {
+      "indice": "tour",
+      "seuil": 1.5,
+      "si_inferieur": "B",
+      "si_superieur": "A"
+     }
+    }
+   },
+   "saboter_ou_barrer": {
+    "profil": {
+     "n": 111,
+     "part_a": 24.3,
+     "part_b": 14.4,
+     "neutre": 61.3,
+     "delta_moyen": 0.59,
+     "ecart_absolu_moyen": 3.26,
+     "erreur_type_moyenne": 1.41,
+     "regime": "indifférent"
+    },
+    "lisibilite": {
+     "n": 43,
+     "hasard": 62.8,
+     "un_indice": 79.1,
+     "deux_indices": 76.7,
+     "regle": {
+      "indice": "menace_max",
+      "seuil": 0.597,
+      "si_inferieur": "A",
+      "si_superieur": "B"
+     }
+    }
+   },
+   "moitie_haute_ou_basse": {
+    "profil": {
+     "n": 295,
+     "part_a": 5.8,
+     "part_b": 6.8,
+     "neutre": 87.5,
+     "delta_moyen": 0.02,
+     "ecart_absolu_moyen": 1.84,
+     "erreur_type_moyenne": 1.42,
+     "regime": "indifférent"
+    },
+    "lisibilite": {
+     "n": 37,
+     "hasard": 45.9,
+     "un_indice": 62.2,
+     "deux_indices": 62.2,
+     "regle": {
+      "indice": "tour",
+      "seuil": 3.5,
+      "si_inferieur": "A",
+      "si_superieur": "B"
+     }
+    }
+   }
+  }
+ }
+}
