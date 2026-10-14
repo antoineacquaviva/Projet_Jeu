@@ -4,7 +4,7 @@
 
 ## En bref
 - **La V0.4 garde nettement moins de forêt que la V0.3 : de −17 à −31 points selon la taille de table, écart sûr dans chaque taille.** Le tour de fin moyen reste proche du dernier tour (5 à 6).
-- **Le rêve ne domine plus** : en V0.3, rêver chaque tour est le meilleur choix ; en V0.4, rêver 0 et rêver 1 sont à égalité. Le problème est donc levé, mais le choix de rêver paraît sans enjeu (alerte E).
+- **Le rêve ne paie plus, mais il ne domine pas non plus.** En V0.3, rêver à chaque tour est nettement le meilleur choix (89,8 % contre 82,6 % sans rêver). En V0.4, la courbe s'inverse : ne jamais rêver donne 73,3 %, rêver à chaque tour 70,6 %, écart dans la marge d'erreur ; pour le glouton, ne pas rêver vaut 67,7 % contre 51,7 %. Le choix de rêver n'a donc plus d'avantage mesurable, et il est même coûteux pour le glouton : l'objectif « défendre ou rêver reste un dilemme » n'est pas tenu (alerte E).
 - **Les autres mesures** : la surprise et la concentration restent vertes. Deux mesures virent à l'orange en V0.4 (contribution des peuples, spectateur), et le gain du bot libre passe au rouge.
 - **Décision de l'auteur (14 oct., 13 h 28)** : la baisse de la forêt est acceptable.
 
@@ -46,7 +46,7 @@ Ces verdicts sont ceux du rapport automatique (`batterie/run7_p3/rapport.json`).
 
 ## 3. Lecture
 - **Pourquoi la forêt baisse.** La V0.4 ajoute les ordres supplémentaires du Méchant et le sablier des rêves (décision du 13 oct.). La baisse est cohérente avec le cycle 1, qui avait choisi la V0.4 pour freiner le rêve. Elle était attendue dans son ordre de grandeur, pas dans son ampleur.
-- **Le rêve.** La dominance est levée : c'est le résultat recherché au cycle 1. Mais rêver ne rapporte plus rien non plus, et l'équipe pourrait ne pas avoir de dilemme sur ce point.
+- **Le rêve.** Le rêve domine en V0.3 : c'est le défaut connu. En V0.4, il ne rapporte plus, sans qu'une autre option le dépasse nettement pour le bot fort. Le dilemme (défendre ou rêver) n'a donc plus de vrai enjeu : rêver ne vaut pas plus que ne pas rêver. Ce n'est pas le résultat recherché au cycle 1, qui visait à freiner le rêve, pas à le rendre inutile.
 - **Les contributions.** Les peuples n'apportent pas la même chose : les insectes pèsent deux fois moins que les mammifères et les reptiles. C'est un point de déséquilibre, à traiter au cycle 2 (priorité « équilibre des peuples »).
 - **Le spectateur** a moins d'impact en V0.4 : un joueur inactif compte moins qu'avant. À surveiller.
 
