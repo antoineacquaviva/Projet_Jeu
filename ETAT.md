@@ -224,13 +224,11 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
-EN COURS depuis 2026-10-14 23:16 (Paris) : réveil de 23 h 15, lancement de la campagne 32 (reve_somnambule).
-
 
 ## 7. Compteur de passages
 
 - Semaine en cours : depuis le lundi 12 oct. 2026, 22 h (heure de Paris).
-- Passages ayant réellement travaillé cette semaine : **2** (plafond : 12, décision du 13 oct.).
+- Passages ayant réellement travaillé cette semaine : **3** (plafond : 12, décision du 13 oct.).
 - Règle : le compteur est remis à zéro au premier passage qui suit un lundi 22 h. Un passage qui s'arrête aussitôt (décision attendue, verrou, campagne en cours, plafond) ne compte pas.
 
 ## 8. Réponses de l'auteur
@@ -282,7 +280,7 @@ Durées de référence, mesurées de la création du lancement à la fin de la d
 | Campagne 27 | choix_instrument sur v0.4rd | 16 | environ 20 min | – | réussi ; traité (bilan, section 3) |
 | Campagnes 28, 29, 30 | **choix_portefeuille** sur v0.3, v0.4 et v0.4rd : MCP64 qui juge une décision sur quatre | 16 | 15 à 25 min | – | réussi ; traité : le profil du rêve décision par décision ne sépare pas les témoins ; T3 complet (rêve 1, rêve 0, libre, apparié) les sépare : V0.3 dominé par rêver +5,8, V0.4 dominé par défendre −7,4, V0.4rd dominé par rêver +11,5 |
 | Campagne 31 | **reve_dispute_grille** sur v0.4rd : grille 2 × 2 × 2 (lunes 3 ou 2, cauchemar d'une ou deux cases, un ou deux rêves pour un pas) × trois instruments du test T3 complet (MC64R, MC 64 sans rêve dans ses suites, MCP64), échantillon P2, 2 parties : 768 parties ; lancée le 14 oct., 18 h 12 (run 38596118170, 128 lots) | 128 | estimée 3 à 4 h (fin vers 22 h 15) ; réveil armé pour 22 h 30 (20:30 UTC) | 2 h 01 (fin 20 h 13) ; 130 tâches réussies | lue le 14 oct., 20 h 40 : aucun réglage retenu ; `projet/4-bilans/essai-reve-dispute.md`, section 3 |
-| Campagne 32 (numéro probable) | **reve_somnambule** sur v0.4rd : référence, somnambule, somnambule avec 2 ou 3 présages, somnambule qui apprend (avec ou sans 3 présages) × trois instruments du T3 complet, échantillon P2, 2 parties : 576 parties ; à lancer par le réveil de 23 h 15 (14 oct.) | 96 | 1 h 30 à 2 h 30 | – | à lancer ; à lire au passage suivant (étape 3 ter, essai « le somnambule ») |
+| Campagne 32 (run 38639000435) | **reve_somnambule** sur v0.4rd : référence, somnambule, somnambule avec 2 ou 3 présages, somnambule qui apprend (avec ou sans 3 présages) × trois instruments du T3 complet, échantillon P2, 2 parties : 576 parties ;  | 96 | 1 h 30 à 2 h 30 | – | LANCÉE le 14 oct., 23 h 17 (21 h 17 UTC) par le réveil de 23 h 15 ; réveil armé pour 15 oct. 00:05 UTC (2 h 05 Paris) ; à lire au passage suivant (étape 3 ter, essai « le somnambule ») |
 
 *Les campagnes 2 à 7 ont été jouées avec le moteur avant l'accélération (moteur 1.7 : prévision deux fois plus rapide) : les mêmes campagnes prendraient aujourd'hui environ moitié moins de temps.*
 
@@ -311,6 +309,7 @@ Les trois derniers passages. Les précédents (13 et 14 oct.) sont dans [`projet
 | 14 oct. 2026 | 20:31 | 15 min | terminé | Session interactive (Opus, avec l'auteur) : campagne 31 terminée en avance (20 h 13, 130 tâches réussies) et lue à la demande de l'auteur. Grille du rêve disputé : aucun réglage retenu ni proche du seuil, rien lancé ; section 3 du bilan `projet/4-bilans/essai-reve-dispute.md` ; DÉCISION UTILISATEUR (étape 3 ter). Documents seulement. Pas compté dans le plafond. |
 | 14 oct. 2026 | 20:52 | 40 min | terminé | Session interactive (Opus, avec l'auteur) : recherche commune d'une solution au rêve disputé. Diagnostic local (20 parties MC 32 et 240 au glouton, v0.4rd) : le bot fort rêve tard et en rafale, et le cauchemar frappe une piste vide (61 % des déclenchements). Problématique, exemple et cinq pistes dans `projet/2-maquettes/reve-dispute-problematique-et-pistes.md` ; recommandation : le somnambule, puis le somnambule avec plus de présages. Aucune règle changée. Pas compté dans le plafond. |
 | 14 oct. 2026 | 22:57 | 15 min | terminé | Session interactive (Opus, avec l'auteur) : essai « le somnambule » codé avec l'accord de l'auteur (règles `somnambule`, `somnambule_apprend`, `presages` ; campagne `reve_somnambule` ; script d'analyse généralisé) ; 415 tests verts, conformité OK ; T1 local au glouton. Lancement confié au réveil (23 h 15), faute de jeton `gh` dans la session. Pas compté dans le plafond. |
+| 14 oct. 2026 | 23:16 | 15 min | terminé | Réveil de 23 h 15 (Sonnet) : campagne 32 (`reve_somnambule`, échelle 1, 96 lots) lancée (run 38639000435) ; réveil armé pour le 15 oct. à 00:05 UTC ; prochaine étape : lire la synthèse et écrire `projet/4-bilans/essai-somnambule.md`. |
 
 ## 11. Reprendre la main
 
