@@ -224,6 +224,8 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
+EN COURS depuis 2026-10-14 23:16 (Paris) : réveil de 23 h 15, lancement de la campagne 32 (reve_somnambule).
+
 
 ## 7. Compteur de passages
 
