@@ -79,3 +79,5 @@ Intervalles à 95 % entre crochets. Colonne « Critères » : nombre de critère
 - **A. Écarter la règle dans sa forme actuelle et revenir à la conception** (recommandé). Les deux enseignements sont à garder pour la suite. Le sablier est un vrai frein à la course au sommeil. En revanche, un mécanisme d'interaction qui ne se déclenche qu'en cours de route est court-circuité par le bot fort. Une nouvelle proposition devrait rendre la dispute fréquente par construction, et non par réglage.
 - **B. Prolonger la grille sur le sablier et le cauchemar** (3 rêves pour un pas, cauchemar de 3 cases), avec 4 parties par table. Coût : une campagne d'environ 2 h. Faible espoir, puisque les reculs sont trop rares partout.
 - **C. Adopter un réglage pour le cycle 2.** Déconseillé : aucun ne remplit les critères.
+
+**Réponse de l'auteur (14 oct., 22 h 55)** : ni adoption ni abandon pur. On cherche une autre forme de la règle : essai « le somnambule » ([pistes](../2-maquettes/reve-dispute-problematique-et-pistes.md), campagne `reve_somnambule`).
