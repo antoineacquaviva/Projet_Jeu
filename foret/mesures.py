@@ -668,10 +668,29 @@ MESURES = {
         vert=(5, None), rouge=[(None, 1 - E)],
         temoins=[("v0.3", "temoin_une_tactique", "fort", "gain plus petit que celui de la V0.3 (une seule tactique : moins à réordonner)")]),
     "dilemmes": dict(
-        niveau=3, objectif="2", nom="Dilemmes parmi les décisions non forcées",
-        etiquette="indice", unite="%", bot="fort (MC 64, sur échantillon)",
+        niveau=3, objectif="2", nom="Dilemmes parmi les décisions non forcées (REMPLACÉE par profil_delta, décision C3)",
+        etiquette="indice", unite="%", bot="fort (MC 64, sur échantillon)", remplacee_par="profil_delta",
         vert=(30, None), rouge=[(None, 10 - E)],
         temoins=[("v1", "temoin_essoufflement", "MC 64", "plus de décisions indifférentes que la v1 (supposé)")]),
+    # Décisions C2 à C4 (14 oct.) : leçon du rêve (projet/3-pilotage/choix-strategique.md), lecture seule.
+    "profil_delta": dict(
+        niveau=3, objectif="2", nom="Profil de Δ : part des situations où chaque option gagne nettement (T4)",
+        etiquette="indice", unite="% des situations ; régime (disputé, dominé, indifférent)",
+        bot="fort (jugements étiquetés, manche 2 de la confirmation)", descriptive=True,
+        bandes_proposees={"vert": "chaque côté ≥ 20 %, neutre ≤ 50 %", "rouge": "un côté < 5 % ou neutre > 80 %"},
+        temoins=[("v0.3", "defaut", "MC64R", "rêver ou défendre : dominé par rêver"),
+                 ("v0.4", "defaut", "MC64R", "rêver ou défendre : dominé par défendre, ou indifférent")]),
+    "lisibilite": dict(
+        niveau=3, objectif="2", nom="Lisibilité : un, puis deux indices publics prédisent l'option gagnante (T5)",
+        etiquette="indice", unite="% bien prédits (validation croisée)", bot="fort (jugements étiquetés)",
+        descriptive=True,
+        bandes_proposees={"vert": "un indice ≥ 65 % et gain du deuxième ≥ 5 points, plafond < 95 %",
+                          "rouge": "un indice au niveau du hasard"}, temoins=[]),
+    "mecanismes": dict(
+        niveau=1, objectif="garde-fou", nom="Mécanismes voulus : fréquence par partie (T1)",
+        etiquette="mesure", unite="occurrences par partie", bot="tous", descriptive=True,
+        bandes_proposees={"alerte": "moins de 0,5 par partie pour un mécanisme noté 8 ou 9 qui concerne toutes les tables"},
+        temoins=[("v0.4", "defaut", "MC64R", "tir à la corde presque absent (0,05 à 0,09 par partie)")]),
     # ---------------------------------------------------------------- objectif 3
     "shapley": dict(
         niveau=2, objectif="3", nom="Contributions de Shapley des six peuples (rapport à la moyenne)",

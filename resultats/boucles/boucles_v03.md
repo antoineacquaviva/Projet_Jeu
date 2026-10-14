@@ -16,6 +16,7 @@
 - **Aucune convention de table ne suffit** (pire composition, mammiferes+reptiles+humains+entites, 4 parties) : « convention:alliance|zone:depart|reves:1 », -1,2 points → rouge (proposé).
 - **Une action ne suffit pas** (la plus proche : saboter partout, 4 joueurs) : +0,4 points, 100 % du bot fort → rouge (proposé).
 - **Échelle de la lecture** (plus petite marche) : -3,0 points → rouge (proposé).
+- **Réflexes de rêve, test T3 léger** (la meilleure règle simple qui lit la situation, contre la meilleure politique d'horloge, taux fixes et horaires ; apparié) : 2 j. : « jugement:si=esprit_proche|reves=1.0 » − « glouton:reves=1.0 » = -10,9 (sûr) ; 3 j. : « jugement:si=hors_portee|reves=1.0 » − « glouton:reves=1.0 » = -9,5 (sûr) ; 4 j. : « jugement:si=calme|reves=1.0 » − « glouton:reves=0.5 » = -6,3 (sûr) ; 5 j. : « jugement:si=esprit_proche|reves=1.0 » − « glouton:reves=0.5 » = -3,6 (sûr) ; 6 j. : « jugement:si=calme|reves=1.0 » − « glouton:reves=1.0 » = -2,4 (incertain).
 
 **Alertes (lecture seule)** : 
 

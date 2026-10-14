@@ -33,7 +33,7 @@ Un bot paramétré par un script (`foret/bots/repete.py`) : priorité d'actions,
 | Réflexes (pas des boucles ouvertes) | saboter ou barrer au plus menacé × rêve 0, 1 ou 0-1 | 6 |
 | **Conventions de table** | un seul rêveur (1 ou 2 rêves) ; un seul saboteur ; relais du rêveur (1 ou 2) ; alliance perpétuelle (zone de départ avec 0 ou 1 rêve, zone fixe) ; barrage et sabotage couplés (0 ou 1 rêve) | 10 |
 
-Le même script à tous les sièges est la convention « miroir ». Les trois gloutons du cycle (rêve 0, 0,5, 1) jouent dans la même campagne. *À venir* (campagne de profondeur) : échouer volontairement pour pousser la piste, sacrifier toujours la même zone, remorquage en chaîne, et la recherche automatique de la meilleure boucle.
+Le même script à tous les sièges est la convention « miroir ». Les trois gloutons du cycle (rêve 0, 0,5, 1) jouent dans la même campagne, avec, depuis le 14 oct. (étape 3 quater), **16 horaires** (rêver à partir du tour *k* ou jusqu'au tour *k* : des boucles d'horloge, comptées parmi les boucles) et **7 réflexes de rêve** (test T3 léger de `choix-strategique.md` : ils lisent la situation, ils ne comptent pas comme boucles). *À venir* (campagne de profondeur) : échouer volontairement pour pousser la piste, sacrifier toujours la même zone, remorquage en chaîne, et la recherche automatique de la meilleure boucle.
 
 ## 5. Mesures et bandes (provisoires)
 Étiquette : **indice** (un vert prouve seulement qu'on n'a pas trouvé de boucle gagnante). Placement : **garde-fou**, à côté de « aucun effort n'est vain » ; pas de cinquième objectif (A4).

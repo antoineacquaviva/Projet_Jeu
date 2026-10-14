@@ -83,7 +83,7 @@ class TestBibliotheque(unittest.TestCase):
         self.assertEqual([b["nom"] for b in camp["blocs"]], ["boucles_n2", "boucles_n3"])
         tt, _ = taches(camp, "v0.4")
         self.assertEqual({t[5] for t in tt}, {2000, 2001})
-        self.assertEqual(len(tt), (len(boucles.bibliotheque(2)) + 3 + len(boucles.bibliotheque(3)) + 3) * 2)
+        self.assertEqual(len(tt), (len(boucles.bibliotheque(2)) + len(boucles.bibliotheque(3)) + 2 * len(boucles._references())) * 2)
 
 
 def _pc(lignes):

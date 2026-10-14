@@ -29,6 +29,23 @@ from collections import defaultdict
 from .stats import ecart_apparie, moyenne
 
 GLOUTONS = [{"type": "glouton", "params": {"reves_par_tour": r}} for r in (0.0, 0.5, 1.0)]
+# Étape 3 quater (14 oct., décisions C2 et C3 ; projet/3-pilotage/choix-strategique.md) :
+# - horaires (principe 7 : « l'horloge n'est pas une situation ») : rêver seulement à partir du tour k, ou
+#   jusqu'au tour k ; ce sont des stratégies répétées, comptées parmi les boucles ;
+# - réflexes de rêve (test T3 léger) : le même glouton, qui ne rêve que si une condition simple est vraie
+#   (foret/choix.py, CONDITIONS_REVE). Ils lisent la situation : ce ne sont pas des boucles. Si l'un bat la
+#   meilleure politique d'horloge (taux fixes et horaires), juger rapporte, même pour un joueur moyen.
+HORAIRES = [{"type": "glouton", "params": {"reves_par_tour": r, "tours_reve": t}}
+            for r in (0.5, 1.0) for t in [[k, 99] for k in range(2, 6)] + [[1, k] for k in range(2, 6)]]
+JUGEMENTS = [{"type": "glouton", "params": {"reves_par_tour": r, "reve_si": c}}
+             for r, c in [(1.0, ["esprit_proche"]), (2.0, ["esprit_proche"]), (1.0, ["calme"]), (1.0, ["hors_portee"]),
+                          (1.0, ["presage_esprit"]), (1.0, ["esprit_proche", "presage_esprit"]),
+                          (1.0, ["calme", "esprit_proche"])]]
+
+
+def _references():
+    """Les politiques de référence jouées avec la bibliothèque : gloutons à taux fixe, horaires, réflexes de rêve."""
+    return GLOUTONS + HORAIRES + JUGEMENTS
 BANDES = {"vert": 10.0, "rouge": 3.0}     # points de forêt (bandes proposées, décision C1 : provisoires)
 ACTION_PROCHE = 3.0                       # « une action ne suffit pas » : rouge si X partout est à moins de 3 points
 ACTION_PART = 0.90                        # … vert si X partout garde au plus 90 % de la forêt du bot fort
@@ -140,14 +157,15 @@ def tables_de(campagne):
 
 
 def blocs(variantes, tables, parties, graine0=0, references=True):
-    """Un bloc par taille de table : la bibliothèque de cette taille (et les gloutons de référence)."""
+    """Un bloc par taille de table : la bibliothèque de cette taille, et les références (gloutons à taux fixe,
+    horaires, réflexes de rêve)."""
     par_n = defaultdict(list)
     for t in tables:
         par_n[len(t)].append(list(t))
     out = []
     for n in sorted(par_n):
         out.append({"nom": f"boucles_n{n}", "variantes": list(variantes),
-                    "bots": bibliotheque(n) + (GLOUTONS if references else []),
+                    "bots": bibliotheque(n) + (_references() if references else []),
                     "tables": [{"liste": par_n[n], "parties": parties}], "graine0": graine0})
     return out
 
@@ -169,6 +187,11 @@ def etiquette(ligne):
     p = json.loads(ligne.get("bot_params") or "{}")
     if ligne["bot"] in ("repete", "table") and p.get("nom"):
         return p["nom"], p.get("famille", ""), bool(p.get("ouverte", True)), bool(p.get("collective"))
+    if ligne["bot"] == "glouton" and p.get("tours_reve"):
+        a, b = p["tours_reve"]
+        return f"horaire:reves={p.get('reves_par_tour', 0)}|tours={a}-{b if b < 99 else 'fin'}", "horaire", False, False
+    if ligne["bot"] == "glouton" and p.get("reve_si"):
+        return f"jugement:si={'+'.join(p['reve_si'])}|reves={p.get('reves_par_tour', 0)}", "jugement", False, False
     if ligne["bot"] == "glouton":
         return f"glouton:reves={p.get('reves_par_tour', 0)}", "glouton", False, False
     if ligne["bot"] == "mc":
@@ -247,7 +270,7 @@ def _par_taille(vals):
 
 
 def _analyser_variante(bots, meta, fort):
-    biblio = [b for b in bots if meta[b]["famille"] not in ("fort", "glouton", "autre", "chef")]
+    biblio = [b for b in bots if meta[b]["famille"] not in ("fort", "glouton", "autre", "chef", "horaire", "jugement")]
     tailles = sorted({_taille(k) for b in biblio for k in bots[b]})
     res = {"fort": fort, "tailles": {}, "strategies": len(biblio)}
     pires = []
@@ -259,18 +282,25 @@ def _analyser_variante(bots, meta, fort):
             c = [b for b in biblio if b in moy and filtre(b)]
             return max(c, key=lambda b: moy[b]) if c else None
         gl = [b for b in moy if meta[b]["famille"] == "glouton"]
-        # la meilleure boucle compte aussi les gloutons : « parer au plus probable à rythme de rêve fixe » est
-        # une politique répétée (le tape-taupe en est le cas particulier)
-        best = max([b for b in biblio if b in moy] + gl, key=lambda b: moy[b], default=None)
+        hor = [b for b in moy if meta[b]["famille"] == "horaire"]
+        jug = [b for b in moy if meta[b]["famille"] == "jugement"]
+        # la meilleure boucle compte aussi les gloutons et les horaires : « parer au plus probable à rythme de
+        # rêve fixe » est une politique répétée (le tape-taupe en est le cas particulier), un horaire aussi
+        best = max([b for b in biblio if b in moy] + gl + hor, key=lambda b: moy[b], default=None)
         ouverte = meilleur(lambda b: meta[b]["ouverte"])
         coll = meilleur(lambda b: meta[b]["collective"])
-        reflexe = max([b for b in gl] + [b for b in biblio if b in moy and not meta[b]["ouverte"]],
+        reflexe = max(gl + hor + jug + [b for b in biblio if b in moy and not meta[b]["ouverte"]],
                       key=lambda b: moy[b], default=None)
         t = {"meilleure": best, "foret_meilleure": _rd(moy.get(best)),
              "meilleure_ouverte": ouverte, "foret_ouverte": _rd(moy.get(ouverte)),
              "meilleure_collective": coll, "foret_collective": _rd(moy.get(coll)),
              "reflexe": reflexe, "foret_reflexe": _rd(moy.get(reflexe)),
              "foret_fort": _rd(moy.get(fort)) if fort else None, "parties": len(vals.get(best, {}))}
+        horloge = max(gl + hor, key=lambda b: moy[b], default=None)
+        regle = max(jug, key=lambda b: moy[b], default=None)
+        if horloge and regle:                                # T3 léger : une règle simple bat-elle l'horloge ?
+            t["jugement_simple"] = {"horloge": horloge, "foret_horloge": _rd(moy[horloge]), "regle": regle,
+                                    "foret_regle": _rd(moy[regle]), "ecart": ecart_apparie(vals[horloge], vals[regle])}
         if fort and fort in moy:
             ec = ecart_apparie(vals[best], vals[fort])          # fort − meilleure boucle
             t["ecart"] = ec
@@ -383,6 +413,14 @@ def markdown(analyse, titre="Garde-fou : aucune boucle gagnante (lecture seule)"
                      f"{_f(a['ecart'])} points, {_f(100 * a['part_du_fort'], '.0f')} % du bot fort → {a['bande_proposee']} (proposé).")
         if m:
             L.append(f"- **Échelle de la lecture** (plus petite marche) : {_f(m['points'])} points → {m['bande_proposee']} (proposé).")
+        js = [(n, t["jugement_simple"]) for n, t in sorted(r["tailles"].items()) if t.get("jugement_simple")]
+        if js:
+            morceaux = []
+            for n, j in js:
+                e = j["ecart"]
+                morceaux.append(f"{n} j. : « {j['regle']} » − « {j['horloge']} » = {_f(e.get('ecart'))} ({e.get('verdict')})")
+            L.append("- **Réflexes de rêve, test T3 léger** (la meilleure règle simple qui lit la situation, contre la meilleure "
+                     "politique d'horloge, taux fixes et horaires ; apparié) : " + " ; ".join(morceaux) + ".")
         L.append("")
     al = alertes(analyse)
     L += ["**Alertes (lecture seule)** : " + ("aucune." if not al else ""), ""] + [f"- {x}" for x in al] + ([""] if al else [])

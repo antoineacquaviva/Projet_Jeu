@@ -173,22 +173,30 @@ class MonteCarlo(Bot):
             self.rng.shuffle(autres)
             permis = [prefere] + autres[:self.p["max_options"] - 1]
         if self.p["juger"] and self.rng.random() < self.p["juger"]:
-            return self._juger(partie, type_, permis)
+            return self._juger(partie, type_, permis, options, siege)
         return self._halving(partie, permis)
 
-    def _juger(self, partie, type_, cands):
+    def _juger(self, partie, type_, cands, options=None, siege=None):
         """[mesure:dilemmes] Estime chaque option avec le même nombre de suites, sur les mêmes
         hasards (nombres aléatoires communs), note les valeurs (forêt finale en %) et prend la
         meilleure. Le classement (dilemme, évidente, indifférente) se fait à l'analyse."""
         self.stats["recherches"] += 1
         somme = {i: 0.0 for i in cands}
+        suites = {i: [] for i in cands}
         for _ in range(self.p["suites_juge"]):
             hasard = self.rng.randrange(1 << 30)
             for i in cands:
-                somme[i] += self._suite(partie, i, hasard)
+                x = self._suite(partie, i, hasard)
+                somme[i] += x
+                suites[i].append(round(100 * x, 1))
         k = self.p["suites_juge"]
-        self.jugements.append({"type": type_, "tour": partie.tour,
-                               "valeurs": [round(100 * somme[i] / k, 2) for i in cands]})
+        j = {"type": type_, "tour": partie.tour, "valeurs": [round(100 * somme[i] / k, 2) for i in cands]}
+        if options is not None:            # [mesure:profil_delta] [mesure:lisibilite] (C3, 14 oct.) : quelle option, quelle situation
+            from ..choix import etiquette_option, indices_publics
+            j["options"] = [etiquette_option(options[i]) for i in cands]
+            j["indices"] = indices_publics(partie, siege)
+            j["suites"] = [suites[i] for i in cands]     # mêmes hasards : l'écart entre options s'apparie suite par suite
+        self.jugements.append(j)
         return max(cands, key=lambda i: somme[i])
 
     def _prefere(self, partie, siege, type_, options, ctx, permis):

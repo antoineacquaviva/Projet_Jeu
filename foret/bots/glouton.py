@@ -53,6 +53,10 @@ class Glouton(Bot):
         "communique": "annonce", # "non", "annonce" ou "complet" (R2.5, voir plus haut)
         "des_connus": True,      # se servir des dés déjà vus pour l'étape en cours (R2.6, R6.2)
         "voie": "auto",          # [v2:D2v_choix] "auto", "sommeil" ou "reveil"
+        # Garde-fou C1 et test T3 léger (étape 3 quater, 14 oct. 2026 ; foret/choix.py) :
+        "tours_reve": None,      # horaire : [a, b] = ne rêver qu'aux tours a à b (sinon jamais)
+        "reve_si": [],           # réflexe de rêve : rêver reves_par_tour cartes seulement si l'une des
+                                 # conditions est vraie (voir foret/choix.py, CONDITIONS_REVE)
     }
 
     def __init__(self, graine=0, **params):
@@ -145,14 +149,22 @@ class Glouton(Bot):
                     return m
         return partie.moitie(p, "plateau") or "haut"
 
-    def _nb_reves(self, siege):
+    def _nb_reves(self, siege, partie=None):
+        if partie is not None and self.p["tours_reve"] is not None:
+            a, b = self.p["tours_reve"]
+            if not a <= partie.tour <= b:
+                return 0
+        if partie is not None and self.p["reve_si"]:
+            from ..choix import condition_reve
+            if not any(condition_reve(c, partie, siege) for c in self.p["reve_si"]):
+                return 0
         r = self.p["reves_par_tour"]
         k = int(r) + (1 if self.rng.random() < r - int(r) else 0)
         return max(0, min(k, len(siege.main) - self.p["garde"]))
 
     def _planifier(self, partie, siege):
         main = list(siege.main)
-        k = self._nb_reves(siege)
+        k = self._nb_reves(siege, partie)
         cap = partie.R["reves_par_joueur_et_tour"]
         if cap is not None:
             k = min(k, cap)
@@ -178,6 +190,8 @@ class Glouton(Bot):
 
     def _plan_du_tour(self, partie, siege):
         cle = (partie.lignee, partie.tour, siege.idx)
+        if self.p["reve_si"]:            # un réflexe de rêve relit le plan quand le présage est connu (R2.6)
+            cle += (partie.etapes[0] in partie.des_vus,)
         if cle not in self._plan:
             self._plan = {cle: self._planifier(partie, siege)}
         return self._plan[cle]
@@ -268,6 +282,8 @@ class Glouton(Bot):
     def d_lune(self, partie, siege, options, ronde):
         """[v2:D5]"""
         veut = any(m == "reve" for _, m, _ in self._plan_du_tour(partie, siege).values())
+        if "presage_esprit" in self.p["reve_si"] and self.p["reves_par_tour"] > 0:
+            veut = True                  # le présage n'est pas encore connu quand on prend les lunes
         if veut and ("prendre", "centre") in options:
             return ("prendre", "centre")
         if not veut and ("rendre",) in options:

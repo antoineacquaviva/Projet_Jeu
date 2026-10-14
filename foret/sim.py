@@ -101,6 +101,9 @@ def jouer_une(tache):
         m = _maquette(maquette, variante)
         bots = fabriquer_table(bot, len(peuples), graine * 100)
         base.update(Partie(m, list(peuples), bots, graine=graine, observateurs=[Usage()]).jouer())
+        jug = [dict(j, siege=i) for i, b in enumerate(bots) for j in getattr(b, "jugements", ())]
+        if jug:                                     # [mesure:profil_delta] décisions jugées en entier (C3)
+            base["jugements"] = jug
         base["tours_max"] = valeur_table(m["tours"], len(peuples))
     except Exception as e:  # noqa: BLE001 - tout attraper : c'est le but de la campagne
         base["erreur"] = f"{type(e).__name__}: {e}"
@@ -198,6 +201,9 @@ def synthetiser(resultats, campagne, maquette, ignorees, duree, extra_meta=None)
         "apparie": apparier(resultats, references_par_bloc(campagne)),
         "parties_compactes": parties_compactes(resultats),
     }
+    if any(r.get("jugements") for r in resultats):       # [mesure:profil_delta] [mesure:lisibilite] (C3, 14 oct.)
+        from .choix import analyser
+        syn["choix"] = analyser(resultats)
     return syn
 
 

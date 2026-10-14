@@ -13,6 +13,25 @@
     "foret_reflexe": 84.72,
     "foret_fort": 89.68,
     "parties": 24,
+    "jugement_simple": {
+     "horloge": "glouton:reves=1.0",
+     "foret_horloge": 84.72,
+     "regle": "jugement:si=esprit_proche|reves=1.0",
+     "foret_regle": 73.81,
+     "ecart": {
+      "paires": 24,
+      "ecart": -10.91,
+      "ic95": [
+       -15.08,
+       -6.94
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -16.59,
+       -5.23
+      ]
+     }
+    },
     "ecart": {
      "paires": 24,
      "ecart": 4.96,
@@ -68,6 +87,25 @@
     "foret_reflexe": 91.37,
     "foret_fort": 96.43,
     "parties": 16,
+    "jugement_simple": {
+     "horloge": "glouton:reves=1.0",
+     "foret_horloge": 91.37,
+     "regle": "jugement:si=hors_portee|reves=1.0",
+     "foret_regle": 81.84,
+     "ecart": {
+      "paires": 16,
+      "ecart": -9.53,
+      "ic95": [
+       -14.88,
+       -3.87
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -15.73,
+       -3.32
+      ]
+     }
+    },
     "ecart": {
      "paires": 16,
      "ecart": 5.06,
@@ -123,6 +161,25 @@
     "foret_reflexe": 93.65,
     "foret_fort": 92.46,
     "parties": 12,
+    "jugement_simple": {
+     "horloge": "glouton:reves=0.5",
+     "foret_horloge": 93.65,
+     "regle": "jugement:si=calme|reves=1.0",
+     "foret_regle": 87.3,
+     "ecart": {
+      "paires": 12,
+      "ecart": -6.35,
+      "ic95": [
+       -9.92,
+       -2.78
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -12.35,
+       -0.35
+      ]
+     }
+    },
     "ecart": {
      "paires": 12,
      "ecart": -1.19,
@@ -178,6 +235,25 @@
     "foret_reflexe": 96.43,
     "foret_fort": 93.45,
     "parties": 8,
+    "jugement_simple": {
+     "horloge": "glouton:reves=0.5",
+     "foret_horloge": 96.43,
+     "regle": "jugement:si=esprit_proche|reves=1.0",
+     "foret_regle": 92.86,
+     "ecart": {
+      "paires": 8,
+      "ecart": -3.57,
+      "ic95": [
+       -6.55,
+       -1.19
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -8.22,
+       1.08
+      ]
+     }
+    },
     "ecart": {
      "paires": 8,
      "ecart": -2.98,
@@ -233,6 +309,25 @@
     "foret_reflexe": 98.81,
     "foret_fort": 98.81,
     "parties": 4,
+    "jugement_simple": {
+     "horloge": "glouton:reves=1.0",
+     "foret_horloge": 98.81,
+     "regle": "jugement:si=calme|reves=1.0",
+     "foret_regle": 96.43,
+     "ecart": {
+      "paires": 4,
+      "ecart": -2.38,
+      "ic95": [
+       -7.14,
+       0.0
+      ],
+      "verdict": "incertain",
+      "ic95_independant": [
+       -6.37,
+       1.61
+      ]
+     }
+    },
     "ecart": {
      "paires": 4,
      "ecart": 0.0,

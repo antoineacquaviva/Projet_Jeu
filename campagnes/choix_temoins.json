@@ -1,0 +1,120 @@
+{
+ "nom": "choix_temoins",
+ "maquette": "v0.4",
+ "description": "Étape 3 quater c (14 oct. 2026, décisions C2 et C3) : témoins du profil de Δ et de la lisibilité (T4, T5). MC64R juge une décision sur quatre en entier (16 suites par option, appariées), sur l'échantillon P2 (16 tables, 2 parties). À jouer sur v0.3 (attendu : rêver domine), v0.4 (attendu : défendre domine ou indifférent) et v0.4rd (le rêve disputé). Lecture : syn['choix'] (foret/choix.py).",
+ "blocs": [
+  {
+   "nom": "juge",
+   "variantes": [
+    "defaut"
+   ],
+   "bots": [
+    {
+     "type": "mc",
+     "params": {
+      "budget": 64,
+      "savoir": "soi",
+      "politique": {
+       "type": "glouton",
+       "params": {
+        "reves_par_tour": 1.0
+       }
+      },
+      "juger": 0.25
+     }
+    }
+   ],
+   "tables": [
+    {
+     "liste": [
+      [
+       "humains",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "humains"
+      ],
+      [
+       "oiseaux",
+       "mammiferes"
+      ],
+      [
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "insectes"
+      ],
+      [
+       "mammiferes",
+       "reptiles"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "humains"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "insectes"
+      ],
+      [
+       "oiseaux",
+       "insectes",
+       "entites"
+      ],
+      [
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ],
+      [
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "humains",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "entites"
+      ],
+      [
+       "oiseaux",
+       "mammiferes",
+       "reptiles",
+       "insectes",
+       "humains",
+       "entites"
+      ]
+     ],
+     "parties": 2
+    }
+   ]
+  }
+ ]
+}

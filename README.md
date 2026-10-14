@@ -71,6 +71,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Diagnostic de la v1 et options de la v2 (phase 3)](projet/4-bilans/diagnostic-v1-options-v2.md) | **Le livrable de la phase 3** : verdicts du bot fort, jeu restreint, options de la v2, robustesse, recommandations |
 | | [Ligne de base P2 : la V0.3 de 2 à 6 joueurs](projet/4-bilans/ligne-de-base-p2.md) | Étape 0.11 du plan vers la V1 |
 | | [Bilan du cycle 1 : de la V0.3 à la V0.4 proposée](projet/4-bilans/cycle-1-bilan.md) | Durée réglée, difficulté selon le bot, proposition de V0.4, alertes D et E |
+| | [Tests du choix stratégique : premières lectures](projet/4-bilans/choix-strategique-premieres-lectures.md) | T1 : le tir à la corde absent en V0.3 et V0.4, réel avec le cauchemar ; T3 léger : aucune règle simple de rêve ne bat l'horloge |
 | | [Garde-fou « aucune boucle gagnante » : première lecture](projet/4-bilans/garde-fou-boucles-ligne-de-base.md) | V0.3 rouge (une boucle égale le bot fort), V0.4 orange (6 points à 4 joueurs) |
 | | [Historique des campagnes et des passages](projet/4-bilans/campagnes-et-passages-historique.md) | Tableau complet des lancements GitHub et journal des passages (hors `ETAT.md`) |
 | `5-visuels` | [Visuels : méthode et techniques](projet/5-visuels/methode-et-techniques.md) | Dossier de cadre de l’auteur, révisé : flux hybride (fait main, 3D, code, IA guidée), principes, pièces, flux par famille, agents, impression, provenance, phasage (14 oct.) |

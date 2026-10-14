@@ -21,6 +21,14 @@ GitHub (workflow `cycle.yml`), puis intégrée dans l'**état** du cycle (un dos
    plan saute l'étape.
 6. `rapport` : `rapport.md`, avec les alertes de conception.
 
+Étape 3 quater (14 oct., décisions C2 à C4 de l'auteur ; projet/3-pilotage/choix-strategique.md), en lecture seule :
+- chaque étape intégrée garde la **fréquence des mécanismes voulus** (T1, foret/mecanismes.py) ; le rapport la
+  donne pour la dernière manche de confirmation, et lève une alerte sous 0,5 par partie ;
+- dans la **dernière manche de confirmation**, le bot fort juge une décision sur dix en entier (réglage
+  `juger_confirmation` du plan, 0,1 par défaut ; 0 pour ne pas juger) : le rapport donne le **profil de Δ et la
+  lisibilité** des choix (T4, T5, foret/choix.py) ;
+- l'étape `boucles` joue aussi les horaires et les réflexes de rêve (T2, T3 léger).
+
 Qualité d'une variante (choix technique de Claude, plan vers la V1, sections 7 et 7 bis ; provisoire) :
 le plus faible de deux scores, chacun pris à la taille de table où il est le plus faible :
 - durée : 1 si au plus 20 % des parties finissent avant la mi-partie (bande verte de l'objectif 4,
@@ -43,6 +51,8 @@ import random
 from collections import defaultdict
 
 from . import boucles as _boucles
+from . import choix as _choix
+from . import mecanismes as _mecanismes
 from .maquette import charger, est_par_table, valeur_table
 from .stats import ecart_apparie
 
@@ -362,6 +372,10 @@ def preparer(plan, etat_dir):
     if e["etape"] in ("confirmation", "controle"):
         cand = lire_json(os.path.join(etat_dir, f"{e['etape']}_candidats.json"))
         bot = plan["bot_fort"] if e["etape"] == "confirmation" else plan["bot_controle"]
+        juger = plan.get("juger_confirmation", 0.1)
+        if e["etape"] == "confirmation" and e["gen"] == len(plan["confirmation"]["parties"]) and juger \
+                and bot.get("type") == "mc":              # T4 et T5 : la dernière manche juge une décision sur dix
+            bot = {**bot, "params": {**bot.get("params", {}), "juger": juger}}
         parties = plan["confirmation"]["parties"][e["gen"] - 1] if e["etape"] == "confirmation" else plan["controle"]["parties"]
         tables = [{"liste": [list(t) for t in _tables_echantillon(plan)], "parties": parties}]
         graine0 = 1000 * e["gen"]                               # manches suivantes : graines nouvelles
@@ -427,7 +441,8 @@ def integrer(plan, etat_dir, syn):
         return _suivante(plan, e, etape="exploration", gen=e["gen"] + 1)
     if e["etape"] == "confirmation":
         res = lire_json(os.path.join(etat_dir, "confirmation.json"), {})
-        res[f"m{e['gen']}"] = {"metriques": mets, "apparie": syn.get("apparie"), "usage": _usage(syn)}
+        res[f"m{e['gen']}"] = {"metriques": mets, "apparie": syn.get("apparie"), "usage": _usage(syn),
+                               "mecanismes": _mecanismes.frequences(syn), "choix": syn.get("choix")}
         ecrire_json(os.path.join(etat_dir, "confirmation.json"), res)
         # parties de la manche, pour apparier le garde-fou « aucune boucle gagnante » au bot fort
         ecrire_json(os.path.join(etat_dir, f"confirmation_parties_m{e['gen']}.json"), syn["parties_compactes"])
@@ -442,7 +457,8 @@ def integrer(plan, etat_dir, syn):
         return _suivante(plan, e, etape="controle", gen=1)
     if e["etape"] == "controle":
         ecrire_json(os.path.join(etat_dir, "controle.json"), {"metriques": mets, "apparie": syn.get("apparie"),
-                                                              "usage": _usage(syn)})
+                                                              "usage": _usage(syn),
+                                                              "mecanismes": _mecanismes.frequences(syn)})
         if plan.get("boucles", True):
             return _suivante(plan, e, etape="boucles", gen=1)
         return _suivante(plan, e, etape="rapport", gen=0)
@@ -516,6 +532,11 @@ def alertes(plan, etat_dir):
         if best <= 0:
             out.append(f"**table de {n} joueurs** : aucune variante n'y est jouable dans les bandes (durée et difficulté).")
     out += _boucles.alertes(lire_json(os.path.join(etat_dir, "boucles.json"), {}))
+    conf = lire_json(os.path.join(etat_dir, "confirmation.json"), {})
+    if conf:
+        derniere = conf[max(conf, key=lambda k: int(k[1:]))]
+        if derniere.get("mecanismes"):
+            out += _mecanismes.alertes({_nom_court(v): f for v, f in derniere["mecanismes"].items()})
     return out
 
 
@@ -557,6 +578,13 @@ def rapport(plan, etat_dir):
             L.append(f"| {_nom_court(v)} | {fr(m['qualite'], '.2f')} | {fo} | {fr(m['precoces_max'], '.0f')} % | "
                      f"{fr(m['tour_moyen'], '.1f')} | {ea} |")
         L.append("")
+    if conf:
+        derniere = conf[max(conf, key=lambda k: int(k[1:]))]
+        if derniere.get("mecanismes"):
+            L.append(_mecanismes.markdown({_nom_court(v): f for v, f in derniere["mecanismes"].items()},
+                                          "Mécanismes voulus, dernière manche de confirmation (T1, décision C4)"))
+        if derniere.get("choix"):
+            L.append(_choix.markdown({_nom_court(v): c for v, c in derniere["choix"].items()}))
     bc = lire_json(os.path.join(etat_dir, "boucles.json"))
     if bc:
         L.append(_boucles.markdown({_nom_court(v): r for v, r in bc.items()}))

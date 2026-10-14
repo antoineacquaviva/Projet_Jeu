@@ -1,0 +1,163 @@
+{
+ "defaut": {
+  "fort": null,
+  "tailles": {
+   "2": {
+    "meilleure": "reflexe:barrer|reves:0",
+    "foret_meilleure": 68.05,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_ouverte": 56.75,
+    "meilleure_collective": "convention:barrage_sabotage|reves:0",
+    "foret_collective": 51.19,
+    "reflexe": "reflexe:barrer|reves:0",
+    "foret_reflexe": 68.05,
+    "foret_fort": null,
+    "parties": 24,
+    "jugement_simple": {
+     "horloge": "glouton:reves=0.0",
+     "foret_horloge": 65.67,
+     "regle": "jugement:si=esprit_proche|reves=1.0",
+     "foret_regle": 65.67,
+     "ecart": {
+      "paires": 24,
+      "ecart": 0.0,
+      "ic95": [
+       0.0,
+       0.0
+      ],
+      "verdict": "négligeable",
+      "ic95_independant": [
+       -5.61,
+       5.61
+      ]
+     }
+    }
+   },
+   "3": {
+    "meilleure": "reflexe:barrer|reves:1",
+    "foret_meilleure": 91.37,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_ouverte": 89.28,
+    "meilleure_collective": "convention:barrage_sabotage|reves:1",
+    "foret_collective": 88.09,
+    "reflexe": "reflexe:barrer|reves:1",
+    "foret_reflexe": 91.37,
+    "foret_fort": null,
+    "parties": 16,
+    "jugement_simple": {
+     "horloge": "horaire:reves=1.0|tours=2-fin",
+     "foret_horloge": 89.58,
+     "regle": "jugement:si=calme|reves=1.0",
+     "foret_regle": 83.63,
+     "ecart": {
+      "paires": 16,
+      "ecart": -5.95,
+      "ic95": [
+       -11.31,
+       -1.19
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -12.72,
+       0.82
+      ]
+     }
+    }
+   },
+   "4": {
+    "meilleure": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_meilleure": 86.91,
+    "meilleure_ouverte": "action:saboter|zone:depart|mode:plateau|reves:1",
+    "foret_ouverte": 86.91,
+    "meilleure_collective": "convention:barrage_sabotage|reves:1",
+    "foret_collective": 76.19,
+    "reflexe": "reflexe:barrer|reves:1",
+    "foret_reflexe": 84.92,
+    "foret_fort": null,
+    "parties": 12,
+    "jugement_simple": {
+     "horloge": "horaire:reves=1.0|tours=2-fin",
+     "foret_horloge": 75.4,
+     "regle": "jugement:si=calme|reves=1.0",
+     "foret_regle": 52.78,
+     "ecart": {
+      "paires": 12,
+      "ecart": -22.62,
+      "ic95": [
+       -29.76,
+       -16.27
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -36.59,
+       -8.65
+      ]
+     }
+    }
+   },
+   "5": {
+    "meilleure": "action:barrer|zone:depart|mode:plateau|reves:1",
+    "foret_meilleure": 94.64,
+    "meilleure_ouverte": "action:barrer|zone:depart|mode:plateau|reves:1",
+    "foret_ouverte": 94.64,
+    "meilleure_collective": "convention:alliance|zone:depart|reves:1",
+    "foret_collective": 88.69,
+    "reflexe": "glouton:reves=1.0",
+    "foret_reflexe": 93.45,
+    "foret_fort": null,
+    "parties": 8,
+    "jugement_simple": {
+     "horloge": "glouton:reves=1.0",
+     "foret_horloge": 93.45,
+     "regle": "jugement:si=esprit_proche|reves=1.0",
+     "foret_regle": 73.22,
+     "ecart": {
+      "paires": 8,
+      "ecart": -20.24,
+      "ic95": [
+       -30.95,
+       -10.71
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -31.44,
+       -9.03
+      ]
+     }
+    }
+   },
+   "6": {
+    "meilleure": "action:barrer|zone:depart|mode:machines|reves:1",
+    "foret_meilleure": 97.62,
+    "meilleure_ouverte": "action:barrer|zone:depart|mode:machines|reves:1",
+    "foret_ouverte": 97.62,
+    "meilleure_collective": "convention:alliance|zone:depart|reves:1",
+    "foret_collective": 95.24,
+    "reflexe": "glouton:reves=1.0",
+    "foret_reflexe": 94.05,
+    "foret_fort": null,
+    "parties": 4,
+    "jugement_simple": {
+     "horloge": "glouton:reves=1.0",
+     "foret_horloge": 94.05,
+     "regle": "jugement:si=esprit_proche|reves=1.0",
+     "foret_regle": 61.91,
+     "ecart": {
+      "paires": 4,
+      "ecart": -32.14,
+      "ic95": [
+       -51.19,
+       -16.67
+      ],
+      "verdict": "sûr",
+      "ic95_independant": [
+       -47.45,
+       -16.84
+      ]
+     }
+    }
+   }
+  },
+  "strategies": 138
+ }
+}
