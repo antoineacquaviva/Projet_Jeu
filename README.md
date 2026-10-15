@@ -61,6 +61,8 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Atelier v2](projet/2-maquettes/atelier_v2.html) (HTML interactif) | L'arbre des variantes, avec le livret assemblé à la volée |
 | | [Règles du noyau N1](docs/regles_noyau.md) et [maquette jouable](https://claude.ai/artifact/495jtCyeRbmDCiWP54SpnV) | Le jeu recentré sur ses idées fortes, rêve qui détourne (15 oct., proposition non adoptée) |
 | | [Règles du modèle « placement »](docs/regles_placement.md) | La mécanique de base seule : grille, menaces annoncées, k ordres du Gentil, perte du tour entre n − k et n (15 oct., modèle d'étude) |
+| | [Forêt en couronne](https://claude.ai/artifact/Y8uxpq492aWUdXN3h1uRps) (maquette jouable, sources `maquettes-numeriques/kit/`) | Le kit par joueur de 2 à 6 joueurs : couronne de tuiles, humains ou bots expliqués, parties enregistrées (15 oct.) |
+| | [Modèle placement, étude 2](projet/4-bilans/placement-etude-2-kit.md) | Le kit par joueur de 2 à 6 joueurs : la couronne règle le placement ; le réglage qui tient à toutes les tailles |
 | `3-pilotage` | [Plan d'action](projet/3-pilotage/plan-d-action.md) | Les six phases : cadrer, mesurer, bots, diagnostic, exploration, validation |
 | | [Objectifs, invariants et catalogue](projet/3-pilotage/objectifs-invariants-catalogue.md) | Les quatre objectifs d'expérience, leurs bandes, ce qui ne change pas, les variables |
 | | [Cahier des charges du calcul](projet/3-pilotage/cahier-des-charges-calcul.md) | Où faire tourner les campagnes : GitHub Actions (décision 10) |
