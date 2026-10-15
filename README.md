@@ -34,7 +34,6 @@ projet/                  Documents de conception et de pilotage (à lire en prem
 docs/                    Documentation technique du moteur (lue en partie par le code)
 foret/                   Le moteur de simulation (Python pur)
 maquettes/               Les règles en données : v0 (V0.1), v1 (V0.2), v2, v0.3 (V0.3), v0.4 (V0.4) ; chacune hérite de la précédente
-placement/               Le modèle de la mécanique de base seule (15 oct.) : règles dans docs/regles_placement.md, tests dans tests/test_placement.py
 maquettes-numeriques/     Le noyau N1 jouable (15 oct.) : moteur et bots en JavaScript, page animée, tests Node ; règles dans docs/regles_noyau.md
 placement/               Le modèle « placement » (15 oct.) : la mécanique de base seule, ses bots et ses campagnes ; règles dans docs/regles_placement.md
 campagnes/               Les campagnes de simulation, en JSON
