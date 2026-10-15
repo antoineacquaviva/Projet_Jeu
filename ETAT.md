@@ -224,6 +224,7 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 6. Verrou
 
+EN COURS depuis le 2026-10-15 02:06 (heure de Paris) : réveil, lecture de la campagne 32.
 
 ## 7. Compteur de passages
 
