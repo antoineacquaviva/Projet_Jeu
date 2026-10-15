@@ -63,3 +63,5 @@ Ensuite : `python -m pytest -q tests`, `python -m foret.conformite`, `python -m 
 
 ## Suite
 Voir « Plan d'action - évaluer et explorer les variantes par la simulation ». Phase 0 validée ; phase 1 terminée (« Batterie d'évaluation (phase 1) »), décisions B1 à B4 prises le 12 oct. Ensuite : choix de l'environnement de calcul (« Cahier des charges - environnement de calcul cloud »), puis phase 2 (bot fort).
+
+- [Proposition : le conseil de la calebasse](proposition-conseil-calebasse.md) (15 oct. 2026) : visions privées, une parole par joueur qui engage ; non adoptée.
