@@ -1,0 +1,162 @@
+{
+ "nom": "placement_voisinage",
+ "description": "Optimisation locale : la variante élue et ses voisines à un cran, jouées avec le Monte-Carlo.",
+ "type": "voisinage",
+ "graine": 41,
+ "parties": 48,
+ "mechant": "hasard",
+ "bots": {
+  "sentinelle": "sentinelle",
+  "marquage": "marquage",
+  "regroupement": "regroupement",
+  "reflexe": "reflexe",
+  "glouton": "glouton",
+  "glouton_aveugle": {
+   "type": "glouton",
+   "params": {
+    "aveugle": true
+   }
+  },
+  "glouton_immobile": {
+   "type": "glouton",
+   "params": {
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  },
+  "mc": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3
+   }
+  },
+  "mc_immobile": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3,
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  }
+ },
+ "base": {},
+ "espace": {
+  "largeur": [
+   4,
+   6
+  ],
+  "hauteur": [
+   4,
+   6
+  ],
+  "voisinage": [
+   8
+  ],
+  "arbres": [
+   2,
+   4
+  ],
+  "machines": [
+   2,
+   4
+  ],
+  "individus": [
+   2,
+   4
+  ],
+  "n": [
+   2,
+   4
+  ],
+  "k": [
+   1,
+   3
+  ],
+  "tours": [
+   6,
+   10
+  ],
+  "portee": [
+   2
+  ],
+  "aller_garder": [
+   true
+  ],
+  "sabotage": [
+   "aucun",
+   "fige",
+   "allie"
+  ],
+  "garde_portee": [
+   1
+  ],
+  "profil": [
+   "coeur",
+   "bosquets"
+  ],
+  "entree": [
+   "bords"
+  ],
+  "annonces": [
+   0,
+   3,
+   4,
+   6,
+   7
+  ],
+  "tactiques": [
+   {
+    "percee": 1,
+    "opportunisme": 1,
+    "represailles": 1
+   },
+   {
+    "cupidite": 2,
+    "percee": 1,
+    "opportunisme": 1,
+    "represailles": 1
+   },
+   {
+    "cupidite": 1,
+    "opportunisme": 1,
+    "represailles": 1
+   },
+   {
+    "cupidite": 1,
+    "percee": 2,
+    "opportunisme": 1,
+    "represailles": 1
+   },
+   {
+    "cupidite": 1,
+    "percee": 1,
+    "represailles": 1
+   },
+   {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 2,
+    "represailles": 1
+   },
+   {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 1
+   },
+   {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 1,
+    "represailles": 2
+   }
+  ]
+ }
+}
