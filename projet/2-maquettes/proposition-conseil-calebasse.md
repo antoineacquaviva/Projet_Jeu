@@ -1,5 +1,7 @@
 # Proposition : le conseil de la calebasse
 
+> **Statut au 15 oct. 2026, 17 h : idée retenue par l'auteur comme très intéressante, dont la conception est DIFFÉRÉE à plus tard.** L'auteur recentre pour l'instant la conception sur la mécanique de base seule (modèle « placement », `docs/regles_placement.md`), sans communication. Ce document est conservé tel quel, comme réserve d'idées : il n'est ni développé, ni codé, ni testé, et rien n'y est adopté. Les « validations » de la fin de la proposition sont suspendues. Registre des parties différées : `projet/1-idees/parties-differees.md`.
+
 *15 oct. 2026, 14 h. Réponse à la demande de l'auteur : un conseil plus intéressant, sans parole libre, avec une règle qui limite ce qu'on se dit. **Statut : proposition de Claude, rien n'est adopté.** Elle remplacerait N2.1 du noyau (`docs/regles_noyau.md`) et s'appuie sur la direction D1, « le rêve détourne ».*
 
 ## En bref

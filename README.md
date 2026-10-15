@@ -6,6 +6,8 @@ Ce dépôt réunit deux choses :
 - **les documents de conception** : les idées, les maquettes de règles, le plan de travail et les bilans ;
 - **le moteur de simulation** `foret` : il joue les règles sans interface, avec des joueurs virtuels, pour trouver les failles des règles et mesurer les variantes.
 
+**Orientation du 15 oct. 2026 :** la conception se concentre sur la **mécanique de base seule** (un Méchant à n actions, un Gentil à k actions, déplacement et placement ; [docs/regles_placement.md](docs/regles_placement.md), code dans `placement/`). Pistes, apprentissage, rêve, peuples et communication sont **différés** : voir [projet/1-idees/parties-differees.md](projet/1-idees/parties-differees.md), qui consigne notamment l'idée du conseil de la calebasse. Le texte ci-dessous décrit l'état de la V0.4, toujours la dernière version adoptée.
+
 Où en est le projet (13 oct. 2026) : les phases 1 (mesures), 2 (le bot fort) et 3 (diagnostic, [projet/4-bilans/diagnostic-v1-options-v2.md](projet/4-bilans/diagnostic-v1-options-v2.md)) sont faites. Le jeu en est à la **V0.4** (adoptée à la fin du cycle 1, [bilan](projet/4-bilans/cycle-1-bilan.md)) ; la suite suit le [plan vers la V1](projet/3-pilotage/plan-vers-v1.md) : trois cycles au plus de simulation, puis une V1.0 testée par des joueurs. L'état du travail, les étapes restantes et le journal des passages automatiques sont dans [ETAT.md](ETAT.md).
 
 ## Les versions du jeu
@@ -32,6 +34,7 @@ projet/                  Documents de conception et de pilotage (à lire en prem
 docs/                    Documentation technique du moteur (lue en partie par le code)
 foret/                   Le moteur de simulation (Python pur)
 maquettes/               Les règles en données : v0 (V0.1), v1 (V0.2), v2, v0.3 (V0.3), v0.4 (V0.4) ; chacune hérite de la précédente
+placement/               Le modèle de la mécanique de base seule (15 oct.) : règles dans docs/regles_placement.md, tests dans tests/test_placement.py
 maquettes-numeriques/     Le noyau N1 jouable (15 oct.) : moteur et bots en JavaScript, page animée, tests Node ; règles dans docs/regles_noyau.md
 campagnes/               Les campagnes de simulation, en JSON
 tests/                   Les tests : chaque règle, nœud ou mesure a au moins le sien

@@ -1,6 +1,6 @@
 # Règles du noyau N1
 
-*15 oct. 2026. Maquette d'étude simplifiée, demandée par l'auteur après le recul du jour (`projet/3-pilotage/prendre-du-recul.md`, décisions 1 à 5 acceptées). Elle applique la démarche « noyau d'abord » (D4) et la direction D1, « le rêve détourne ». **Statut : proposition de Claude, à jouer et à juger. Rien n'est adopté** : la V0.4 reste la dernière version adoptée. Maquette jouable : https://claude.ai/artifact/495jtCyeRbmDCiWP54SpnV (sources : `maquettes-numeriques/noyau/`). Chaque règle porte un identifiant (N1.1…), que le code cite.*
+*15 oct. 2026. Maquette d'étude simplifiée, demandée par l'auteur après le recul du jour (`projet/3-pilotage/prendre-du-recul.md`, décisions 1 à 5 acceptées). Elle applique la démarche « noyau d'abord » (D4) et la direction D1, « le rêve détourne ». **Statut : proposition de Claude, à jouer et à juger. Rien n'est adopté. Depuis le 15 oct., 17 h, la ligne de travail active est la mécanique de base seule (`docs/regles_placement.md`) ; ce noyau reste une référence disponible, et le conseil de la calebasse qui devait le compléter est différé (`projet/1-idees/parties-differees.md`)** : la V0.4 reste la dernière version adoptée. Maquette jouable : https://claude.ai/artifact/495jtCyeRbmDCiWP54SpnV (sources : `maquettes-numeriques/noyau/`). Chaque règle porte un identifiant (N1.1…), que le code cite.*
 
 ## Ce qui est gardé, ce qui est retiré
 | Gardé (idées fortes, mécanismes jugés solides) | Retiré pour l'instant (modules à réintroduire un par un) |
