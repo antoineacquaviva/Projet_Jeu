@@ -1,0 +1,118 @@
+name: Placement
+
+# Campagnes du modèle « placement » (docs/regles_placement.md) : onglet Actions -> Placement -> Run workflow.
+# Le plan (campagnes/placement_*.json) est découpé en N lots joués en parallèle, puis fusionné ;
+# la synthèse et le rapport sont publiés sur la branche « resultats », dans placement/<plan>_run<n>/.
+
+on:
+  workflow_dispatch:
+    inputs:
+      plan:
+        description: "Plan (nom du fichier dans campagnes/, sans .json), par ex. placement_criblage"
+        default: "placement_temoins"
+        required: true
+      echelle:
+        description: "Échelle : 0.25 = un quart des parties, 1 = le plan entier"
+        default: "1"
+        required: true
+      lots:
+        description: "Nombre de lots en parallèle (1 à 256)"
+        default: "8"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  preparer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      lots: ${{ steps.matrice.outputs.lots }}
+    steps:
+      - name: Contrôler les paramètres et préparer la matrice
+        id: matrice
+        env:
+          PLAN: ${{ inputs.plan }}
+          ECHELLE: ${{ inputs.echelle }}
+          LOTS: ${{ inputs.lots }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, re, sys
+          plan, echelle, lots = os.environ["PLAN"], os.environ["ECHELLE"], os.environ["LOTS"]
+          if not re.fullmatch(r"placement_[A-Za-z0-9_\-]+", plan):
+              sys.exit(f"nom de plan invalide : {plan!r}")
+          try:
+              if float(echelle) <= 0:
+                  raise ValueError
+          except ValueError:
+              sys.exit(f"échelle invalide : {echelle!r}")
+          if not re.fullmatch(r"[0-9]+", lots) or not 1 <= int(lots) <= 256:
+              sys.exit(f"nombre de lots invalide (1 à 256) : {lots!r}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("lots=" + json.dumps(list(range(int(lots)))) + "\n")
+          EOF
+
+  lot:
+    needs: preparer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        lot: ${{ fromJSON(needs.preparer.outputs.lots) }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Jouer le lot
+        env:
+          PLAN: ${{ inputs.plan }}
+          ECHELLE: ${{ inputs.echelle }}
+          LOTS: ${{ inputs.lots }}
+          LOT: ${{ matrix.lot }}
+        run: python -m placement.campagne "campagnes/$PLAN.json" --echelle "$ECHELLE" --lot "$LOT/$LOTS" --sortie lots
+      - uses: actions/upload-artifact@v7
+        with:
+          name: lot-${{ matrix.lot }}
+          path: lots/
+          retention-days: 3
+          if-no-files-found: error
+
+  fusion:
+    needs: lot
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write        # pour publier sur la branche « resultats »
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: lot-*
+          path: lots
+          merge-multiple: true
+      - name: Fusionner et analyser
+        env:
+          PLAN: ${{ inputs.plan }}
+          ECHELLE: ${{ inputs.echelle }}
+        run: |
+          python -m placement.campagne "campagnes/$PLAN.json" --echelle "$ECHELLE" --fusionner lots --sortie publie
+          python -m placement.analyse publie/synthese.json --md publie/rapport.md > /dev/null
+          head -c 60000 publie/rapport.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Publier sur la branche « resultats »
+        env:
+          PLAN: ${{ inputs.plan }}
+          ECHELLE: ${{ inputs.echelle }}
+          LOTS: ${{ inputs.lots }}
+          RUN: ${{ github.run_number }}
+        run: bash scripts/publier_resultats.sh publie "placement/${PLAN}_run${RUN}" "Placement ${PLAN} (échelle ${ECHELLE}, ${LOTS} lots), run ${RUN}"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: synthese-${{ inputs.plan }}-${{ github.run_number }}
+          path: publie/
+          retention-days: 30

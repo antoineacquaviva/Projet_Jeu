@@ -1,0 +1,44 @@
+{
+  "nom": "placement_criblage",
+  "description": "Criblage au hasard du modèle placement : 400 variantes tirées dans l'espace des paramètres et des variantes de règles, jouées par les bots bon marché (sans Monte-Carlo). Sert à trouver les zones viables et intéressantes et l'effet de chaque paramètre.",
+  "type": "criblage",
+  "graine": 2026,
+  "configs": 400,
+  "parties": 16,
+  "mechant": "hasard",
+  "bots": {
+    "aleatoire": "aleatoire",
+    "sentinelle": "sentinelle",
+    "marquage": "marquage",
+    "regroupement": "regroupement",
+    "reflexe": "reflexe",
+    "glouton": {"type": "glouton", "params": {"echantillons": 12}},
+    "glouton_aveugle": {"type": "glouton", "params": {"echantillons": 12, "aveugle": true}},
+    "glouton_immobile": {"type": "glouton", "params": {"echantillons": 12, "deplacer": false, "interdits": ["aller", "poster"]}},
+    "oracle": "oracle"
+  },
+  "espace": {
+    "plateau": [[4, 4], [5, 5], [6, 6], [6, 4], [7, 7]],
+    "voisinage": [4, 8],
+    "arbres": [1, 2, 3, 4],
+    "profil": ["uniforme", "coeur", "bosquets"],
+    "machines": [2, 3, 4, 5],
+    "entree": ["front", "bords"],
+    "n": [2, 3, 4, 5],
+    "k_rel": [0.34, 0.5, 0.67, 0.8],
+    "individus_rel": [0, 1, 2],
+    "tours": [6, 8, 10],
+    "annonces_rel": [0, 1, 2, 3, 4],
+    "tactiques": [
+      {"cupidite": 1, "percee": 1, "opportunisme": 1, "represailles": 1},
+      {"cupidite": 2, "percee": 2},
+      {"cupidite": 1, "percee": 1, "opportunisme": 2, "represailles": 2},
+      {"cupidite": 1, "percee": 3, "opportunisme": 1, "represailles": 1},
+      {"cupidite": 1, "percee": 1, "opportunisme": 1}
+    ],
+    "portee": [1, 2],
+    "aller_garder": [false, true],
+    "sabotage": ["aucun", "fige", "echappe", "allie"],
+    "garde_portee": [0, 1]
+  }
+}

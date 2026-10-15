@@ -1,0 +1,372 @@
+{
+ "nom": "placement_election",
+ "description": "Élection : les 20 meilleures variantes de placement_criblage, rejouées avec le Monte-Carlo (MC 256, horizon 3). Plus la variante de départ (base) comme repère.",
+ "type": "liste",
+ "graine": 31,
+ "parties": 32,
+ "mechant": "hasard",
+ "bots": {
+  "sentinelle": "sentinelle",
+  "marquage": "marquage",
+  "regroupement": "regroupement",
+  "reflexe": "reflexe",
+  "glouton": "glouton",
+  "glouton_aveugle": {
+   "type": "glouton",
+   "params": {
+    "aveugle": true
+   }
+  },
+  "glouton_immobile": {
+   "type": "glouton",
+   "params": {
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  },
+  "mc": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3
+   }
+  },
+  "mc_immobile": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3,
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  }
+ },
+ "variantes": {
+  "base": {},
+  "c0038": {
+   "largeur": 6,
+   "hauteur": 4,
+   "voisinage": 8,
+   "machines": 4,
+   "entree": "bords",
+   "individus": 4,
+   "n": 4,
+   "k": 3,
+   "tours": 6,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 1
+   },
+   "aller_garder": true,
+   "sabotage": "fige"
+  },
+  "c0082": {
+   "arbres": 1,
+   "machines": 2,
+   "individus": 1,
+   "n": 4,
+   "k": 1,
+   "tours": 6,
+   "annonces": 6,
+   "aller_garder": true,
+   "sabotage": "allie"
+  },
+  "c0095": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 2,
+   "entree": "bords",
+   "n": 2,
+   "k": 1,
+   "tours": 6,
+   "annonces": 4,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 3,
+    "opportunisme": 1,
+    "represailles": 1
+   },
+   "portee": 2,
+   "sabotage": "aucun"
+  },
+  "c0194": {
+   "largeur": 6,
+   "hauteur": 6,
+   "arbres": 1,
+   "profil": "bosquets",
+   "machines": 5,
+   "individus": 2,
+   "k": 1,
+   "tours": 10,
+   "annonces": 6,
+   "tactiques": {
+    "cupidite": 2,
+    "percee": 2
+   },
+   "sabotage": "aucun"
+  },
+  "c0220": {
+   "largeur": 7,
+   "hauteur": 7,
+   "individus": 4,
+   "n": 4,
+   "k": 3,
+   "tactiques": {
+    "cupidite": 2,
+    "percee": 2
+   },
+   "garde_portee": 1
+  },
+  "c0233": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 1
+   },
+   "portee": 2,
+   "aller_garder": true,
+   "sabotage": "allie"
+  },
+  "c0234": {
+   "largeur": 7,
+   "hauteur": 7,
+   "voisinage": 8,
+   "arbres": 2,
+   "profil": "bosquets",
+   "machines": 5,
+   "entree": "bords",
+   "individus": 4,
+   "n": 4,
+   "tours": 6,
+   "annonces": 7,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 3,
+    "opportunisme": 1,
+    "represailles": 1
+   },
+   "aller_garder": true
+  },
+  "c0237": {
+   "largeur": 7,
+   "hauteur": 7,
+   "voisinage": 8,
+   "profil": "coeur",
+   "machines": 4,
+   "individus": 1,
+   "n": 2,
+   "k": 1,
+   "annonces": 4,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 1
+   },
+   "aller_garder": true,
+   "sabotage": "aucun"
+  },
+  "c0254": {
+   "largeur": 6,
+   "hauteur": 4,
+   "voisinage": 8,
+   "arbres": 4,
+   "machines": 5,
+   "entree": "bords",
+   "individus": 2,
+   "n": 5,
+   "tours": 6,
+   "annonces": 8,
+   "tactiques": {
+    "cupidite": 2,
+    "percee": 2
+   },
+   "portee": 2
+  },
+  "c0278": {
+   "largeur": 7,
+   "hauteur": 7,
+   "voisinage": 8,
+   "arbres": 1,
+   "profil": "coeur",
+   "machines": 5,
+   "entree": "bords",
+   "individus": 1,
+   "n": 4,
+   "k": 1,
+   "tours": 10,
+   "aller_garder": true
+  },
+  "c0307": {
+   "largeur": 6,
+   "hauteur": 6,
+   "arbres": 2,
+   "machines": 4,
+   "individus": 6,
+   "n": 5,
+   "k": 4,
+   "annonces": 7,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 1
+   },
+   "aller_garder": true,
+   "sabotage": "aucun"
+  },
+  "c0373": {
+   "largeur": 7,
+   "hauteur": 7,
+   "arbres": 2,
+   "profil": "bosquets",
+   "machines": 5,
+   "n": 4,
+   "k": 3,
+   "tours": 6,
+   "tactiques": {
+    "cupidite": 2,
+    "percee": 2
+   },
+   "aller_garder": true,
+   "sabotage": "aucun"
+  },
+  "c0381": {
+   "arbres": 4,
+   "profil": "coeur",
+   "machines": 2,
+   "individus": 2,
+   "tours": 10,
+   "annonces": 4,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 1
+   },
+   "portee": 2,
+   "aller_garder": true,
+   "sabotage": "allie"
+  },
+  "c0399": {
+   "largeur": 4,
+   "hauteur": 4,
+   "arbres": 4,
+   "machines": 4,
+   "entree": "bords",
+   "individus": 2,
+   "n": 5,
+   "tours": 10,
+   "annonces": 7,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 1
+   },
+   "aller_garder": true
+  },
+  "c0296": {
+   "largeur": 4,
+   "hauteur": 4,
+   "arbres": 4,
+   "profil": "bosquets",
+   "entree": "bords",
+   "individus": 4,
+   "n": 4,
+   "k": 3,
+   "tours": 6,
+   "annonces": 4,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 3,
+    "opportunisme": 1,
+    "represailles": 1
+   },
+   "aller_garder": true,
+   "sabotage": "allie"
+  },
+  "c0046": {
+   "largeur": 7,
+   "hauteur": 7,
+   "arbres": 1,
+   "profil": "coeur",
+   "entree": "bords",
+   "individus": 2,
+   "tactiques": {
+    "cupidite": 2,
+    "percee": 2
+   },
+   "portee": 2,
+   "aller_garder": true
+  },
+  "c0349": {
+   "largeur": 6,
+   "hauteur": 4,
+   "arbres": 1,
+   "profil": "bosquets",
+   "machines": 5,
+   "individus": 4,
+   "tours": 6,
+   "annonces": 4,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 3,
+    "opportunisme": 1,
+    "represailles": 1
+   },
+   "aller_garder": true,
+   "sabotage": "allie"
+  },
+  "c0148": {
+   "largeur": 6,
+   "hauteur": 6,
+   "voisinage": 8,
+   "machines": 5,
+   "entree": "bords",
+   "n": 4,
+   "tours": 6,
+   "annonces": 6,
+   "tactiques": {
+    "cupidite": 2,
+    "percee": 2
+   }
+  },
+  "c0113": {
+   "voisinage": 8,
+   "profil": "bosquets",
+   "n": 5,
+   "annonces": 8,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 1,
+    "opportunisme": 1
+   },
+   "aller_garder": true,
+   "sabotage": "allie"
+  },
+  "c0092": {
+   "arbres": 2,
+   "profil": "bosquets",
+   "machines": 4,
+   "individus": 4,
+   "n": 5,
+   "k": 4,
+   "tactiques": {
+    "cupidite": 1,
+    "percee": 3,
+    "opportunisme": 1,
+    "represailles": 1
+   },
+   "portee": 2,
+   "sabotage": "fige",
+   "garde_portee": 1
+  }
+ }
+}

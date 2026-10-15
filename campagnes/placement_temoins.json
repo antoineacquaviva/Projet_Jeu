@@ -1,0 +1,27 @@
+{
+  "nom": "placement_temoins",
+  "description": "Témoins des mesures du modèle placement : chaque variante est construite pour faire rater une mesure précise.",
+  "type": "liste",
+  "graine": 7,
+  "parties": 40,
+  "mechant": "hasard",
+  "bots": {
+    "aleatoire": "aleatoire",
+    "sentinelle": "sentinelle",
+    "marquage": "marquage",
+    "regroupement": "regroupement",
+    "reflexe": "reflexe",
+    "glouton": "glouton",
+    "glouton_aveugle": {"type": "glouton", "params": {"aveugle": true}},
+    "glouton_immobile": {"type": "glouton", "params": {"deplacer": false, "interdits": ["aller", "poster"]}},
+    "oracle": "oracle",
+    "mc": {"type": "mc", "params": {"budget": 256, "horizon": 3}}
+  },
+  "variantes": {
+    "base": {},
+    "temoin_boucle_gagnante": {"largeur": 3, "hauteur": 3, "voisinage": 8, "garde_portee": 1},
+    "temoin_annonce_inutile": {"annonces": 0},
+    "temoin_teleportation": {"aller_garder": true, "portee": 8},
+    "temoin_resolu": {"aller_garder": true, "portee": 8, "annonces": 3, "garde_portee": 1}
+  }
+}
