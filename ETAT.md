@@ -186,7 +186,14 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 5. Étape suivante
 
-**DÉCISION UTILISATEUR (15 oct., 9 h) : prendre du recul avant le cycle 2.** Proposition de Claude, à la demande de l'auteur : `projet/3-pilotage/prendre-du-recul.md` (bilan complété, risque de défauts structurels, démarche « noyau d'abord » avec une porte de conception, directions D1 à D4, cinq décisions en section 4). **Tant que l'auteur n'a pas répondu, ne pas préparer ni lancer le cycle 2** (étape 4 ci-dessous) ; la décision en attente sur le somnambule (3 ter) y est reprise.
+**P0 : concevoir le noyau (depuis le 15 oct., 9 h 50 ; décisions de l'auteur en section 8).** Le cycle 2 est suspendu jusqu'à ce que le noyau passe la porte de conception (`projet/3-pilotage/prendre-du-recul.md`, section 3.1). Le somnambule est écarté. La suite :
+1. **Maquette numérique du noyau N1** (FAIT le 15 oct., 10 h 20, session interactive) : règles `docs/regles_noyau.md` ; page jouable https://claude.ai/artifact/495jtCyeRbmDCiWP54SpnV (sources et tests : `maquettes-numeriques/noyau/`). L'auteur y joue seul ou avec des bots ; chaque partie est enregistrée dans la base de l'artefact (`parties`, `series`, `index`).
+2. **L'auteur joue et note ses impressions** (ATTENTE DE L'AUTEUR) : quelques parties à 2 et 3 peuples, en humain, et au moins une série de comparaison des profils.
+3. **Analyse des parties enregistrées** (Claude, à la demande de l'auteur) : relire la base de l'artefact, profil des choix (rêver ou défendre selon la situation), mécanismes voulus (T1), puis proposition de réglages ou de règles.
+4. Audit structurel des dix choix et modèle jouet (décisions 3 et 4) : sur le noyau, au fil des retours de l'auteur.
+5. Porte de conception passée : retour au moteur Python (le noyau y est codé, conformité et tests), puis reprise de P1.
+
+*Les passages automatiques ne préparent ni ne lancent le cycle 2 tant que la porte n'est pas passée.*
 
 **Cycle 2, étape a : préparer (EN COURS : a.1 et a.2 FAITES ; reste a.3 puis a.4).** La V0.4 est adoptée (section 8, 13 oct., 23 h 27). Détail des priorités et des alertes : `projet/4-bilans/cycle-1-bilan.md`, sections 4, 6 et 8. Une sous-étape par passage, dans cet ordre :
 
@@ -236,6 +243,8 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 ## 8. Réponses de l'auteur
 
 *L'auteur écrit ici ses réponses aux DÉCISIONS UTILISATEUR, avec la date ; le passage suivant les applique et repart.*
+
+- **15 oct. 2026, 9 h 50 (recul sur la démarche, `projet/3-pilotage/prendre-du-recul.md`, section 4)** : l'auteur répond oui aux cinq décisions : (1) cycle 2 suspendu jusqu'à la porte de conception ; (2) somnambule écarté ; (3) démarche « noyau d'abord » et porte de conception adoptées, critères à confirmer ; (4) directions D1 et D4 explorées d'abord ; (5) jeu humain avant tout nouveau code de règle. Il ajoute : repartir d'une maquette très simplifiée, centrée sur les idées fortes et les mécanismes les plus solides, sous forme **numérique et animée** (pas un rendu de boîte), jouable en incarnant tous les peuples ou avec des bots, avec les règles automatisées montrées à l'écran, des bots dont on comprend les choix, et des parties enregistrées pour l'analyse. Fait : noyau N1 (section 5, P0).
 
 - **14 oct. 2026, 22 h 55 (rêve disputé, après la grille)** : l'auteur choisit de chercher une solution avec Claude plutôt que d'écarter ou de régler la règle ; il retient le somnambule, puis le somnambule avec plus de présages, et donne son accord pour coder les variantes d'essai. Fait (étape 3 ter, essai « le somnambule »).
 - **13 oct. 2026 (validation du bot fort, fin de la phase 2)** :
@@ -314,6 +323,7 @@ Les trois derniers passages. Les précédents (13 et 14 oct.) sont dans [`projet
 | 14 oct. 2026 | 23:16 | 15 min | terminé | Réveil de 23 h 15 (Sonnet) : campagne 32 (`reve_somnambule`, échelle 1, 96 lots) lancée (run 38639000435) ; réveil armé pour le 15 oct. à 00:05 UTC ; prochaine étape : lire la synthèse et écrire `projet/4-bilans/essai-somnambule.md`. |
 | 15 oct. 2026 | 02:06 | 10 min | terminé | Réveil (Sonnet) : campagne 32 lue (réussie), bilan `projet/4-bilans/essai-somnambule.md` : aucun réglage ne remplit les trois critères (meilleur : « qui apprend », gain +7,3 sûr, riposte manque). DÉCISION UTILISATEUR sur le somnambule. Compté dans le plafond (4/12). |
 | 15 oct. 2026 | 08:42 | 45 min | terminé | Session interactive (Opus, avec l'auteur) : recul sur la démarche, `projet/3-pilotage/prendre-du-recul.md` (bilan complété, risque, pistes, décisions groupées). Relecture des campagnes 18 à 20 : T1 sur la V0.4 (4 mécanismes centraux sur 8 sous le seuil), le rêve absent en duo pour tous les bots forts. Défaut d'instrument trouvé et corrigé : les témoins de communication hérités de la v2 remplaçaient la version (`maquettes/v2.json`, `tests/test_variantes_heritees.py`) ; aucune décision n'avait été prise sur ces chiffres. Conformité OK, tests verts. Aucune règle changée, aucun lancement GitHub. Pas compté dans le plafond. |
+| 15 oct. 2026 | 09:50 | 35 min | terminé | Session interactive (Opus, avec l'auteur) : décisions du recul consignées ; noyau N1 écrit (`docs/regles_noyau.md`, proposition non adoptée) et maquette numérique jouable publiée (https://claude.ai/artifact/495jtCyeRbmDCiWP54SpnV ; `maquettes-numeriques/noyau/`, tests Node). Calibrage local aux bots (24 puis 24 réglages, 30 tables) : la première écriture était trop facile (97 % sans rêver) et le rêve à heure fixe menait au sommeil ; valeurs par défaut retenues (barrage « entrer et abattre », ordres = moitié des joueurs, un mouvement d'esprit par tour), indices : Lecteur 76 %, Défenseur 68 %, Rêveur 45 %. Aucune règle adoptée, aucun lancement GitHub. Pas compté dans le plafond. |
 
 ## 11. Reprendre la main
 

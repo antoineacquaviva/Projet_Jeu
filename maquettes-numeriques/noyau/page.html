@@ -1,0 +1,273 @@
+<title>Noyau de la Forêt qui rêve</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;1,400&family=Alegreya+Sans:wght@500;700;800&family=Young+Serif&display=swap">
+<style>
+/* Table de travail : le plateau à gauche, la main de l'auteur à droite (ce qu'il faut décider, puis le journal),
+   comme sur BGA. Même famille que l'atelier v2 (feutre vert, rêve violet, chantier jaune). */
+:root{
+  --bg:#E9EEE6; --panel:#F7F9F4; --card:#FFFFFF; --ink:#18201B; --muted:#5A665E; --line:#C9D2C6; --grid:#DCE4D8;
+  --felt:#2B4434; --felt-ink:#E8F0E9; --accent:#2D6A44; --accent-bg:#DCEADF;
+  --dream:#5442A8; --dream-bg:#E7E2F7; --wake:#9A5C10; --wake-bg:#F5E8D1;
+  --machine:#E2AE16; --machine-ink:#2A2306; --danger:#B23A2C; --danger-bg:#F6E0DB; --ok:#2F7A4B;
+  --zone:#CFE0C9; --zone-deep:#B5CFAE; --zone-heart:#9DBF95; --zone-line:#7E9A79; --river:#8FB3C9;
+  --t-cup:#E3BE45; --t-opp:#7FC2B8; --t-rep:#E38B76; --t-per:#EBA457;
+  --p-oiseaux:#2E7DB7; --p-mammiferes:#8A5A34; --p-reptiles:#3D8A3A; --p-insectes:#C98A12; --p-humains:#B8433A; --p-entites:#6F5AA8;
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Alegreya", Georgia, "Times New Roman", serif;
+  --f-ui:"Alegreya Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111712; --panel:#18211B; --card:#1D2820; --ink:#E1E9E1; --muted:#9BA99D; --line:#314036; --grid:#1F2A22;
+    --felt:#1B2B20; --felt-ink:#DCE8DE; --accent:#7CC196; --accent-bg:#1E3325;
+    --dream:#B1A4F3; --dream-bg:#2A2448; --wake:#E2A95C; --wake-bg:#36290F;
+    --machine:#E8B523; --machine-ink:#221C04; --danger:#EC8B7B; --danger-bg:#3D211C; --ok:#7CC196;
+    --zone:#2A3B2E; --zone-deep:#2F4634; --zone-heart:#36533B; --zone-line:#5F7C64; --river:#3F6378;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111712; --panel:#18211B; --card:#1D2820; --ink:#E1E9E1; --muted:#9BA99D; --line:#314036; --grid:#1F2A22;
+  --felt:#1B2B20; --felt-ink:#DCE8DE; --accent:#7CC196; --accent-bg:#1E3325;
+  --dream:#B1A4F3; --dream-bg:#2A2448; --wake:#E2A95C; --wake-bg:#36290F;
+  --machine:#E8B523; --machine-ink:#221C04; --danger:#EC8B7B; --danger-bg:#3D211C; --ok:#7CC196;
+  --zone:#2A3B2E; --zone-deep:#2F4634; --zone-heart:#36533B; --zone-line:#5F7C64; --river:#3F6378;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);margin:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+button,select,input{font:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1360px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;line-height:1.15;text-wrap:balance}
+.ui{font-family:var(--f-ui)}
+.num{font-variant-numeric:tabular-nums}
+
+/* en-tête et onglets */
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;padding-block:22px 10px}
+.head h1{font-size:clamp(26px,3.4vw,38px)}
+.head .sub{font:600 14.5px/1.4 var(--f-ui);color:var(--muted);max-width:70ch}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:4px;border-bottom:1.5px solid var(--line);padding-block:6px}
+.tabs button{font:800 13.5px var(--f-ui);letter-spacing:.04em;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:6px 10px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.status{margin-left:auto;font:700 13.5px var(--f-ui);color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.status b{color:var(--ink)}
+section[role="tabpanel"]{padding-top:16px}
+
+/* table de jeu */
+.table{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:980px){.table{grid-template-columns:minmax(0,1fr)}}
+.board{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:10px;min-width:0}
+.board svg{width:100%;height:auto;display:block}
+.svg-zone{stroke:var(--zone-line);stroke-width:1.5}
+.svg-zone.d0{fill:var(--zone)} .svg-zone.d1{fill:var(--zone-deep)} .svg-zone.d2{fill:var(--zone-heart)}
+.svg-zone.cand{stroke:var(--accent);stroke-width:4;cursor:pointer}
+.svg-zone.cible{stroke:var(--danger);stroke-width:4}
+.svg-link{stroke:var(--zone-line);stroke-width:2;opacity:.6}
+.svg-fleche{stroke:var(--wake);stroke-width:2;fill:none;opacity:.55}
+.svg-name{font:700 13px var(--f-ui);fill:var(--ink)}
+.svg-small{font:700 10.5px var(--f-ui);fill:var(--muted)}
+.svg-tree{fill:var(--ok)} .svg-stump{fill:var(--muted);opacity:.45}
+.svg-barre{fill:none;stroke:var(--danger);stroke-width:4;stroke-dasharray:9 6}
+.svg-mach{transition:transform .55s ease}
+@media (prefers-reduced-motion: reduce){.svg-mach{transition:none}}
+.svg-mach rect{fill:var(--machine);stroke:var(--machine-ink);stroke-width:1}
+.svg-mach.hs rect{fill:var(--line)}
+.svg-mach text{font:800 10.5px var(--f-ui);fill:var(--machine-ink)}
+.svg-mach.hs text{fill:var(--muted)}
+.svg-org{fill:var(--machine-ink)} .svg-org.off{fill:none;stroke:var(--machine-ink);stroke-width:1}
+.svg-chantier{fill:var(--wake-bg);stroke:var(--line)}
+.svg-ordre{stroke:var(--danger);stroke-width:3;fill:none;marker-end:url(#tete)}
+.flash{animation:flash 1s ease-out}
+@keyframes flash{0%{opacity:1}50%{opacity:.25}100%{opacity:1}}
+@media (prefers-reduced-motion: reduce){.flash{animation:none}}
+
+/* pistes et dés */
+.pistes{display:grid;gap:8px}
+.piste-l{font:800 11px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.piste{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:3px}
+.piste.m{grid-template-columns:repeat(5,minmax(0,1fr))}
+.case{border-radius:7px;padding:4px 2px 5px;text-align:center;font:800 10.5px/1.1 var(--f-ui);color:#1D231F;border:1.5px solid transparent;min-width:0;overflow:hidden}
+.case .n{display:block;font:800 13px var(--f-ui);opacity:.75}
+.case.cup{background:var(--t-cup)} .case.opp{background:var(--t-opp)} .case.rep{background:var(--t-rep)} .case.per{background:var(--t-per)}
+.case.esp{background:var(--dream);color:#F4F1FF}
+.case.mach{background:var(--machine);color:var(--machine-ink)}
+.case.mach.hs{background:var(--line);color:var(--muted)} .case.mach.ch{background:var(--wake-bg);color:var(--wake)}
+.case.vise{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset}
+.case.c7{outline:2px dashed var(--dream);outline-offset:-2px}
+.des{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:700 13.5px var(--f-ui);color:var(--muted)}
+.de{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:7px;background:var(--card);border:1.5px solid var(--ink);font:800 16px var(--f-ui);color:var(--ink)}
+.de.p{border-color:var(--wake);color:var(--wake)}
+
+/* colonne de droite */
+.side{display:grid;gap:14px;min-width:0}
+.box{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px;min-width:0}
+.box.ask{border-color:var(--accent)}
+.box.ask.p-humain{box-shadow:0 2px 0 var(--line)}
+.box h2{font-size:21px}
+.eyebrow{font:800 11.5px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ctx{font:500 14.5px/1.45 var(--f-ui);color:var(--muted)}
+.ctx b{color:var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{font:700 14px var(--f-ui);background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:9px;padding:7px 11px;cursor:pointer;text-align:left}
+.opt:hover{border-color:var(--accent)}
+.opt.k-barrer{border-left:5px solid var(--danger)} .opt.k-saboter{border-left:5px solid var(--machine)} .opt.k-aller{border-left:5px solid var(--accent)}
+.grp{display:grid;gap:5px}
+.grp>span{font:800 11px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.btn{font:800 14px var(--f-ui);border-radius:9px;padding:8px 14px;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent);color:var(--card)}
+.btn.sec{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hint{font:500 14px/1.45 var(--f-ui);background:var(--accent-bg);border-radius:9px;padding:9px 11px}
+.hint b{font-weight:800}
+.prog{display:grid;gap:8px}
+.prow{display:grid;grid-template-columns:7.5em minmax(0,1fr);gap:8px;align-items:center;font:700 14px var(--f-ui)}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{font:800 13px var(--f-ui);background:var(--panel);border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--felt);color:var(--felt-ink);border-color:var(--felt)}
+.seg button.r[aria-pressed="true"]{background:var(--dream);border-color:var(--dream);color:#F7F5FF}
+.seg button:disabled{opacity:.4;cursor:not-allowed}
+.small{font:500 13px/1.4 var(--f-ui);color:var(--muted)}
+
+/* joueurs */
+.players{display:grid;gap:6px}
+.pl{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:center;font:600 14px var(--f-ui);padding:5px 6px;border-radius:8px}
+.pl.actif{background:var(--accent-bg)}
+.pl .dot{width:12px;height:12px;border-radius:50%}
+.pl .who{color:var(--muted);font-weight:600;font-size:12.5px}
+.cards{display:flex;gap:3px}
+.cards i{display:inline-grid;place-items:center;width:20px;height:26px;border-radius:4px;border:1.5px solid var(--line);font:800 10px var(--f-ui);font-style:normal;color:var(--muted)}
+.cards i.a{background:var(--felt);border-color:var(--felt);color:var(--felt-ink)}
+.cards i.r{background:var(--dream);border-color:var(--dream);color:#F7F5FF}
+.cards i.cur{outline:2px solid var(--ink);outline-offset:1px}
+
+/* journal */
+.journal{max-height:520px;overflow:auto;display:grid;gap:3px;font:500 14px/1.42 var(--f-ui);padding-right:4px}
+.jl{padding:4px 8px;border-radius:7px;border-left:3px solid transparent}
+.jl.k-phase{font-weight:800;color:var(--ink);margin-top:6px;border-left-color:var(--felt)}
+.jl.k-presage,.jl.k-voir{background:var(--wake-bg);border-left-color:var(--wake)}
+.jl.k-des{background:var(--panel);border-left-color:var(--ink)}
+.jl.k-ordre.ok{color:var(--danger)} .jl.k-ordre.ko{color:var(--ok);font-weight:700}
+.jl.k-reve,.jl.k-annule,.jl.k-sommeil{background:var(--dream-bg);border-left-color:var(--dream)}
+.jl.k-sabotage,.jl.k-hs,.jl.k-egaree{border-left-color:var(--machine)}
+.jl.k-decision{color:var(--muted)}
+.jl.k-fin{background:var(--accent-bg);font-weight:800;color:var(--ink)}
+.jl .why{display:block;font-size:13px;color:var(--muted);font-style:italic;margin-top:1px}
+.jl details summary{cursor:pointer;color:var(--accent);font-size:13px}
+.jl .tag{font:800 10.5px var(--f-ui);letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 5px;margin-right:5px;background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+.jl .tag.bot{color:var(--accent);border-color:var(--accent)}
+.jl .tag.auto{color:var(--wake);border-color:var(--wake)}
+
+/* préparation */
+.setup{display:grid;gap:12px}
+.seat{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,11em);gap:10px;align-items:center;font:700 14.5px var(--f-ui)}
+.seat label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.seat .pw{font:500 12.5px/1.3 var(--f-ui);color:var(--muted)}
+select,input[type="number"],input[type="text"]{background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;min-width:0;max-width:100%}
+.params{display:grid;grid-template-columns:repeat(auto-fill,minmax(14em,1fr));gap:8px 14px}
+.params label{display:grid;gap:3px;font:700 13px var(--f-ui);color:var(--muted)}
+details.reg>summary{cursor:pointer;font:800 13.5px var(--f-ui);color:var(--accent)}
+
+/* tableaux de résultats */
+.tw{overflow-x:auto}
+table.res{border-collapse:collapse;width:100%;font:500 14px/1.35 var(--f-ui)}
+.res th,.res td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:right;white-space:nowrap}
+.res th:first-child,.res td:first-child{text-align:left}
+.res th{font:800 11px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.res tr.best td{font-weight:800}
+.verdict{font:700 15px/1.45 var(--f-ui);padding:10px 12px;border-radius:9px;background:var(--accent-bg)}
+.verdict.warn{background:var(--wake-bg)}
+.bar{height:8px;border-radius:4px;background:var(--accent)}
+
+/* règles */
+.regles{max-width:78ch;display:grid;gap:10px;font:400 16.5px/1.6 var(--f-body)}
+.regles h2{font-size:26px;margin-top:18px}
+.regles h3{font-size:19px;margin-top:10px}
+.regles table{border-collapse:collapse;font:500 14px/1.4 var(--f-ui)}
+.regles th,.regles td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+.regles .tw{max-width:100%}
+.regles ul,.regles ol{margin:0;padding-left:22px;display:grid;gap:3px}
+.regles p{margin:0}
+.regles code{font:600 13px ui-monospace,Menlo,Consolas,monospace;background:var(--panel);padding:1px 5px;border-radius:4px}
+
+.saved{display:grid;gap:8px}
+.sv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font:600 14px var(--f-ui)}
+.sv .m{color:var(--muted);font-weight:500;font-size:13px}
+.empty{font:500 15px/1.5 var(--f-ui);color:var(--muted);padding:18px;border:1.5px dashed var(--line);border-radius:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--felt);color:var(--felt-ink);font:700 14px var(--f-ui);padding:9px 16px;border-radius:999px;z-index:20;max-width:calc(100% - 32px)}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <h1>La Forêt qui rêve, noyau</h1>
+    <p class="sub">Maquette d'étude N1 : plateau, Méchant qui apprend, rêve qui détourne. Jouez tous les peuples, laissez jouer des bots, ou mélangez.</p>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-partie" aria-selected="true" aria-controls="pan-partie">Partie</button>
+    <button role="tab" id="tab-series" aria-selected="false" aria-controls="pan-series">Séries de parties</button>
+    <button role="tab" id="tab-archives" aria-selected="false" aria-controls="pan-archives">Parties enregistrées</button>
+    <button role="tab" id="tab-regles" aria-selected="false" aria-controls="pan-regles">Règles</button>
+    <div class="status num" id="status" aria-live="polite"></div>
+  </nav>
+
+  <section role="tabpanel" id="pan-partie" aria-labelledby="tab-partie">
+    <div class="table">
+      <div class="board">
+        <svg id="plateau" viewBox="0 0 640 540" role="img" aria-label="Plateau : sept zones de forêt, Machines et pions"></svg>
+        <div class="pistes">
+          <div class="piste-l"><span>Piste des pensées (somme des dés) : éveil 2 à 6, centre 7, rêve 8 à 12</span><span id="dlbl"></span></div>
+          <div class="piste" id="piste"></div>
+          <div class="piste-l"><span>Piste des Machines (écart des dés ; un double désigne la case 1)</span></div>
+          <div class="piste m" id="pisteM"></div>
+          <div class="des" id="des"></div>
+        </div>
+      </div>
+      <div class="side">
+        <div class="box ask" id="ask"></div>
+        <div class="box"><div class="eyebrow">À la table</div><div class="players" id="players"></div></div>
+        <div class="box">
+          <div class="btn-row" style="justify-content:space-between">
+            <div class="eyebrow">Journal de la partie</div>
+            <label class="small"><input type="checkbox" id="showWhy" checked> raisonnement des bots</label>
+          </div>
+          <div class="journal" id="journal" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pan-series" aria-labelledby="tab-series" hidden>
+    <div class="table">
+      <div class="box setup">
+        <h2>Comparer des façons de jouer</h2>
+        <p class="ctx">Les bots jouent beaucoup de parties sans animation, avec les mêmes tables et les mêmes graines pour chaque profil : les écarts sont donc appariés. Le résultat « juger rapporte » est l'écart entre le Lecteur et la meilleure stratégie fixe (ne jamais rêver, rêver à heure fixe).</p>
+        <div class="params" id="serieForm"></div>
+        <div class="btn-row"><button class="btn" id="runSerie">Lancer la série</button><span class="small" id="serieProg"></span></div>
+      </div>
+      <div class="side"><div class="box" id="serieRes"><div class="empty">Les résultats s'afficheront ici : forêt gardée par profil et par taille de table, fins, rêves, et l'écart qui mesure si lire le jeu rapporte.</div></div></div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pan-archives" aria-labelledby="tab-archives" hidden>
+    <div class="box">
+      <div class="btn-row" style="justify-content:space-between">
+        <h2>Parties enregistrées</h2>
+        <div class="btn-row"><button class="btn sec" id="expAll">Exporter tout (JSON)</button></div>
+      </div>
+      <p class="ctx" id="dbState">Chaque partie terminée est enregistrée avec tout son journal : réglages, graine, décisions et raisons des bots, dés, ordres. Claude peut les relire pour les analyser.</p>
+      <div class="saved" id="saved"></div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pan-regles" aria-labelledby="tab-regles" hidden>
+    <div class="regles" id="regles"></div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>/*MOTEUR*/</script>
+<script>/*BOTS*/</script>
+<script>/*REGLES*/</script>
+<script>/*UI*/</script>

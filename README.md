@@ -32,6 +32,7 @@ projet/                  Documents de conception et de pilotage (à lire en prem
 docs/                    Documentation technique du moteur (lue en partie par le code)
 foret/                   Le moteur de simulation (Python pur)
 maquettes/               Les règles en données : v0 (V0.1), v1 (V0.2), v2, v0.3 (V0.3), v0.4 (V0.4) ; chacune hérite de la précédente
+maquettes-numeriques/     Le noyau N1 jouable (15 oct.) : moteur et bots en JavaScript, page animée, tests Node ; règles dans docs/regles_noyau.md
 campagnes/               Les campagnes de simulation, en JSON
 tests/                   Les tests : chaque règle, nœud ou mesure a au moins le sien
 outils/tableau/          Le générateur du tableau de bord de la batterie
@@ -55,6 +56,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Règles de la maquette v1](docs/regles_v1.md) | Les 45 règles numérotées (R1.1…), référence du moteur |
 | | [Maquette de conception v2](projet/2-maquettes/maquette-de-conception-v2.md) | Le plan du Méchant à deux pistes, les trois fins, le conseil par traces |
 | | [Atelier v2](projet/2-maquettes/atelier_v2.html) (HTML interactif) | L'arbre des variantes, avec le livret assemblé à la volée |
+| | [Règles du noyau N1](docs/regles_noyau.md) et [maquette jouable](https://claude.ai/artifact/495jtCyeRbmDCiWP54SpnV) | Le jeu recentré sur ses idées fortes, rêve qui détourne (15 oct., proposition non adoptée) |
 | `3-pilotage` | [Plan d'action](projet/3-pilotage/plan-d-action.md) | Les six phases : cadrer, mesurer, bots, diagnostic, exploration, validation |
 | | [Objectifs, invariants et catalogue](projet/3-pilotage/objectifs-invariants-catalogue.md) | Les quatre objectifs d'expérience, leurs bandes, ce qui ne change pas, les variables |
 | | [Cahier des charges du calcul](projet/3-pilotage/cahier-des-charges-calcul.md) | Où faire tourner les campagnes : GitHub Actions (décision 10) |

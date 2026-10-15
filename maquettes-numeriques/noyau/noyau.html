@@ -1,0 +1,1661 @@
+<title>Noyau de la Forêt qui rêve</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;1,400&family=Alegreya+Sans:wght@500;700;800&family=Young+Serif&display=swap">
+<style>
+/* Table de travail : le plateau à gauche, la main de l'auteur à droite (ce qu'il faut décider, puis le journal),
+   comme sur BGA. Même famille que l'atelier v2 (feutre vert, rêve violet, chantier jaune). */
+:root{
+  --bg:#E9EEE6; --panel:#F7F9F4; --card:#FFFFFF; --ink:#18201B; --muted:#5A665E; --line:#C9D2C6; --grid:#DCE4D8;
+  --felt:#2B4434; --felt-ink:#E8F0E9; --accent:#2D6A44; --accent-bg:#DCEADF;
+  --dream:#5442A8; --dream-bg:#E7E2F7; --wake:#9A5C10; --wake-bg:#F5E8D1;
+  --machine:#E2AE16; --machine-ink:#2A2306; --danger:#B23A2C; --danger-bg:#F6E0DB; --ok:#2F7A4B;
+  --zone:#CFE0C9; --zone-deep:#B5CFAE; --zone-heart:#9DBF95; --zone-line:#7E9A79; --river:#8FB3C9;
+  --t-cup:#E3BE45; --t-opp:#7FC2B8; --t-rep:#E38B76; --t-per:#EBA457;
+  --p-oiseaux:#2E7DB7; --p-mammiferes:#8A5A34; --p-reptiles:#3D8A3A; --p-insectes:#C98A12; --p-humains:#B8433A; --p-entites:#6F5AA8;
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Alegreya", Georgia, "Times New Roman", serif;
+  --f-ui:"Alegreya Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111712; --panel:#18211B; --card:#1D2820; --ink:#E1E9E1; --muted:#9BA99D; --line:#314036; --grid:#1F2A22;
+    --felt:#1B2B20; --felt-ink:#DCE8DE; --accent:#7CC196; --accent-bg:#1E3325;
+    --dream:#B1A4F3; --dream-bg:#2A2448; --wake:#E2A95C; --wake-bg:#36290F;
+    --machine:#E8B523; --machine-ink:#221C04; --danger:#EC8B7B; --danger-bg:#3D211C; --ok:#7CC196;
+    --zone:#2A3B2E; --zone-deep:#2F4634; --zone-heart:#36533B; --zone-line:#5F7C64; --river:#3F6378;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111712; --panel:#18211B; --card:#1D2820; --ink:#E1E9E1; --muted:#9BA99D; --line:#314036; --grid:#1F2A22;
+  --felt:#1B2B20; --felt-ink:#DCE8DE; --accent:#7CC196; --accent-bg:#1E3325;
+  --dream:#B1A4F3; --dream-bg:#2A2448; --wake:#E2A95C; --wake-bg:#36290F;
+  --machine:#E8B523; --machine-ink:#221C04; --danger:#EC8B7B; --danger-bg:#3D211C; --ok:#7CC196;
+  --zone:#2A3B2E; --zone-deep:#2F4634; --zone-heart:#36533B; --zone-line:#5F7C64; --river:#3F6378;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);margin:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+button,select,input{font:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1360px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;line-height:1.15;text-wrap:balance}
+.ui{font-family:var(--f-ui)}
+.num{font-variant-numeric:tabular-nums}
+
+/* en-tête et onglets */
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;padding-block:22px 10px}
+.head h1{font-size:clamp(26px,3.4vw,38px)}
+.head .sub{font:600 14.5px/1.4 var(--f-ui);color:var(--muted);max-width:70ch}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:4px;border-bottom:1.5px solid var(--line);padding-block:6px}
+.tabs button{font:800 13.5px var(--f-ui);letter-spacing:.04em;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:6px 10px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.status{margin-left:auto;font:700 13.5px var(--f-ui);color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.status b{color:var(--ink)}
+section[role="tabpanel"]{padding-top:16px}
+
+/* table de jeu */
+.table{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:980px){.table{grid-template-columns:minmax(0,1fr)}}
+.board{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:10px;min-width:0}
+.board svg{width:100%;height:auto;display:block}
+.svg-zone{stroke:var(--zone-line);stroke-width:1.5}
+.svg-zone.d0{fill:var(--zone)} .svg-zone.d1{fill:var(--zone-deep)} .svg-zone.d2{fill:var(--zone-heart)}
+.svg-zone.cand{stroke:var(--accent);stroke-width:4;cursor:pointer}
+.svg-zone.cible{stroke:var(--danger);stroke-width:4}
+.svg-link{stroke:var(--zone-line);stroke-width:2;opacity:.6}
+.svg-fleche{stroke:var(--wake);stroke-width:2;fill:none;opacity:.55}
+.svg-name{font:700 13px var(--f-ui);fill:var(--ink)}
+.svg-small{font:700 10.5px var(--f-ui);fill:var(--muted)}
+.svg-tree{fill:var(--ok)} .svg-stump{fill:var(--muted);opacity:.45}
+.svg-barre{fill:none;stroke:var(--danger);stroke-width:4;stroke-dasharray:9 6}
+.svg-mach{transition:transform .55s ease}
+@media (prefers-reduced-motion: reduce){.svg-mach{transition:none}}
+.svg-mach rect{fill:var(--machine);stroke:var(--machine-ink);stroke-width:1}
+.svg-mach.hs rect{fill:var(--line)}
+.svg-mach text{font:800 10.5px var(--f-ui);fill:var(--machine-ink)}
+.svg-mach.hs text{fill:var(--muted)}
+.svg-org{fill:var(--machine-ink)} .svg-org.off{fill:none;stroke:var(--machine-ink);stroke-width:1}
+.svg-chantier{fill:var(--wake-bg);stroke:var(--line)}
+.svg-ordre{stroke:var(--danger);stroke-width:3;fill:none;marker-end:url(#tete)}
+.flash{animation:flash 1s ease-out}
+@keyframes flash{0%{opacity:1}50%{opacity:.25}100%{opacity:1}}
+@media (prefers-reduced-motion: reduce){.flash{animation:none}}
+
+/* pistes et dés */
+.pistes{display:grid;gap:8px}
+.piste-l{font:800 11px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.piste{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:3px}
+.piste.m{grid-template-columns:repeat(5,minmax(0,1fr))}
+.case{border-radius:7px;padding:4px 2px 5px;text-align:center;font:800 10.5px/1.1 var(--f-ui);color:#1D231F;border:1.5px solid transparent;min-width:0;overflow:hidden}
+.case .n{display:block;font:800 13px var(--f-ui);opacity:.75}
+.case.cup{background:var(--t-cup)} .case.opp{background:var(--t-opp)} .case.rep{background:var(--t-rep)} .case.per{background:var(--t-per)}
+.case.esp{background:var(--dream);color:#F4F1FF}
+.case.mach{background:var(--machine);color:var(--machine-ink)}
+.case.mach.hs{background:var(--line);color:var(--muted)} .case.mach.ch{background:var(--wake-bg);color:var(--wake)}
+.case.vise{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset}
+.case.c7{outline:2px dashed var(--dream);outline-offset:-2px}
+.des{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:700 13.5px var(--f-ui);color:var(--muted)}
+.de{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:7px;background:var(--card);border:1.5px solid var(--ink);font:800 16px var(--f-ui);color:var(--ink)}
+.de.p{border-color:var(--wake);color:var(--wake)}
+
+/* colonne de droite */
+.side{display:grid;gap:14px;min-width:0}
+.box{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px;min-width:0}
+.box.ask{border-color:var(--accent)}
+.box.ask.p-humain{box-shadow:0 2px 0 var(--line)}
+.box h2{font-size:21px}
+.eyebrow{font:800 11.5px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ctx{font:500 14.5px/1.45 var(--f-ui);color:var(--muted)}
+.ctx b{color:var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{font:700 14px var(--f-ui);background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:9px;padding:7px 11px;cursor:pointer;text-align:left}
+.opt:hover{border-color:var(--accent)}
+.opt.k-barrer{border-left:5px solid var(--danger)} .opt.k-saboter{border-left:5px solid var(--machine)} .opt.k-aller{border-left:5px solid var(--accent)}
+.grp{display:grid;gap:5px}
+.grp>span{font:800 11px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.btn{font:800 14px var(--f-ui);border-radius:9px;padding:8px 14px;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent);color:var(--card)}
+.btn.sec{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hint{font:500 14px/1.45 var(--f-ui);background:var(--accent-bg);border-radius:9px;padding:9px 11px}
+.hint b{font-weight:800}
+.prog{display:grid;gap:8px}
+.prow{display:grid;grid-template-columns:7.5em minmax(0,1fr);gap:8px;align-items:center;font:700 14px var(--f-ui)}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{font:800 13px var(--f-ui);background:var(--panel);border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--felt);color:var(--felt-ink);border-color:var(--felt)}
+.seg button.r[aria-pressed="true"]{background:var(--dream);border-color:var(--dream);color:#F7F5FF}
+.seg button:disabled{opacity:.4;cursor:not-allowed}
+.small{font:500 13px/1.4 var(--f-ui);color:var(--muted)}
+
+/* joueurs */
+.players{display:grid;gap:6px}
+.pl{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:center;font:600 14px var(--f-ui);padding:5px 6px;border-radius:8px}
+.pl.actif{background:var(--accent-bg)}
+.pl .dot{width:12px;height:12px;border-radius:50%}
+.pl .who{color:var(--muted);font-weight:600;font-size:12.5px}
+.cards{display:flex;gap:3px}
+.cards i{display:inline-grid;place-items:center;width:20px;height:26px;border-radius:4px;border:1.5px solid var(--line);font:800 10px var(--f-ui);font-style:normal;color:var(--muted)}
+.cards i.a{background:var(--felt);border-color:var(--felt);color:var(--felt-ink)}
+.cards i.r{background:var(--dream);border-color:var(--dream);color:#F7F5FF}
+.cards i.cur{outline:2px solid var(--ink);outline-offset:1px}
+
+/* journal */
+.journal{max-height:520px;overflow:auto;display:grid;gap:3px;font:500 14px/1.42 var(--f-ui);padding-right:4px}
+.jl{padding:4px 8px;border-radius:7px;border-left:3px solid transparent}
+.jl.k-phase{font-weight:800;color:var(--ink);margin-top:6px;border-left-color:var(--felt)}
+.jl.k-presage,.jl.k-voir{background:var(--wake-bg);border-left-color:var(--wake)}
+.jl.k-des{background:var(--panel);border-left-color:var(--ink)}
+.jl.k-ordre.ok{color:var(--danger)} .jl.k-ordre.ko{color:var(--ok);font-weight:700}
+.jl.k-reve,.jl.k-annule,.jl.k-sommeil{background:var(--dream-bg);border-left-color:var(--dream)}
+.jl.k-sabotage,.jl.k-hs,.jl.k-egaree{border-left-color:var(--machine)}
+.jl.k-decision{color:var(--muted)}
+.jl.k-fin{background:var(--accent-bg);font-weight:800;color:var(--ink)}
+.jl .why{display:block;font-size:13px;color:var(--muted);font-style:italic;margin-top:1px}
+.jl details summary{cursor:pointer;color:var(--accent);font-size:13px}
+.jl .tag{font:800 10.5px var(--f-ui);letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 5px;margin-right:5px;background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+.jl .tag.bot{color:var(--accent);border-color:var(--accent)}
+.jl .tag.auto{color:var(--wake);border-color:var(--wake)}
+
+/* préparation */
+.setup{display:grid;gap:12px}
+.seat{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,11em);gap:10px;align-items:center;font:700 14.5px var(--f-ui)}
+.seat label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.seat .pw{font:500 12.5px/1.3 var(--f-ui);color:var(--muted)}
+select,input[type="number"],input[type="text"]{background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;min-width:0;max-width:100%}
+.params{display:grid;grid-template-columns:repeat(auto-fill,minmax(14em,1fr));gap:8px 14px}
+.params label{display:grid;gap:3px;font:700 13px var(--f-ui);color:var(--muted)}
+details.reg>summary{cursor:pointer;font:800 13.5px var(--f-ui);color:var(--accent)}
+
+/* tableaux de résultats */
+.tw{overflow-x:auto}
+table.res{border-collapse:collapse;width:100%;font:500 14px/1.35 var(--f-ui)}
+.res th,.res td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:right;white-space:nowrap}
+.res th:first-child,.res td:first-child{text-align:left}
+.res th{font:800 11px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.res tr.best td{font-weight:800}
+.verdict{font:700 15px/1.45 var(--f-ui);padding:10px 12px;border-radius:9px;background:var(--accent-bg)}
+.verdict.warn{background:var(--wake-bg)}
+.bar{height:8px;border-radius:4px;background:var(--accent)}
+
+/* règles */
+.regles{max-width:78ch;display:grid;gap:10px;font:400 16.5px/1.6 var(--f-body)}
+.regles h2{font-size:26px;margin-top:18px}
+.regles h3{font-size:19px;margin-top:10px}
+.regles table{border-collapse:collapse;font:500 14px/1.4 var(--f-ui)}
+.regles th,.regles td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+.regles .tw{max-width:100%}
+.regles ul,.regles ol{margin:0;padding-left:22px;display:grid;gap:3px}
+.regles p{margin:0}
+.regles code{font:600 13px ui-monospace,Menlo,Consolas,monospace;background:var(--panel);padding:1px 5px;border-radius:4px}
+
+.saved{display:grid;gap:8px}
+.sv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font:600 14px var(--f-ui)}
+.sv .m{color:var(--muted);font-weight:500;font-size:13px}
+.empty{font:500 15px/1.5 var(--f-ui);color:var(--muted);padding:18px;border:1.5px dashed var(--line);border-radius:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--felt);color:var(--felt-ink);font:700 14px var(--f-ui);padding:9px 16px;border-radius:999px;z-index:20;max-width:calc(100% - 32px)}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <h1>La Forêt qui rêve, noyau</h1>
+    <p class="sub">Maquette d'étude N1 : plateau, Méchant qui apprend, rêve qui détourne. Jouez tous les peuples, laissez jouer des bots, ou mélangez.</p>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-partie" aria-selected="true" aria-controls="pan-partie">Partie</button>
+    <button role="tab" id="tab-series" aria-selected="false" aria-controls="pan-series">Séries de parties</button>
+    <button role="tab" id="tab-archives" aria-selected="false" aria-controls="pan-archives">Parties enregistrées</button>
+    <button role="tab" id="tab-regles" aria-selected="false" aria-controls="pan-regles">Règles</button>
+    <div class="status num" id="status" aria-live="polite"></div>
+  </nav>
+
+  <section role="tabpanel" id="pan-partie" aria-labelledby="tab-partie">
+    <div class="table">
+      <div class="board">
+        <svg id="plateau" viewBox="0 0 640 540" role="img" aria-label="Plateau : sept zones de forêt, Machines et pions"></svg>
+        <div class="pistes">
+          <div class="piste-l"><span>Piste des pensées (somme des dés) : éveil 2 à 6, centre 7, rêve 8 à 12</span><span id="dlbl"></span></div>
+          <div class="piste" id="piste"></div>
+          <div class="piste-l"><span>Piste des Machines (écart des dés ; un double désigne la case 1)</span></div>
+          <div class="piste m" id="pisteM"></div>
+          <div class="des" id="des"></div>
+        </div>
+      </div>
+      <div class="side">
+        <div class="box ask" id="ask"></div>
+        <div class="box"><div class="eyebrow">À la table</div><div class="players" id="players"></div></div>
+        <div class="box">
+          <div class="btn-row" style="justify-content:space-between">
+            <div class="eyebrow">Journal de la partie</div>
+            <label class="small"><input type="checkbox" id="showWhy" checked> raisonnement des bots</label>
+          </div>
+          <div class="journal" id="journal" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pan-series" aria-labelledby="tab-series" hidden>
+    <div class="table">
+      <div class="box setup">
+        <h2>Comparer des façons de jouer</h2>
+        <p class="ctx">Les bots jouent beaucoup de parties sans animation, avec les mêmes tables et les mêmes graines pour chaque profil : les écarts sont donc appariés. Le résultat « juger rapporte » est l'écart entre le Lecteur et la meilleure stratégie fixe (ne jamais rêver, rêver à heure fixe).</p>
+        <div class="params" id="serieForm"></div>
+        <div class="btn-row"><button class="btn" id="runSerie">Lancer la série</button><span class="small" id="serieProg"></span></div>
+      </div>
+      <div class="side"><div class="box" id="serieRes"><div class="empty">Les résultats s'afficheront ici : forêt gardée par profil et par taille de table, fins, rêves, et l'écart qui mesure si lire le jeu rapporte.</div></div></div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pan-archives" aria-labelledby="tab-archives" hidden>
+    <div class="box">
+      <div class="btn-row" style="justify-content:space-between">
+        <h2>Parties enregistrées</h2>
+        <div class="btn-row"><button class="btn sec" id="expAll">Exporter tout (JSON)</button></div>
+      </div>
+      <p class="ctx" id="dbState">Chaque partie terminée est enregistrée avec tout son journal : réglages, graine, décisions et raisons des bots, dés, ordres. Claude peut les relire pour les analyser.</p>
+      <div class="saved" id="saved"></div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pan-regles" aria-labelledby="tab-regles" hidden>
+    <div class="regles" id="regles"></div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>/* La Forêt qui rêve : moteur du noyau N1.
+   Règles : docs/regles_noyau.md (identifiants N1.1 à N7.2, cités en commentaire).
+   Pur JavaScript, sans DOM : la page l'anime, Node le teste (node test_moteur.js).
+   Le moteur ne décide rien : chaque choix passe par decider(), qui interroge un bot (NoyauBots)
+   ou un humain (io.ask). Tout ce qui se passe est écrit dans le journal (this.ev), qui est aussi
+   l'enregistrement de la partie. */
+(function (G) {
+  'use strict';
+
+  const VERSION = 'N1.0';
+
+  // N1.1 plateau
+  const ZONES = {
+    1: { nom: 'Lisière', f: 2, prof: 0 },
+    2: { nom: 'Clairière', f: 1, prof: 0 },
+    3: { nom: 'Várzea', f: 2, prof: 0 },
+    4: { nom: 'Igapó', f: 3, prof: 1 },
+    5: { nom: 'Sources', f: 4, prof: 1 },
+    6: { nom: 'Colline aux aras', f: 4, prof: 2 },
+    7: { nom: 'Samaúma', f: 5, prof: 2 },
+  };
+  const VOISINS = { 1: [2, 4], 2: [1, 3, 4, 5], 3: [2, 5], 4: [1, 2, 5, 6], 5: [2, 3, 4, 6, 7], 6: [4, 5, 7], 7: [5, 6] };
+  const FLECHE = { 1: 4, 2: 5, 3: 5, 4: 6, 5: 7, 6: null, 7: null };
+  const NZ = [1, 2, 3, 4, 5, 6, 7];
+
+  // N1.2 Machines
+  const MACHINES = [
+    { id: 1, nom: 'Grosse Gueule', organes: ['moteur', 'chenilles'], entree: 1 },
+    { id: 2, nom: 'Rapiat', organes: ['moteur', 'chenilles', 'phares'], entree: 2 },
+    { id: 3, nom: 'Mâchoire', organes: ['moteur', 'phares'], entree: 3 },
+    { id: 4, nom: 'Tonton Débard', organes: ['moteur', 'chenilles'], entree: 1 },
+    { id: 5, nom: 'Ripaille', organes: ['moteur', 'chenilles', 'phares'], entree: 3 },
+  ];
+
+  // N1.3 piste des pensées
+  const PISTE0 = { 2: 'Percée', 3: 'Représailles', 4: 'Percée', 5: 'Représailles', 6: 'Opportunisme', 7: 'Cupidité',
+    8: 'Opportunisme', 9: 'Représailles', 10: 'Percée', 11: 'Cupidité', 12: 'Cupidité' };
+
+  // N5 peuples
+  const PEUPLES = {
+    oiseaux: { nom: 'Oiseaux', pouvoir: 'Voir', court: 'Les dés de la 2e étape sont connus au conseil.' },
+    mammiferes: { nom: 'Mammifères', pouvoir: 'Renverser', court: 'Sabotent seuls, sans allié.' },
+    reptiles: { nom: 'Reptiles', pouvoir: 'Attendre', court: 'Choisissent leur action après les dés (Aller ou Barrer).' },
+    insectes: { nom: 'Insectes', pouvoir: "S'unir", court: "Agissent dans la zone d'une autre carte de l'étape ; choisissent en dernier." },
+    humains: { nom: 'Humains', pouvoir: 'Tromper', court: "Peuvent inverser ce qu'apprend le Méchant à l'étape de leur carte." },
+    entites: { nom: 'Entités', pouvoir: 'Égarer', court: 'Sabotent seules ; une Machine mise hors service par elles quitte le jeu et fait rêver.' },
+  };
+  const ORDRE_PEUPLES = ['oiseaux', 'mammiferes', 'reptiles', 'insectes', 'humains', 'entites'];
+  const SPECIALISTES = { mammiferes: true, entites: true };       // N5.2, N5.6
+
+  // N8 réglages
+  // valeurs par défaut choisies le 15 oct. après un calibrage local aux bots (docs/regles_noyau.md, section 8)
+  const PARAMS = { tours: 6, main: 4, machines_depart: 3, reves_par_tour: 1, reve_annule: true, presage: true,
+    ordres_par_etape: 'n/2', avances_par_tour: 1, barrage: 'entrer_abattre', pions: 3 };
+  // ordres_par_etape : un nombre, ou une formule « n-1 », « n/2 » (n = nombre de joueurs, au moins 1)
+  function valeurTable(x, n) {
+    if (typeof x === 'number') return x;
+    if (x === 'n') return n;
+    if (x === 'n-1') return Math.max(1, n - 1);
+    if (x === 'n/2') return Math.max(1, Math.ceil(n / 2));
+    return 1;
+  }
+
+  function generateur(graine) {                                  // mulberry32 : parties reproductibles
+    let a = graine >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const nomZ = (z) => ZONES[z].nom;
+  const vers7 = (c) => (c < 7 ? c + 1 : c > 7 ? c - 1 : c);
+  const versBord = (c) => (c < 7 ? Math.max(2, c - 1) : Math.min(12, c + 1));
+
+  class Partie {
+    /* cfg : {sieges: [{peuple, type: 'humain' | 'bot', profil}], params, graine}
+       io  : {ask(demande) -> Promise<id ou programme>, show(evenement) -> Promise} (facultatifs) */
+    constructor(cfg, io) {
+      this.version = VERSION;
+      this.params = Object.assign({}, PARAMS, cfg.params || {});
+      this.graine = cfg.graine != null ? cfg.graine >>> 0 : Math.floor(Math.random() * 2 ** 31);
+      this.alea = generateur(this.graine);
+      this.sieges = cfg.sieges.map((s) => Object.assign({ type: 'bot', profil: 'lecteur' }, s));
+      this.peuples = this.sieges.map((s) => s.peuple);
+      this.io = io || {};
+      this.bots = cfg.bots || G.NoyauBots;
+      this.ev = [];
+      this.decisions = 0;
+      this.stats = { ordres: 0, reussis: 0, echoues: 0, sans_effet: 0, annules_par_reve: 0, reves_aux_des: 0,
+        reves_cartes: 0, reves_egarer: 0, esprits_entres: 0, oublis: 0, tir_a_la_corde: 0, sabotages: 0,
+        sabotages_rates: 0, machines_hs: 0, machines_egarees: 0, entrees: 0, remorquages: 0, barrages: 0,
+        ordres_bloques: 0, tromperies: 0, forets_abattues: 0, presages_annules: 0 };
+      this.etat = this.initial();
+    }
+
+    initial() {
+      const P = this.params, f = {}, piste = {}, pions = {}, main = {}, reves = {};
+      NZ.forEach((z) => { f[z] = ZONES[z].f; });
+      for (let c = 2; c <= 12; c++) piste[c] = { k: 'tactique', nom: PISTE0[c] };
+      const mach = MACHINES.map((m) => ({ id: m.id, nom: m.nom, entree: m.entree,
+        org: Object.fromEntries(m.organes.map((o) => [o, true])),
+        etat: m.id <= P.machines_depart ? 'marche' : 'chantier', zone: m.id <= P.machines_depart ? m.entree : null }));
+      this.peuples.forEach((p) => { pions[p] = []; main[p] = P.main; reves[p] = 0; });
+      return { tour: 0, etape: 0, premier: 0, f, mach, piste, pisteM: { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5 },
+        pions, main, reves, des: {}, prog: {}, barres: [], cartes: [], decl: [], fin: null, nEsprits: 0, avances: {} };
+    }
+
+    // ---------------------------------------------------------------- lectures
+    siege(p) { return this.sieges.find((s) => s.peuple === p); }
+    ordre() { const n = this.peuples.length, d = this.etat.premier; return this.peuples.map((_, i) => this.peuples[(i + d) % n]); }
+    presence(z) { let n = 0; for (const p of this.peuples) n += this.etat.pions[p].filter((x) => x === z).length; return n; }
+    present(p, z) { return this.etat.pions[p].includes(z); }
+    foret() { return NZ.reduce((s, z) => s + this.etat.f[z], 0); }
+    machine(id) { return this.etat.mach.find((m) => m.id === id); }
+    lancer() { return [1 + Math.floor(this.alea() * 6), 1 + Math.floor(this.alea() * 6)]; }
+    esprits() { const out = []; for (let c = 8; c <= 12; c++) if (this.etat.piste[c].k === 'esprit') out.push(c); return out; }
+    distanceSommeil() { const e = this.esprits(); return e.length ? Math.min(...e) - 7 : 6; }
+
+    // N6.1 à N6.3 : le plan que donnent deux dés, dans l'état présent
+    plan(des) {
+      const E = this.etat, [a, b] = des, somme = a + b, ecart = Math.abs(a - b), caseM = ecart === 0 ? 1 : ecart;
+      const tuile = E.piste[somme], mid = E.pisteM[caseM], m = this.machine(mid);
+      const p = { des: [a, b], somme, ecart, caseM, machine: m ? m.id : null, nomMachine: m ? m.nom : null,
+        tactique: tuile.k === 'esprit' ? 'esprit' : tuile.nom };
+      if (tuile.k === 'esprit') { p.type = 'reve'; return p; }
+      if (!m || m.etat === 'egaree') { p.type = 'rien'; p.raison = 'la Machine de cette case s\'est égarée'; p.apprend = false; return p; }
+      if (m.etat === 'chantier') { p.type = 'entree'; p.cible = m.entree; return p; }
+      if (m.etat === 'hs') { p.type = 'remorquage'; p.depuis = m.zone; return p; }
+      p.depuis = m.zone;
+      const c = this.cible(m.zone, tuile.nom);
+      if (c == null) { p.type = 'rien'; p.raison = 'plus aucune forêt dans son rayon'; p.apprend = true; return p; }
+      p.type = 'abattre'; p.cible = c; return p;
+    }
+
+    cible(z, tac) {
+      const E = this.etat, cand = [z, ...VOISINS[z]].filter((x) => E.f[x] > 0);
+      if (!cand.length) return null;
+      const tri = (score) => cand.slice().sort((x, y) =>
+        (score(y) - score(x)) || (E.f[y] - E.f[x]) || ((y === z) - (x === z)) || (x - y))[0];
+      if (tac === 'Cupidité') return tri((x) => E.f[x]);
+      if (tac === 'Opportunisme') return tri((x) => -this.presence(x));
+      if (tac === 'Représailles') return tri((x) => this.presence(x));
+      const fl = FLECHE[z];                                       // Percée
+      if (fl && E.f[fl] > 0) return fl;
+      return E.f[z] > 0 ? z : tri((x) => E.f[x]);
+    }
+
+    decrirePlan(p) {
+      if (!p) return '';
+      const d = `${p.des[0]}-${p.des[1]} (somme ${p.somme}, écart ${p.ecart})`;
+      if (p.type === 'reve') return `${d} : la somme tombe sur un esprit, le Méchant rêve`;
+      if (p.type === 'rien') return `${d} : ${p.nomMachine || 'aucune Machine'} par ${p.tactique}, sans effet (${p.raison})`;
+      if (p.type === 'entree') return `${d} : ${p.nomMachine} entre en ${nomZ(p.cible)}`;
+      if (p.type === 'remorquage') return `${d} : ${p.nomMachine}, hors service, est remorquée au chantier`;
+      const trajet = p.cible === p.depuis ? `abat en ${nomZ(p.cible)}` : `va de ${nomZ(p.depuis)} en ${nomZ(p.cible)} et y abat`;
+      return `${d} : ${p.nomMachine} par ${p.tactique} ${trajet}`;
+    }
+
+    // ---------------------------------------------------------------- journal
+    async note(k, txt, data) {
+      const E = this.etat;
+      const ev = Object.assign({ i: this.ev.length, k, t: E.tour, e: E.etape, txt }, data || {});
+      this.ev.push(ev);
+      if (this.io.show) await this.io.show(ev, this);
+      return ev;
+    }
+
+    async decider(p, type, options, ctx) {
+      ctx = ctx || {};
+      const s = this.siege(p);
+      let r;
+      if (options.length === 1) r = { choix: options[0], pourquoi: 'Seul choix possible.', auto: true };
+      else if (s.type === 'bot') r = this.bots.decider(this, p, type, options, ctx);
+      else {
+        const id = await this.io.ask({ p, type, options, ctx });
+        r = { choix: options.find((o) => o.id === id) || options[0], pourquoi: '' };
+      }
+      this.decisions++;
+      await this.note('decision', `${PEUPLES[p].nom} : ${r.choix.label}`, { p, type, choix: r.choix.id,
+        label: r.choix.label, options: options.map((o) => o.label), pourquoi: r.pourquoi || '',
+        joueur: s.type === 'bot' ? s.profil : 'humain', auto: !!r.auto });
+      return r.choix;
+    }
+
+    // ---------------------------------------------------------------- partie
+    async jouer() {
+      const P = this.params;
+      await this.note('debut', `Nouvelle partie (noyau ${VERSION}), graine ${this.graine} : ${this.peuples.map((p) => PEUPLES[p].nom).join(', ')}.`,
+        { graine: this.graine, params: P, sieges: this.sieges });
+      await this.placement();
+      for (let t = 1; t <= P.tours && !this.etat.fin; t++) await this.tour(t);
+      if (!this.etat.fin) this.etat.fin = { type: 'nuit', tour: P.tours };
+      const r = this.resume();
+      await this.note('fin', r.fin.type === 'sommeil'
+        ? `Le Méchant s'endort au tour ${r.fin.tour}. Forêt restante : ${r.foret} sur 21 (${String(r.pct).replace('.', ',')} %).`
+        : `La nuit tombe. Forêt restante : ${r.foret} sur 21 (${String(r.pct).replace('.', ',')} %).`, { resume: r });
+      return r;
+    }
+
+    async placement() {                                            // N1.6
+      this.etat.tour = 0; this.etat.etape = 0;
+      await this.note('phase', 'Mise en place : chacun pose ses trois pions de présence, à tour de rôle.');
+      for (let r = 0; r < this.params.pions; r++) {
+        for (const p of this.ordre()) {
+          const opts = NZ.map((z) => ({ id: 'z' + z, zone: z, label: `Poser un pion en ${nomZ(z)}` }));
+          const c = await this.decider(p, 'placer', opts, { rang: r });
+          this.etat.pions[p].push(c.zone);
+          await this.note('pion', `${PEUPLES[p].nom} pose un pion en ${nomZ(c.zone)}.`, { p, zone: c.zone });
+        }
+      }
+    }
+
+    async tour(t) {
+      const E = this.etat, P = this.params;
+      E.tour = t; E.etape = 0; E.des = {}; E.prog = {}; E.avances = {};
+      await this.note('phase', `Tour ${t} sur ${P.tours}. Premier joueur : ${PEUPLES[this.ordre()[0]].nom}.`);
+      if (P.presage) {                                                 // N2.1
+        E.des[1] = this.lancer();
+        const p = this.plan(E.des[1]);
+        await this.note('presage', `Présage de l'étape 1 : ${this.decrirePlan(p)}.`, { etapeDes: 1, plan: p });
+      }
+      if (this.peuples.includes('oiseaux')) {                          // N5.1
+        E.des[2] = this.lancer();
+        const p = this.plan(E.des[2]);
+        await this.note('voir', `Les oiseaux voient l'étape 2 : ${this.decrirePlan(p)}.`, { etapeDes: 2, plan: p });
+      }
+      await this.programmation();
+      for (let e = 1; e <= 3 && !E.fin; e++) await this.etape(e);
+      if (E.fin) return;
+      E.premier = (E.premier + 1) % this.peuples.length;               // N2.5
+      await this.note('fin_tour', `Fin du tour ${t} : les cartes qui ont agi reviennent en main ; ${this.peuples.map((p) => `${PEUPLES[p].nom} ${E.main[p]}`).join(', ')}.`);
+    }
+
+    // N2.2, N2.3 : chaque joueur pose au plus une carte par étape, au plus un rêve par tour
+    programmeValide(p, prog) {
+      if (!Array.isArray(prog) || prog.length !== 3) return false;
+      const n = prog.filter(Boolean).length, r = prog.filter((x) => x === 'rever').length;
+      return n <= this.etat.main[p] && r <= this.params.reves_par_tour && prog.every((x) => !x || x === 'agir' || x === 'rever');
+    }
+
+    async programmation() {
+      const E = this.etat;
+      await this.note('phase', 'Programmation : chacun pose ses cartes en secret.');
+      const bots = this.ordre().filter((p) => this.siege(p).type === 'bot');
+      const humains = this.ordre().filter((p) => this.siege(p).type !== 'bot');
+      for (const p of humains) {
+        let prog = await this.io.ask({ p, type: 'programme', options: [], ctx: { main: E.main[p], reves: this.params.reves_par_tour } });
+        if (!this.programmeValide(p, prog)) prog = [null, null, null];
+        E.prog[p] = prog;
+        this.decisions++;
+        await this.note('decision', `${PEUPLES[p].nom} a programmé.`, { p, type: 'programme', prog, cache: true, joueur: 'humain', pourquoi: '' });
+      }
+      if (bots.length) {
+        const plan = this.bots.programmer(this, bots);
+        for (const p of bots) {
+          let prog = plan[p].prog;
+          if (!this.programmeValide(p, prog)) prog = [null, null, null];
+          E.prog[p] = prog;
+          this.decisions++;
+          await this.note('decision', `${PEUPLES[p].nom} a programmé.`, { p, type: 'programme', prog, cache: true,
+            joueur: this.siege(p).profil, pourquoi: plan[p].pourquoi.join(' ') });
+        }
+      }
+    }
+
+    async etape(e) {
+      const E = this.etat, P = this.params;
+      E.etape = e; E.barres = []; E.decl = [];
+      const cartes = this.ordre().filter((p) => E.prog[p] && E.prog[p][e - 1]).map((p) => ({ p, mode: E.prog[p][e - 1] }));
+      E.cartes = cartes;
+      await this.note('revele', cartes.length
+        ? `Étape ${e} : ${cartes.map((c) => `${PEUPLES[c.p].nom} ${c.mode === 'rever' ? 'rêve' : 'agit'}`).join(', ')}.`
+        : `Étape ${e} : aucune carte.`, { cartes });
+
+      // 2. les rêves (N3)
+      const reveurs = cartes.filter((c) => c.mode === 'rever');
+      for (const c of reveurs) {
+        E.main[c.p]--; E.reves[c.p]++; this.stats.reves_cartes++;
+        await this.rever(c.p, 'carte');
+        if (E.fin) return;
+      }
+      const nOrdres = valeurTable(P.ordres_par_etape, this.peuples.length);
+      let aAnnuler = P.reve_annule ? Math.min(reveurs.length, nOrdres) : 0;     // N3.2 : un ordre annulé par carte en rêve
+      const annule = aAnnuler >= nOrdres;                                       // tous les ordres de l'étape sont annulés
+
+      // 3. les actions : les autres, puis les insectes (N5.4) ; les reptiles attendent les dés (N5.3)
+      const agissent = cartes.filter((c) => c.mode === 'agir');
+      for (const c of agissent.filter((c) => c.p !== 'reptiles' && c.p !== 'insectes')) await this.agir(c.p, { annule, annules: aAnnuler });
+      for (const c of agissent.filter((c) => c.p === 'insectes')) await this.agir(c.p, { annule, annules: aAnnuler });
+
+      // 4. les sabotages (N4.3)
+      await this.sabotages();
+      if (E.fin) return;
+
+      // 5. les dés et les ordres (N6) : le premier ordre de l'étape utilise les dés connus (présage, Voir)
+      const plans = [];
+      for (let j = 1; j <= nOrdres; j++) {
+        const connus = j === 1 ? E.des[e] : null;
+        if (aAnnuler > 0) {
+          aAnnuler--; this.stats.annules_par_reve++;
+          const pl = connus ? this.plan(connus) : null;
+          if (pl) this.stats.presages_annules++;
+          await this.note('annule', pl
+            ? `Le Méchant rêve : l'ordre ${nOrdres > 1 ? j + ' ' : ''}de l'étape ${e} est annulé (il aurait été : ${this.decrirePlan(pl)}).`
+            : `Le Méchant rêve : l'ordre ${nOrdres > 1 ? j + ' ' : ''}de l'étape ${e} est annulé, on ne lance pas ses dés.`, { plan: pl, j });
+          continue;
+        }
+        const des = connus || this.lancer();
+        if (j === 1) E.des[e] = des;
+        const pl = this.plan(des);
+        plans.push({ j, des, pl });
+        await this.note('des', `Les dés ${nOrdres > 1 ? `de l'ordre ${j} ` : ''}de l'étape ${e} : ${this.decrirePlan(pl)}.`, { plan: pl, j });
+      }
+      // 6. les reptiles (N5.3) : ils connaissent les plans de l'étape
+      for (const c of agissent.filter((c) => c.p === 'reptiles')) await this.agir(c.p, { annule, plan: plans.length ? plans[0].pl : null, plans: plans.map((x) => x.pl) });
+
+      // 7. exécution et apprentissage, ordre par ordre ; le plan est relu au moment d'exécuter
+      let trompe = false;
+      for (const o of plans) {
+        if (E.fin) return;
+        const plan = this.plan(o.des);
+        if (plan.type === 'reve') { this.stats.reves_aux_des++; await this.note('ordre', 'Pas d\'ordre : la somme tombe sur un esprit, le Méchant rêve.', { ok: null, j: o.j }); continue; }
+        if (plan.type === 'rien' && plan.apprend === false) { await this.note('ordre', `Pas d'ordre : ${plan.raison}.`, { ok: null, j: o.j }); continue; }
+        this.stats.ordres++;
+        const res = this.executer(plan);
+        if (res.ok) this.stats.reussis++; else this.stats.echoues++;
+        await this.note('ordre', res.txt, { ok: res.ok, plan, mouvement: res.mouvement || null, bloque: res.bloque || null, j: o.j });
+        let ok = res.ok;
+        if (!trompe && agissent.some((c) => c.p === 'humains')) {                    // N5.5 : une fois par étape
+          const c = await this.decider('humains', 'tromper', [
+            { id: 'oui', label: ok ? 'Tromper : le Méchant croit avoir échoué' : 'Tromper : le Méchant croit avoir réussi' },
+            { id: 'non', label: 'Ne pas tromper' }], { ok });
+          if (c.id === 'oui') { ok = !ok; trompe = true; this.stats.tromperies++; }
+        }
+        await this.apprendre(plan, ok);
+      }
+    }
+
+    // options d'action d'une carte (N4, N5)
+    optionsAction(p, ctx) {
+      const E = this.etat, out = [], zones = [...new Set(E.pions[p])].sort((a, b) => a - b);
+      const peutSaboter = p !== 'reptiles';
+      const zonesAction = new Set(zones);
+      if (p === 'insectes') E.decl.forEach((d) => { if (d.p !== p) zonesAction.add(d.zone); });   // N5.4
+      for (const z of zones) for (const v of VOISINS[z]) out.push({ id: `aller-${z}-${v}`, kind: 'aller', de: z, zone: v, label: `Aller de ${nomZ(z)} en ${nomZ(v)}` });
+      for (const z of [...zonesAction].sort((a, b) => a - b)) {
+        out.push({ id: `barrer-${z}`, kind: 'barrer', zone: z, label: `Barrer ${nomZ(z)}${E.barres.includes(z) ? ' (déjà barrée)' : ''}` });
+        if (!peutSaboter) continue;
+        for (const m of E.mach) {
+          if (m.etat !== 'marche' || m.zone !== z) continue;
+          if (!Object.values(m.org).some(Boolean)) continue;
+          out.push({ id: `saboter-${m.id}`, kind: 'saboter', zone: z, machine: m.id, label: `Saboter ${m.nom} en ${nomZ(z)}` });
+        }
+      }
+      return out;
+    }
+
+    async agir(p, ctx) {
+      const E = this.etat, opts = this.optionsAction(p, ctx);
+      if (!opts.length) { await this.note('info', `${PEUPLES[p].nom} n'a aucune action possible.`); return; }
+      const c = await this.decider(p, 'action', opts, ctx);
+      const d = { p, kind: c.kind, zone: c.zone, machine: c.machine || null, de: c.de || null };
+      if (c.kind === 'aller') {
+        const i = E.pions[p].indexOf(c.de); E.pions[p][i] = c.zone;
+        await this.note('aller', `${PEUPLES[p].nom} va de ${nomZ(c.de)} en ${nomZ(c.zone)}.`, { p, de: c.de, zone: c.zone });
+      } else if (c.kind === 'barrer') {
+        if (!E.barres.includes(c.zone)) { E.barres.push(c.zone); this.stats.barrages++; }
+        await this.note('barrer', `${PEUPLES[p].nom} barre ${nomZ(c.zone)} pour l'étape.`, { p, zone: c.zone });
+      } else {
+        await this.note('saboter_decl', `${PEUPLES[p].nom} s'attaque à ${this.machine(c.machine).nom} en ${nomZ(c.zone)}.`, { p, zone: c.zone, machine: c.machine });
+      }
+      E.decl.push(d);
+    }
+
+    async sabotages() {                                               // N4.3, N4.4
+      const E = this.etat;
+      for (const d of E.decl.filter((x) => x.kind === 'saboter')) {
+        const m = this.machine(d.machine);
+        const allie = E.decl.find((x) => x.p !== d.p && x.zone === d.zone);
+        if (!SPECIALISTES[d.p] && !allie) {
+          this.stats.sabotages_rates++;
+          await this.note('sabotage', `Le sabotage des ${PEUPLES[d.p].nom.toLowerCase()} échoue : aucun allié en ${nomZ(d.zone)}.`, { p: d.p, ok: false, machine: m.id });
+          continue;
+        }
+        if (m.etat !== 'marche') continue;
+        const o = Object.keys(m.org).find((k) => m.org[k]);
+        if (!o) continue;
+        m.org[o] = false; this.stats.sabotages++;
+        const par = SPECIALISTES[d.p] && !allie ? 'seuls' : `avec les ${PEUPLES[allie.p].nom.toLowerCase()}`;
+        await this.note('sabotage', `Les ${PEUPLES[d.p].nom.toLowerCase()} neutralisent ${o === 'phares' ? 'les phares' : o === 'chenilles' ? 'les chenilles' : 'le moteur'} de ${m.nom} (${par}).`, { p: d.p, ok: true, machine: m.id, organe: o });
+        if (!Object.values(m.org).some(Boolean)) {
+          if (d.p === 'entites') {                                       // N5.6
+            m.etat = 'egaree'; m.zone = null; this.stats.machines_egarees++; this.stats.reves_egarer++;
+            await this.note('egaree', `${m.nom} s'égare : elle quitte le jeu et fait rêver le Méchant.`, { machine: m.id });
+            await this.rever('entites', 'egarer');
+            if (E.fin) return;
+          } else {
+            m.etat = 'hs'; this.stats.machines_hs++;
+            await this.note('hs', `${m.nom} est hors service.`, { machine: m.id });
+          }
+        }
+      }
+    }
+
+    // N3.1, N3.4
+    async rever(p, source) {
+      const E = this.etat, ev = this.esprits(), opts = [];
+      if (E.piste[12].k !== 'esprit') opts.push({ id: 'entrer', label: `Un esprit entre en 12 (le Méchant oublie ${E.piste[12].nom})` });
+      for (const c of ev) {
+        if (E.piste[c - 1].k === 'esprit') continue;
+        if ((E.avances[E.piste[c].n] || 0) >= this.params.avances_par_tour) continue;     // N3.1 bis
+        opts.push({ id: 'avancer-' + c, case: c, label: `L'esprit en ${c} avance en ${c - 1}` });
+      }
+      if (!opts.length) { await this.note('info', 'Aucun esprit ne peut bouger.'); return; }
+      const qui = source === 'egarer' ? 'entites' : p;
+      const c = await this.decider(qui, 'esprit', opts, { source });
+      if (c.id === 'entrer') {
+        const oubli = E.piste[12].nom;
+        E.piste[12] = { k: 'esprit', n: ++E.nEsprits };
+        E.avances[E.nEsprits] = 1;
+        this.stats.esprits_entres++; this.stats.oublis++;
+        await this.note('reve', `Le Méchant rêve : un esprit entre en 12, ${oubli} est oubliée.`, { p, source, de: null, vers: 12, oubli });
+      } else {
+        const a = c.case, tmp = E.piste[a - 1];
+        E.avances[E.piste[a].n] = (E.avances[E.piste[a].n] || 0) + 1;
+        E.piste[a - 1] = E.piste[a]; E.piste[a] = tmp;
+        await this.note('reve', `Le Méchant rêve : l'esprit passe de ${a} à ${a - 1}${a - 1 === 7 ? '' : ` (${tmp.nom} recule en ${a})`}.`, { p, source, de: a, vers: a - 1 });
+        if (a - 1 === 7) { E.fin = { type: 'sommeil', tour: E.tour, etape: E.etape }; await this.note('sommeil', 'Un esprit atteint le 7 : le Méchant s\'endort.'); }
+      }
+    }
+
+    // N6.2, N6.4
+    executer(p) {
+      const E = this.etat, B = E.barres, m = this.machine(p.machine);
+      if (p.type === 'rien') { this.stats.sans_effet++; return { ok: false, txt: `${m.nom} ne fait rien : ${p.raison}.` }; }
+      if (p.type === 'entree') {
+        if (B.includes(p.cible)) { this.stats.ordres_bloques++; return { ok: false, bloque: p.cible, txt: `${m.nom} ne peut pas entrer : ${nomZ(p.cible)} est barrée. L'ordre échoue.` }; }
+        m.etat = 'marche'; m.zone = p.cible; this.stats.entrees++;
+        return { ok: true, mouvement: { machine: m.id, de: null, vers: p.cible }, txt: `${m.nom} entre en ${nomZ(p.cible)}.` };
+      }
+      if (p.type === 'remorquage') {
+        m.etat = 'chantier'; m.zone = null; Object.keys(m.org).forEach((k) => { m.org[k] = true; }); this.stats.remorquages++;
+        return { ok: true, txt: `${m.nom} est remorquée au chantier et remise en état.` };
+      }
+      const z = m.zone, c = p.cible;
+      const sortieBloquee = this.params.barrage === 'complet' ? B.includes(z) : (c === z && B.includes(z));   // N4.2
+      if (sortieBloquee) { this.stats.ordres_bloques++; return { ok: false, bloque: z, txt: `${m.nom} est bloquée : ${nomZ(z)} est barrée. L'ordre échoue.` }; }
+      if (c !== z && B.includes(c)) { this.stats.ordres_bloques++; return { ok: false, bloque: c, txt: `${m.nom} ne peut pas entrer en ${nomZ(c)}, barrée. L'ordre échoue.` }; }
+      m.zone = c; E.f[c]--; this.stats.forets_abattues++;
+      return { ok: true, mouvement: { machine: m.id, de: z, vers: c }, txt: `${m.nom} ${c === z ? '' : `va en ${nomZ(c)} et `}abat une forêt en ${nomZ(c)} (il en reste ${E.f[c]}).` };
+    }
+
+    // N6.5
+    async apprendre(p, ok) {
+      const E = this.etat, c = p.somme, t = ok ? vers7(c) : versBord(c);
+      const morceaux = [];
+      if (t !== c) {
+        const voisin = E.piste[t];
+        if (voisin.k === 'esprit' && !ok) morceaux.push(`${E.piste[c].nom} reste en ${c} (un échec ne fait pas avancer l'esprit)`);
+        else {
+          E.piste[t] = E.piste[c]; E.piste[c] = voisin;
+          if (voisin.k === 'esprit') { this.stats.tir_a_la_corde++; morceaux.push(`${E.piste[t].nom} monte en ${t} et repousse l'esprit en ${c} : tir à la corde`); }
+          else morceaux.push(`${E.piste[t].nom} passe de ${c} à ${t}${ok ? ', vers le centre' : ', vers le bord'}`);
+        }
+      } else morceaux.push(`${E.piste[c].nom} reste en ${c}`);
+      const cm = p.caseM, tm = ok ? Math.max(1, cm - 1) : Math.min(5, cm + 1);
+      if (tm !== cm) {
+        const a = E.pisteM[cm]; E.pisteM[cm] = E.pisteM[tm]; E.pisteM[tm] = a;
+        morceaux.push(`${this.machine(a).nom} passe en case ${tm} des Machines`);
+      }
+      await this.note('apprend', `Le Méchant apprend (${ok ? 'réussite' : 'échec'}) : ${morceaux.join(' ; ')}.`, { ok, de: c, vers: t });
+    }
+
+    // ---------------------------------------------------------------- bilan
+    resume() {
+      const E = this.etat, fo = this.foret();
+      return { version: VERSION, graine: this.graine, params: this.params,
+        sieges: this.sieges.map((s) => ({ peuple: s.peuple, type: s.type, profil: s.type === 'bot' ? s.profil : null })),
+        fin: E.fin || { type: 'en cours', tour: E.tour }, foret: fo, pct: Math.round((fo / 21) * 1000) / 10,
+        reves: Object.assign({}, E.reves), main_finale: Object.assign({}, E.main), stats: Object.assign({}, this.stats),
+        decisions: this.decisions };
+    }
+  }
+
+  const Noyau = { valeurTable, VERSION, ZONES, VOISINS, FLECHE, MACHINES, PISTE0, PEUPLES, ORDRE_PEUPLES, PARAMS, SPECIALISTES, Partie, generateur, nomZ };
+  G.Noyau = Noyau;
+  if (typeof module !== 'undefined') module.exports = Noyau;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+</script>
+<script>/* La Forêt qui rêve : joueurs virtuels du noyau N1, qui expliquent chaque choix.
+   Profils :
+   - lecteur   : lit le présage et la menace ; rêve quand l'ordre annoncé est hors de portée de la table,
+                 quand une carte en trop ne coûte rien, quand le sommeil est à portée, ou au dernier tour ;
+   - defenseur : ne rêve jamais (témoin « ne jamais rêver ») ;
+   - reveur    : rêve une carte par tour, à heure fixe (témoin « horaire ») ;
+   - hasard    : joue au hasard parmi les coups permis (témoin du plancher).
+   Les bots d'une même table se concertent au conseil, comme le fait une table qui parle : leur programme est
+   décidé ensemble. Ils ne connaissent pas le programme des joueurs humains.
+   Les nombres des explications sont des estimations du bot (menace calculée sur les 36 tirages, dans l'état
+   présent), pas des vérités du jeu. */
+(function (G) {
+  'use strict';
+  const N = G.Noyau || (typeof require !== 'undefined' ? require('./moteur.js') : null);
+  const { PEUPLES, SPECIALISTES, nomZ } = N;
+  const NZ = [1, 2, 3, 4, 5, 6, 7];
+  const VALEUR_ACTION = 0.35;    // forêt moyenne qu'une action sauve, estimation du bot (sert au coût d'un rêve)
+  const pct = (x) => Math.round(x * 100) + ' %';
+  const f1 = (x) => (Math.round(x * 100) / 100).toString().replace('.', ',');
+  const nomP = (p) => PEUPLES[p].nom;
+
+  // menace de l'étape à venir : pour chaque zone, la part des 36 tirages qu'un barrage là ferait échouer
+  function menace(partie) {
+    const bloc = {}, abat = {};
+    NZ.forEach((z) => { bloc[z] = 0; abat[z] = 0; });
+    let reve = 0, danger = 0;
+    for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) {
+      const p = partie.plan([a, b]), w = 1 / 36;
+      if (p.type === 'abattre') {
+        abat[p.cible] += w; danger += w;
+        zonesBloquantes(p, partie).forEach((z) => { bloc[z] += w; });
+      }
+      else if (p.type === 'entree') { bloc[p.cible] += 0.6 * w; danger += 0.6 * w; }
+      else if (p.type === 'reve') reve += w;
+    }
+    return { bloc, abat, reve, danger };
+  }
+  function zonesBloquantes(pl, partie) {
+    if (!pl) return [];
+    const complet = !partie || partie.params.barrage === 'complet';
+    if (pl.type === 'abattre') return complet ? [...new Set([pl.depuis, pl.cible])] : [pl.cible];
+    if (pl.type === 'entree') return [pl.cible];
+    return [];
+  }
+  const gainPlan = (pl) => (pl.type === 'abattre' ? 1 : pl.type === 'entree' ? 0.6 : 0);
+  function court(partie, pl) {
+    if (pl.type === 'abattre') return `${pl.nomMachine} par ${pl.tactique} sur ${nomZ(pl.cible)}`;
+    if (pl.type === 'entree') return `${pl.nomMachine} entre en ${nomZ(pl.cible)}`;
+    return partie.decrirePlan(pl);
+  }
+
+  // ------------------------------------------------------------ programmation concertée des bots
+  function programmer(partie, bots) {
+    const E = partie.etat, P = partie.params, out = {};
+    bots.forEach((p) => { out[p] = { prog: [null, null, null], pourquoi: [], reves: 0 }; });
+    const prof = (p) => partie.siege(p).profil;
+    const restants = P.tours - E.tour;                       // tours après celui-ci
+    const utilisees = (p) => out[p].prog.filter(Boolean).length;
+    const libre = (p, e) => !out[p].prog[e - 1] && utilisees(p) < E.main[p];
+    const peutRever = (p, e) => libre(p, e) && out[p].reves < P.reves_par_tour;
+    const rever = (p, e, txt) => { out[p].prog[e - 1] = 'rever'; out[p].reves++; out[p].pourquoi.push(txt); };
+    const agir = (p, e, txt) => { out[p].prog[e - 1] = 'agir'; if (txt) out[p].pourquoi.push(txt); };
+    // coût futur d'une carte perdue : une action de moins par tour, si la main passe sous 3
+    const coutCarte = (p) => ((E.main[p] - out[p].reves - 1) < 3 ? VALEUR_ACTION * restants : 0);
+    const m = menace(partie);
+    const meilleurBloc = (p) => Math.max(0, ...E.pions[p].map((z) => m.bloc[z]));
+
+    // le témoin au hasard
+    for (const p of bots.filter((p) => prof(p) === 'hasard')) {
+      for (let e = 1; e <= 3; e++) {
+        if (!libre(p, e)) continue;
+        const r = partie.alea();
+        if (r < 0.15 && peutRever(p, e)) rever(p, e, `Étape ${e} : rêve (au hasard).`);
+        else if (r < 0.85) agir(p, e, `Étape ${e} : agit (au hasard).`);
+      }
+    }
+    const S = bots.filter((p) => prof(p) !== 'hasard');
+
+    // 1. les étapes dont on connaît les dés (présage, Voir)
+    for (let e = 1; e <= 3; e++) {
+      if (!E.des[e]) continue;
+      const pl = partie.plan(E.des[e]), zb = zonesBloquantes(pl, partie);
+      if (!zb.length) { S.forEach((p) => out[p].pourquoi.push(`Étape ${e} : l'ordre annoncé est sans danger (${partie.decrirePlan(pl)}).`)); continue; }
+      const def = S.find((p) => libre(p, e) && zb.some((z) => partie.present(p, z)));
+      if (def) {
+        agir(def, e, `Étape ${e} : l'ordre annoncé (${court(partie, pl)}) passe par ${zb.map(nomZ).join(' et ')}, où j'ai un pion : je le barrerai.`);
+        continue;
+      }
+      if (!P.reve_annule) continue;
+      const cand = S.filter((p) => prof(p) === 'lecteur' && peutRever(p, e)).map((p) => ({ p, cout: coutCarte(p) })).sort((a, b) => a.cout - b.cout);
+      if (!cand.length) continue;
+      const gain = gainPlan(pl) + 0.15;                        // + l'avance de l'esprit
+      if (cand[0].cout <= gain) {
+        rever(cand[0].p, e, `Étape ${e} : l'ordre annoncé (${court(partie, pl)}) est hors de portée de la table : je rêve pour l'annuler (gain estimé ${f1(gain)} forêt, coût de la carte perdue ${f1(cand[0].cout)}).`);
+      } else {
+        out[cand[0].p].pourquoi.push(`Étape ${e} : l'ordre annoncé (${court(partie, pl)}) est hors de portée, mais perdre une carte coûterait plus (${f1(cand[0].cout)}) qu'il ne sauve (${f1(gain)}).`);
+      }
+    }
+
+    // 2. le long sommeil à portée ce tour
+    if (P.reve_annule || true) {
+      const d = partie.distanceSommeil();
+      const lecteurs = S.filter((p) => prof(p) === 'lecteur');
+      const possibles = lecteurs.filter((p) => [1, 2, 3].some((e) => peutRever(p, e)));
+      if (d <= possibles.length && d <= 3 * lecteurs.length) {
+        let reste = d;
+        for (const p of possibles) {
+          if (!reste) break;
+          const e = [1, 2, 3].find((x) => peutRever(p, x));
+          rever(p, e, `Étape ${e} : le long sommeil est à portée ce tour (${d} rêve${d > 1 ? 's' : ''} suffisent) ; il arrête la partie avec la forêt qui reste.`);
+          reste--;
+        }
+      }
+    }
+
+    // 3. le rêveur à heure fixe
+    for (const p of S.filter((p) => prof(p) === 'reveur')) {
+      if (out[p].reves >= P.reves_par_tour) continue;
+      const e = [1, 2, 3].find((x) => peutRever(p, x));
+      if (e) rever(p, e, `Étape ${e} : je rêve une carte par tour, à heure fixe (stratégie de témoin).`);
+    }
+
+    // 4. le lecteur : une carte en trop, ou le dernier tour, rendent le rêve bon marché
+    if (P.reve_annule) {
+      const prises = new Set();
+      [1, 2, 3].forEach((e) => { if (S.some((p) => out[p].prog[e - 1] === 'rever')) prises.add(e); });
+      for (const p of S.filter((p) => prof(p) === 'lecteur')) {
+        if (out[p].reves >= P.reves_par_tour) continue;
+        let best = null;
+        for (let e = 1; e <= 3; e++) {
+          if (!peutRever(p, e) || prises.has(e) || E.des[e]) continue;
+          const vReve = m.danger + 0.15, vAgir = meilleurBloc(p), cout = coutCarte(p);
+          const net = vReve - vAgir - cout;
+          if (!best || net > best.net) best = { e, net, vReve, vAgir, cout };
+        }
+        if (best && best.net > 0.2) {
+          prises.add(best.e);
+          rever(p, best.e, `Étape ${best.e} : rêver annule un ordre où qu'il tombe (il abattrait ou ferait entrer une Machine dans ${pct(m.danger)} des tirages) et fait avancer l'esprit, soit ${f1(best.vReve)} forêt estimée ; agir là où je suis en vaut ${f1(best.vAgir)} ; la carte perdue coûte ${f1(best.cout)}${restants === 0 ? ' (dernier tour)' : (E.main[p] > 3 ? ' (j\'ai une carte de plus que d\'étapes)' : '')}. Je rêve.`);
+        }
+      }
+    }
+
+    // 5. le reste : agir sur les étapes encore libres
+    for (const p of S) {
+      const agies = [];
+      for (let e = 1; e <= 3; e++) if (libre(p, e)) { agir(p, e); agies.push(e); }
+      if (agies.length) out[p].pourquoi.push(`Étape${agies.length > 1 ? 's' : ''} ${agies.join(', ')} : j'agirai selon ce que je verrai (barrer la zone la plus menacée, saboter si un allié est là).`);
+      const vides = [1, 2, 3].filter((e) => !out[p].prog[e - 1]);
+      if (vides.length) out[p].pourquoi.push(`Plus assez de cartes pour l'étape ${vides.join(', ')} (main : ${E.main[p]}).`);
+    }
+    return out;
+  }
+
+  // ------------------------------------------------------------ décisions ponctuelles
+  function decider(partie, p, type, options, ctx) {
+    const prof = partie.siege(p).profil;
+    if (prof === 'hasard' && type !== 'esprit') {
+      const c = options[Math.floor(partie.alea() * options.length)];
+      return { choix: c, pourquoi: 'Au hasard (témoin).' };
+    }
+    if (type === 'placer') return placer(partie, p, options);
+    if (type === 'action') return action(partie, p, options, ctx);
+    if (type === 'esprit') return esprit(partie, p, options);
+    if (type === 'tromper') return ctx.ok
+      ? { choix: options.find((o) => o.id === 'oui'), pourquoi: 'L\'ordre a réussi : je le fais passer pour un échec, sa tactique recule vers le bord.' }
+      : { choix: options.find((o) => o.id === 'non'), pourquoi: 'L\'ordre a échoué : le Méchant l\'apprend bien tout seul.' };
+    return { choix: options[0], pourquoi: '' };
+  }
+
+  function placer(partie, p, options) {
+    const m = menace(partie);
+    let best = null;
+    for (const o of options) {
+      const z = o.zone, dej = partie.presence(z);
+      const v = m.bloc[z] / (1 + 0.8 * dej) + 0.01 * partie.etat.f[z];
+      if (!best || v > best.v) best = { o, v, z, dej };
+    }
+    return { choix: best.o, pourquoi: `${nomZ(best.z)} : un barrage là ferait échouer ${pct(m.bloc[best.z])} des ordres possibles, et ${best.dej === 1 ? 'il n\'y a qu\'un pion' : best.dej ? `il n'y a que ${best.dej} pions` : 'personne n\'y est encore'}.` };
+  }
+
+  function action(partie, p, options, ctx) {
+    const E = partie.etat, e = E.etape, m = menace(partie);
+    // ce que l'on sait des ordres de l'étape : les plans tirés (reptiles), ou le présage s'il n'est pas annulé
+    let plans = ctx.plans && ctx.plans.length ? ctx.plans : null;
+    if (!plans && E.des[e] && !(ctx.annules > 0)) plans = [partie.plan(E.des[e])];
+    const pl = plans ? plans[0] : null;
+    const zb = plans ? [...new Set(plans.flatMap((x) => zonesBloquantes(x, partie)))] : null;
+    const unSeulConnu = plans && !ctx.plans && partie.params.ordres_par_etape > 1;   // le 2e ordre reste inconnu
+    const notes = [];
+    for (const o of options) {
+      let v = 0, why = '';
+      if (o.kind === 'barrer') {
+        if (ctx.annule) { v = 0.01; why = 'l\'ordre de l\'étape est déjà annulé par un rêve'; }
+        else if (E.barres.includes(o.zone)) { v = 0; why = 'déjà barrée'; }
+        else if (zb) {
+          const dans = zb.includes(o.zone);
+          v = (dans ? 1 : 0.02) + (unSeulConnu ? m.bloc[o.zone] : 0);
+          why = dans ? `l'ordre connu (${court(partie, pl)}) passe par là : il échouera` : 'l\'ordre connu ne passe pas par là';
+          if (unSeulConnu) why += ` ; l'autre ordre de l'étape y échouerait dans ${pct(m.bloc[o.zone])} des tirages`;
+        }
+        else { v = m.bloc[o.zone]; why = `${pct(v)} des tirages possibles échoueraient`; }
+      } else if (o.kind === 'saboter') {
+        const mach = partie.machine(o.machine), reste = Object.values(mach.org).filter(Boolean).length;
+        const allie = SPECIALISTES[p] || E.decl.some((d) => d.p !== p && d.zone === o.zone);
+        if (!allie) { v = 0.03; why = 'aucun allié encore dans la zone : le sabotage risque d\'échouer'; }
+        else {
+          v = 0.25 + (reste === 1 ? 0.35 : 0);
+          why = reste === 1 ? `dernier organe : ${mach.nom} sera hors service` : `un organe de moins pour ${mach.nom} (il lui en restera ${reste - 1})`;
+          if (pl && pl.machine === mach.id && pl.type === 'abattre' && reste === 1 && !ctx.annule) { v += 1; why += ', et c\'est elle que l\'ordre connu désigne'; }
+          if (SPECIALISTES[p]) why += ` (les ${nomP(p).toLowerCase()} sabotent seuls)`;
+        }
+      } else if (o.kind === 'aller') {
+        v = 0.3 * (m.bloc[o.zone] - m.bloc[o.de]);
+        why = `se rapprocher de la menace (${pct(m.bloc[o.zone])} contre ${pct(m.bloc[o.de])})`;
+      }
+      notes.push({ o, v, why });
+    }
+    notes.sort((a, b) => b.v - a.v);
+    const best = notes[0], second = notes.find((n) => n.o.kind !== best.o.kind || n.o.zone !== best.o.zone);
+    let txt = `${best.o.label} : ${best.why}.`;
+    if (second && second.v > 0.05) txt += ` Autre choix envisagé : « ${second.o.label} » (${second.why}).`;
+    if (pl && !ctx.annule && p === 'reptiles') txt = `J'ai attendu les dés. ${txt}`;
+    return { choix: best.o, pourquoi: txt };
+  }
+
+  function esprit(partie, p, options) {
+    const av = options.filter((o) => o.id.startsWith('avancer')).sort((a, b) => a.case - b.case);
+    if (av.length) return { choix: av[0], pourquoi: `L'esprit de tête avance : il sera à ${av[0].case - 1 - 7} case${av[0].case - 8 > 1 ? 's' : ''} du sommeil.` };
+    return { choix: options[0], pourquoi: 'Aucun esprit sur la piste : un esprit entre, et le Méchant oublie la tuile du 12.' };
+  }
+
+  const NoyauBots = { programmer, decider, menace, zonesBloquantes, PROFILS: {
+    lecteur: { nom: 'Lecteur', texte: 'Lit le présage et la menace ; rêve quand cela rapporte.' },
+    defenseur: { nom: 'Défenseur', texte: 'Ne rêve jamais (témoin).' },
+    reveur: { nom: 'Rêveur', texte: 'Rêve une carte par tour à heure fixe (témoin).' },
+    hasard: { nom: 'Hasard', texte: 'Joue au hasard (témoin du plancher).' } } };
+  G.NoyauBots = NoyauBots;
+  if (typeof module !== 'undefined') module.exports = NoyauBots;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+</script>
+<script>window.REGLES_NOYAU = "# Règles du noyau N1\n\n*15 oct. 2026. Maquette d'étude simplifiée, demandée par l'auteur après le recul du jour (`projet/3-pilotage/prendre-du-recul.md`, décisions 1 à 5 acceptées). Elle applique la démarche « noyau d'abord » (D4) et la direction D1, « le rêve détourne ». **Statut : proposition de Claude, à jouer et à juger. Rien n'est adopté** : la V0.4 reste la dernière version adoptée. Maquette jouable : `maquettes-numeriques/noyau/` (page « La Forêt qui rêve, noyau »). Chaque règle porte un identifiant (N1.1…), que le code cite.*\n\n## Ce qui est gardé, ce qui est retiré\n| Gardé (idées fortes, mécanismes jugés solides) | Retiré pour l'instant (modules à réintroduire un par un) |\n|---|---|\n| Deux plans : le plateau et la tête du Méchant | Le Cercle et la voie du réveil |\n| Le plan « qui et où » : la somme des dés désigne la tactique, l'écart désigne la Machine (concentration et surprise vertes en V0.4) | Les lunes, les traces, l'escalade, les ordres supplémentaires |\n| Le Méchant apprend : une tuile échange sa place avec une voisine | Les deux moitiés de carte (un seul pouvoir par peuple) |\n| Les esprits, l'oubli en 12, le long sommeil au 7 | Les réglages propres au nombre de joueurs |\n| Programmation secrète sur trois étapes ; Aller, Barrer, Saboter ; l'alliance | La rivière |\n| Le présage | |\n| Chaque peuple brise une règle | |\n| Pas de défaite : on compte la forêt restante | |\n| **Nouveau (D1)** : rêver annule l'ordre de l'étape | |\n\n## 0. En une phrase\nChacun à la tête d'un peuple, les joueurs défendent ensemble la forêt pendant six tours contre les Machines d'un Méchant qui apprend ; à chaque étape, ils peuvent parer l'ordre sur le plateau, là où ils sont, ou le détourner en faisant rêver le Méchant, à n'importe quel endroit, au prix d'une carte perdue.\n\n## 1. Mise en place\n**N1.1 Plateau.** Sept zones ; les forêts entre parenthèses (21 en tout).\n\n| Zone | Profondeur | Forêts | Voisines | Flèche de percée |\n|---|---|---|---|---|\n| 1 Lisière | lisière | 2 | 2, 4 | → 4 |\n| 2 Clairière | lisière | 1 | 1, 3, 4, 5 | → 5 |\n| 3 Várzea | lisière | 2 | 2, 5 | → 5 |\n| 4 Igapó | milieu | 3 | 1, 2, 5, 6 | → 6 |\n| 5 Sources | milieu | 4 | 2, 3, 4, 6, 7 | → 7 |\n| 6 Colline aux aras | cœur | 4 | 4, 5, 7 | – |\n| 7 Samaúma | cœur | 5 | 5, 6 | – |\n\n**N1.2 Machines.** Cinq Machines, chacune avec 2 ou 3 organes et une zone d'entrée :\n\n| Case de départ | Machine | Organes | Zone d'entrée |\n|---|---|---|---|\n| 1 | Grosse Gueule | moteur, chenilles | 1 Lisière |\n| 2 | Rapiat | moteur, chenilles, phares | 2 Clairière |\n| 3 | Mâchoire | moteur, phares | 3 Várzea |\n| 4 | Tonton Débard | moteur, chenilles | 1 Lisière |\n| 5 | Ripaille | moteur, chenilles, phares | 3 Várzea |\n\nLes Machines 1 à 3 commencent sur leur zone d'entrée ; les Machines 4 et 5 attendent au chantier. Le nombre de Machines en jeu au départ est un réglage (3 par défaut).\n\n**N1.3 Piste des pensées** (cases 2 à 12, publique) : 2 Percée, 3 Représailles, 4 Percée, 5 Représailles, 6 Opportunisme, 7 Cupidité, 8 Opportunisme, 9 Représailles, 10 Percée, 11 Cupidité, 12 Cupidité. Aucun esprit au départ. Les cases 2 à 6 sont le côté de l'éveil, les cases 8 à 12 le côté du rêve.\n\n**N1.4 Piste des Machines** (cases 1 à 5, publique) : chaque Machine sur la case de son numéro.\n\n**N1.5 Peuples.** De 2 à 6 joueurs, un peuple chacun. Chaque peuple a 3 pions de présence et une main de cartes de personnages identiques (4 par défaut, réglage), pour toute la partie : il n'y a pas de pioche.\n\n**N1.6 Présence.** À tour de rôle, en commençant par le premier joueur, chacun pose un pion dans la zone de son choix, jusqu'à ce que tous soient posés.\n\n## 2. Le tour\nUne partie dure 6 tours (réglage) de 3 étapes.\n\n**N2.1 Le conseil.** On lance les dés de la première étape et on les laisse visibles : c'est le **présage**. On affiche le plan qu'ils donnent (quelle Machine, quelle tactique, quelle zone). Si les oiseaux sont à la table, on lance aussi les dés de la deuxième étape (N5.1). Les joueurs parlent librement, sans montrer leur main.\n\n**N2.2 La programmation.** Chacun, en secret et en même temps, pose au plus une carte sur chacune des trois étapes. Chaque carte est posée pour **agir** ou pour **rêver**. Une étape peut rester vide.\n\n**N2.3 Un rêve par tour.** Chaque joueur envoie au plus une carte en rêve par tour (réglage).\n\n**N2.4 La résolution, étape par étape.**\n1. On révèle les cartes de l'étape.\n2. **Les rêves** (N3) : chaque carte en rêve fait rêver le Méchant. Si au moins une carte rêve, l'ordre de l'étape est annulé.\n3. **Les actions** : les cartes qui agissent choisissent leur action, à découvert, dans l'ordre des joueurs à partir du premier joueur. Les insectes choisissent après les autres (N5.4) ; les reptiles attendent les dés (N5.3).\n4. **Les sabotages** s'appliquent (N4.3).\n5. **Les dés** : le Méchant donne **autant d'ordres que la moitié du nombre de joueurs, arrondie au-dessus** (1 ordre à 2 joueurs, 2 à 3 et 4 joueurs, 3 à 5 et 6 joueurs). Chaque ordre a ses dés ; le premier utilise les dés déjà connus (présage, Voir).\n6. Les reptiles agissent.\n7. Les Machines exécutent les ordres un par un (N6.4), et le Méchant apprend après chacun (N6.5).\n\n**N2.5 Fin du tour.** Chacun reprend en main ses cartes qui ont agi ; les cartes parties en rêve sont perdues pour la partie. Les barrages prennent fin. Le rôle de premier joueur passe au joueur suivant.\n\n## 3. Rêver\n**N3.1 Faire rêver.** Une carte en rêve fait rêver le Méchant : un esprit entre en case 12 (la tuile qui s'y trouvait est **oubliée** : retirée du jeu), ou un esprit déjà sur la piste avance d'une case vers le 7, en échangeant sa place avec la tuile voisine. Un esprit n'avance pas sur un autre esprit. Le joueur choisit ; s'il n'y a pas d'esprit, un esprit entre.\n\n**N3.1 bis Le rêve prend racine.** Un même esprit bouge au plus une fois par tour (entrer compte). Les rêves de plus, dans le même tour, font entrer de nouveaux esprits ; s'il n'y a plus de place, ils n'ont pas d'effet sur la piste (ils annulent quand même un ordre).\n\n**N3.2 Le rêve détourne (D1).** Chaque carte en rêve annule un ordre de son étape, le premier d'abord (celui du présage ou de Voir). Le Méchant rêve au lieu d'agir : on ne lance pas les dés de cet ordre, sauf s'ils sont déjà connus. Ce qui est annulé n'apprend rien. *Réglage : « le rêve annule l'ordre » (oui par défaut), pour comparer avec l'ancienne règle.*\n\n**N3.3 Le prix.** La carte en rêve n'agit pas à cette étape, et elle quitte la main pour le reste de la partie.\n\n**N3.4 Le long sommeil.** Dès qu'un esprit atteint la case 7, le Méchant s'endort : la partie s'arrête aussitôt.\n\n## 4. Agir\n**N4.1 Où agit une carte.** Une carte qui agit agit dans une zone où son peuple a un pion de présence (sauf les insectes, N5.4).\n\n**N4.2 Les trois actions.** Chaque carte qui agit fait une seule action :\n- **Aller** : déplacer un de ses pions vers une zone voisine. La carte agit alors dans la zone d'arrivée.\n- **Barrer** : pendant l'étape, aucune Machine ne peut entrer dans la zone ni y abattre. Une Machine peut quitter une zone barrée pour aller abattre ailleurs (forme « entrer et abattre » du catalogue, B2 ; *réglage : forme complète, qui interdit aussi d'en sortir*).\n- **Saboter** : neutraliser un organe intact d'une Machine en marche de la zone. Il faut un allié dans la zone (N4.4), sauf pour les mammifères et les entités (N5.2, N5.6). Les reptiles ne sabotent pas.\n\n**N4.3 Les sabotages s'appliquent** une fois toutes les actions choisies (avant les dés) : un sabotage sans allié échoue. Une Machine dont tous les organes sont neutralisés est **hors service** : elle reste sur le plateau, inerte.\n\n**N4.4 L'alliance.** Deux cartes de peuples différents qui agissent dans la même zone à la même étape sont alliées, quel que soit l'ordre de leurs choix.\n\n## 5. Les peuples (chacun brise une règle)\n**N5.1 Oiseaux, Voir.** Au conseil, les dés de la deuxième étape sont lancés et affichés, en plus du présage.\n\n**N5.2 Mammifères, Renverser.** Ils sabotent seuls, sans allié.\n\n**N5.3 Reptiles, Attendre.** Leurs cartes choisissent leur action après les dés, quand on sait où va la Machine (Aller ou Barrer seulement).\n\n**N5.4 Insectes, S'unir.** Leur carte peut agir dans la zone de n'importe quelle autre carte qui agit à la même étape, même sans y être présente ; elles sont alliées. Ils choisissent après les autres cartes.\n\n**N5.5 Humains, Tromper.** Quand une carte humaine a agi à l'étape, l'humain peut inverser ce qu'apprend le Méchant : une réussite compte comme un échec, et inversement.\n\n**N5.6 Entités, Égarer.** Elles sabotent seules. Une Machine qu'elles mettent hors service s'égare : elle quitte le jeu et fait rêver le Méchant (N3.1, sans annuler l'ordre et sans coûter de carte).\n\n## 6. L'ordre du Méchant\n**N6.1 Le plan.** On lance deux dés. La **somme** désigne une case de la piste des pensées : sa tuile donne la tactique. L'**écart** désigne une case de la piste des Machines : sa Machine exécute ; un double désigne la case 1 (le favori). Si la tuile est un esprit, le Méchant rêve : pas d'ordre, pas d'apprentissage. Si la case désignée n'a plus de Machine (égarée), il n'y a pas d'ordre.\n\n**N6.2 Ce que fait la Machine désignée.**\n- **Au chantier** : elle entre sur sa zone d'entrée.\n- **Hors service** : elle est remorquée au chantier et remise en état.\n- **En marche** : elle choisit une zone selon la tactique, parmi sa zone et ses voisines qui ont encore de la forêt (son **rayon**), y va et y abat une forêt.\n\n**N6.3 Les tactiques**, dans le rayon :\n- *Cupidité* : la zone la plus boisée ;\n- *Opportunisme* : la moins défendue (le moins de pions de présence) ;\n- *Représailles* : la plus défendue (le plus de pions) ;\n- *Percée* : la zone que montre la flèche de sa zone ; sans flèche ou sans forêt au bout, sa propre zone (si elle n'a plus de forêt : la plus boisée du rayon).\n\nÉgalités : la plus boisée, puis la zone de la Machine, puis le plus petit numéro. Si aucune zone du rayon n'a de forêt, l'ordre n'a pas d'effet.\n\n**N6.4 L'exécution.** L'ordre échoue si un barrage empêche la Machine d'entrer dans la zone ou d'y abattre. Le plan est relu au moment d'exécuter : un ordre précédent de la même étape peut l'avoir changé. Il **réussit** s'il a eu un effet : une forêt abattue, une Machine entrée, une Machine remorquée.\n\n**N6.5 Le Méchant apprend.** Après chaque ordre exécuté, réussi ou non :\n- la tuile de la tactique échange sa place avec une voisine : vers le 7 si l'ordre a réussi (au 7, elle reste), vers le bord s'il a échoué (du 7, elle passe en 8 ; en 2 ou en 12, elle reste). Si l'ordre a réussi et que cette voisine est un esprit, l'esprit est repoussé : c'est le **tir à la corde**. Un ordre qui échoue ne fait jamais avancer un esprit : si la voisine côté bord est un esprit, la tuile reste en place. Un ordre sans effet faute de forêt compte comme un échec ;\n- la Machine échange sa place avec une voisine sur la piste des Machines : vers la case 1 si l'ordre a réussi, vers la case 5 s'il a échoué.\n\n## 7. Fin de partie\n**N7.1 Deux fins.** Le **long sommeil** (un esprit atteint le 7) arrête la partie aussitôt ; sinon, **la nuit** tombe à la fin du dernier tour.\n\n**N7.2 Bilan.** On compte la forêt restante. Il n'y a pas de défaite.\n\n## 8. Réglages de la maquette\nCe sont des réglages d'étude, modifiables dans la page : nombre de tours (6), main (4 cartes), pions de présence (3), Machines en jeu au départ (3), ordres par étape (la moitié des joueurs, arrondie au-dessus ; ou 1, ou « n-1 »), avances d'un esprit par tour (1), rêves par joueur et par tour (1), forme du barrage (entrer et abattre), « le rêve annule l'ordre » (oui), présage (oui).\n\n**Comment les valeurs par défaut ont été choisies (15 oct., indices).** Un calibrage local aux bots de la maquette (30 tables de 2 à 6 joueurs, 8 parties chacune, 24 combinaisons de réglages) a montré deux défauts dans la première écriture : avec le barrage complet et un ordre par étape, une table qui ne rêve jamais gardait 97 % de la forêt ; avec des esprits sans limite d'avance, rêver à heure fixe menait au sommeil dans 90 à 100 % des parties. Avec les valeurs ci-dessus, le bot qui lit le jeu garde 79 % de la forêt, contre 71 % pour la table qui ne rêve jamais et 47 % pour celle qui rêve à heure fixe : juger rapporte environ 9 points. Ce sont des **indices** (des bots simples, peu de parties) : à confirmer en jouant, puis au moteur Python.\n\n## 9. Ce que la maquette automatise\nTout ce qui n'est pas un choix est fait par la page et affiché dans le journal : lancer les dés, calculer le plan, déplacer la Machine, abattre, appliquer barrages et sabotages, faire apprendre le Méchant, compter la forêt. Les choix restent aux joueurs : poser ses pions, programmer, choisir l'action de chaque carte, choisir l'esprit qui avance, Tromper ou non.\n\n## 10. Pourquoi ce noyau (à vérifier en jouant)\nLe choix « rêver ou défendre » doit maintenant dépendre de la situation. **Défendre** est bon marché (la carte revient) mais local : il faut être présent dans la zone de la Machine ou dans celle qu'elle vise. **Rêver** est cher (la carte est perdue) mais agit partout. On rêve donc quand l'ordre annoncé est hors de portée de la table, et on défend quand il est à portée. Le présage, Voir et la position des pions renseignent ce choix. La fin par le sommeil devient une conséquence des rêves, pas un objectif à atteindre à heure fixe. Questions à regarder en jouant : rêver devient-il une défense trop sûre ? La main de 4 cartes rend-elle les premiers rêves gratuits ? Une table qui ne rêve jamais fait-elle aussi bien qu'une table qui lit le présage ?\n";</script>
+<script>/* La Forêt qui rêve, noyau N1 : la page jouable (plateau animé, saisie, séries, enregistrement). */
+(function () {
+  'use strict';
+  const N = window.Noyau, B = window.NoyauBots;
+  const { ZONES, VOISINS, FLECHE, PEUPLES, ORDRE_PEUPLES, nomZ } = N;
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, attrs, html) => { const e = document.createElement(tag); if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]); if (html != null) e.innerHTML = html; return e; };
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const PROFILS = B.PROFILS;
+  const POS = { 1: [95, 140], 2: [320, 130], 3: [545, 140], 4: [190, 295], 5: [450, 295], 6: [190, 455], 7: [450, 455] };
+  const R = 66;
+  const ABR = { 'Cupidité': ['Cupid.', 'cup'], 'Opportunisme': ['Oppor.', 'opp'], 'Représailles': ['Repré.', 'rep'], 'Percée': ['Percée', 'per'] };
+  const ABANDON = new Error('abandon');
+  const fr = (x) => String(x).replace('.', ',');
+
+  // ------------------------------------------------------------ état de la page
+  const UI = {
+    partie: null, mode: 'setup', vitesse: 'normal', pending: null, abort: false, next: null, vise: null, pvise: null,
+    ordreTrace: null, cfg: null, enregistre: false, derniere: null, db: null, dl: null, index: [], session: [],
+  };
+  const VITESSES = { pas: { nom: 'Pas à pas', ms: 0 }, lent: { nom: 'Lent', ms: 1100 }, normal: { nom: 'Normal', ms: 550 }, rapide: { nom: 'Rapide', ms: 160 }, instant: { nom: 'Instantané', ms: 0 } };
+  const MAJEURS = new Set(['presage', 'voir', 'revele', 'reve', 'annule', 'des', 'ordre', 'apprend', 'sabotage', 'hs', 'egaree', 'barrer', 'aller', 'saboter_decl', 'sommeil', 'fin', 'pion']);
+
+  function cfgDefaut() {
+    return {
+      sieges: ORDRE_PEUPLES.map((p) => ({ peuple: p, actif: ['oiseaux', 'mammiferes', 'reptiles'].includes(p), type: p === 'oiseaux' ? 'humain' : 'bot', profil: 'lecteur' })),
+      params: Object.assign({}, N.PARAMS), graine: '',
+    };
+  }
+  try { UI.vitesse = localStorage.getItem('noyau.vitesse') || 'normal'; } catch (e) { /* pas de stockage */ }
+  if (!VITESSES[UI.vitesse]) UI.vitesse = 'normal';
+  UI.cfg = cfgDefaut();
+
+  function toast(t) { const x = $('#toast'); x.textContent = t; x.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => { x.hidden = true; }, 3200); }
+
+  // ------------------------------------------------------------ onglets
+  document.querySelectorAll('[role="tab"]').forEach((b) => b.addEventListener('click', () => ouvrirOnglet(b.id.slice(4))));
+  function ouvrirOnglet(nom) {
+    document.querySelectorAll('[role="tab"]').forEach((b) => b.setAttribute('aria-selected', String(b.id === 'tab-' + nom)));
+    document.querySelectorAll('[role="tabpanel"]').forEach((p) => { p.hidden = p.id !== 'pan-' + nom; });
+    if (nom === 'archives') renderArchives();
+  }
+  if (['series', 'archives', 'regles'].includes(location.hash.slice(1))) ouvrirOnglet(location.hash.slice(1));
+
+  // ------------------------------------------------------------ plateau (SVG)
+  const svg = $('#plateau');
+  function construirePlateau() {
+    let h = `<defs><marker id="tete" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/></marker>
+      <marker id="fl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--wake)"/></marker></defs>`;
+    h += `<rect class="svg-chantier" x="8" y="6" width="624" height="46" rx="10"/><text class="svg-small" x="20" y="24">CHANTIER</text><text class="svg-small" x="20" y="40">et Machines égarées</text>`;
+    const vus = new Set();
+    for (const a in VOISINS) for (const b of VOISINS[a]) {
+      const k = Math.min(a, b) + '-' + Math.max(a, b); if (vus.has(k)) continue; vus.add(k);
+      const [x1, y1] = POS[a], [x2, y2] = POS[b];
+      h += `<line class="svg-link" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+    }
+    for (const a in FLECHE) {
+      const b = FLECHE[a]; if (!b) continue;
+      const [x1, y1] = POS[a], [x2, y2] = POS[b], dx = x2 - x1, dy = y2 - y1, d = Math.hypot(dx, dy);
+      const ux = dx / d, uy = dy / d, mx = x1 + dx / 2, my = y1 + dy / 2;
+      h += `<line class="svg-fleche" x1="${mx - ux * 14}" y1="${my - uy * 14}" x2="${mx + ux * 14}" y2="${my + uy * 14}" marker-end="url(#fl)"/>`;
+    }
+    for (let z = 1; z <= 7; z++) {
+      const [x, y] = POS[z];
+      h += `<g data-zone="${z}"><circle id="zc${z}" class="svg-zone d${ZONES[z].prof}" cx="${x}" cy="${y}" r="${R}"><title>${esc(nomZ(z))} (zone ${z})</title></circle>
+        <text class="svg-name" x="${x}" y="${y - 42}" text-anchor="middle">${z} · ${esc(nomZ(z))}</text></g>`;
+    }
+    h += `<g id="dyn"></g><g id="trace"></g><g id="machs"></g>`;
+    svg.innerHTML = h;
+    for (const m of N.MACHINES) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('id', 'm' + m.id); g.setAttribute('class', 'svg-mach');
+      g.innerHTML = `<rect x="0" y="0" width="104" height="21" rx="6"/><text x="6" y="14.5">${esc(m.nom)}</text><g class="orgs"></g>`;
+      $('#machs').appendChild(g);
+    }
+    svg.addEventListener('click', (ev) => {
+      const g = ev.target.closest && ev.target.closest('[data-zone]');
+      if (!g || !UI.pending) return;
+      const z = +g.getAttribute('data-zone');
+      const opts = UI.pending.req.options.filter((o) => o.zone === z && (UI.pending.req.type === 'placer'));
+      if (opts.length === 1) repondre(opts[0].id);
+    });
+  }
+
+  function renderPlateau() {
+    const P = UI.partie, E = P ? P.etat : null;
+    const f = E ? E.f : Object.fromEntries([1, 2, 3, 4, 5, 6, 7].map((z) => [z, ZONES[z].f]));
+    let h = '';
+    const cands = new Set(UI.pending && UI.pending.req.type === 'placer' ? UI.pending.req.options.map((o) => o.zone) : []);
+    for (let z = 1; z <= 7; z++) {
+      const c = $('#zc' + z);
+      c.setAttribute('class', `svg-zone d${ZONES[z].prof}${cands.has(z) ? ' cand' : ''}${UI.vise && UI.vise.cible === z ? ' cible' : ''}`);
+      const [x, y] = POS[z], tot = ZONES[z].f, reste = f[z];
+      const larg = tot * 12, x0 = x - larg / 2 + 6;
+      for (let i = 0; i < tot; i++) {
+        const cx = x0 + i * 12, cy = y - 22;
+        h += i < reste ? `<path class="svg-tree" d="M${cx},${cy - 9} L${cx + 5},${cy + 3} L${cx - 5},${cy + 3} Z"/>` : `<rect class="svg-stump" x="${cx - 3}" y="${cy - 1}" width="6" height="4" rx="1"/>`;
+      }
+      if (E && E.barres.includes(z)) h += `<circle class="svg-barre" cx="${x}" cy="${y}" r="${R + 5}"/><text class="svg-small" x="${x}" y="${y + R + 4}" text-anchor="middle" style="fill:var(--danger)">barrée</text>`;
+      if (E) {
+        const pions = [];
+        P.peuples.forEach((p) => E.pions[p].forEach((pz) => { if (pz === z) pions.push(p); }));
+        const n = pions.length, w = Math.min(15, 104 / Math.max(1, n));
+        pions.forEach((p, i) => {
+          const cx = x - ((n - 1) * w) / 2 + i * w;
+          h += `<circle cx="${cx}" cy="${y - 4}" r="6.5" fill="var(--p-${p})" stroke="var(--card)" stroke-width="1.5"><title>${esc(PEUPLES[p].nom)}</title></circle>`;
+        });
+      }
+    }
+    $('#dyn').innerHTML = h;
+    // trace de l'ordre en cours
+    let t = '';
+    if (UI.vise && UI.vise.type === 'abattre' && UI.vise.depuis) {
+      const [x1, y1] = POS[UI.vise.depuis], [x2, y2] = POS[UI.vise.cible];
+      if (UI.vise.depuis !== UI.vise.cible) {
+        const dx = x2 - x1, dy = y2 - y1, d = Math.hypot(dx, dy);
+        t += `<line class="svg-ordre" x1="${x1 + (dx / d) * 30}" y1="${y1 + (dy / d) * 30}" x2="${x2 - (dx / d) * 40}" y2="${y2 - (dy / d) * 40}"/>`;
+      }
+    } else if (UI.vise && UI.vise.type === 'entree') {
+      const [x2, y2] = POS[UI.vise.cible];
+      t += `<line class="svg-ordre" x1="${x2}" y1="52" x2="${x2}" y2="${y2 - R - 6}"/>`;
+    }
+    $('#trace').innerHTML = t;
+    // Machines
+    const parZone = {}; let nCh = 0;
+    for (const m of N.MACHINES) {
+      const g = $('#m' + m.id);
+      const mm = E ? E.mach.find((x) => x.id === m.id) : { etat: m.id <= 3 ? 'marche' : 'chantier', zone: m.id <= 3 ? m.entree : null, org: Object.fromEntries(m.organes.map((o) => [o, true])) };
+      let x, y;
+      if (mm.etat === 'marche' || mm.etat === 'hs') {
+        const i = (parZone[mm.zone] = (parZone[mm.zone] || 0) + 1) - 1;
+        x = POS[mm.zone][0] - 52; y = POS[mm.zone][1] + 10 + i * 24;
+      } else { x = 150 + nCh * 96; y = 18; nCh++; }
+      g.style.transform = `translate(${x}px,${y}px)`;
+      g.setAttribute('class', 'svg-mach' + (mm.etat === 'hs' || mm.etat === 'egaree' ? ' hs' : ''));
+      g.style.opacity = mm.etat === 'egaree' ? '.45' : '1';
+      const orgs = Object.keys(mm.org);
+      g.querySelector('.orgs').innerHTML = orgs.map((o, i) => `<circle class="svg-org${mm.org[o] ? '' : ' off'}" cx="${96 - (orgs.length - 1 - i) * 9}" cy="10.5" r="3.3"><title>${o}${mm.org[o] ? '' : ' neutralisé'}</title></circle>`).join('');
+      g.querySelector('text').textContent = m.nom + (mm.etat === 'hs' ? ' (HS)' : mm.etat === 'egaree' ? ' (égarée)' : '');
+      g.querySelector('rect').setAttribute('width', mm.etat === 'egaree' || mm.etat === 'hs' ? 120 : 104);
+    }
+  }
+
+  function renderPistes() {
+    const P = UI.partie, E = P ? P.etat : null;
+    let h = '';
+    for (let c = 2; c <= 12; c++) {
+      const t = E ? E.piste[c] : { k: 'tactique', nom: N.PISTE0[c] };
+      const [ab, cl] = t.k === 'esprit' ? ['Esprit', 'esp'] : ABR[t.nom];
+      h += `<div class="case ${cl}${c === 7 ? ' c7' : ''}${UI.pvise && UI.pvise.somme === c ? ' vise' : ''}" title="${esc(t.k === 'esprit' ? 'Esprit' : t.nom)} en ${c}"><span class="n">${c}</span>${ab}</div>`;
+    }
+    $('#piste').innerHTML = h;
+    h = '';
+    for (let c = 1; c <= 5; c++) {
+      const id = E ? E.pisteM[c] : c, m = E ? E.mach.find((x) => x.id === id) : { nom: N.MACHINES[c - 1].nom, etat: c <= 3 ? 'marche' : 'chantier' };
+      const cl = m.etat === 'hs' || m.etat === 'egaree' ? ' hs' : m.etat === 'chantier' ? ' ch' : '';
+      h += `<div class="case mach${cl}${UI.pvise && UI.pvise.caseM === c ? ' vise' : ''}" title="${esc(m.nom)} (${m.etat})"><span class="n">${c}${c === 1 ? ' · favori' : ''}</span>${esc(m.nom)}</div>`;
+    }
+    $('#pisteM').innerHTML = h;
+    // dés connus
+    let d = '';
+    if (E && E.des) {
+      for (const e of [1, 2, 3]) if (E.des[e]) d += `<span>Étape ${e}</span><span class="de${e <= 2 && E.etape < e ? ' p' : ''}">${E.des[e][0]}</span><span class="de${e <= 2 && E.etape < e ? ' p' : ''}">${E.des[e][1]}</span>`;
+    }
+    $('#des').innerHTML = d || '<span>Aucun dé lancé.</span>';
+    const dist = E ? P.distanceSommeil() : 6;
+    $('#dlbl').textContent = E && P.esprits().length ? `esprit de tête à ${dist} case${dist > 1 ? 's' : ''} du sommeil` : 'aucun esprit';
+  }
+
+  function renderStatus() {
+    const P = UI.partie;
+    if (!P) { $('#status').innerHTML = '<span>Préparation</span>'; return; }
+    const E = P.etat;
+    $('#status').innerHTML = `<span>Tour <b>${E.tour || '–'}</b>/${P.params.tours}</span><span>Étape <b>${E.etape || '–'}</b></span><span>Forêt <b>${P.foret()}</b>/21</span><span>Ordres par étape <b>${N.valeurTable(P.params.ordres_par_etape, P.peuples.length)}</b></span>`;
+  }
+
+  function renderJoueurs() {
+    const P = UI.partie, box = $('#players');
+    if (!P) {
+      const actifs = UI.cfg.sieges.filter((s) => s.actif);
+      box.innerHTML = actifs.map((s) => `<div class="pl"><span class="dot" style="background:var(--p-${s.peuple})"></span><span>${PEUPLES[s.peuple].nom} <span class="who">${s.type === 'humain' ? 'vous' : 'bot ' + PROFILS[s.profil].nom}</span></span><span class="small">${PEUPLES[s.peuple].pouvoir}</span></div>`).join('') || '<div class="small">Aucun peuple choisi.</div>';
+      return;
+    }
+    const E = P.etat, cur = UI.pending ? UI.pending.req.p : null;
+    box.innerHTML = P.ordre().map((p, i) => {
+      const s = P.siege(p), prog = E.prog[p] || [null, null, null];
+      const cartes = [1, 2, 3].map((e) => {
+        const m = prog[e - 1];
+        const vu = m && (e < E.etape || (e === E.etape && E.cartes.some((c) => c.p === p)) || P.etat.fin);
+        const cls = !m ? '' : vu ? (m === 'rever' ? 'r' : 'a') : '';
+        const lbl = !m ? '' : vu ? (m === 'rever' ? 'R' : 'A') : '?';
+        return `<i class="${cls}${E.etape === e && E.tour ? ' cur' : ''}" title="étape ${e}">${lbl}</i>`;
+      }).join('');
+      return `<div class="pl${cur === p ? ' actif' : ''}"><span class="dot" style="background:var(--p-${p})"></span>
+        <span>${i === 0 ? '<b>' : ''}${PEUPLES[p].nom}${i === 0 ? '</b> · 1er' : ''} <span class="who">${s.type === 'humain' ? 'vous' : 'bot ' + PROFILS[s.profil].nom} · main ${E.main[p]} · rêves ${E.reves[p]} · ${PEUPLES[p].pouvoir}</span></span>
+        <span class="cards">${cartes}</span></div>`;
+    }).join('');
+  }
+
+  // ------------------------------------------------------------ journal
+  function ligneJournal(ev) {
+    const d = el('div', { class: `jl k-${ev.k}${ev.k === 'ordre' ? (ev.ok ? ' ok' : ev.ok === false ? ' ko' : '') : ''}` });
+    let h = '';
+    if (ev.k === 'decision') {
+      const tag = ev.auto ? '<span class="tag auto">auto</span>' : ev.joueur === 'humain' ? '<span class="tag">vous</span>' : `<span class="tag bot">bot ${esc(PROFILS[ev.joueur] ? PROFILS[ev.joueur].nom : ev.joueur)}</span>`;
+      h = tag + esc(ev.txt);
+      if (ev.pourquoi && ev.joueur !== 'humain' && !ev.auto) {
+        h += ev.type === 'programme'
+          ? `<details class="why"><summary>raisonnement (révèle le programme : ${ev.prog.map((x) => x === 'rever' ? 'rêve' : x === 'agir' ? 'agit' : '—').join(' / ')})</summary>${esc(ev.pourquoi)}</details>`
+          : `<span class="why">${esc(ev.pourquoi)}</span>`;
+      }
+    } else h = esc(ev.txt);
+    d.innerHTML = h;
+    return d;
+  }
+  function renderJournal(complet) {
+    const j = $('#journal');
+    if (complet) { j.innerHTML = ''; if (UI.partie) UI.partie.ev.forEach((ev) => j.appendChild(ligneJournal(ev))); }
+    j.classList.toggle('nowhy', !$('#showWhy').checked);
+    j.querySelectorAll('.why').forEach((w) => { w.hidden = !$('#showWhy').checked; });
+  }
+  $('#showWhy').addEventListener('change', () => renderJournal(false));
+
+  // ------------------------------------------------------------ panneau « à faire »
+  function controles() {
+    const v = Object.entries(VITESSES).map(([k, x]) => `<option value="${k}"${k === UI.vitesse ? ' selected' : ''}>${x.nom}</option>`).join('');
+    return `<div class="btn-row"><label class="small" for="vit">Vitesse</label><select id="vit">${v}</select>
+      ${UI.vitesse === 'pas' && UI.next ? '<button class="btn" id="suivant">Suivant</button>' : ''}
+      ${UI.vitesse !== 'pas' && UI.mode === 'jeu' ? '<button class="btn sec" id="pause">Pause</button>' : ''}
+      ${UI.mode === 'jeu' ? '<button class="btn sec" id="abandon">Abandonner</button>' : ''}</div>`;
+  }
+  function brancherControles() {
+    const v = $('#vit'); if (v) v.addEventListener('change', () => { UI.vitesse = v.value; try { localStorage.setItem('noyau.vitesse', v.value); } catch (e) { /* rien */ } if (UI.vitesse !== 'pas' && UI.next) { const n = UI.next; UI.next = null; n(); } renderAsk(); });
+    const s = $('#suivant'); if (s) s.addEventListener('click', () => { const n = UI.next; UI.next = null; if (n) n(); });
+    const pz = $('#pause'); if (pz) pz.addEventListener('click', () => { UI.vitesse = 'pas'; renderAsk(); });
+    const a = $('#abandon'); if (a) a.addEventListener('click', () => { if (a.dataset.ok) { abandonner(); } else { a.dataset.ok = '1'; a.textContent = 'Confirmer l\'abandon'; } });
+  }
+
+  function renderAsk() {
+    const box = $('#ask');
+    if (UI.mode === 'setup') { renderSetup(box); return; }
+    if (UI.mode === 'fini') { renderFin(box); return; }
+    const pe = UI.pending;
+    if (!pe) {
+      const P = UI.partie, E = P.etat;
+      box.className = 'box ask';
+      box.innerHTML = `<div class="eyebrow">Le jeu avance tout seul</div><p class="ctx">${UI.vitesse === 'pas' ? 'Cliquez sur « Suivant » pour voir l\'événement suivant.' : 'Les bots jouent et la page applique les règles ; tout est écrit dans le journal.'} Tour ${E.tour || 0}, étape ${E.etape || '–'}.</p>${controles()}`;
+      brancherControles();
+      return;
+    }
+    const { req } = pe, p = req.p, P = UI.partie, E = P.etat;
+    box.className = 'box ask p-humain';
+    let h = `<div class="eyebrow" style="color:var(--p-${p})">${esc(PEUPLES[p].nom)} · à vous</div>`;
+    if (req.type === 'placer') {
+      h += `<h2>Posez un pion (${E.pions[p].length + 1} sur ${P.params.pions})</h2><p class="ctx">Cliquez une zone du plateau ou un bouton.</p><div class="opts">${req.options.map((o) => `<button class="opt" data-id="${o.id}">${esc(nomZ(o.zone))} <span class="small">· ${P.presence(o.zone)} pion${P.presence(o.zone) > 1 ? 's' : ''}</span></button>`).join('')}</div>`;
+    } else if (req.type === 'programme') {
+      h += programmeHTML(req);
+    } else if (req.type === 'action') {
+      h += actionHTML(req);
+    } else if (req.type === 'esprit') {
+      h += `<h2>Le Méchant rêve : quel esprit ?</h2><p class="ctx">Un même esprit bouge au plus ${P.params.avances_par_tour} fois par tour ; un nouvel esprit fait oublier la tuile du 12.</p><div class="opts">${req.options.map((o) => `<button class="opt" data-id="${o.id}">${esc(o.label)}</button>`).join('')}</div>`;
+    } else if (req.type === 'tromper') {
+      h += `<h2>Tromper le Méchant ?</h2><p class="ctx">L'ordre a ${req.ctx.ok ? '<b>réussi</b>' : '<b>échoué</b>'}. En le trompant, sa tactique apprend l'inverse.</p><div class="opts">${req.options.map((o) => `<button class="opt" data-id="${o.id}">${esc(o.label)}</button>`).join('')}</div>`;
+    }
+    if (req.type !== 'programme') h += `<div class="btn-row"><button class="btn sec" id="conseil">Que ferait le bot Lecteur ?</button></div><div id="conseilTxt"></div>`;
+    h += controles();
+    box.innerHTML = h;
+    box.querySelectorAll('.opt[data-id]').forEach((b) => b.addEventListener('click', () => repondre(b.dataset.id)));
+    const c = $('#conseil');
+    if (c) c.addEventListener('click', () => {
+      const r = B.decider(P, p, req.type, req.options, req.ctx || {});
+      $('#conseilTxt').innerHTML = `<div class="hint"><b>${esc(r.choix.label)}</b> : ${esc(r.pourquoi)}</div>`;
+    });
+    if (req.type === 'programme') brancherProgramme(req);
+    brancherControles();
+  }
+
+  function planTexte(e) {
+    const P = UI.partie, E = P.etat;
+    if (!E.des[e]) return '<span class="small">dés inconnus</span>';
+    return `<span class="small">${esc(P.decrirePlan(P.plan(E.des[e])))}</span>`;
+  }
+  function programmeHTML(req) {
+    const P = UI.partie, E = P.etat, p = req.p;
+    UI.prog = [null, null, null];
+    let h = `<h2>Programmez vos cartes</h2><p class="ctx">Main : <b>${E.main[p]}</b> carte${E.main[p] > 1 ? 's' : ''}. Au plus une carte par étape, au plus ${P.params.reves_par_tour} rêve par tour. Une carte qui agit revient en main ; une carte qui rêve est perdue, mais annule un ordre de son étape.</p><div class="prog">`;
+    for (const e of [1, 2, 3]) {
+      h += `<div class="prow"><span>Étape ${e}</span><div><div class="seg" data-e="${e}"><button data-v="" aria-pressed="true">Rien</button><button data-v="agir" aria-pressed="false">Agir</button><button class="r" data-v="rever" aria-pressed="false">Rêver</button></div>${planTexte(e)}</div></div>`;
+    }
+    h += `</div><div class="btn-row"><button class="btn" id="valider">Valider le programme</button><button class="btn sec" id="conseilProg">Que ferait le bot Lecteur ?</button></div><div id="conseilTxt"></div><p class="small" id="progMsg"></p>`;
+    return h;
+  }
+  function brancherProgramme(req) {
+    const P = UI.partie, E = P.etat, p = req.p;
+    const maj = () => {
+      const n = UI.prog.filter(Boolean).length, r = UI.prog.filter((x) => x === 'rever').length;
+      document.querySelectorAll('.seg[data-e]').forEach((s) => {
+        const e = +s.dataset.e;
+        s.querySelectorAll('button').forEach((b) => {
+          const v = b.dataset.v || null;
+          b.setAttribute('aria-pressed', String(UI.prog[e - 1] === v));
+          const ajoute = v && !UI.prog[e - 1];
+          b.disabled = (ajoute && n >= E.main[p]) || (v === 'rever' && UI.prog[e - 1] !== 'rever' && r >= P.params.reves_par_tour);
+        });
+      });
+      $('#progMsg').textContent = `${n} carte${n > 1 ? 's' : ''} posée${n > 1 ? 's' : ''}, dont ${r} en rêve.`;
+    };
+    document.querySelectorAll('.seg[data-e] button').forEach((b) => b.addEventListener('click', () => { const e = +b.parentNode.dataset.e; UI.prog[e - 1] = b.dataset.v || null; maj(); }));
+    $('#valider').addEventListener('click', () => repondre(UI.prog.slice()));
+    $('#conseilProg').addEventListener('click', () => {
+      const r = B.programmer(P, [p])[p];
+      $('#conseilTxt').innerHTML = `<div class="hint"><b>${r.prog.map((x, i) => `Étape ${i + 1} : ${x === 'rever' ? 'rêver' : x === 'agir' ? 'agir' : 'rien'}`).join(' · ')}</b><br>${esc(r.pourquoi.join(' '))}</div>`;
+    });
+    maj();
+  }
+  function actionHTML(req) {
+    const P = UI.partie, E = P.etat, e = E.etape, ctx = req.ctx || {};
+    let connu = '';
+    if (ctx.plans && ctx.plans.length) connu = ctx.plans.map((pl) => esc(P.decrirePlan(pl))).join(' ; ');
+    else if (E.des[e] && !(ctx.annules > 0)) connu = esc(P.decrirePlan(P.plan(E.des[e])));
+    const allies = E.decl.filter((d) => d.p !== req.p).map((d) => `${PEUPLES[d.p].nom} en ${nomZ(d.zone)}`);
+    let h = `<h2>Étape ${e} : que fait votre carte ?</h2><p class="ctx">${ctx.annule ? '<b>Tous les ordres de l\'étape sont annulés par un rêve.</b> ' : ctx.annules ? `<b>${ctx.annules} ordre${ctx.annules > 1 ? 's' : ''} annulé${ctx.annules > 1 ? 's' : ''} par un rêve.</b> ` : ''}${connu ? `Ordre connu : ${connu}.` : 'Les dés de cette étape ne sont pas encore connus.'}${allies.length ? `<br>Déjà joués : ${esc(allies.join(', '))}.` : ''}${req.p === 'reptiles' && ctx.plans ? '<br>Vous avez attendu les dés.' : ''}</p>`;
+    const groupes = [['barrer', 'Barrer'], ['saboter', 'Saboter'], ['aller', 'Aller']];
+    for (const [k, nom] of groupes) {
+      const o = req.options.filter((x) => x.kind === k);
+      if (!o.length) continue;
+      h += `<div class="grp"><span>${nom}</span><div class="opts">${o.map((x) => `<button class="opt k-${k}" data-id="${x.id}">${esc(x.label.replace(/^(Barrer|Saboter|Aller de) /, ''))}</button>`).join('')}</div></div>`;
+    }
+    return h;
+  }
+
+  function repondre(val) {
+    const pe = UI.pending; if (!pe) return;
+    UI.pending = null;
+    pe.res(val);
+    renderTout(false);
+  }
+
+  // ------------------------------------------------------------ préparation
+  function renderSetup(box) {
+    box.className = 'box ask';
+    const c = UI.cfg;
+    let h = `<div class="eyebrow">Nouvelle partie</div><h2>Qui est à la table ?</h2><p class="ctx">De 2 à 6 peuples. Choisissez « vous » pour les peuples que vous jouez (vous pouvez les jouer tous), ou un profil de bot.</p><div class="setup">`;
+    c.sieges.forEach((s, i) => {
+      h += `<div class="seat"><label><input type="checkbox" data-i="${i}" class="actif"${s.actif ? ' checked' : ''}><span class="dot" style="width:12px;height:12px;border-radius:50%;background:var(--p-${s.peuple})"></span></label>
+        <div><div>${PEUPLES[s.peuple].nom}</div><div class="pw">${PEUPLES[s.peuple].pouvoir} : ${esc(PEUPLES[s.peuple].court)}</div></div>
+        <select data-i="${i}" class="qui" aria-label="Qui joue les ${PEUPLES[s.peuple].nom}">${['humain', 'lecteur', 'defenseur', 'reveur', 'hasard'].map((k) => `<option value="${k}"${(s.type === 'humain' ? 'humain' : s.profil) === k ? ' selected' : ''}>${k === 'humain' ? 'Vous' : 'Bot ' + PROFILS[k].nom}</option>`).join('')}</select></div>`;
+    });
+    h += `</div><details class="reg"><summary>Réglages d'étude</summary><div class="params" style="margin-top:8px">${formParams(c.params, 'p')}</div></details>
+      <div class="btn-row"><label class="small" for="graine">Graine</label><input type="text" id="graine" placeholder="au hasard" value="${esc(c.graine)}" style="width:9em"><button class="btn" id="go">Commencer la partie</button><span class="small" id="setupMsg"></span></div>${controles()}`;
+    box.innerHTML = h;
+    box.querySelectorAll('.actif').forEach((x) => x.addEventListener('change', () => { c.sieges[+x.dataset.i].actif = x.checked; renderJoueurs(); }));
+    box.querySelectorAll('.qui').forEach((x) => x.addEventListener('change', () => { const s = c.sieges[+x.dataset.i]; if (x.value === 'humain') s.type = 'humain'; else { s.type = 'bot'; s.profil = x.value; } renderJoueurs(); }));
+    brancherParams(box, c.params, 'p');
+    $('#graine').addEventListener('input', (e) => { c.graine = e.target.value.trim(); });
+    $('#go').addEventListener('click', () => {
+      const n = c.sieges.filter((s) => s.actif).length;
+      if (n < 2) { $('#setupMsg').textContent = 'Il faut au moins deux peuples.'; return; }
+      lancerPartie();
+    });
+    brancherControles();
+  }
+  const CHAMPS = [
+    ['tours', 'Tours', [4, 5, 6, 7, 8]], ['main', 'Cartes en main', [3, 4, 5]], ['pions', 'Pions de présence', [2, 3, 4]],
+    ['machines_depart', 'Machines en jeu au départ', [2, 3, 4, 5]],
+    ['ordres_par_etape', 'Ordres par étape', [['n/2', 'moitié des joueurs'], [1, '1'], [2, '2'], ['n-1', 'joueurs moins 1']]],
+    ['avances_par_tour', 'Avances d\'un esprit par tour', [1, 2, [9, 'sans limite']]], ['reves_par_tour', 'Rêves par joueur et par tour', [1, 2]],
+    ['barrage', 'Barrage', [['entrer_abattre', 'entrer et abattre'], ['complet', 'complet (aussi sortir)']]],
+    ['reve_annule', 'Le rêve annule un ordre', [[true, 'oui'], [false, 'non']]], ['presage', 'Présage', [[true, 'oui'], [false, 'non']]],
+  ];
+  function formParams(params, pre) {
+    return CHAMPS.map(([k, nom, vals]) => `<label>${nom}<select id="${pre}-${k}" data-k="${k}">${vals.map((v) => { const [val, lib] = Array.isArray(v) ? v : [v, String(v)]; return `<option value='${JSON.stringify(val)}'${JSON.stringify(params[k]) === JSON.stringify(val) ? ' selected' : ''}>${lib}${JSON.stringify(N.PARAMS[k]) === JSON.stringify(val) ? ' (défaut)' : ''}</option>`; }).join('')}</select></label>`).join('');
+  }
+  function brancherParams(box, params, pre) {
+    box.querySelectorAll(`select[id^="${pre}-"]`).forEach((s) => s.addEventListener('change', () => { params[s.dataset.k] = JSON.parse(s.value); }));
+  }
+
+  // ------------------------------------------------------------ déroulement
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let compteur = 0;
+  const io = {
+    async show(ev) {
+      if (UI.abort) throw ABANDON;
+      if (ev.k === 'des' || ev.k === 'presage' || ev.k === 'voir' || ev.k === 'annule') { UI.vise = ev.plan || null; UI.pvise = ev.plan || null; }
+      if (ev.k === 'revele' || ev.k === 'phase') { UI.vise = null; UI.pvise = null; }
+      $('#journal').appendChild(ligneJournal(ev));
+      renderJournal(false);
+      const j = $('#journal'); j.scrollTop = j.scrollHeight;
+      const majeur = MAJEURS.has(ev.k) || (ev.k === 'decision' && ev.joueur !== 'humain' && ev.type !== 'programme');
+      if (UI.vitesse === 'instant') { if (++compteur % 40 === 0) { renderTout(false); await sleep(0); } }
+      else {
+        renderTout(false);
+        if (majeur) {
+          if (UI.vitesse === 'pas') { await new Promise((r) => { UI.next = r; renderAsk(); }); }
+          else await sleep(VITESSES[UI.vitesse].ms * (ev.k === 'decision' || ev.k === 'pion' ? 0.6 : 1));
+        }
+      }
+      if (UI.abort) throw ABANDON;
+      if (ev.k === 'ordre') { UI.vise = null; }
+    },
+    ask(req) {
+      if (UI.abort) return Promise.reject(ABANDON);
+      return new Promise((res, rej) => { UI.pending = { req, res, rej }; renderTout(false); $('#ask').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
+    },
+  };
+
+  async function lancerPartie(graineForcee) {
+    const c = UI.cfg;
+    const sieges = c.sieges.filter((s) => s.actif).map((s) => ({ peuple: s.peuple, type: s.type, profil: s.type === 'humain' ? 'lecteur' : s.profil }));
+    const g = graineForcee != null ? graineForcee : (c.graine && !isNaN(+c.graine) ? +c.graine : undefined);
+    UI.partie = new N.Partie({ sieges, params: Object.assign({}, c.params), graine: g }, io);
+    UI.mode = 'jeu'; UI.abort = false; UI.pending = null; UI.next = null; UI.vise = null; UI.pvise = null; UI.enregistre = false;
+    renderJournal(true); renderTout(true);
+    try {
+      await UI.partie.jouer();
+      UI.mode = 'fini';
+      await enregistrer(UI.partie, 'terminée');
+    } catch (e) {
+      if (e !== ABANDON) { console.error(e); toast('Erreur du moteur : ' + e.message); }
+      UI.mode = 'fini';
+      if (UI.partie && UI.partie.ev.length > 5) await enregistrer(UI.partie, e === ABANDON ? 'abandonnée' : 'erreur');
+    }
+    renderTout(false);
+  }
+  function abandonner() {
+    UI.abort = true;
+    if (UI.pending) { const p = UI.pending; UI.pending = null; p.rej(ABANDON); }
+    if (UI.next) { const n = UI.next; UI.next = null; n(); }
+  }
+
+  function renderFin(box) {
+    const P = UI.partie, r = P.resume();
+    box.className = 'box ask';
+    box.innerHTML = `<div class="eyebrow">Partie ${UI.derniere ? esc(UI.derniere.statut) : 'terminée'}</div>
+      <h2>${r.fin.type === 'sommeil' ? `Le Méchant s'endort au tour ${r.fin.tour}` : r.fin.type === 'nuit' ? 'La nuit tombe' : 'Partie interrompue'}</h2>
+      <p class="ctx">Forêt restante : <b>${r.foret}</b> sur 21 (<b>${fr(r.pct)} %</b>). Ordres : ${r.stats.ordres} exécutés, ${r.stats.reussis} réussis, ${r.stats.annules_par_reve} annulés par un rêve, ${r.stats.reves_aux_des} tombés sur un esprit. Rêves joués : ${r.stats.reves_cartes}. Tir à la corde : ${r.stats.tir_a_la_corde}. Machines hors service : ${r.stats.machines_hs + r.stats.machines_egarees}.</p>
+      <p class="small">${UI.derniere && UI.derniere.ok ? 'Partie enregistrée (onglet « Parties enregistrées »).' : UI.db ? 'Enregistrement en cours ou impossible.' : 'Enregistrement indisponible dans cette vue : utilisez l\'export.'} Graine ${r.graine}.</p>
+      <div class="btn-row"><button class="btn" id="rejouer">Rejouer la même graine</button><button class="btn sec" id="nouvelle">Nouvelle partie</button><button class="btn sec" id="expUne">Exporter (JSON)</button></div>`;
+    $('#rejouer').addEventListener('click', () => lancerPartie(r.graine));
+    $('#nouvelle').addEventListener('click', () => { UI.mode = 'setup'; UI.partie = null; renderJournal(true); renderTout(true); });
+    $('#expUne').addEventListener('click', () => exporter(`noyau-partie-${r.graine}.json`, enregistrement(P, UI.derniere ? UI.derniere.statut : 'terminée')));
+  }
+
+  function renderTout() { renderPlateau(); renderPistes(); renderStatus(); renderJoueurs(); renderAsk(); }
+
+  // ------------------------------------------------------------ enregistrement
+  function compacter(ev) {
+    const o = { i: ev.i, k: ev.k, t: ev.t, e: ev.e, txt: ev.txt };
+    for (const k of ['p', 'type', 'choix', 'label', 'pourquoi', 'joueur', 'auto', 'prog', 'ok', 'zone', 'de', 'vers', 'machine', 'j', 'oubli', 'source']) if (ev[k] !== undefined && ev[k] !== '') o[k] = ev[k];
+    if (ev.k === 'decision' && ev.type !== 'placer' && ev.options) o.options = ev.options;
+    if (ev.plan) { const p = ev.plan; o.plan = { des: p.des, somme: p.somme, ecart: p.ecart, machine: p.machine, tactique: p.tactique, type: p.type, cible: p.cible, depuis: p.depuis }; }
+    if (ev.cartes) o.cartes = ev.cartes;
+    return o;
+  }
+  function enregistrement(P, statut) {
+    const r = P.resume(), date = new Date().toISOString();
+    let journal = P.ev.map(compacter);
+    let rec = { id: `p-${date.replace(/[^0-9]/g, '').slice(0, 14)}-${r.graine}`, quoi: 'partie', version: r.version, date, statut, graine: r.graine,
+      params: r.params, sieges: r.sieges, fin: r.fin, foret: r.foret, pct: r.pct, stats: r.stats, reves: r.reves, main_finale: r.main_finale, decisions: r.decisions, journal };
+    if (JSON.stringify(rec).length > 240000) { rec.journal = journal.map((x) => { const y = Object.assign({}, x); delete y.options; return y; }); rec.allege = true; }
+    return rec;
+  }
+  async function enregistrer(P, statut) {
+    const rec = enregistrement(P, statut);
+    UI.derniere = { statut, ok: false };
+    UI.session.unshift(rec);
+    if (!UI.db) { renderArchives(); return; }
+    try {
+      await UI.db.collection('parties').doc(rec.id).set(rec);
+      await UI.db.collection('index').doc(rec.id).set(indexDe(rec));
+      UI.derniere.ok = true;
+      toast('Partie enregistrée.');
+    } catch (e) { toast('Enregistrement impossible : ' + (e.message || e.code)); }
+    renderArchives();
+  }
+  function indexDe(rec) {
+    if (rec.quoi === 'serie') return { quoi: 'serie', date: rec.date, version: rec.version, titre: rec.titre, parties: rec.lignes.length, resume: rec.resume };
+    return { quoi: 'partie', date: rec.date, version: rec.version, statut: rec.statut, graine: rec.graine, pct: rec.pct, fin: rec.fin,
+      table: rec.sieges.map((s) => s.peuple + ':' + (s.type === 'humain' ? 'humain' : s.profil)).join(','), reves: rec.stats.reves_cartes };
+  }
+  async function exporter(nom, obj) {
+    if (!UI.dl) { toast('Export indisponible dans cette vue.'); return; }
+    try { await UI.dl.save({ filename: nom, data: JSON.stringify(obj, null, 1) }); }
+    catch (e) { if (e && e.code !== 'declined') toast('Export impossible : ' + (e.message || e.code)); }
+  }
+
+  function renderArchives() {
+    const box = $('#saved');
+    $('#dbState').textContent = UI.db
+      ? 'Chaque partie terminée ou abandonnée est enregistrée avec tout son journal : réglages, graine, décisions et raisons des bots, dés, ordres. Les séries de parties aussi. Claude peut les relire pour les analyser.'
+      : 'L\'enregistrement partagé n\'est pas disponible dans cette vue (il faut être connecté à claude.ai). Les parties de cette session restent listées ici et peuvent être exportées.';
+    const lignes = UI.db ? UI.index : UI.session.map((r) => Object.assign({ id: r.id }, indexDe(r)));
+    if (!lignes.length) { box.innerHTML = '<div class="empty">Aucune partie enregistrée pour l\'instant. Jouez une partie dans l\'onglet « Partie », ou lancez une série de parties : elles apparaîtront ici.</div>'; return; }
+    box.innerHTML = lignes.map((x) => x.quoi === 'serie'
+      ? `<div class="sv"><div>Série : ${esc(x.titre)}<div class="m">${new Date(x.date).toLocaleString('fr-FR')} · ${x.parties} parties · ${esc(x.version)}</div></div><button class="btn sec" data-id="${esc(x.id)}" data-c="series">Exporter</button></div>`
+      : `<div class="sv"><div>${fr(x.pct)} % de forêt · ${x.fin && x.fin.type === 'sommeil' ? 'sommeil au tour ' + x.fin.tour : x.fin ? x.fin.type : ''} · ${esc(x.statut)}<div class="m">${new Date(x.date).toLocaleString('fr-FR')} · ${esc(String(x.table).replace(/,/g, ', '))} · graine ${x.graine} · ${x.reves} rêves</div></div><button class="btn sec" data-id="${esc(x.id)}" data-c="parties">Exporter</button></div>`).join('');
+    box.querySelectorAll('button[data-id]').forEach((b) => b.addEventListener('click', async () => {
+      const loc = UI.session.find((r) => r.id === b.dataset.id);
+      let rec = loc;
+      if (!rec && UI.db) { try { const s = await UI.db.collection(b.dataset.c).doc(b.dataset.id).get(); rec = s.exists ? s.data() : null; } catch (e) { rec = null; } }
+      if (rec) exporter(`noyau-${b.dataset.id}.json`, rec); else toast('Document introuvable.');
+    }));
+  }
+  $('#expAll').addEventListener('click', async () => {
+    let tout = UI.session.slice();
+    if (UI.db) {
+      try {
+        const [pa, se] = await Promise.all([UI.db.collection('parties').get(), UI.db.collection('series').get()]);
+        tout = pa.docs.map((d) => d.data()).concat(se.docs.map((d) => d.data()));
+      } catch (e) { toast('Lecture impossible : ' + (e.message || e.code)); }
+    }
+    if (!tout.length) { toast('Rien à exporter pour l\'instant.'); return; }
+    exporter('noyau-parties.json', { version: N.VERSION, exporte_le: new Date().toISOString(), documents: tout });
+  });
+
+  // ------------------------------------------------------------ séries
+  const SERIE = { tables: 'toutes', parties: 10, profils: { lecteur: true, defenseur: true, reveur: true, hasard: false }, graine: 1000, params: Object.assign({}, N.PARAMS) };
+  function renderSerieForm() {
+    const f = $('#serieForm');
+    f.innerHTML = `<label>Tables<select id="s-tables"><option value="toutes">toutes les compositions de 2 à 6 (30 tables)</option><option value="2">duos (6 tables)</option><option value="3">trios (6)</option><option value="4">4 joueurs (6)</option><option value="5">5 joueurs (6)</option><option value="6">la table de six</option><option value="choisie">la table de l'onglet Partie</option></select></label>
+      <label>Parties par table<select id="s-parties">${[4, 10, 20, 40].map((n) => `<option${n === SERIE.parties ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+      <label>Première graine<input type="number" id="s-graine" value="${SERIE.graine}"></label>
+      <fieldset style="border:0;padding:0;margin:0;display:grid;gap:4px"><legend class="small" style="font-weight:700">Profils comparés</legend>${Object.keys(PROFILS).map((k) => `<label style="display:flex;gap:6px;align-items:center;font:600 14px var(--f-ui);color:var(--ink)"><input type="checkbox" data-pr="${k}"${SERIE.profils[k] ? ' checked' : ''}> ${PROFILS[k].nom} <span class="small">${esc(PROFILS[k].texte)}</span></label>`).join('')}</fieldset>
+      <details class="reg" style="grid-column:1/-1"><summary>Réglages d'étude de la série</summary><div class="params" style="margin-top:8px">${formParams(SERIE.params, 's')}</div></details>`;
+    $('#s-tables').value = SERIE.tables;
+    $('#s-tables').addEventListener('change', (e) => { SERIE.tables = e.target.value; });
+    $('#s-parties').addEventListener('change', (e) => { SERIE.parties = +e.target.value; });
+    $('#s-graine').addEventListener('change', (e) => { SERIE.graine = +e.target.value || 0; });
+    f.querySelectorAll('[data-pr]').forEach((x) => x.addEventListener('change', () => { SERIE.profils[x.dataset.pr] = x.checked; }));
+    brancherParams(f, SERIE.params, 's');
+  }
+  function tablesSerie() {
+    const PEU = ORDRE_PEUPLES, out = [];
+    if (SERIE.tables === 'choisie') { const t = UI.cfg.sieges.filter((s) => s.actif).map((s) => s.peuple); return t.length >= 2 ? [t] : []; }
+    const tailles = SERIE.tables === 'toutes' ? [2, 3, 4, 5, 6] : [+SERIE.tables];
+    for (const n of tailles) {
+      if (n === 6) { out.push(PEU.slice()); continue; }
+      for (let k = 0; k < 6; k++) out.push(PEU.slice(k).concat(PEU.slice(0, k)).slice(0, n));
+    }
+    return out;
+  }
+  $('#runSerie').addEventListener('click', async () => {
+    const btn = $('#runSerie'), profils = Object.keys(SERIE.profils).filter((k) => SERIE.profils[k]), tables = tablesSerie();
+    if (!profils.length || !tables.length) { $('#serieProg').textContent = 'Choisissez au moins un profil et une table.'; return; }
+    btn.disabled = true;
+    const total = profils.length * tables.length * SERIE.parties, lignes = [];
+    let fait = 0;
+    for (const pr of profils) for (const t of tables) for (let g = 0; g < SERIE.parties; g++) {
+      const pa = new N.Partie({ sieges: t.map((p) => ({ peuple: p, type: 'bot', profil: pr })), params: Object.assign({}, SERIE.params), graine: SERIE.graine + g }, {});
+      const r = await pa.jouer();
+      lignes.push([pr, t.join('+'), SERIE.graine + g, r.pct, r.fin.type, r.fin.tour, r.stats.reves_cartes, r.stats.annules_par_reve, r.stats.reussis, r.stats.ordres, r.stats.tir_a_la_corde, r.stats.sabotages]);
+      if (++fait % 25 === 0) { $('#serieProg').textContent = `${fait} parties sur ${total}…`; await sleep(0); }
+    }
+    $('#serieProg').textContent = `${total} parties jouées.`;
+    btn.disabled = false;
+    const res = analyserSerie(lignes, profils);
+    renderSerieRes(res, lignes);
+    const date = new Date().toISOString();
+    const rec = { id: `s-${date.replace(/[^0-9]/g, '').slice(0, 14)}`, quoi: 'serie', version: N.VERSION, date,
+      titre: `${profils.map((k) => PROFILS[k].nom).join(', ')} · ${tables.length} table${tables.length > 1 ? 's' : ''} × ${SERIE.parties}`,
+      params: SERIE.params, graine: SERIE.graine, tables: tables.map((t) => t.join('+')),
+      colonnes: ['profil', 'table', 'graine', 'foret_pct', 'fin', 'tour_fin', 'reves', 'annules_par_reve', 'ordres_reussis', 'ordres', 'tir_a_la_corde', 'sabotages'],
+      lignes: lignes.slice(0, 3500), resume: res.resume };
+    UI.session.unshift(rec);
+    if (UI.db) {
+      try { await UI.db.collection('series').doc(rec.id).set(rec); await UI.db.collection('index').doc(rec.id).set(indexDe(rec)); toast('Série enregistrée.'); }
+      catch (e) { toast('Enregistrement impossible : ' + (e.message || e.code)); }
+    }
+    UI.derniereSerie = rec;
+  });
+  function analyserSerie(lignes, profils) {
+    const moy = (a) => a.reduce((x, y) => x + y, 0) / (a.length || 1);
+    const par = {};
+    for (const pr of profils) {
+      const L = lignes.filter((l) => l[0] === pr);
+      const tailles = {};
+      for (let n = 2; n <= 6; n++) { const x = L.filter((l) => l[1].split('+').length === n); if (x.length) tailles[n] = moy(x.map((l) => l[3])); }
+      par[pr] = { n: L.length, foret: moy(L.map((l) => l[3])), sommeil: L.filter((l) => l[4] === 'sommeil').length / (L.length || 1), reves: moy(L.map((l) => l[6])), annules: moy(L.map((l) => l[7])), reussis: moy(L.map((l) => l[8])), tir: moy(L.map((l) => l[10])), tailles };
+    }
+    // écart apparié Lecteur − meilleure stratégie fixe (Défenseur, Rêveur)
+    let juger = null;
+    const fixes = ['defenseur', 'reveur'].filter((k) => profils.includes(k));
+    if (profils.includes('lecteur') && fixes.length) {
+      const best = fixes.reduce((a, b) => (par[a].foret >= par[b].foret ? a : b));
+      const cle = (l) => l[1] + '|' + l[2];
+      const ref = new Map(lignes.filter((l) => l[0] === best).map((l) => [cle(l), l[3]]));
+      const d = lignes.filter((l) => l[0] === 'lecteur' && ref.has(cle(l))).map((l) => l[3] - ref.get(cle(l)));
+      const m = moy(d), sd = Math.sqrt(moy(d.map((x) => (x - m) ** 2)) * d.length / Math.max(1, d.length - 1)), ic = 1.96 * sd / Math.sqrt(d.length || 1);
+      juger = { contre: best, ecart: m, ic, n: d.length };
+    }
+    return { par, juger, resume: { profils: Object.fromEntries(Object.entries(par).map(([k, v]) => [k, { foret: +v.foret.toFixed(1), sommeil: +(v.sommeil * 100).toFixed(0), reves: +v.reves.toFixed(2) }])), juger: juger ? { contre: juger.contre, ecart: +juger.ecart.toFixed(1), ic95: +juger.ic.toFixed(1) } : null } };
+  }
+  function renderSerieRes(res, lignes) {
+    const f1 = (x) => x.toFixed(1).replace('.', ',');
+    const pr = Object.keys(res.par), max = Math.max(...pr.map((k) => res.par[k].foret));
+    let h = `<div class="eyebrow">Résultats de la série (indices : des bots simples)</div>`;
+    if (res.juger) {
+      const j = res.juger, sur = Math.abs(j.ecart) > j.ic;
+      h += `<div class="verdict${j.ecart >= 5 && sur ? '' : ' warn'}">Juger rapporte <b>${j.ecart >= 0 ? '+' : ''}${f1(j.ecart)} points</b> de forêt (± ${f1(j.ic)}, ${j.n} paires) par rapport à la meilleure stratégie fixe, « ${PROFILS[j.contre].nom} ». ${j.ecart >= 5 && sur ? 'Le choix rêver ou défendre a de l\'enjeu pour ces bots.' : sur ? 'L\'écart est réel mais sous le seuil de 5 points.' : 'L\'écart n\'est pas distinguable du hasard.'}</div>`;
+    }
+    h += `<div class="tw"><table class="res num"><thead><tr><th>Profil</th><th>Forêt</th><th></th><th>2 j.</th><th>3 j.</th><th>4 j.</th><th>5 j.</th><th>6 j.</th><th>Sommeil</th><th>Rêves</th><th>Annulés</th><th>Tir à la corde</th></tr></thead><tbody>`;
+    for (const k of pr) {
+      const v = res.par[k];
+      h += `<tr class="${v.foret === max ? 'best' : ''}"><td>${PROFILS[k].nom}</td><td>${f1(v.foret)} %</td><td style="min-width:70px"><div class="bar" style="width:${Math.max(2, v.foret * 0.7)}px"></div></td>${[2, 3, 4, 5, 6].map((n) => `<td>${v.tailles[n] != null ? f1(v.tailles[n]) : '–'}</td>`).join('')}<td>${Math.round(v.sommeil * 100)} %</td><td>${f1(v.reves)}</td><td>${f1(v.annules)}</td><td>${f1(v.tir)}</td></tr>`;
+    }
+    h += `</tbody></table></div><p class="small">Forêt : moyenne de la forêt restante, en % des 21 forêts. Rêves et annulés : par partie. Les mêmes tables et graines sont jouées par chaque profil.</p><div class="btn-row"><button class="btn sec" id="expSerie">Exporter la série (JSON)</button></div>`;
+    $('#serieRes').innerHTML = h;
+    $('#expSerie').addEventListener('click', () => exporter(`noyau-serie-${Date.now()}.json`, UI.derniereSerie || { lignes }));
+  }
+
+  // ------------------------------------------------------------ règles (Markdown léger)
+  function md(src) {
+    const inl = (t) => esc(t).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\*([^*]+)\*/g, '<i>$1</i>');
+    const L = src.split('\n'), out = [];
+    let i = 0;
+    while (i < L.length) {
+      const l = L[i];
+      if (/^#\s/.test(l)) { out.push(`<h2>${inl(l.slice(2))}</h2>`); i++; continue; }
+      if (/^##\s/.test(l)) { out.push(`<h2>${inl(l.slice(3))}</h2>`); i++; continue; }
+      if (/^###\s/.test(l)) { out.push(`<h3>${inl(l.slice(4))}</h3>`); i++; continue; }
+      if (/^\|/.test(l)) {
+        const rows = []; while (i < L.length && /^\|/.test(L[i])) { rows.push(L[i]); i++; }
+        const cells = (r) => r.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+        let t = '<div class="tw"><table><thead><tr>' + cells(rows[0]).map((c) => `<th>${inl(c)}</th>`).join('') + '</tr></thead><tbody>';
+        rows.slice(2).forEach((r) => { t += '<tr>' + cells(r).map((c) => `<td>${inl(c)}</td>`).join('') + '</tr>'; });
+        out.push(t + '</tbody></table></div>'); continue;
+      }
+      if (/^\s*(-|\d+\.)\s/.test(l)) {
+        const ol = /^\s*\d+\./.test(l), items = [];
+        while (i < L.length && /^\s*(-|\d+\.)\s/.test(L[i])) { items.push(L[i].replace(/^\s*(-|\d+\.)\s/, '')); i++; }
+        out.push(`<${ol ? 'ol' : 'ul'}>${items.map((x) => `<li>${inl(x)}</li>`).join('')}</${ol ? 'ol' : 'ul'}>`); continue;
+      }
+      if (!l.trim()) { i++; continue; }
+      const para = []; while (i < L.length && L[i].trim() && !/^(#|\||\s*-\s|\s*\d+\.\s)/.test(L[i])) { para.push(L[i]); i++; }
+      out.push(`<p>${inl(para.join(' '))}</p>`);
+    }
+    return out.join('\n');
+  }
+  $('#regles').innerHTML = md(window.REGLES_NOYAU || 'Règles indisponibles.');
+
+  // ------------------------------------------------------------ capacités (enregistrement partagé, export)
+  if (window.claude && window.claude.use) {
+    window.claude.use('db').then((db) => {
+      UI.db = db;
+      if (!db) { renderArchives(); return; }
+      db.collection('index').orderBy('date', 'desc').limit(200).onSnapshot((snap) => {
+        UI.index = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
+        renderArchives();
+      }, (e) => { $('#dbState').textContent = 'Lecture des parties impossible : ' + (e.message || e.code); });
+    }).catch(() => renderArchives());
+    window.claude.use('downloads').then((d) => { UI.dl = d; }).catch(() => {});
+  }
+
+  construirePlateau();
+  renderSerieForm();
+  renderJournal(true);
+  renderTout(true);
+  renderArchives();
+})();
+</script>
