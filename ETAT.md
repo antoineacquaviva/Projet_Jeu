@@ -297,6 +297,7 @@ Durées de référence, mesurées de la création du lancement à la fin de la d
 
 | Lancement | Contenu | Lots | Durée totale | Lot le plus lent | Statut |
 |---|---|---|---|---|---|
+| Placement 7 (run 38798736849) | **placement_kit** : campagne 2, le kit par joueur de 2 à 6 joueurs, 119 variantes × 64 parties × 9 bots (≈ 7 600 tâches) | 20 | estimée 15 à 30 min | – | lancé le 15 oct. à 22:02 ; à lire (section 5, P0 bis, étape 5) |
 | Batterie 1 | batterie de la phase 1 complète, glouton, 96 200 parties | 16 | 2,5 min | 1,8 min | réussi |
 | Campagne 7 | coordination_mc, v2 | 20 | 47,2 min | 27,6 min | réussi (a attendu la 6) |
 | Campagne 13 | v2_options_mc, 16 variantes, MC 64 qui rêve, 960 parties | 20 | 82 min | 17 min | fusion annulée, relancée : réussi ; traité (section 7) |

@@ -1,0 +1,292 @@
+{
+ "nom": "placement_kit_confirmation",
+ "description": "Confirmation de la campagne 2 (15 oct.) : les trois réglages du kit les plus robustes de 2 à 6 joueurs (score minimal sur J), et le kit par défaut, à 160 parties appariées (graines neuves).",
+ "type": "liste",
+ "graine": 82,
+ "parties": 160,
+ "mechant": "hasard",
+ "bots": {
+  "sentinelle": "sentinelle",
+  "marquage": "marquage",
+  "regroupement": "regroupement",
+  "reflexe": "reflexe",
+  "glouton": "glouton",
+  "glouton_aveugle": {
+   "type": "glouton",
+   "params": {
+    "aveugle": true
+   }
+  },
+  "glouton_immobile": {
+   "type": "glouton",
+   "params": {
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  },
+  "mc": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3
+   }
+  },
+  "mc_immobile": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3,
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  }
+ },
+ "variantes": {
+  "J2_M+2_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 2,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 6,
+   "k": 2,
+   "machines": 4,
+   "n": 4,
+   "annonces": 4,
+   "menaces_par_machine": 1
+  },
+  "J2_M+1_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 2,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 6,
+   "k": 2,
+   "machines": 3,
+   "n": 3,
+   "annonces": 3,
+   "menaces_par_machine": 1
+  },
+  "J2_M+1_q1_t3x3_i2": {
+   "plateau": "couronne",
+   "joueurs": 2,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 4,
+   "k": 2,
+   "machines": 3,
+   "n": 3,
+   "annonces": 3,
+   "menaces_par_machine": 1
+  },
+  "J2_M+1_q1_t3x4_i2": {
+   "plateau": "couronne",
+   "joueurs": 2,
+   "tuile_l": 3,
+   "tuile_p": 4,
+   "individus": 4,
+   "k": 2,
+   "machines": 3,
+   "n": 3,
+   "annonces": 3,
+   "menaces_par_machine": 1
+  },
+  "J3_M+2_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 3,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 9,
+   "k": 3,
+   "machines": 5,
+   "n": 5,
+   "annonces": 5,
+   "menaces_par_machine": 1
+  },
+  "J3_M+1_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 3,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 9,
+   "k": 3,
+   "machines": 4,
+   "n": 4,
+   "annonces": 4,
+   "menaces_par_machine": 1
+  },
+  "J3_M+1_q1_t3x3_i2": {
+   "plateau": "couronne",
+   "joueurs": 3,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 6,
+   "k": 3,
+   "machines": 4,
+   "n": 4,
+   "annonces": 4,
+   "menaces_par_machine": 1
+  },
+  "J3_M+1_q1_t3x4_i2": {
+   "plateau": "couronne",
+   "joueurs": 3,
+   "tuile_l": 3,
+   "tuile_p": 4,
+   "individus": 6,
+   "k": 3,
+   "machines": 4,
+   "n": 4,
+   "annonces": 4,
+   "menaces_par_machine": 1
+  },
+  "J4_M+2_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 4,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 12,
+   "k": 4,
+   "machines": 6,
+   "n": 6,
+   "annonces": 6,
+   "menaces_par_machine": 1
+  },
+  "J4_M+1_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 4,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 12,
+   "k": 4,
+   "machines": 5,
+   "n": 5,
+   "annonces": 5,
+   "menaces_par_machine": 1
+  },
+  "J4_M+1_q1_t3x3_i2": {
+   "plateau": "couronne",
+   "joueurs": 4,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 8,
+   "k": 4,
+   "machines": 5,
+   "n": 5,
+   "annonces": 5,
+   "menaces_par_machine": 1
+  },
+  "J4_M+1_q1_t3x4_i2": {
+   "plateau": "couronne",
+   "joueurs": 4,
+   "tuile_l": 3,
+   "tuile_p": 4,
+   "individus": 8,
+   "k": 4,
+   "machines": 5,
+   "n": 5,
+   "annonces": 5,
+   "menaces_par_machine": 1
+  },
+  "J5_M+2_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 5,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 15,
+   "k": 5,
+   "machines": 7,
+   "n": 7,
+   "annonces": 7,
+   "menaces_par_machine": 1
+  },
+  "J5_M+1_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 5,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 15,
+   "k": 5,
+   "machines": 6,
+   "n": 6,
+   "annonces": 6,
+   "menaces_par_machine": 1
+  },
+  "J5_M+1_q1_t3x3_i2": {
+   "plateau": "couronne",
+   "joueurs": 5,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 10,
+   "k": 5,
+   "machines": 6,
+   "n": 6,
+   "annonces": 6,
+   "menaces_par_machine": 1
+  },
+  "J5_M+1_q1_t3x4_i2": {
+   "plateau": "couronne",
+   "joueurs": 5,
+   "tuile_l": 3,
+   "tuile_p": 4,
+   "individus": 10,
+   "k": 5,
+   "machines": 6,
+   "n": 6,
+   "annonces": 6,
+   "menaces_par_machine": 1
+  },
+  "J6_M+2_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 6,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 18,
+   "k": 6,
+   "machines": 8,
+   "n": 8,
+   "annonces": 8,
+   "menaces_par_machine": 1
+  },
+  "J6_M+1_q1_t3x3_i3": {
+   "plateau": "couronne",
+   "joueurs": 6,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 18,
+   "k": 6,
+   "machines": 7,
+   "n": 7,
+   "annonces": 7,
+   "menaces_par_machine": 1
+  },
+  "J6_M+1_q1_t3x3_i2": {
+   "plateau": "couronne",
+   "joueurs": 6,
+   "tuile_l": 3,
+   "tuile_p": 3,
+   "individus": 12,
+   "k": 6,
+   "machines": 7,
+   "n": 7,
+   "annonces": 7,
+   "menaces_par_machine": 1
+  },
+  "J6_M+1_q1_t3x4_i2": {
+   "plateau": "couronne",
+   "joueurs": 6,
+   "tuile_l": 3,
+   "tuile_p": 4,
+   "individus": 12,
+   "k": 6,
+   "machines": 7,
+   "n": 7,
+   "annonces": 7,
+   "menaces_par_machine": 1
+  }
+ }
+}
