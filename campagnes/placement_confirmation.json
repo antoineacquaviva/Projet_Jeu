@@ -1,0 +1,74 @@
+{
+ "nom": "placement_confirmation",
+ "description": "Confirmation : la base et les meilleures voisines de l'optimisation locale, 160 parties chacune, pour départager à ± 2 points environ.",
+ "type": "liste",
+ "graine": 61,
+ "parties": 160,
+ "mechant": "hasard",
+ "bots": {
+  "sentinelle": "sentinelle",
+  "marquage": "marquage",
+  "regroupement": "regroupement",
+  "reflexe": "reflexe",
+  "glouton": "glouton",
+  "glouton_aveugle": {
+   "type": "glouton",
+   "params": {
+    "aveugle": true
+   }
+  },
+  "glouton_immobile": {
+   "type": "glouton",
+   "params": {
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  },
+  "mc": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3
+   }
+  },
+  "mc_immobile": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3,
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  }
+ },
+ "variantes": {
+  "base": {},
+  "6x5": {
+   "largeur": 6
+  },
+  "5x6": {
+   "hauteur": 6
+  },
+  "tours=10": {
+   "tours": 10
+  },
+  "annonces=4": {
+   "annonces": 4
+  },
+  "annonces=3": {
+   "annonces": 3
+  },
+  "bosquets": {
+   "profil": "bosquets"
+  },
+  "portee=2": {
+   "portee": 2
+  }
+ }
+}

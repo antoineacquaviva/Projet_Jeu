@@ -63,7 +63,9 @@ def mesures(v):
     b = v["bots"]
     taux = {nom: x["taux"] for nom, x in b.items()}
     fort = next((n for n in ("mc", "glouton", "reflexe") if n in b), None)
-    m = {"taux": taux, "fort": fort, "taux_fort": taux.get(fort)}
+    m = {"taux": taux, "fort": fort, "taux_fort": taux.get(fort), "notes": {}, "score": None, "bande": {}}
+    if fort is None:          # plan sans bot de référence (par exemple la force du Méchant) : taux seulement
+        return m
     boucles = [n for n in BOUCLES if n in b]
     if boucles:
         meilleure = max(boucles, key=lambda n: taux[n])
@@ -161,12 +163,24 @@ def rapport_md(syn, top=15):
     lignes.append("| Variante | Ce qui change | Score | Taux fort | Lecture | Profondeur | Info | Placement | Maîtrise | Investit | Incertitude |")
     lignes.append("|---|---|---|---|---|---|---|---|---|---|---|")
     ordre = sorted(vs, key=lambda i: -(ms[i]["score"] if ms[i]["score"] is not None else -1))
+    if all(ms[i]["score"] is None for i in vs):
+        ordre = list(vs)
     for vid in ordre[:top]:
         m = ms[vid]
         lignes.append(f"| {vid} | {resume_variante(vs[vid]['params'])} | {_f(m['score'], 2)} | {_f(m['taux_fort'])} | "
                       f"{_f(m.get('lecture'))} | {_f(m.get('profondeur'))} | {_f(m.get('info'))} | "
                       f"{_f(m.get('placement'))} | {_f(m.get('maitrise'))} | {_f(m.get('investissement'), 0)} | {_f(m.get('incertitude'))} |")
     lignes.append("")
+    if len(vs) <= 60:
+        bots = list(syn["plan"]["bots"])
+        lignes.append("## Taux de parade par bot (points)")
+        lignes.append("")
+        lignes.append("| Variante | " + " | ".join(bots) + " |")
+        lignes.append("|---|" + "---|" * len(bots))
+        for vid in ordre:
+            t = ms[vid]["taux"]
+            lignes.append(f"| {vid} | " + " | ".join(_f(t.get(b)) for b in bots) + " |")
+        lignes.append("")
     lignes.append("## Bandes sur l'ensemble des variantes")
     lignes.append("")
     lignes.append("| Mesure | vert | orange | rouge |")

@@ -3,7 +3,7 @@
  "description": "Force du Méchant : le même Gentil (réflexe, glouton, Monte-Carlo) contre un Méchant au hasard (le vrai jeu), adverse de force beta 1, 3, 10 (il évite les menaces exposées, sans voir les ordres), puis omniscient (il voit les ordres : borne).",
  "type": "liste",
  "graine": 53,
- "parties": 32,
+ "parties": 64,
  "bots": {
   "reflexe_b0": {
    "type": "reflexe",
@@ -142,6 +142,12 @@
   }
  },
  "variantes": {
-  "base": {}
+  "base": {},
+  "6x5": {
+   "largeur": 6
+  },
+  "annonces=4": {
+   "annonces": 4
+  }
  }
 }
