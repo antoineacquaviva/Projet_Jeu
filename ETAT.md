@@ -186,6 +186,8 @@ Le détail est dans `projet/3-pilotage/plan-vers-v1.md`. Noms des versions : V0.
 
 ## 5. Étape suivante
 
+**DÉCISION UTILISATEUR (15 oct., 9 h) : prendre du recul avant le cycle 2.** Proposition de Claude, à la demande de l'auteur : `projet/3-pilotage/prendre-du-recul.md` (bilan complété, risque de défauts structurels, démarche « noyau d'abord » avec une porte de conception, directions D1 à D4, cinq décisions en section 4). **Tant que l'auteur n'a pas répondu, ne pas préparer ni lancer le cycle 2** (étape 4 ci-dessous) ; la décision en attente sur le somnambule (3 ter) y est reprise.
+
 **Cycle 2, étape a : préparer (EN COURS : a.1 et a.2 FAITES ; reste a.3 puis a.4).** La V0.4 est adoptée (section 8, 13 oct., 23 h 27). Détail des priorités et des alertes : `projet/4-bilans/cycle-1-bilan.md`, sections 4, 6 et 8. Une sous-étape par passage, dans cet ordre :
 
 1. **V0.4 dans le moteur** (FAIT le 13 oct., 23 h 45 : `maquettes/v0.4.json`, `tests/test_v04.py`, `docs/noeuds_v2.md`, plan et README à jour ; conformité et 361 tests verts) :
@@ -311,6 +313,7 @@ Les trois derniers passages. Les précédents (13 et 14 oct.) sont dans [`projet
 | 14 oct. 2026 | 22:57 | 15 min | terminé | Session interactive (Opus, avec l'auteur) : essai « le somnambule » codé avec l'accord de l'auteur (règles `somnambule`, `somnambule_apprend`, `presages` ; campagne `reve_somnambule` ; script d'analyse généralisé) ; 415 tests verts, conformité OK ; T1 local au glouton. Lancement confié au réveil (23 h 15), faute de jeton `gh` dans la session. Pas compté dans le plafond. |
 | 14 oct. 2026 | 23:16 | 15 min | terminé | Réveil de 23 h 15 (Sonnet) : campagne 32 (`reve_somnambule`, échelle 1, 96 lots) lancée (run 38639000435) ; réveil armé pour le 15 oct. à 00:05 UTC ; prochaine étape : lire la synthèse et écrire `projet/4-bilans/essai-somnambule.md`. |
 | 15 oct. 2026 | 02:06 | 10 min | terminé | Réveil (Sonnet) : campagne 32 lue (réussie), bilan `projet/4-bilans/essai-somnambule.md` : aucun réglage ne remplit les trois critères (meilleur : « qui apprend », gain +7,3 sûr, riposte manque). DÉCISION UTILISATEUR sur le somnambule. Compté dans le plafond (4/12). |
+| 15 oct. 2026 | 08:42 | 45 min | terminé | Session interactive (Opus, avec l'auteur) : recul sur la démarche, `projet/3-pilotage/prendre-du-recul.md` (bilan complété, risque, pistes, décisions groupées). Relecture des campagnes 18 à 20 : T1 sur la V0.4 (4 mécanismes centraux sur 8 sous le seuil), le rêve absent en duo pour tous les bots forts. Défaut d'instrument trouvé et corrigé : les témoins de communication hérités de la v2 remplaçaient la version (`maquettes/v2.json`, `tests/test_variantes_heritees.py`) ; aucune décision n'avait été prise sur ces chiffres. Conformité OK, tests verts. Aucune règle changée, aucun lancement GitHub. Pas compté dans le plafond. |
 
 ## 11. Reprendre la main
 

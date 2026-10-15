@@ -66,8 +66,8 @@
     "coeur":        {"atelier": "c:A2a,d_fav,C2a,D2v_choix|m:|p:"},
     "gang":         {"atelier": "c:A2a,d_fav,C2b,D2v_choix|m:C3,D5|p:"},
     "heritage_v1":  {"atelier": "c:A2c,d_fav,C2c,D2v_choix|m:C3|p:represailles=attaque,bonus=10"},
-    "comm_aucun_signe": {"atelier": "c:A2a,d_fav,C2d,D2v_choix|m:C3|p:"},
-    "comm_tout_dire":   {"atelier": "c:A2a,d_fav,C2e,D2v_choix|m:C3|p:"},
+    "comm_aucun_signe": {"regles": {"communication": "aucun_signe"}},
+    "comm_tout_dire":   {"regles": {"communication": "tout_dire"}},
 
     "temoin_une_tactique":   {"piste": {"disposition": ["Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite", "Cupidite"]}},
     "temoin_des_fixes":      {"regles": {"des_fixes": [3, 4]}},
