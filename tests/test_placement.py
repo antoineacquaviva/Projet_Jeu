@@ -217,3 +217,29 @@ def test_dispute_profil_tourne():
     from placement.dispute import profil
     res, lignes = profil(Params(tours=3), parties=1, R=8)
     assert lignes and abs(res["placer_gagne"] + res["proteger_gagne"] + res["neutre"] - 100) < 1e-6
+
+
+def test_p34bis_part_de_chaque_joueur():
+    """P3.4 bis : avec J joueurs, chacun commande ses individus (blocs contigus) et donne au plus ceil(k / J)
+    ordres ; tous les bots respectent la règle ; sans joueurs (J = 0), rien ne change."""
+    from placement.regles import proprietaire, ordres_par_joueur, permis
+    p = Params(individus=4, k=2, n=3, annonces=3, joueurs=2)
+    assert [proprietaire(p, i) for i in range(4)] == [0, 0, 1, 1]
+    assert ordres_par_joueur(p) == 1 and ordres_par_joueur(p.avec(joueurs=1)) == 2
+    pl = Plateau(p)
+    e = Etat([3] * 25, [0, 1, 2], [5, 5, 9, 9])
+    assert not permis(p, [(GARDER, 5), (GARDER, 5), (RIEN, None), (RIEN, None)])
+    assert permis(p, [(GARDER, 5), (RIEN, None), (GARDER, 9), (RIEN, None)])
+    with pytest.raises(ValueError):
+        appliquer_programme(p, pl, e.copie(), [(GARDER, 5), (GARDER, 5), (RIEN, None), (RIEN, None)])
+    with pytest.raises(ValueError):
+        Params(individus=2, k=1, n=2, joueurs=3).valider()
+    q = Params(largeur=6, hauteur=6, individus=6, k=3, n=4, annonces=4, machines=4, tours=4, joueurs=3)
+    for bot in BOTS + ["mc"]:
+        for g in range(2):
+            journal = []
+            st = jouer_partie(q, fabriquer_gentil(bot), "hasard", g, journal=journal)
+            assert st["r"] > 0
+            for t in journal:
+                if "programme" in t:
+                    assert permis(q, t["programme"])

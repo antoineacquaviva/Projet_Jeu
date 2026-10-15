@@ -22,7 +22,8 @@ import random
 from itertools import permutations
 
 from .regles import (RIEN, GARDER, ALLER, SABOTER, POSTER, destination, ordres_possibles,
-                     jouer_tour, nb_ordres, tirer_annonces, tirer_execution)
+                     jouer_tour, nb_ordres, tirer_annonces, tirer_execution,
+                     permis, reparer)
 
 
 # --------------------------------------------------------------------------- outils communs
@@ -108,8 +109,15 @@ def deplacements_libres(p, pl, e, prog, rng=None):
         if pas != pos:
             candidats.append((pl.dist[pos][cible], i, pas))
     candidats.sort()
-    for _, i, pas in candidats[:restant]:
-        prog[i] = (ALLER, pas)
+    for _, i, pas in candidats:
+        if restant <= 0:
+            break
+        essai = prog[:]
+        essai[i] = (ALLER, pas)
+        if not permis(p, essai):
+            continue
+        prog = essai
+        restant -= 1
         tenues.add(pas)
     return prog
 
@@ -135,7 +143,7 @@ class Gentil:
         return placement_heuristique(p, pl, e, rng)
 
     def jouer(self, p, pl, e, annonces, rng, verite=None):
-        return self.programme(p, pl, e, None if self.aveugle else annonces, rng, verite)
+        return reparer(p, self.programme(p, pl, e, None if self.aveugle else annonces, rng, verite))
 
     def programme(self, p, pl, e, annonces, rng, verite=None):
         raise NotImplementedError
@@ -160,7 +168,13 @@ class Sentinelle(Gentil):
     nom = "sentinelle"
 
     def programme(self, p, pl, e, annonces, rng, verite=None):
-        return [(GARDER, e.individus[i]) if i < p.k else (RIEN, None) for i in range(p.individus)]
+        prog = [(RIEN, None)] * p.individus
+        for i in range(p.individus):              # les premiers individus de chaque joueur d'abord (P3.4 bis)
+            essai = prog[:]
+            essai[i] = (GARDER, e.individus[i])
+            if permis(p, essai):
+                prog = essai
+        return prog
 
 
 class Marquage(Gentil):
@@ -180,8 +194,11 @@ class Marquage(Gentil):
             else:
                 voeux.append((2 + pl.dist[pos][mpos], i, (ALLER, pas_vers(p, pl, pos, mpos))))
         voeux.sort()
-        for _, i, o in voeux[:p.k]:
-            prog[i] = o
+        for _, i, o in voeux:
+            essai = prog[:]
+            essai[i] = o
+            if permis(p, essai):
+                prog = essai
         return prog
 
 
@@ -197,12 +214,13 @@ class Regroupement(Gentil):
         prog = [(RIEN, None)] * p.individus
         n = 0
         for i, pos in enumerate(e.individus):
-            if pos == self.point and n < p.k:
+            if pos == self.point and n < p.k and permis(p, prog[:i] + [(GARDER, pos)] + prog[i + 1:]):
                 prog[i] = (GARDER, pos)
                 n += 1
         for i, pos in enumerate(e.individus):
-            if pos != self.point and n < p.k:
-                prog[i] = (ALLER, pas_vers(p, pl, pos, self.point))
+            o = (ALLER, pas_vers(p, pl, pos, self.point))
+            if pos != self.point and n < p.k and permis(p, prog[:i] + [o] + prog[i + 1:]):
+                prog[i] = o
                 n += 1
         return prog
 
@@ -253,7 +271,7 @@ class Reflexe(Gentil):
                     prog[i] = (POSTER, c) if p.aller_garder else (ALLER, c)
                     libres.remove(i)
                     n += 1
-        return deplacements_libres(p, pl, e, prog)
+        return deplacements_libres(p, pl, e, reparer(p, prog))
 
 
 class Glouton(Gentil):
@@ -284,6 +302,8 @@ class Glouton(Gentil):
                         continue  # Aller ne pare rien ce tour-ci (sauf effet de présence, vu plus bas)
                     essai = prog[:]
                     essai[i] = o
+                    if not permis(p, essai):
+                        continue
                     v = valeur(p, pl, e, annonces, essai, ech)
                     if v - base > best[0]:
                         best = (v - base, i, o)
@@ -300,7 +320,7 @@ class Glouton(Gentil):
                     continue
                 essai = prog[:]
                 essai[i] = o
-                if nb_ordres(essai) > p.k:
+                if not permis(p, essai):
                     continue
                 v = valeur(p, pl, e, annonces, essai, ech)
                 if v > base + 1e-9:
@@ -342,7 +362,7 @@ class MC(Glouton):
         cands = []
 
         def ajoute(prog):
-            if nb_ordres(prog) <= p.k and prog not in cands:
+            if permis(p, prog) and prog not in cands:
                 cands.append(prog)
 
         ajoute(deplacements_libres(p, pl, e, base[:]) if ALLER not in self.interdits else base[:])
@@ -356,7 +376,7 @@ class MC(Glouton):
                     continue
                 essai = base[:]
                 essai[i] = o
-                if nb_ordres(essai) > p.k:
+                if not permis(p, essai):
                     # libérer l'ordre le moins utile d'un autre individu
                     for j in range(p.individus):
                         if j != i and essai[j][0] != RIEN:

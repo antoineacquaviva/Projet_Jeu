@@ -35,6 +35,8 @@ Sur une grille boisée, le Méchant annonce chaque tour quelques menaces dont n 
 
 **P3.4 Une parade par ordre.** Chaque ordre pare au plus une menace. Deux gardes sur la même case en parent deux.
 
+**P3.4 bis Plusieurs joueurs (réglage `joueurs`, 0 par défaut).** *Outil d'étude du nombre de joueurs (15 oct.), pas une règle adoptée.* Avec J joueurs, les individus sont répartis en blocs aussi égaux que possible ; chaque joueur ne commande que les siens et donne au plus ⌈k / J⌉ ordres par tour (un seul dès que k ≤ J), toujours dans la limite de k ordres en tout. Les bots restent un Gentil parfaitement coordonné : la règle mesure le prix de la répartition, pas celui de la communication. Voir `projet/3-pilotage/nombre-de-joueurs-pistes.md`.
+
 ## 4. La résolution, sans aucun choix
 **P4.1** Les n menaces s'exécutent une à une, dans l'ordre du tirage.
 
@@ -79,6 +81,7 @@ Sur une grille boisée, le Méchant annonce chaque tour quelques menaces dont n 
 | `aller_garder` | ordre « poster » | non | non, oui |
 | `sabotage` | forme du sabotage | échappe | aucun, fige, échappe, allié |
 | `garde_portee` | garde étendue aux voisines | 0 | 0, 1 |
+| `joueurs` | J, répartition des individus et des ordres (P3.4 bis) | 0 (Gentil unique) | 1 à 6 (sondes du nombre de joueurs) |
 
 Contraintes de validité : k < n, k ≤ p, m = 0 ou m ≥ n, c0 > n × t.
 

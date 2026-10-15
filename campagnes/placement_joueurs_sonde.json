@@ -1,0 +1,199 @@
+{
+ "nom": "placement_joueurs_sonde",
+ "description": "Sonde du nombre de joueurs (15 oct., réflexion sur la division du Gentil) : trois familles de règles génériques de 1 à 6 joueurs, chaque joueur = un individu et un ordre. A : plateau fixe 5x5, 3 Machines, n = J+1. B : plateau d'environ 12 cases par joueur, J+1 Machines, n = J+1. E : comme B avec n = 2J (rapport k/n constant). Annonce m = n (décision 2). Gentil unique parfaitement coordonné : borne haute de la coordination.",
+ "type": "liste",
+ "graine": 71,
+ "parties": 64,
+ "mechant": "hasard",
+ "bots": {
+  "sentinelle": "sentinelle",
+  "marquage": "marquage",
+  "regroupement": "regroupement",
+  "reflexe": "reflexe",
+  "glouton": "glouton",
+  "glouton_aveugle": {
+   "type": "glouton",
+   "params": {
+    "aveugle": true
+   }
+  },
+  "glouton_immobile": {
+   "type": "glouton",
+   "params": {
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  },
+  "mc": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3
+   }
+  },
+  "mc_immobile": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3,
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  }
+ },
+ "variantes": {
+  "reference_base_m=n": {
+   "annonces": 3
+  },
+  "A_fixe_J1": {
+   "individus": 1,
+   "k": 1,
+   "n": 2,
+   "annonces": 2
+  },
+  "B_grandit_J1": {
+   "largeur": 4,
+   "hauteur": 3,
+   "machines": 2,
+   "individus": 1,
+   "k": 1,
+   "n": 2,
+   "annonces": 2
+  },
+  "E_ratio_J1": {
+   "largeur": 4,
+   "hauteur": 3,
+   "machines": 2,
+   "individus": 1,
+   "k": 1,
+   "n": 2,
+   "annonces": 2
+  },
+  "A_fixe_J2": {
+   "individus": 2,
+   "k": 2,
+   "n": 3,
+   "annonces": 3
+  },
+  "B_grandit_J2": {
+   "largeur": 5,
+   "hauteur": 5,
+   "machines": 3,
+   "individus": 2,
+   "k": 2,
+   "n": 3,
+   "annonces": 3
+  },
+  "E_ratio_J2": {
+   "largeur": 5,
+   "hauteur": 5,
+   "machines": 3,
+   "individus": 2,
+   "k": 2,
+   "n": 4,
+   "annonces": 4
+  },
+  "A_fixe_J3": {
+   "individus": 3,
+   "k": 3,
+   "n": 4,
+   "annonces": 4
+  },
+  "B_grandit_J3": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 3,
+   "k": 3,
+   "n": 4,
+   "annonces": 4
+  },
+  "E_ratio_J3": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 3,
+   "k": 3,
+   "n": 6,
+   "annonces": 6
+  },
+  "A_fixe_J4": {
+   "individus": 4,
+   "k": 4,
+   "n": 5,
+   "annonces": 5
+  },
+  "B_grandit_J4": {
+   "largeur": 7,
+   "hauteur": 7,
+   "machines": 5,
+   "individus": 4,
+   "k": 4,
+   "n": 5,
+   "annonces": 5
+  },
+  "E_ratio_J4": {
+   "largeur": 7,
+   "hauteur": 7,
+   "machines": 5,
+   "individus": 4,
+   "k": 4,
+   "n": 8,
+   "annonces": 8
+  },
+  "A_fixe_J5": {
+   "individus": 5,
+   "k": 5,
+   "n": 6,
+   "annonces": 6
+  },
+  "B_grandit_J5": {
+   "largeur": 8,
+   "hauteur": 7,
+   "machines": 6,
+   "individus": 5,
+   "k": 5,
+   "n": 6,
+   "annonces": 6
+  },
+  "E_ratio_J5": {
+   "largeur": 8,
+   "hauteur": 7,
+   "machines": 6,
+   "individus": 5,
+   "k": 5,
+   "n": 10,
+   "annonces": 10
+  },
+  "A_fixe_J6": {
+   "individus": 6,
+   "k": 6,
+   "n": 7,
+   "annonces": 7
+  },
+  "B_grandit_J6": {
+   "largeur": 9,
+   "hauteur": 8,
+   "machines": 7,
+   "individus": 6,
+   "k": 6,
+   "n": 7,
+   "annonces": 7
+  },
+  "E_ratio_J6": {
+   "largeur": 9,
+   "hauteur": 8,
+   "machines": 7,
+   "individus": 6,
+   "k": 6,
+   "n": 12,
+   "annonces": 12
+  }
+ }
+}

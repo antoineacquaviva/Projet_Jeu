@@ -1,0 +1,232 @@
+{
+ "nom": "placement_joueurs_sonde2",
+ "description": "Sonde du nombre de joueurs, 2e partie (15 oct.) : règle P3.4 bis (chaque joueur commande ses individus et donne au plus ceil(k/J) ordres). F : deux individus et un ordre par joueur, plateau d'environ 12 cases par joueur, J+1 Machines, n = J+1. G : comme F avec n = 2J. H : constantes réparties, un seul jeu (6x6, 4 Machines, 6 individus, k = 3, n = 4) partagé entre J joueurs. Annonce m = n.",
+ "type": "liste",
+ "graine": 72,
+ "parties": 64,
+ "mechant": "hasard",
+ "bots": {
+  "sentinelle": "sentinelle",
+  "marquage": "marquage",
+  "regroupement": "regroupement",
+  "reflexe": "reflexe",
+  "glouton": "glouton",
+  "glouton_aveugle": {
+   "type": "glouton",
+   "params": {
+    "aveugle": true
+   }
+  },
+  "glouton_immobile": {
+   "type": "glouton",
+   "params": {
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  },
+  "mc": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3
+   }
+  },
+  "mc_immobile": {
+   "type": "mc",
+   "params": {
+    "budget": 256,
+    "horizon": 3,
+    "deplacer": false,
+    "interdits": [
+     "aller",
+     "poster"
+    ]
+   }
+  }
+ },
+ "variantes": {
+  "F_deuxpions_J1": {
+   "largeur": 4,
+   "hauteur": 3,
+   "machines": 2,
+   "individus": 2,
+   "k": 1,
+   "n": 2,
+   "annonces": 2,
+   "joueurs": 1
+  },
+  "G_deuxpions_ratio_J1": {
+   "largeur": 4,
+   "hauteur": 3,
+   "machines": 2,
+   "individus": 2,
+   "k": 1,
+   "n": 2,
+   "annonces": 2,
+   "joueurs": 1
+  },
+  "H_partage_J1": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 6,
+   "k": 3,
+   "n": 4,
+   "annonces": 4,
+   "joueurs": 1
+  },
+  "F_deuxpions_J2": {
+   "largeur": 5,
+   "hauteur": 5,
+   "machines": 3,
+   "individus": 4,
+   "k": 2,
+   "n": 3,
+   "annonces": 3,
+   "joueurs": 2
+  },
+  "G_deuxpions_ratio_J2": {
+   "largeur": 5,
+   "hauteur": 5,
+   "machines": 3,
+   "individus": 4,
+   "k": 2,
+   "n": 4,
+   "annonces": 4,
+   "joueurs": 2
+  },
+  "H_partage_J2": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 6,
+   "k": 3,
+   "n": 4,
+   "annonces": 4,
+   "joueurs": 2
+  },
+  "F_deuxpions_J3": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 6,
+   "k": 3,
+   "n": 4,
+   "annonces": 4,
+   "joueurs": 3
+  },
+  "G_deuxpions_ratio_J3": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 6,
+   "k": 3,
+   "n": 6,
+   "annonces": 6,
+   "joueurs": 3
+  },
+  "H_partage_J3": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 6,
+   "k": 3,
+   "n": 4,
+   "annonces": 4,
+   "joueurs": 3
+  },
+  "F_deuxpions_J4": {
+   "largeur": 7,
+   "hauteur": 7,
+   "machines": 5,
+   "individus": 8,
+   "k": 4,
+   "n": 5,
+   "annonces": 5,
+   "joueurs": 4
+  },
+  "G_deuxpions_ratio_J4": {
+   "largeur": 7,
+   "hauteur": 7,
+   "machines": 5,
+   "individus": 8,
+   "k": 4,
+   "n": 8,
+   "annonces": 8,
+   "joueurs": 4
+  },
+  "H_partage_J4": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 6,
+   "k": 3,
+   "n": 4,
+   "annonces": 4,
+   "joueurs": 4
+  },
+  "F_deuxpions_J5": {
+   "largeur": 8,
+   "hauteur": 7,
+   "machines": 6,
+   "individus": 10,
+   "k": 5,
+   "n": 6,
+   "annonces": 6,
+   "joueurs": 5
+  },
+  "G_deuxpions_ratio_J5": {
+   "largeur": 8,
+   "hauteur": 7,
+   "machines": 6,
+   "individus": 10,
+   "k": 5,
+   "n": 10,
+   "annonces": 10,
+   "joueurs": 5
+  },
+  "H_partage_J5": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 6,
+   "k": 3,
+   "n": 4,
+   "annonces": 4,
+   "joueurs": 5
+  },
+  "F_deuxpions_J6": {
+   "largeur": 9,
+   "hauteur": 8,
+   "machines": 7,
+   "individus": 12,
+   "k": 6,
+   "n": 7,
+   "annonces": 7,
+   "joueurs": 6
+  },
+  "G_deuxpions_ratio_J6": {
+   "largeur": 9,
+   "hauteur": 8,
+   "machines": 7,
+   "individus": 12,
+   "k": 6,
+   "n": 12,
+   "annonces": 12,
+   "joueurs": 6
+  },
+  "H_partage_J6": {
+   "largeur": 6,
+   "hauteur": 6,
+   "machines": 4,
+   "individus": 6,
+   "k": 3,
+   "n": 4,
+   "annonces": 4,
+   "joueurs": 6
+  }
+ }
+}

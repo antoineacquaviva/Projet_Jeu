@@ -39,6 +39,8 @@ class Params:
     aller_garder: bool = False     # Poster : aller puis garder la case d'arrivée, en un seul ordre
     sabotage: str = "echappe"      # aucun | fige (la Machine reste) | echappe (elle avance sans abattre) | allie (deux saboteurs)
     garde_portee: int = 0          # 0 : la garde protège sa case ; 1 : sa case et les voisines (une seule parade)
+    joueurs: int = 0               # P3.4 bis : 0 = Gentil unique ; J > 0 = individus répartis entre J joueurs,
+                                   # chacun donnant au plus ceil(k / J) ordres, à ses propres individus
 
     def valider(self):
         err = []
@@ -56,6 +58,8 @@ class Params:
             err.append("profil inconnu")
         if self.entree not in ("front", "bords"):
             err.append("entrée inconnue")
+        if self.joueurs and not (1 <= self.joueurs <= self.individus):
+            err.append("1 <= joueurs <= individus (chaque joueur a au moins un individu)")
         if self.foret_initiale() <= self.n * self.tours:
             err.append("forêt initiale <= n x t : r > 0 ne serait pas garanti (P5.2)")
         for nom, poids in self.tactiques:
@@ -249,10 +253,57 @@ def nb_ordres(programme):
     return sum(1 for o in programme if o[0] != RIEN)
 
 
+def proprietaire(p: Params, i):
+    """P3.4 bis : le joueur qui commande l'individu i (blocs contigus, aussi égaux que possible)."""
+    return i * p.joueurs // p.individus if p.joueurs else 0
+
+
+def ordres_par_joueur(p: Params):
+    """P3.4 bis : chaque joueur donne au plus ceil(k / J) ordres (un seul dès que k <= J)."""
+    return -(-p.k // p.joueurs) if p.joueurs else p.k
+
+
+def permis(p: Params, programme):
+    """Le programme respecte P3.1 (au plus k ordres) et P3.4 bis (la part de chaque joueur)."""
+    if nb_ordres(programme) > p.k:
+        return False
+    if p.joueurs:
+        lim = ordres_par_joueur(p)
+        compte = {}
+        for i, o in enumerate(programme):
+            if o[0] != RIEN:
+                j = proprietaire(p, i)
+                compte[j] = compte.get(j, 0) + 1
+                if compte[j] > lim:
+                    return False
+    return True
+
+
+def reparer(p: Params, programme):
+    """Rend un programme permis en retirant les ordres en trop (dans l'ordre des individus)."""
+    if permis(p, programme):
+        return programme
+    prog = list(programme)
+    lim = ordres_par_joueur(p)
+    compte, total = {}, 0
+    for i, o in enumerate(prog):
+        if o[0] == RIEN:
+            continue
+        j = proprietaire(p, i)
+        if total >= p.k or compte.get(j, 0) >= lim:
+            prog[i] = (RIEN, None)
+            continue
+        compte[j] = compte.get(j, 0) + 1
+        total += 1
+    return prog
+
+
 def appliquer_programme(p: Params, pl: Plateau, e: Etat, programme):
     """P3.3 : déplacements, puis gardes et sabotages posés. Renvoie (gardes, sabotages) : capacités restantes."""
     if nb_ordres(programme) > p.k:
         raise ValueError("plus de k ordres")
+    if not permis(p, programme):
+        raise ValueError("un joueur donne plus que sa part d'ordres (P3.4 bis)")
     gardes = {}
     saboteurs = {}
     for i, (typ, arg) in enumerate(programme):

@@ -68,6 +68,7 @@ Pour découvrir le jeu, lire dans l'ordre : la synthèse des idées, puis le liv
 | | [Avant ou après la V1](projet/3-pilotage/avant-ou-apres-v1.md) | Ce qui s'applique dès les cycles en cours (M1 à M11), à chaque version adoptée, ou après la V1 |
 | | [Campagne de profondeur](projet/3-pilotage/campagne-de-profondeur.md) | La campagne qui suivra la V1 : bots renforcés, courbe d'apprentissage, failles, vitesse |
 | | [Ce qui fait un choix stratégique](projet/3-pilotage/choix-strategique.md) | La leçon du rêve (14 oct.) : choix dominé, indifférent ou disputé ; principes de conception, tests T1 à T5, règles de méthode |
+| | [Diviser le Gentil : 1 à 6 joueurs](projet/3-pilotage/nombre-de-joueurs-pistes.md) | Pistes structurelles pour le nombre de joueurs (règle générique, une Machine par joueur, tuiles en couronne, jeu constant partagé) et sondes chiffrées (15 oct.) |
 | | [Garde-fou « aucune boucle gagnante »](projet/3-pilotage/garde-fou-boucles-gagnantes.md) | Aucune action ni suite d'actions répétée, ni convention de table, ne doit gagner (décision C1, 14 oct.) |
 | `4-bilans` | [Moteur v0 : lacunes et incohérences](projet/4-bilans/moteur-v0-lacunes.md) | Le premier moteur et ce qu'il a révélé |
 | | [Moteur v1 : conformité et campagne de référence](projet/4-bilans/moteur-v1-conformite.md) | L'audit règle par règle, v0 contre v1 |

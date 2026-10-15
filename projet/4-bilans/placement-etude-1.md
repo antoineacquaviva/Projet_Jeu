@@ -184,3 +184,5 @@ Le même Gentil contre un Méchant qui choisit les menaces les moins exposées (
 4. **Les seuils de lecture provisoires** (section 2) : les garder comme indices, sans valeur de bande. *Recommandé : oui, à revoir après la campagne 2.*
 5. **Lancer la campagne 2** (section 9), y compris l'essai de l'ordre *Éclairer*. *Recommandé : oui.*
 6. **Publier une maquette jouable** du modèle pour un test humain. *Recommandé : oui, après la décision 2.*
+
+**Réponse de l'auteur (15 oct., 17 h 50) : les six recommandations sont validées.** Avant la campagne 2, il demande une réflexion sur la division du Gentil en plusieurs joueurs : `projet/3-pilotage/nombre-de-joueurs-pistes.md`.
