@@ -1,6 +1,6 @@
 # Proposition : le Gentil réparti entre 2 et 6 joueurs
 
-*15 oct. 2026, 21 h 30. Réponse à l'auteur : une seule proposition synthétique, qui change le moins d'éléments possible du modèle « placement » (`docs/regles_placement.md`) et laisse des réglages pour plus tard. **Statut : proposition de Claude, rien n'est adopté.** Elle reprend les pistes 1 à 3 de `projet/3-pilotage/nombre-de-joueurs-pistes.md` (le « kit par joueur »).*
+*15 oct. 2026, 21 h 30. Réponse à l'auteur : une seule proposition synthétique, qui change le moins d'éléments possible du modèle « placement » (`docs/regles_placement.md`) et laisse des réglages pour plus tard. **Statut : retenue par l'auteur le 15 oct., 21 h 47, comme modèle de la campagne 2** (modèle d'étude ; aucune règle du jeu adoptée). Codée dans `placement/` (P1.1 bis, P1.3 bis, P1.4 bis, P2.1 bis de `docs/regles_placement.md`). Elle reprend les pistes 1 à 3 de `projet/3-pilotage/nombre-de-joueurs-pistes.md` (le « kit par joueur »).*
 
 ## Le principe
 Chaque joueur apporte son kit : **une tuile de forêt, deux individus et une Machine**. Le Méchant ajoute une Machine. Il n'y a rien d'autre à régler selon le nombre de joueurs.

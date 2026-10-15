@@ -87,6 +87,11 @@ def mesures(v):
         c = b["mc"]["compteurs"]
         if c.get("decisions"):
             m["investissement"] = 100 * c.get("investissements", 0) / c["decisions"]
+    if fort in b and "agence" in b[fort]:          # plusieurs joueurs : indices, sans seuil
+        m["agence"] = 100 * mean(b[fort]["agence"])
+        tot = sum(b[fort]["parades"])
+        if Params.depuis(v["params"]).plateau == "couronne" and tot:
+            m["couplage"] = 100 * b[fort].get("hors_tuile", 0) / tot
     if fort in b and len(b[fort]["parades"]) > 1:
         m["ecart_type_fort"] = stdev(b[fort]["parades"]) * ech
     # part de la compétence : le bot fort fait mieux que le réflexe sur la même graine

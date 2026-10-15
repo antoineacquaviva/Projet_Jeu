@@ -39,6 +39,12 @@ class Params:
     aller_garder: bool = False     # Poster : aller puis garder la case d'arrivée, en un seul ordre
     sabotage: str = "echappe"      # aucun | fige (la Machine reste) | echappe (elle avance sans abattre) | allie (deux saboteurs)
     garde_portee: int = 0          # 0 : la garde protège sa case ; 1 : sa case et les voisines (une seule parade)
+    plateau: str = "grille"        # grille (L x H) | couronne (P1.1 bis : une tuile par joueur autour du Cœur)
+    tuile_l: int = 3               # couronne : largeur d'une tuile (cases le long de la couronne)
+    tuile_p: int = 4               # couronne : profondeur d'une tuile (du Cœur à la lisière)
+    coeur_arbres: int = 0          # couronne : arbres de la case Cœur (0 = comme les autres cases)
+    menaces_par_machine: int = 0   # P2.1 bis : 0 = annonce classique ; q > 0 = chaque Machine fait q menaces
+                                   # par tour (n = M x q, toutes annoncées, seul l'ordre est caché)
     joueurs: int = 0               # P3.4 bis : 0 = Gentil unique ; J > 0 = individus répartis entre J joueurs,
                                    # chacun donnant au plus ceil(k / J) ordres, à ses propres individus
 
@@ -58,6 +64,18 @@ class Params:
             err.append("profil inconnu")
         if self.entree not in ("front", "bords"):
             err.append("entrée inconnue")
+        if self.plateau not in ("grille", "couronne"):
+            err.append("plateau grille ou couronne")
+        if self.plateau == "couronne":
+            if self.joueurs < 1:
+                err.append("couronne : il faut joueurs >= 1 (une tuile par joueur)")
+            if self.profil != "uniforme" or self.entree != "front":
+                err.append("couronne : profil uniforme et entrée par la lisière des tuiles")
+            if self.tuile_l < 1 or self.tuile_p < 1:
+                err.append("tuile d'au moins 1 x 1")
+        if self.menaces_par_machine:
+            if self.n != self.machines * self.menaces_par_machine or self.annonces != self.n:
+                err.append("menaces par Machine : n = machines x q et annonces = n")
         if self.joueurs and not (1 <= self.joueurs <= self.individus):
             err.append("1 <= joueurs <= individus (chaque joueur a au moins un individu)")
         if self.foret_initiale() <= self.n * self.tours:
@@ -72,6 +90,8 @@ class Params:
     # La forêt initiale ne dépend pas de la graine pour les profils uniforme et coeur ;
     # pour « bosquets », le total est conservé (on redistribue).
     def foret_initiale(self):
+        if self.plateau == "couronne":
+            return self.joueurs * self.tuile_l * self.tuile_p * self.arbres + (self.coeur_arbres or self.arbres)
         return self.largeur * self.hauteur * self.arbres
 
     def avec(self, **kw):
@@ -96,6 +116,11 @@ class Plateau:
     """La géométrie, calculée une fois par variante : voisins, distances, centre."""
 
     def __init__(self, p: Params):
+        self.tuile = None          # couronne : tuile de chaque case (-1 pour le Cœur)
+        self.lisieres = None       # couronne : cases de lisière de chaque tuile
+        if p.plateau == "couronne":
+            self._couronne(p)
+            return
         self.W, self.H = p.largeur, p.hauteur
         self.N = self.W * self.H
         diag = p.voisinage == 8
@@ -128,6 +153,51 @@ class Plateau:
         self.coeur = [int(round(2 * (abs(c % self.W - cx) + abs(c // self.W - cy)))) for c in range(self.N)]
         self.portee_cache = {}
 
+    def _couronne(self, p):
+        """P1.1 bis : J tuiles de l x q cases autour d'une case Cœur (indice 0). Dans une tuile, la rangée 0
+        touche le Cœur et la rangée q - 1 est la lisière ; la dernière colonne d'une tuile touche la première
+        colonne de la suivante, rangée par rangée (la couronne se referme dès 2 tuiles)."""
+        J, l, q = p.joueurs, p.tuile_l, p.tuile_p
+        self.W, self.H = None, None
+        self.N = 1 + J * l * q
+        idx = lambda t, r, c: 1 + t * l * q + r * l + c
+        adj = [set() for _ in range(self.N)]
+
+        def lier(a, b):
+            if a != b:
+                adj[a].add(b)
+                adj[b].add(a)
+        diag = p.voisinage == 8
+        for t in range(J):
+            for r in range(q):
+                for c in range(l):
+                    for dr in (-1, 0, 1):
+                        for dc in (-1, 0, 1):
+                            if (dr, dc) == (0, 0) or (not diag and dr and dc):
+                                continue
+                            if 0 <= r + dr < q and 0 <= c + dc < l:
+                                lier(idx(t, r, c), idx(t, r + dr, c + dc))
+                if J >= 2:
+                    lier(idx(t, r, l - 1), idx((t + 1) % J, r, 0))
+            for c in range(l):
+                lier(0, idx(t, 0, c))
+        self.voisins = [tuple(sorted(v)) for v in adj]
+        self.dist = []
+        for c in range(self.N):
+            d = [-1] * self.N
+            d[c] = 0
+            file = [c]
+            for u in file:
+                for w in self.voisins[u]:
+                    if d[w] < 0:
+                        d[w] = d[u] + 1
+                        file.append(w)
+            self.dist.append(d)
+        self.coeur = [2 * self.dist[0][c] for c in range(self.N)]
+        self.tuile = [-1] + [t for t in range(J) for _ in range(l * q)]
+        self.lisieres = [[idx(t, q - 1, c) for c in range(l)] for t in range(J)]
+        self.portee_cache = {}
+
     def a_portee(self, c, r):
         """Cases à r pas au plus de c (c compris)."""
         cle = (c, r)
@@ -136,6 +206,8 @@ class Plateau:
         return self.portee_cache[cle]
 
     def bord(self):
+        if self.lisieres is not None:
+            return [c for li in self.lisieres for c in li]
         return [c for c in range(self.N) if c % self.W in (0, self.W - 1) or c // self.W in (0, self.H - 1)]
 
 
@@ -156,6 +228,15 @@ class Etat:
 
 def mise_en_place(p: Params, pl: Plateau, rng: random.Random):
     """P1.1 à P1.3. Les individus sont placés ensuite par le Gentil (P1.4)."""
+    if p.plateau == "couronne":
+        arbres = [p.arbres] * pl.N
+        arbres[0] = p.coeur_arbres or p.arbres
+        # P1.3 bis : la Machine j entre sur la lisière de la tuile j ; les Machines en plus, sur une lisière au dé
+        machines = []
+        for j in range(p.machines):
+            li = pl.lisieres[j] if j < p.joueurs else pl.lisieres[rng.randrange(p.joueurs)]
+            machines.append(rng.choice(li))
+        return Etat(arbres, machines, [])
     if p.profil == "uniforme":
         arbres = [p.arbres] * pl.N
     elif p.profil == "coeur":
@@ -194,6 +275,9 @@ def tirer_annonces(p: Params, rng: random.Random):
     m = p.annonces if p.annonces else p.n
     noms = [t for t, w in p.tactiques if w > 0]
     poids = [w for t, w in p.tactiques if w > 0]
+    if p.menaces_par_machine:
+        # P2.1 bis : chaque Machine fait q menaces ; on retourne une tactique pour chacune
+        return [(j, rng.choices(noms, poids)[0]) for j in range(p.machines) for _ in range(p.menaces_par_machine)]
     return [(rng.randrange(p.machines), rng.choices(noms, poids)[0]) for _ in range(m)]
 
 
@@ -279,6 +363,14 @@ def permis(p: Params, programme):
     return True
 
 
+def cases_depart(p: Params, pl: Plateau, i):
+    """P1.4 bis : sur la couronne, un individu part sur la tuile de son joueur ; sinon, n'importe où."""
+    if pl.tuile is None:
+        return range(pl.N)
+    j = proprietaire(p, i)
+    return [c for c in range(pl.N) if pl.tuile[c] == j]
+
+
 def reparer(p: Params, programme):
     """Rend un programme permis en retirant les ordres en trop (dans l'ordre des individus)."""
     if permis(p, programme):
@@ -357,6 +449,7 @@ def executer(p: Params, pl: Plateau, e: Etat, menaces, gardes, sabotages, stats=
             parades += 1
             if stats is not None:
                 stats["pare_sabotage"] = stats.get("pare_sabotage", 0) + 1
+                _attribuer(stats, pl, stats.get("_qui_s", {}).get(machine), e.machines[machine])
             if p.sabotage == "echappe":
                 e.machines[machine] = cible
             continue
@@ -366,16 +459,36 @@ def executer(p: Params, pl: Plateau, e: Etat, menaces, gardes, sabotages, stats=
             parades += 1
             if stats is not None:
                 stats["pare_garde"] = stats.get("pare_garde", 0) + 1
+                _attribuer(stats, pl, stats.get("_qui_g", {}).get(g), g)
             continue
         e.machines[machine] = cible               # P4.7 elle entre et abat un arbre
         e.arbres[cible] -= 1
     return parades
 
 
+def _attribuer(stats, pl, qui, case):
+    """Statistiques d'agence et de couplage : quel joueur a paré, et hors de sa tuile ou non."""
+    if not qui:
+        return
+    j = qui.pop(0)
+    pj = stats.setdefault("parades_joueur", {})
+    pj[j] = pj.get(j, 0) + 1
+    if pl.tuile is not None and pl.tuile[case] != j:
+        stats["hors_tuile"] = stats.get("hors_tuile", 0) + 1
+
+
 def jouer_tour(p, pl, e, annonces, programme, execution, stats=None):
     """Un tour complet sur l'état `e` (modifié). `execution` : indices ordonnés des menaces exécutées
     parmi les annonces, ou liste explicite de menaces si `annonces` est vide."""
     gardes, sabotages = appliquer_programme(p, pl, e, programme)
+    if stats is not None:                         # qui garde quelle case, qui sabote quelle Machine
+        qg, qs = {}, {}
+        for i, (typ, arg) in enumerate(programme):
+            if typ in (GARDER, POSTER):
+                qg.setdefault(e.individus[i], []).append(proprietaire(p, i))
+            elif typ == SABOTER:
+                qs.setdefault(arg, []).append(proprietaire(p, i))
+        stats["_qui_g"], stats["_qui_s"] = qg, qs
     menaces = [annonces[j] for j in execution]
     parades = executer(p, pl, e, menaces, gardes, sabotages, stats)
     e.tour += 1

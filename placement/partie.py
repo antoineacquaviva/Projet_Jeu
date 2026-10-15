@@ -12,14 +12,15 @@ import argparse
 import json
 import random
 
-from .regles import Params, Plateau, mise_en_place, tirer_annonces, tirer_execution, jouer_tour, RIEN
+from .regles import Params, Plateau, cases_depart, mise_en_place, tirer_annonces, tirer_execution, jouer_tour, RIEN
 from .bots import fabriquer_gentil, fabriquer_mechant
 
 _PLATEAUX = {}
 
 
 def plateau(p: Params):
-    cle = (p.largeur, p.hauteur, p.voisinage)
+    cle = (p.plateau, p.largeur, p.hauteur, p.voisinage, p.joueurs if p.plateau == "couronne" else 0,
+           p.tuile_l, p.tuile_p)
     if cle not in _PLATEAUX:
         _PLATEAUX[cle] = Plateau(p)
     return _PLATEAUX[cle]
@@ -38,6 +39,8 @@ def jouer_partie(p: Params, gentil, mechant, graine: int, journal=None):
     gentil.debut()
     e = mise_en_place(p, pl, rng_jeu)
     e.individus = list(gentil.placer(p, pl, e, rng_bot))
+    for i, c in enumerate(e.individus):          # P1.4 bis : chacun part sur sa tuile (couronne)
+        assert c in cases_depart(p, pl, i), (i, c)
     c0 = e.foret()
     stats = {"pertes": [], "ordres": {}}
     S = 0
@@ -67,6 +70,11 @@ def jouer_partie(p: Params, gentil, mechant, graine: int, journal=None):
                             "parades": parades, "arbres": e.arbres[:]})
     r = e.foret()
     assert r > 0  # P5.2
+    stats.pop("_qui_g", None)
+    stats.pop("_qui_s", None)
+    pj = stats.pop("parades_joueur", {})
+    if p.joueurs:
+        stats["parades_joueur"] = [pj.get(j, 0) for j in range(p.joueurs)]
     stats.update({"c0": c0, "r": r, "parades": S, "taux": S / (p.k * p.tours), "foret": r / c0,
                   "compteurs": dict(gentil.compteurs)})
     return stats
@@ -93,6 +101,12 @@ def main(argv=None):
 
     def dessin(arbres, machines, individus):
         lignes = []
+        if pl.tuile is not None:
+            for t in range(-1, p.joueurs):
+                cases = [c for c in range(pl.N) if pl.tuile[c] == t]
+                lignes.append(("Cœur  " if t < 0 else f"T{t + 1}    ") + " ".join(
+                    (str(arbres[c]) + "M" * machines.count(c) + "g" * individus.count(c)).ljust(4) for c in cases))
+            return "\n".join(lignes)
         for y in range(p.hauteur):
             cases = []
             for x in range(p.largeur):

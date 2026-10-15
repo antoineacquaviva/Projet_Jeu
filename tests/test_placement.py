@@ -243,3 +243,79 @@ def test_p34bis_part_de_chaque_joueur():
             for t in journal:
                 if "programme" in t:
                     assert permis(q, t["programme"])
+
+
+def kit(J=3, **kw):
+    """Le « kit par joueur » (projet/2-maquettes/proposition-gentil-reparti.md)."""
+    d = dict(plateau="couronne", joueurs=J, individus=2 * J, k=J, machines=J + 1, n=J + 1, annonces=J + 1,
+             menaces_par_machine=1)
+    d.update(kw)
+    return Params(**d)
+
+
+def test_p11bis_couronne_geometrie():
+    """P1.1 bis : J tuiles l x q autour du Cœur (case 0) ; rangée 0 contre le Cœur, rangée q - 1 en lisière ;
+    la dernière colonne d'une tuile touche la première de la suivante ; forêt initiale = J l q a + Cœur."""
+    p = kit(3).valider()
+    pl = Plateau(p)
+    assert pl.N == 1 + 3 * 12
+    assert sorted(pl.voisins[0]) == [1 + t * 12 + c for t in range(3) for c in range(3)]
+    assert 13 in pl.voisins[3]            # tuile 0, rangée 0, colonne 2 -> tuile 1, rangée 0, colonne 0
+    assert 1 in pl.voisins[1 + 2 * 12 + 2]  # la couronne se referme
+    assert pl.lisieres[1] == [1 + 12 + 9, 1 + 12 + 10, 1 + 12 + 11]
+    assert pl.coeur[0] == 0 and pl.coeur[1] == 2 and max(pl.coeur) == 2 * 4
+    assert p.foret_initiale() == 3 * 12 * 3 + 3
+    assert kit(2).valider().foret_initiale() == 75     # 2 joueurs : 25 cases, comme le modèle codé
+    with pytest.raises(ValueError):
+        kit(3, joueurs=0, individus=6).valider()
+
+
+def test_p13bis_machines_et_p21bis_menaces_par_machine():
+    """P1.3 bis : la Machine j entre sur la lisière de la tuile j, la Machine en plus sur une lisière.
+    P2.1 bis : chaque Machine fait q menaces, toutes annoncées (n = M q), seul l'ordre est caché.
+    P1.4 bis : chaque individu part sur la tuile de son joueur."""
+    p = kit(4).valider()
+    pl = Plateau(p)
+    for g in range(5):
+        rng = random.Random(g)
+        e = mise_en_place(p, pl, rng)
+        for j in range(4):
+            assert e.machines[j] in pl.lisieres[j]
+        assert e.machines[4] in pl.bord()
+        from placement.regles import tirer_annonces, tirer_execution, cases_depart
+        ann = tirer_annonces(p, rng)
+        assert sorted(m for m, _ in ann) == [0, 1, 2, 3, 4]
+        assert sorted(tirer_execution(p, rng)) == list(range(5))
+        for bot in ("aleatoire", "glouton", "regroupement"):
+            pos = fabriquer_gentil(bot).placer(p, pl, e, rng)
+            assert all(pl.tuile[c] == i // 2 for i, c in enumerate(pos))
+    q2 = kit(3, n=8, annonces=8, menaces_par_machine=2).valider()
+    assert len(tirer_annonces(q2, random.Random(1))) == 8
+    with pytest.raises(ValueError):
+        kit(3, n=5, annonces=5).valider()     # n doit valoir M x q
+
+
+@pytest.mark.parametrize("bot", BOTS)
+def test_kit_bornes_et_attribution(bot):
+    """P5.1 et P5.2 sur la couronne ; chaque parade est attribuée à un joueur (agence, couplage)."""
+    for p in (kit(2, tours=4), kit(5, tours=4, tuile_l=3, tuile_p=3), kit(3, tours=4, machines=5, n=5, annonces=5)):
+        for g in range(2):
+            st = jouer_partie(p.valider(), fabriquer_gentil(bot), "hasard", g)
+            assert all(p.n - p.k <= x <= p.n for x in st["pertes"])
+            assert st["r"] == st["c0"] - p.n * p.tours + st["parades"] > 0
+            assert sum(st["parades_joueur"]) == st["parades"]
+            assert st.get("hors_tuile", 0) <= st["parades"]
+
+
+def test_campagne_kit_agence_couplage(tmp_path):
+    """Les campagnes agrègent l'agence (part des joueurs qui ont paré) et le couplage (parades hors de sa tuile)."""
+    plan = {"nom": "t", "type": "liste", "graine": 5, "parties": 2,
+            "variantes": {"kit": {"plateau": "couronne", "joueurs": 2, "individus": 4, "k": 2, "machines": 3,
+                                  "n": 3, "annonces": 3, "menaces_par_machine": 1, "tours": 4}},
+            "bots": {"reflexe": "reflexe", "glouton": "glouton"}}
+    chemin = tmp_path / "plan.json"
+    chemin.write_text(json.dumps(plan))
+    campagne.main([str(chemin), "--sortie", str(tmp_path / "r"), "--processus", "1"])
+    syn = json.loads((tmp_path / "r" / "synthese.json").read_text())
+    m = analyse.mesures(syn["variantes"]["kit"])
+    assert 0 <= m["agence"] <= 100 and 0 <= m["couplage"] <= 100

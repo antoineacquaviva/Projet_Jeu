@@ -23,7 +23,7 @@ from itertools import permutations
 
 from .regles import (RIEN, GARDER, ALLER, SABOTER, POSTER, destination, ordres_possibles,
                      jouer_tour, nb_ordres, tirer_annonces, tirer_execution,
-                     permis, reparer)
+                     permis, reparer, cases_depart)
 
 
 # --------------------------------------------------------------------------- outils communs
@@ -61,11 +61,11 @@ def valeur(p, pl, e, annonces, programme, echantillons):
 def placement_heuristique(p, pl, e, rng):
     """Placement initial commun (P1.4) : devant les Machines, sur des cases boisées, sans s'empiler."""
     pris = []
-    for _ in range(p.individus):
+    for i in range(p.individus):
         def score(c):
             s = sum(max(0, 3 - pl.dist[m][c]) for m in e.machines)
             return s + 0.05 * e.arbres[c] - 3 * pris.count(c) - 0.01 * pl.coeur[c]
-        meilleur = max(range(pl.N), key=lambda c: (score(c), -c))
+        meilleur = max(cases_depart(p, pl, i), key=lambda c: (score(c), -c))
         pris.append(meilleur)
     return pris
 
@@ -153,7 +153,7 @@ class Aleatoire(Gentil):
     nom = "aleatoire"
 
     def placer(self, p, pl, e, rng):
-        return [rng.randrange(pl.N) for _ in range(p.individus)]
+        return [rng.choice(list(cases_depart(p, pl, i))) for i in range(p.individus)]
 
     def programme(self, p, pl, e, annonces, rng, verite=None):
         prog = [(RIEN, None)] * p.individus

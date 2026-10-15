@@ -8,14 +8,22 @@ Sur une grille boisée, le Méchant annonce chaque tour quelques menaces dont n 
 ## 1. La configuration
 **P1.1 Plateau.** Une grille de L × H cases, voisinage orthogonal (4) ou avec diagonales (8). Le **cœur** est le centre de la grille.
 
+**P1.1 bis Le plateau en couronne** (réglage `plateau` = couronne ; le « kit par joueur », retenu par l'auteur le 15 oct. comme modèle de la campagne 2, `projet/2-maquettes/proposition-gentil-reparti.md`). Chaque joueur pose une tuile de `tuile_l` × `tuile_p` cases (3 × 4 par défaut) autour d'une case **Cœur** commune. Dans une tuile, la rangée intérieure touche le Cœur et la rangée extérieure est la lisière ; la dernière colonne d'une tuile touche la première colonne de la suivante, rangée par rangée. Le cœur des tactiques est la case Cœur (qui porte `coeur_arbres` arbres, autant que les autres cases par défaut).
+
 **P1.2 Arbres.** Chaque case porte des arbres : a par case (profil uniforme), plus au cœur (profil cœur), ou répartis au hasard avec au moins un par case (bosquets). La forêt initiale vaut c0 = L × H × a dans les trois cas.
 
 **P1.3 Machines.** M Machines entrent sur des cases de la lisière (rangée du haut, « front ») ou du bord (« bords »), tirées au hasard. Elles ne quittent jamais le plateau.
 
+**P1.3 bis Sur la couronne**, la Machine j entre sur une case de la lisière de la tuile j, tirée au dé ; les Machines en plus (M > J) entrent sur une lisière tirée au dé.
+
 **P1.4 Individus.** Le Gentil place p individus sur les cases de son choix. La **configuration** est l'ensemble plateau, arbres, Machines et individus.
+
+**P1.4 bis Sur la couronne**, chaque individu part sur une case de la tuile de son joueur (P3.4 bis), puis va où il veut.
 
 ## 2. Le Méchant : un hasard contrôlé
 **P2.1 L'annonce.** Au début du tour, le Méchant annonce m menaces (m ≥ n). Chaque menace est une Machine (tirée au dé) et une tactique, tirée selon la composition de son jeu de tactiques (réglage). Les menaces sont publiques.
+
+**P2.1 bis Une menace par Machine** (réglage `menaces_par_machine` = q > 0). Chaque Machine fait q menaces par tour : on tire une tactique pour chacune et on les montre toutes (m = n = M × q). Seul l'ordre d'exécution reste caché.
 
 **P2.2 L'exécution.** n des m menaces s'exécuteront, dans un ordre inconnu. Le Gentil ne sait pas lesquelles : chacune part avec la probabilité n / m. Variante « sans annonce » (m = 0) : les menaces sont tirées au moment de l'exécution, et le Gentil ne connaît que la composition du jeu du Méchant.
 
@@ -82,6 +90,8 @@ Sur une grille boisée, le Méchant annonce chaque tour quelques menaces dont n 
 | `sabotage` | forme du sabotage | échappe | aucun, fige, échappe, allié |
 | `garde_portee` | garde étendue aux voisines | 0 | 0, 1 |
 | `joueurs` | J, répartition des individus et des ordres (P3.4 bis) | 0 (Gentil unique) | 1 à 6 (sondes du nombre de joueurs) |
+| `plateau`, `tuile_l`, `tuile_p`, `coeur_arbres` | grille ou couronne (P1.1 bis), taille des tuiles, arbres du Cœur | grille ; 3 × 4 ; comme les autres cases | couronne ; 3 × 3, 3 × 4, 4 × 4 (campagne 2) |
+| `menaces_par_machine` | q menaces par Machine et par tour (P2.1 bis) | 0 (annonce classique) | 1, 2 (campagne 2) |
 
 Contraintes de validité : k < n, k ≤ p, m = 0 ou m ≥ n, c0 > n × t.
 
@@ -97,6 +107,8 @@ Toutes les mesures sont des écarts de taux de parade, en points, entre bots jou
 | Maîtrise | voir plus loin que le tour compte-t-il ? | Monte-Carlo − glouton | ≥ 4 | < 1 |
 | Difficulté | ni trivial ni impossible | taux du bot fort | 35 à 75 | < 20 ou > 90 |
 | Investissement | le dilemme « protéger ou se placer » existe-t-il ? | part des décisions où le Monte-Carlo sacrifie une parade immédiate pour se placer | indice | – |
+| Agence | chaque joueur compte-t-il ? | part des joueurs dont un ordre a paré au moins une menace dans la partie (bot fort) | indice | – |
+| Couplage | les joueurs s'entraident-ils ? | part des parades faites hors de la tuile du joueur (Cœur compris), couronne seulement | indice | – |
 
 Le **score d'intérêt** d'une variante est sa note la plus faible (même logique que la qualité des cycles : l'objectif le plus faible).
 

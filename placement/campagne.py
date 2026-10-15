@@ -32,7 +32,7 @@ from . import VERSION
 def _appliquer(base: dict, choix: dict):
     d = dict(base)
     for cle, v in choix.items():
-        if cle == "plateau":           # [largeur, hauteur]
+        if cle == "plateau" and isinstance(v, (list, tuple)):   # raccourci [largeur, hauteur]
             d["largeur"], d["hauteur"] = v
         else:
             d[cle] = v
@@ -142,6 +142,10 @@ def _agreger(vs, resultats, plan):
                 b[cle] += st.get(cle, 0)
             for cle, x in st["compteurs"].items():
                 b["compteurs"][cle] = b["compteurs"].get(cle, 0) + x
+            if "parades_joueur" in st:                 # P3.4 bis : agence et couplage
+                pj = st["parades_joueur"]
+                b.setdefault("agence", []).append(sum(1 for x in pj if x > 0) / len(pj))
+                b["hors_tuile"] = b.get("hors_tuile", 0) + st.get("hors_tuile", 0)
     for v in syn["variantes"].values():
         p = Params.depuis(v["params"])
         for b in v["bots"].values():
@@ -199,7 +203,8 @@ def main(argv=None):
         brut = []
         for vid, g, res in resultats:
             brut.append((vid, g, {n: {k: st[k] for k in ("parades", "duree", "ordres", "pare_garde", "pare_sabotage",
-                                                        "replis", "compteurs", "c0") if k in st}
+                                                        "replis", "compteurs", "c0", "parades_joueur", "hors_tuile")
+                                     if k in st}
                                   for n, st in res.items()}))
         with open(os.path.join(a.sortie, f"lot_{lot[0]:03d}.json"), "w", encoding="utf-8") as f:
             json.dump({"resultats": brut}, f)
