@@ -210,3 +210,10 @@ def test_plans_du_depot_valides():
         assert vs
         for d in vs.values():
             Params.depuis(d).valider()
+
+
+def test_dispute_profil_tourne():
+    """Mesure du choix disputé (T4, T5) : elle tourne et ses parts somment à 100 %."""
+    from placement.dispute import profil
+    res, lignes = profil(Params(tours=3), parties=1, R=8)
+    assert lignes and abs(res["placer_gagne"] + res["proteger_gagne"] + res["neutre"] - 100) < 1e-6
