@@ -9,19 +9,19 @@ Les joueurs ne voient plus les menaces, seulement les deux pistes du Méchant ; 
 
 **Les deux pistes**, publiques, celles de l'atelier v2 :
 - **piste des pensées**, cases 2 à 12, une tactique par case, désignée par la **somme** des deux dés. Disposition de départ de l'atelier : 2 Percée · 3 Représailles · 4 Percée · 5 Représailles · 6 Opportunisme · 7 Cupidité · 8 Opportunisme · 9 Représailles · 10 Percée · 11 Cupidité · 12 Cupidité. Pas d'esprit (le rêve reste différé) ;
-- **piste des Machines**, cases 1 à 5, une Machine par case, désignée par l'**écart** des dés. Un doublé (écart 0) fait obéir le **favori**, la Machine de la case 1 (option proposée de l'atelier, `d_fav`).
+- **piste des Machines**, six cases, une Machine par case, désignée par l'**écart** des dés (0 à 5). **Décidé par l'auteur le 16 oct., 13 h 11 : le doublé (écart 0) désigne une sixième Machine, Zizanie, la scie à grappin** (option `d_six` de l'atelier). Les cases s'impriment **dans l'ordre des probabilités : 1 · 2 · 0 · 3 · 4 · 5**, soit 10, 8, 6, 6, 4 et 2 chances sur 36. Le numéro d'écart est écrit sur chaque case ; la position sur la piste est la probabilité, sans exception.
 
 **Une menace = un lancer.** Somme → tactique ; écart → Machine ; la Machine applique la tactique dans son rayon (règles P4.2 à P4.7 inchangées). Les dés sont lancés **à la résolution**, jamais avant la programmation.
 
 **Ce que savent les joueurs en programmant** : exactement les deux pistes, donc la probabilité de chaque tactique, de chaque Machine et de chacun des 21 plans (la pyramide de l'atelier, imprimable sous les pistes). C'est le mécanisme envisagé, sans écart.
 
 **Apprendre** (règle de l'atelier, sans esprits). Après chaque menace, les deux tuiles désignées s'échangent avec une voisine, selon le même verdict :
-- réussite (un arbre est tombé) : vers le 7 sur la piste des pensées (au 7, elle reste), vers la case 1 sur la piste des Machines (en 1, elle reste) ;
-- échec (la menace est parée) : vers le bord (en 2 ou 12, elle reste ; au 7, elle passe en 8), vers la case 5 (en 5, elle reste).
+- réussite (un arbre est tombé) : vers le 7 sur la piste des pensées (au 7, elle reste), vers le côté probable de la piste des Machines, c'est-à-dire d'une case vers la gauche de l'ordre 1 · 2 · 0 · 3 · 4 · 5 (en tête, elle reste) ;
+- échec (la menace est parée) : vers le bord (en 2 ou 12, elle reste ; au 7, elle passe en 8), d'une case vers la droite, côté rare (en queue, elle reste). Le sens se lit sur la piste imprimée, jamais sur le numéro d'écart : la case 0 n'est donc pas collante.
 
 Les pistes changent donc **pendant le tour** : la seconde vague ne se lit plus comme la première, et les joueurs peuvent l'anticiper. Parer une tactique, c'est aussi la faire reculer.
 
-**Les Machines, toujours cinq.** La pression ne vient plus du nombre de Machines mais du nombre de lancers : le nombre de Machines n'a plus à suivre J. Il y a toujours 5 Machines sur la piste ; au départ, J + 1 (au plus 5) sont sur le plateau, sur la lisière de la tuile de leur joueur, les autres attendent au chantier. **Une Machine appelée au chantier entre** sur une case de lisière tirée au dé **et y abat un arbre** (une garde sur cette case la pare). Ainsi chaque lancer abat un arbre s'il n'est pas paré, et la borne du tour tient.
+**Les Machines, toujours six.** La pression ne vient plus du nombre de Machines mais du nombre de lancers : le nombre de Machines n'a plus à suivre J. Il y a toujours 6 Machines sur la piste (Grosse Gueule 1, Rapiat 2, Zizanie 0, Mâchoire 3, Tonton Débard 4, Ripaille 5, les noms de l'atelier) ; au départ, min(J + 1, 6) sont sur le plateau, sur la lisière de la tuile de leur joueur, les autres attendent au chantier. *Choix de Claude, à confirmer* : on les met sur le plateau dans l'ordre 1, 2, 3, 4, 5, 0 (Zizanie arrive en dernier, comme dans l'atelier) ; à 6 joueurs, les six sont sur le plateau et le chantier est vide. **Une Machine appelée au chantier entre** sur une case de lisière tirée au dé **et y abat un arbre** (une garde sur cette case la pare). Ainsi chaque lancer abat un arbre s'il n'est pas paré, et la borne du tour tient.
 
 ## 2. Le Gentil : deux ordres, deux étapes
 
@@ -47,7 +47,7 @@ Une garde ou un sabotage posé à une étape vaut pour la vague qui la suit, pui
 |---|---|---|
 | Ce que sait le Gentil | toutes les menaces (Machine et tactique) ; seul l'ordre est caché | les deux pistes, donc des probabilités |
 | Une menace | une carte de tactique devant chaque Machine | un lancer de 2D6 : somme → tactique, écart → Machine |
-| Machines | J + 2, une menace chacune | 5 sur la piste des Machines ; J + 1 au départ sur le plateau, les autres au chantier |
+| Machines | J + 2, une menace chacune | 6 sur la piste des Machines ; min(J + 1, 6) au départ sur le plateau, les autres au chantier |
 | Apprentissage | aucun | échanges sur les deux pistes après chaque menace |
 | Ordres | 1 par joueur et par tour | 2 par joueur, programmés ensemble, révélés en deux étapes |
 | Résolution | ordres posés, puis toutes les menaces | étape 1 → vague 1 → étape 2 → vague 2 |
@@ -76,7 +76,7 @@ Une garde ou un sabotage posé à une étape vaut pour la vague qui la suit, pui
 - **Ordres par joueur** : 2 (proposé), 1 (la maquette actuelle, comme témoin) ou 3.
 - **Présage** : les dés de la vague 1 sont lancés et montrés avant la programmation. C'est l'annonce actuelle pour la première vague, les pistes seules pour la seconde. Ce levier est à garder en réserve si l'information manque. Plus tard, il pourrait devenir un pouvoir (les oiseaux, « Voir »).
 - **Le verdict de l'apprentissage** : **partagé, décidé par l'auteur le 16 oct., 13 h 09** (les deux tuiles, celle de la tactique et celle de la Machine, apprennent à chaque menace, parée ou non, comme dans l'atelier). L'auteur privilégie le meilleur apprentissage du Méchant, même quand la Machine est parée. Écarté : le verdict ciblé (une garde ferait échouer la tactique seule, un sabotage la Machine seule), qui laissait une tuile immobile à chaque parade. Conséquence : garder et saboter ont le même effet sur l'apprentissage ; ils ne diffèrent que par leur condition et leur effet sur le tour.
-- **Le doublé** : le favori (proposé), branle-bas, il hésite (les options de l'atelier).
+- **Le doublé** : **décidé, une sixième Machine en case 0** (16 oct., 13 h 11). Écartés : le favori, branle-bas, il hésite.
 - **Nombre de tours** : 4 (proposé), 3 ou 5.
 
 ## 6. Ce qu'il faut mesurer (campagne 3, si tu retiens la proposition)
