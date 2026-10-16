@@ -14,7 +14,7 @@
 | V0.3 | 89,8 % contre 82,6 % : **rêver domine** | +2,4 points (orange) | « le rêve est trop rentable » |
 | V0.4 | 70,6 % contre 73,3 % : **ne pas rêver vaut un peu mieux** | −1,3 point (rouge) | « le rêve ne paie plus, il ne domine pas » |
 
-*Sources : protocole P3 (`projet/4-bilans/protocole-p3-analyse.md`), proposition « le rêve disputé ».*
+*Sources : protocole P3 (`archive/conception-v0x/bilans/protocole-p3-analyse.md`), proposition « le rêve disputé ».*
 
 Entre les deux versions, l'avantage **moyen** du rêve est passé d'environ +7 points à environ −3. Pourtant le gain d'un joueur qui *juge* la situation est resté proche de zéro. On a traversé le point d'équilibre sans jamais créer de dilemme. L'auteur l'a formulé ainsi : si une option est toujours meilleure, l'autre n'a pas d'intérêt ; si les deux s'équilibrent dans toutes les situations, il n'y a plus de choix. **Toute l'intelligence stratégique est dans l'appréciation de la situation.**
 
@@ -115,7 +115,7 @@ Sans ces deux points, un gain libre faible pourrait venir du bot et non de la r�
 | Où poser une trace | ce que l'autre ignore | coordination nulle chez les bots (alerte C) |
 
 ## 8. Décisions (adoptées par l'auteur le 14 oct., 14 h 10 : C2, C3, C4)
-*Mise en œuvre : dès le cycle 2, selon [avant-ou-apres-v1.md](avant-ou-apres-v1.md) (M1 à M6, M10).*
+*Mise en œuvre : dès le cycle 2, selon [avant-ou-apres-v1.md](../../archive/conception-v0x/pilotage/avant-ou-apres-v1.md) (M1 à M6, M10).*
 1. **Adopter les sept principes et les six règles de méthode**, et la fiche du choix comme préalable à toute nouvelle règle. *Recommandation : oui.* Ils ne changent aucune règle du jeu et auraient évité les deux tours de réglage du rêve.
 2. **Remplacer la mesure des « dilemmes » par le profil de Δ (T4) et ajouter la lisibilité (T5)**, d'abord en lecture seule, avec les seuils proposés ci-dessus. *Recommandation : oui, en lecture seule jusqu'à la confirmation des seuils sur les témoins*, comme pour le garde-fou C1.
 3. **Ajouter T1 (fréquence des mécanismes voulus) au rapport de chaque cycle**, avec un seuil d'alerte (moins de 0,5 occurrence par partie pour un mécanisme noté 8 ou 9). *Recommandation : oui.* C'est le test le moins cher, et il aurait révélé le défaut dès la phase 1.

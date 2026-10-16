@@ -42,10 +42,10 @@
 - l'écart de difficulté du cycle 1 varie du simple au triple entre les deux bots ;
 - l'avantage du rêve dans T3 dépend des suites du bot (MC64R rêve à horloge fixe dans ses suites).
 
-**Défaut trouvé ce matin, corrigé.** Dans `maquettes/v2.json`, les témoins de communication « aucun signe » et « tout dire » étaient écrits comme des codes d'atelier complets. Hérités par la V0.3, la V0.4 et la V0.4rd, ils remplaçaient toute la version : plus de lunes, plus d'escalade, et un Cercle à 3 cases par joueur. En V0.4, la mesure de coordination comparait donc la V0.4 à un autre jeu, la V2 proposée sans lunes. En duo, ce jeu-là finit au tour 3 par le réveil, avec 88 % de forêt.
+**Défaut trouvé ce matin, corrigé.** Dans `archive/moteur-foret/maquettes/v2.json`, les témoins de communication « aucun signe » et « tout dire » étaient écrits comme des codes d'atelier complets. Hérités par la V0.3, la V0.4 et la V0.4rd, ils remplaçaient toute la version : plus de lunes, plus d'escalade, et un Cercle à 3 cases par joueur. En V0.4, la mesure de coordination comparait donc la V0.4 à un autre jeu, la V2 proposée sans lunes. En duo, ce jeu-là finit au tour 3 par le réveil, avec 88 % de forêt.
 - J'ai d'abord pris ce chiffre pour une stratégie dominante cachée, la « ruée vers le Cercle ». C'est en vérifiant les règles chargées que le défaut est apparu.
 - **Conséquences.** Aucune décision n'a été prise sur ces chiffres : ceux de la V0.4 n'avaient jamais été lus. En V0.3 et en duo, l'écart est sans effet, puisque 2 lunes à deux joueurs reviennent à un rêve par joueur.
-- **Correction.** Les deux variantes ne changent plus que la communication. `tests/test_variantes_heritees.py` vérifie qu'une variante de mesure ne change que sa cible, sur la v2 et ses descendantes.
+- **Correction.** Les deux variantes ne changent plus que la communication. `archive/moteur-foret/tests/test_variantes_heritees.py` vérifie qu'une variante de mesure ne change que sa cible, sur la v2 et ses descendantes.
 - **Leçon.** Une chaîne de mesure de cette taille peut se tromper en silence, et un analyste pressé peut tirer une conclusion de conception d'un artefact. C'est un argument de plus pour vérifier le mécanisme avant de croire au résultat.
 
 **c. L'empilement des règles.** Depuis la v1 se sont ajoutés :

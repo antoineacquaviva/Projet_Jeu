@@ -1,7 +1,14 @@
 name: Tests
 
+# Tests de la ligne active : le modèle « placement » (Python) et les maquettes jouables du kit et des pistes (JavaScript).
+# Le moteur archivé (archive/moteur-foret/) n'est plus testé ici : voir archive/LISEZMOI.md pour le relancer à la main.
+
 on:
   push:
+    paths-ignore:
+      - "archive/**"
+      - "projet/**"
+      - "**.md"
   pull_request:
   workflow_dispatch:
 
@@ -9,9 +16,9 @@ permissions:
   contents: read
 
 jobs:
-  tests:
+  placement:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -23,11 +30,17 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Installer pytest
         run: python -m pip install pytest
-      - name: Conformité règles, code et tests
-        run: python -m foret.conformite
-      - name: Conformité des nœuds de l'atelier v2
-        run: python -m foret.conformite --v2
-      - name: Conformité des mesures de la batterie
-        run: python -m foret.conformite --mesures
-      - name: Tests
+      - name: Tests du modèle placement
         run: python -m pytest -q tests
+
+  maquettes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Version de Node (préinstallée sur l'image)
+        run: node --version
+      - name: Maquette du kit (rejoue les parties du moteur Python)
+        run: node maquettes-numeriques/kit/test_moteur.js
+      - name: Maquette des deux pistes
+        run: node maquettes-numeriques/pistes/test_moteur.js

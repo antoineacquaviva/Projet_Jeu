@@ -1,8 +1,8 @@
 # Le rêve disputé : la problématique et des pistes de conception
 
-*14 oct. 2026, 21 h 30. Rédigé par Claude à la demande de l'auteur, après la grille de réglage (campagne 31, [bilan](../4-bilans/essai-reve-dispute.md)). **Document de travail pour la recherche commune** : aucune règle n'est changée ni codée. Les pistes sont des propositions soumises à l'auteur.*
+*14 oct. 2026, 21 h 30. Rédigé par Claude à la demande de l'auteur, après la grille de réglage (campagne 31, [bilan](../../archive/conception-v0x/bilans/essai-reve-dispute.md)). **Document de travail pour la recherche commune** : aucune règle n'est changée ni codée. Les pistes sont des propositions soumises à l'auteur.*
 
-*Suite (14 oct., 22 h 55) : l'auteur retient la piste 1, puis la piste 1 avec la piste 4, et donne son accord pour coder les variantes d'essai. Codé le 14 oct., 23 h : règles `somnambule`, `somnambule_apprend` et `presages`, campagne `campagnes/reve_somnambule.json`. Choix de modélisation de Claude : la tuile dépassée s'exécute après les barrages et sabotages de l'étape, avec le favori (case 1 de la piste des Machines) ; elle n'apprend que dans la variante « qui apprend » ; le sommeil attend l'exécution de la dernière tuile dépassée.*
+*Suite (14 oct., 22 h 55) : l'auteur retient la piste 1, puis la piste 1 avec la piste 4, et donne son accord pour coder les variantes d'essai. Codé le 14 oct., 23 h : règles `somnambule`, `somnambule_apprend` et `presages`, campagne `archive/moteur-foret/campagnes/reve_somnambule.json`. Choix de modélisation de Claude : la tuile dépassée s'exécute après les barrages et sabotages de l'étape, avec le favori (case 1 de la piste des Machines) ; elle n'apprend que dans la variante « qui apprend » ; le sommeil attend l'exécution de la dernière tuile dépassée.*
 
 ## 1. La problématique en une phrase
 **Le rêve n'a pas d'adversaire au moment où il se joue.** Le meilleur plan est donc un horaire : défendre d'abord, puis rêver en rafale à la fin. Cet horaire ne dépend pas de ce que la table voit, et un choix qui ne dépend pas de la situation n'est pas un dilemme.

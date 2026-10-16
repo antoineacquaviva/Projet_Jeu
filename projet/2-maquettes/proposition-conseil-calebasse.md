@@ -2,7 +2,7 @@
 
 > **Statut au 15 oct. 2026, 17 h : idée retenue par l'auteur comme très intéressante, dont la conception est DIFFÉRÉE à plus tard.** L'auteur recentre pour l'instant la conception sur la mécanique de base seule (modèle « placement », `docs/regles_placement.md`), sans communication. Ce document est conservé tel quel, comme réserve d'idées : il n'est ni développé, ni codé, ni testé, et rien n'y est adopté. Les « validations » de la fin de la proposition sont suspendues. Registre des parties différées : `projet/1-idees/parties-differees.md`.
 
-*15 oct. 2026, 14 h. Réponse à la demande de l'auteur : un conseil plus intéressant, sans parole libre, avec une règle qui limite ce qu'on se dit. **Statut : proposition de Claude, rien n'est adopté.** Elle remplacerait N2.1 du noyau (`docs/regles_noyau.md`) et s'appuie sur la direction D1, « le rêve détourne ».*
+*15 oct. 2026, 14 h. Réponse à la demande de l'auteur : un conseil plus intéressant, sans parole libre, avec une règle qui limite ce qu'on se dit. **Statut : proposition de Claude, rien n'est adopté.** Elle remplacerait N2.1 du noyau (`archive/noyau-n1/regles_noyau.md`) et s'appuie sur la direction D1, « le rêve détourne ».*
 
 ## En bref
 
@@ -18,7 +18,7 @@ C'est ce que les tests n'ont jamais eu : une **information privée** qui vaut la
 
 **Il n'y a rien à apprendre aux autres.** Le présage, la piste des pensées, la piste des Machines, les pions et le nombre de cartes sont publics, et les mains sont identiques (N1.5). Seule la programmation est cachée. Un conseil libre ne fait donc circuler que des intentions. La table qui parle devient un seul joueur, et c'est l'effet leader, critique n° 1 du jeu coopératif selon le panel (`projet/1-idees/panel-de-joueurs-virtuels.md`). Les remèdes que cite le panel sont l'information cachée et une profondeur propre à chaque joueur.
 
-**Les mesures le confirment.** Sur la V0.3, « aucun signe » donne 89,9 % de forêt, les traces 90,5 % et « tout dire » 90,5 % : l'écart entre ne rien dire et tout dire n'est que de 0,6 point (`projet/4-bilans/ligne-de-base-p2.md`). Le conseil parlé de la v1, approché par des traces, ne récupérait que 7 % de l'écart (`projet/4-bilans/diagnostic-v1-options-v2.md`). **Une limite de communication n'a d'intérêt que s'il y a quelque chose à dire et quelque chose à coordonner.** Aucun réglage de la limite ne crée ni l'un ni l'autre.
+**Les mesures le confirment.** Sur la V0.3, « aucun signe » donne 89,9 % de forêt, les traces 90,5 % et « tout dire » 90,5 % : l'écart entre ne rien dire et tout dire n'est que de 0,6 point (`archive/conception-v0x/bilans/ligne-de-base-p2.md`). Le conseil parlé de la v1, approché par des traces, ne récupérait que 7 % de l'écart (`archive/conception-v0x/bilans/diagnostic-v1-options-v2.md`). **Une limite de communication n'a d'intérêt que s'il y a quelque chose à dire et quelque chose à coordonner.** Aucun réglage de la limite ne crée ni l'un ni l'autre.
 
 **Il y a pourtant à coordonner dans le noyau :**
 - **l'alliance** : saboter demande un allié dans la même zone à la même étape (N4.2, N4.4) ;
@@ -120,4 +120,4 @@ Cela représente environ une session de travail. Aucune règle ne serait adopté
 - Le mambeadero, l'ambil et la calebasse : article de la *Revista Anthropológicas* (UFPE), https://periodicos.ufpe.br/revistas/revistaanthropologicas/article/download/265181/49224/286604
 - Le *rafue*, parole-œuvre : Juan Andrés Osorio, « *Rafue uai* : una revisión bibliográfica en la tradición múrui-muina », *Lingüística y Literatura*, n° 76, 2019, https://revistas.udea.edu.co/public/journals/recursos_html/lyl-Html/linli-n76/0120-5587-linli-76-192.html
 - Davi Kopenawa, propos recueillis par Survival International, https://survivalinternational.org/articles/3511-Daviswords
-- Projet : `projet/4-bilans/ligne-de-base-p2.md`, `projet/4-bilans/diagnostic-v1-options-v2.md`, `projet/2-maquettes/maquette-de-conception-v2.md`, `projet/3-pilotage/objectifs-invariants-catalogue.md` (C2, bande de coordination), `projet/1-idees/synthese-des-idees.md` (l'alliance, l'asymétrie d'information, les peuples), `projet/1-idees/panel-de-joueurs-virtuels.md` (effet leader).
+- Projet : `archive/conception-v0x/bilans/ligne-de-base-p2.md`, `archive/conception-v0x/bilans/diagnostic-v1-options-v2.md`, `projet/2-maquettes/maquette-de-conception-v2.md`, `projet/3-pilotage/objectifs-invariants-catalogue.md` (C2, bande de coordination), `projet/1-idees/synthese-des-idees.md` (l'alliance, l'asymétrie d'information, les peuples), `projet/1-idees/panel-de-joueurs-virtuels.md` (effet leader).

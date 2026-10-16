@@ -1,6 +1,6 @@
 # Maquette de conception v2 : plan du Méchant, fins, conseil
 
-> **13 oct. 2026 : la v2 fixée s'appelle désormais V0.3** (`maquettes/v0.3.json`) ; voir le [plan vers la V1](../3-pilotage/plan-vers-v1.md).
+> **13 oct. 2026 : la v2 fixée s'appelle désormais V0.3** (`archive/moteur-foret/maquettes/v0.3.json`) ; voir le [plan vers la V1](../../archive/conception-v0x/pilotage/plan-vers-v1.md).
 
 *Statut (12 oct. 2026) : propositions de Claude sur les quatre demandes de l'auteur, rangées dans l'« Atelier de la Forêt qui rêve » (artefact HTML : https://claude.ai/artifact/WJiQMwXDJEDwVvAERsDWss ; source : `claude/maquette-html/atelier_v2.html`). **Toutes les décisions (D1 à D9) ont été tranchées le 13 oct. 2026** après le diagnostic de la phase 3 (voir la section « Décision de l'auteur du 13 oct. » et le [journal des décisions](../3-pilotage/journal-des-decisions.md)). Ce document est conservé pour l'historique des propositions. La maquette v1 reste la référence publiée du moteur.*
 
@@ -58,7 +58,7 @@
 ## 4. La maquette de conception
 L'atelier remplace la logique « boîte + livret » par un **arbre** : socle (toujours présent), choix (une option exactement), modules (on/off, idées verrouillées), paramètres (valeur proposée et plage, statut du catalogue). Préréglages : Le cœur seul, V2 proposée (cœur + présage), Façon The Gang (partage + lunes + présage), Héritage v1. Le livret de la variante s'assemble à la volée ; un code de variante permet de noter et recharger une configuration. Chaque fiche indique si le moteur sait déjà jouer le nœud.
 
-**À coder dans le moteur, dans l'ordre** : piste des Machines avec rayon, flèches et cycle ; moteur des rêves à deux voies et Cercle ; fins et bilan sans bonus ; traces comme décision « annonce » des joueurs virtuels ; lunes. Une variante deviendra `maquettes/v2.json` avec `"base": "v1"`.
+**À coder dans le moteur, dans l'ordre** : piste des Machines avec rayon, flèches et cycle ; moteur des rêves à deux voies et Cercle ; fins et bilan sans bonus ; traces comme décision « annonce » des joueurs virtuels ; lunes. Une variante deviendra `archive/moteur-foret/maquettes/v2.json` avec `"base": "v1"`.
 
 ## Décisions à prendre (recommandation de Claude en gras)
 1. Plan du Méchant : **qui et où** / où et comment.

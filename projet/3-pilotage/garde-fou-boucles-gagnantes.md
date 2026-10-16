@@ -1,6 +1,6 @@
 # Garde-fou « aucune boucle gagnante »
 
-*Statut (14 oct. 2026) : **adopté par l'auteur le 14 oct., 7 h 55** (ETAT.md, section 8) ; **mis en œuvre le 14 oct., 8 h 30, en lecture seule** (section 7) ; première lecture : [garde-fou-boucles-ligne-de-base.md](../4-bilans/garde-fou-boucles-ligne-de-base.md). Spécification autonome, tirée de la section 6 bis du document « Campagne de profondeur - tester la V1, courbe d'apprentissage, garde-fous » (projet Claude « Idée de jeu de société », anciennement « Campagne P3 »). Bandes confirmées par l'auteur le 14 oct., 11 h 50 (option A : vert ≥ 10 points, rouge < 3), à réexaminer après le cycle 2 au vu d'un échantillon plus grand. Les noms « protocole P2 / P3 » de ce dépôt désignent les protocoles des cycles ; ce document dit « campagne de profondeur » pour la campagne qui suivra la V1.0.*
+*Statut (14 oct. 2026) : **adopté par l'auteur le 14 oct., 7 h 55** (ETAT.md, section 8) ; **mis en œuvre le 14 oct., 8 h 30, en lecture seule** (section 7) ; première lecture : [garde-fou-boucles-ligne-de-base.md](../../archive/conception-v0x/bilans/garde-fou-boucles-ligne-de-base.md). Spécification autonome, tirée de la section 6 bis du document « Campagne de profondeur - tester la V1, courbe d'apprentissage, garde-fous » (projet Claude « Idée de jeu de société », anciennement « Campagne P3 »). Bandes confirmées par l'auteur le 14 oct., 11 h 50 (option A : vert ≥ 10 points, rouge < 3), à réexaminer après le cycle 2 au vu d'un échantillon plus grand. Les noms « protocole P2 / P3 » de ce dépôt désignent les protocoles des cycles ; ce document dit « campagne de profondeur » pour la campagne qui suivra la V1.0.*
 
 ## 1. Exigence (auteur)
 Une action d'un joueur, ou une suite d'actions répétées, y compris à plusieurs joueurs, ne doit pas constituer une stratégie gagnante.
@@ -22,7 +22,7 @@ Une action d'un joueur, ou une suite d'actions répétées, y compris à plusieu
 - Les **gloutons** (parer au plus probable, rythme de rêve fixe) comptent parmi les stratégies répétées : c'est la politique du tape-taupe.
 
 ## 4. Bibliothèque de stratégies répétées (bot `repete`, déclaratif)
-Un bot paramétré par un script (`foret/bots/repete.py`) : priorité d'actions, règle de zone (fixe, la plus menacée au départ, ou la plus menacée maintenant pour les réflexes), déplacement (jamais, ou vers une zone cible commune), moitié jouée, motif de rêve, relais, motif d'étapes, voie du rêve, Tromper, Voir, Hanter. Un script par siège pour les conventions collectives (table mixte). La bibliothèque (`foret/boucles.py`, `bibliotheque(n)`) compte **130 stratégies par taille de table** :
+Un bot paramétré par un script (`archive/moteur-foret/foret/bots/repete.py`) : priorité d'actions, règle de zone (fixe, la plus menacée au départ, ou la plus menacée maintenant pour les réflexes), déplacement (jamais, ou vers une zone cible commune), moitié jouée, motif de rêve, relais, motif d'étapes, voie du rêve, Tromper, Voir, Hanter. Un script par siège pour les conventions collectives (table mixte). La bibliothèque (`archive/moteur-foret/foret/boucles.py`, `bibliotheque(n)`) compte **130 stratégies par taille de table** :
 | Famille | Contenu | Nombre |
 |---|---|---|
 | Une action partout | saboter, barrer ou soutenir en premier × zone fixe ou la plus menacée au départ × moitié Machines ou plateau × rêve 0 ou 1 par tour | 24 |
@@ -59,13 +59,13 @@ Le même script à tous les sièges est la convention « miroir ». Les trois gl
 
 ## 7. Mise en œuvre
 **Fait le 14 oct., en lecture seule** (décision de l'auteur : « dès à présent ») : aucune bande ne juge, rien n'entre dans le score des variantes.
-1. `foret/bots/repete.py` : le bot déclaratif, enregistré sous le nom `repete`.
-2. `foret/boucles.py` : la bibliothèque, la campagne appariée (`python -m foret.boucles campagne --maquette … --tables-de <campagne du bot fort>`), l'analyse (`python -m foret.boucles analyser --boucles … --fort …`), les alertes et le bloc Markdown.
-3. `foret/mesures.py` : quatre mesures descriptives (`boucle_gagnante`, `convention_table`, `action_suffit`, `echelle_lecture`), étiquette indice, bandes rangées dans `bandes_proposees` ; `docs/mesures.md`, section « Garde-fou ».
-4. `foret/cycle.py` : **étape `boucles`** entre le contrôle et le rapport, jouée automatiquement à chaque cycle (`"boucles": false` dans le plan pour la sauter). Elle joue les finalistes et l'ancre sur les tables et les graines de la dernière manche de confirmation, ce qui l'apparie au bot fort ; le rapport reçoit un bloc « Garde-fou » et une **alerte de conception** si une boucle ou une convention arrive à moins de 3 points du bot fort.
-5. `tests/test_boucles.py` : bot, bibliothèque, campagne appariée, analyse, enchaînement du cycle.
+1. `archive/moteur-foret/foret/bots/repete.py` : le bot déclaratif, enregistré sous le nom `repete`.
+2. `archive/moteur-foret/foret/boucles.py` : la bibliothèque, la campagne appariée (`python -m foret.boucles campagne --maquette … --tables-de <campagne du bot fort>`), l'analyse (`python -m foret.boucles analyser --boucles … --fort …`), les alertes et le bloc Markdown.
+3. `archive/moteur-foret/foret/mesures.py` : quatre mesures descriptives (`boucle_gagnante`, `convention_table`, `action_suffit`, `echelle_lecture`), étiquette indice, bandes rangées dans `bandes_proposees` ; `archive/moteur-foret/docs/mesures.md`, section « Garde-fou ».
+4. `archive/moteur-foret/foret/cycle.py` : **étape `boucles`** entre le contrôle et le rapport, jouée automatiquement à chaque cycle (`"boucles": false` dans le plan pour la sauter). Elle joue les finalistes et l'ancre sur les tables et les graines de la dernière manche de confirmation, ce qui l'apparie au bot fort ; le rapport reçoit un bloc « Garde-fou » et une **alerte de conception** si une boucle ou une convention arrive à moins de 3 points du bot fort.
+5. `archive/moteur-foret/tests/test_boucles.py` : bot, bibliothèque, campagne appariée, analyse, enchaînement du cycle.
 6. **Coût mesuré** : 8 512 parties (130 stratégies et 3 gloutons, 16 tables, 4 parties) en 26 à 33 s sur 2 cœurs. L'étape du cycle (finalistes et ancre, 8 parties par table) coûte quelques minutes.
-7. **Première lecture** : V0.3 et V0.4, appariées aux Campagnes 16 et 18 ([bilan](../4-bilans/garde-fou-boucles-ligne-de-base.md)).
+7. **Première lecture** : V0.3 et V0.4, appariées aux Campagnes 16 et 18 ([bilan](../../archive/conception-v0x/bilans/garde-fou-boucles-ligne-de-base.md)).
 
 **Campagne de profondeur (après la V1.0)** : bandes confirmées et gelées ; recherche automatique de la meilleure boucle (vecteur par siège, recherche locale ou évolutionnaire, graines appariées) ; « répétition punie » ; boucles de règles ; reprise des cinq meilleures comme politique des suites du bot fort (échantillon : 15 tables, 6 parties, environ 28 heures-cœur) ; rejeu par le bot appris sans bibliothèque (tout écart signale une stratégie manquée).
 
