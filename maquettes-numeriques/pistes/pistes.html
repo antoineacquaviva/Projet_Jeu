@@ -1,0 +1,1557 @@
+<title>Couronne aux deux pistes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;1,400&family=Alegreya+Sans:wght@500;700;800&family=Young+Serif&display=swap">
+<style>
+/* Table de travail : la couronne et la tête du Méchant (ses deux pistes) à gauche, ce qu'il faut décider à droite.
+   Même famille que « Forêt en couronne » : feutre vert, Machines jaunes, une couleur par joueur, tuiles de tactique. */
+:root{
+  --bg:#E9EEE6; --panel:#F7F9F4; --card:#FFFFFF; --ink:#18201B; --muted:#5A665E; --line:#C9D2C6;
+  --felt:#2B4434; --felt-ink:#E8F0E9; --accent:#2D6A44; --accent-bg:#DCEADF;
+  --machine:#E2AE16; --machine-ink:#2A2306; --danger:#B23A2C; --danger-bg:#F6E0DB; --ok:#2F7A4B; --warn-bg:#F5E8D1;
+  --f0:#E7DED0; --f1:#CFE0C9; --f2:#B5CFAE; --f3:#93BC8B; --f4:#6FA367; --f5:#4F8A4A; --heart:#3E6E46; --cell-line:#7E9A79;
+  --t-cup:#E3BE45; --t-opp:#7FC2B8; --t-rep:#E38B76; --t-per:#EBA457;
+  --j1:#2E7DB7; --j2:#B8433A; --j3:#7A55B0; --j4:#C98A12; --j5:#2F8F7A; --j6:#8A5A34;
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Alegreya", Georgia, "Times New Roman", serif;
+  --f-ui:"Alegreya Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111712; --panel:#18211B; --card:#1D2820; --ink:#E1E9E1; --muted:#9BA99D; --line:#314036;
+    --felt:#1B2B20; --felt-ink:#DCE8DE; --accent:#7CC196; --accent-bg:#1E3325;
+    --machine:#E8B523; --machine-ink:#221C04; --danger:#EC8B7B; --danger-bg:#3D211C; --ok:#7CC196; --warn-bg:#36290F;
+    --f0:#3A332A; --f1:#24362A; --f2:#2B4532; --f3:#33563B; --f4:#3C6A45; --f5:#467D50; --heart:#5E9A66; --cell-line:#4F6A55;
+    --j1:#6FB0E6; --j2:#EC8B7B; --j3:#B49BE8; --j4:#E8B54D; --j5:#6CCBB3; --j6:#C99B74;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111712; --panel:#18211B; --card:#1D2820; --ink:#E1E9E1; --muted:#9BA99D; --line:#314036;
+  --felt:#1B2B20; --felt-ink:#DCE8DE; --accent:#7CC196; --accent-bg:#1E3325;
+  --machine:#E8B523; --machine-ink:#221C04; --danger:#EC8B7B; --danger-bg:#3D211C; --ok:#7CC196; --warn-bg:#36290F;
+  --f0:#3A332A; --f1:#24362A; --f2:#2B4532; --f3:#33563B; --f4:#3C6A45; --f5:#467D50; --heart:#5E9A66; --cell-line:#4F6A55;
+  --j1:#6FB0E6; --j2:#EC8B7B; --j3:#B49BE8; --j4:#E8B54D; --j5:#6CCBB3; --j6:#C99B74;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);margin:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,select,input{font:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1360px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;line-height:1.15;text-wrap:balance}
+.num{font-variant-numeric:tabular-nums}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;padding-block:22px 10px}
+.head h1{font-size:clamp(26px,3.4vw,38px)}
+.head .sub{font:600 14.5px/1.4 var(--f-ui);color:var(--muted);max-width:72ch;margin:0}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:4px;border-bottom:1.5px solid var(--line);padding-block:6px}
+.tabs button{font:800 13.5px var(--f-ui);letter-spacing:.04em;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:6px 10px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.status{margin-left:auto;font:700 13.5px var(--f-ui);color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.status b{color:var(--ink)}
+section[role="tabpanel"]{padding-top:16px}
+
+.table{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:980px){.table{grid-template-columns:minmax(0,1fr)}}
+.board{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:8px;min-width:0}
+.board svg{width:100%;height:auto;display:block;max-height:78vh}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font:600 12.5px var(--f-ui);color:var(--muted);padding-inline:4px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+.cell{stroke:var(--cell-line);stroke-width:1}
+.cell.a0{fill:var(--f0)} .cell.a1{fill:var(--f1)} .cell.a2{fill:var(--f2)} .cell.a3{fill:var(--f3)} .cell.a4{fill:var(--f4)} .cell.a5{fill:var(--f5)}
+.cell.cand{stroke:var(--accent);stroke-width:3.5;cursor:pointer}
+.cell.cible{stroke:var(--danger);stroke-width:3.5}
+.cell.pare{stroke:var(--ok);stroke-width:3.5}
+.tile-sep{stroke:var(--ink);stroke-width:2.5;opacity:.55}
+.tile-name{font:800 13px var(--f-ui);letter-spacing:.06em}
+.ntree{font:800 11px var(--f-ui);fill:var(--ink);opacity:.8;pointer-events:none}
+.cname{font:700 8.5px var(--f-ui);fill:var(--ink);opacity:.5;pointer-events:none}
+.tok{transition:transform .5s ease}
+@media (prefers-reduced-motion: reduce){.tok{transition:none}}
+.mach rect{fill:var(--machine);stroke:var(--machine-ink);stroke-width:1.2}
+.mach text{font:800 9.5px var(--f-ui);fill:var(--machine-ink)}
+.mach.actif rect{stroke:var(--danger);stroke-width:3}
+.ind circle{stroke:var(--card);stroke-width:1.5}
+.ind text{font:800 9px var(--f-ui);fill:var(--card)}
+.ind.sel circle{stroke:var(--ink);stroke-width:3}
+.ind.cliquable{cursor:pointer}
+.ordre-g{fill:none;stroke:var(--ink);stroke-width:2}
+.fleche{fill:none;stroke:var(--danger);stroke-width:1.6;stroke-dasharray:4 3;opacity:.75}
+.fleche.aller{stroke:var(--accent);stroke-dasharray:none;opacity:.9}
+
+.side{display:grid;gap:14px;min-width:0}
+.box{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px;min-width:0}
+.box.ask{border-color:var(--accent)}
+.box h2{font-size:21px}
+.eyebrow{font:800 11.5px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ctx{font:500 14.5px/1.45 var(--f-ui);color:var(--muted);margin:0}
+.ctx b{color:var(--ink)}
+.btn{font:800 14px var(--f-ui);border-radius:9px;padding:8px 14px;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent);color:var(--card)}
+.btn.sec{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.opt{font:700 13.5px var(--f-ui);background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:9px;padding:6px 10px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{background:var(--felt);color:var(--felt-ink);border-color:var(--felt)}
+.opt.k-garder{border-left:5px solid var(--ok)} .opt.k-saboter{border-left:5px solid var(--machine)} .opt.k-aller{border-left:5px solid var(--accent)}
+.indrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:start;padding:6px 0;border-top:1px solid var(--line)}
+.indrow:first-child{border-top:0}
+.pion{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;font:800 11px var(--f-ui);color:var(--card)}
+.small{font:500 13px/1.4 var(--f-ui);color:var(--muted)}
+.hint{font:500 14px/1.45 var(--f-ui);background:var(--accent-bg);border-radius:9px;padding:9px 11px}
+.hint.warn{background:var(--warn-bg)}
+
+.ann{display:grid;gap:5px}
+.anl{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:8px;align-items:center;font:600 14px var(--f-ui)}
+.mtag{display:inline-grid;place-items:center;min-width:30px;height:22px;border-radius:5px;background:var(--machine);color:var(--machine-ink);font:800 11.5px var(--f-ui);padding-inline:4px}
+.tac{border-radius:5px;padding:1px 7px;font:800 12px var(--f-ui);color:#1D231F}
+.tac.cupidite{background:var(--t-cup)} .tac.percee{background:var(--t-per)} .tac.opportunisme{background:var(--t-opp)} .tac.represailles{background:var(--t-rep)}
+.anl.fait{opacity:.5}
+.anl.encours{outline:2px solid var(--danger);outline-offset:2px;border-radius:6px}
+
+.players{display:grid;gap:6px}
+.pl{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;font:600 14px var(--f-ui);padding:5px 6px;border-radius:8px}
+.pl.actif{background:var(--accent-bg)}
+.pl .dot{width:14px;height:14px;border-radius:50%}
+.pl .who{color:var(--muted);font-weight:600;font-size:12.5px}
+.pl .ord{font-size:13px;color:var(--muted)}
+
+.journal{max-height:460px;overflow:auto;display:grid;gap:3px;font:500 14px/1.42 var(--f-ui);padding-right:4px}
+.jl{padding:4px 8px;border-radius:7px;border-left:3px solid transparent}
+.jl.k-tour{font-weight:800;color:var(--ink);margin-top:6px;border-left-color:var(--felt)}
+.jl.k-ann{background:var(--panel);border-left-color:var(--machine)}
+.jl.k-abattu{color:var(--danger)} .jl.k-pare{color:var(--ok);font-weight:700}
+.jl.k-fin{background:var(--accent-bg);font-weight:800;color:var(--ink)}
+.jl .why{display:block;font-size:13px;color:var(--muted);font-style:italic;margin-top:1px}
+.jl .tag{font:800 10.5px var(--f-ui);letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 5px;margin-right:5px;background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+
+.setup{display:grid;gap:12px}
+.seat{display:grid;grid-template-columns:14px minmax(0,1fr) minmax(0,12em);gap:10px;align-items:center;font:700 14.5px var(--f-ui)}
+.seat .dot{width:14px;height:14px;border-radius:50%}
+select,input[type="number"]{background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;min-width:0;max-width:100%}
+.params{display:grid;grid-template-columns:repeat(auto-fill,minmax(13em,1fr));gap:8px 14px}
+.params label{display:grid;gap:3px;font:700 13px var(--f-ui);color:var(--muted)}
+.resume{display:flex;flex-wrap:wrap;gap:6px 16px;font:600 14px var(--f-ui);color:var(--muted)}
+.resume b{color:var(--ink)}
+
+.tw{overflow-x:auto}
+table.res{border-collapse:collapse;width:100%;font:500 14px/1.35 var(--f-ui)}
+.res th,.res td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:right;white-space:nowrap}
+.res th:first-child,.res td:first-child{text-align:left}
+.res th{font:800 11px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.res tr.best td{font-weight:800}
+.bars{display:grid;gap:5px}
+.barl{display:grid;grid-template-columns:5.5em minmax(0,1fr) 3em;gap:8px;align-items:center;font:700 13px var(--f-ui)}
+.bart{height:10px;border-radius:5px;background:var(--panel);overflow:hidden}
+.bart span{display:block;height:100%;border-radius:5px}
+.verdict{font:700 15px/1.45 var(--f-ui);padding:10px 12px;border-radius:9px;background:var(--accent-bg)}
+
+.regles{max-width:78ch;display:grid;gap:10px;font:400 16.5px/1.6 var(--f-body)}
+.regles h2{font-size:26px;margin-top:14px}
+.regles h3{font-size:19px;margin-top:6px}
+.regles p{margin:0}
+.regles ul,.regles ol{margin:0;padding-left:22px;display:grid;gap:3px}
+.regles table{border-collapse:collapse;font:500 14px/1.4 var(--f-ui)}
+.regles th,.regles td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+
+.saved{display:grid;gap:8px}
+.sv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font:600 14px var(--f-ui)}
+.sv .m{color:var(--muted);font-weight:500;font-size:13px}
+.empty{font:500 15px/1.5 var(--f-ui);color:var(--muted);padding:18px;border:1.5px dashed var(--line);border-radius:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--felt);color:var(--felt-ink);font:700 14px var(--f-ui);padding:9px 16px;border-radius:999px;z-index:20;max-width:calc(100% - 32px)}
+
+/* le plateau laisse voir les pistes sous lui sur ordinateur */
+.board svg{max-height:60vh}
+/* la tête du Méchant */
+.mech{display:grid;gap:8px;min-width:0}
+.trk-h{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.track{display:grid;gap:3px;min-width:0}
+.trk-p{grid-template-columns:repeat(11,minmax(0,1fr))}
+.trk-m{grid-template-columns:repeat(6,minmax(0,1fr))}
+.tc{border:1.5px solid var(--line);border-radius:8px;background:var(--card);padding:4px 3px;display:grid;gap:3px;justify-items:center;align-content:start;text-align:center;min-width:0;transition:background .3s}
+.tc.sept{border-color:var(--felt)}
+.tc .n{font:800 12px var(--f-ui)}
+.tc .ch,.tc .lieu,.tc .agit{font:600 10.5px/1.2 var(--f-ui);color:var(--muted)}
+.tc .agit{color:var(--danger);font-weight:800}
+.tc .mn{font:700 10.5px/1.15 var(--f-ui);overflow-wrap:anywhere}
+.tc.vise{border-color:var(--danger);box-shadow:0 0 0 2px var(--danger)}
+.tc.bouge{background:var(--warn-bg)}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:30px;min-height:7px}
+.dots i{width:4px;height:4px;border-radius:50%;background:var(--ink);opacity:.7}
+.tile{display:block;width:100%;border-radius:5px;padding:3px 1px;font:800 10.5px var(--f-ui);color:#1D231F}
+.tile.cupidite,.pbar .cupidite{background:var(--t-cup)} .tile.percee,.pbar .percee{background:var(--t-per)}
+.tile.opportunisme,.pbar .opportunisme{background:var(--t-opp)} .tile.represailles,.pbar .represailles{background:var(--t-rep)}
+.mtag.off{background:transparent;color:var(--muted);border:1.5px dashed var(--muted)}
+.pbar{display:flex;width:100%;height:7px;border-radius:4px;overflow:hidden;gap:1px}
+.sens{margin:0;text-align:center}
+.tleg{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;font:600 12.5px var(--f-ui);color:var(--muted)}
+.tleg .tile{display:inline-block;width:auto;padding:1px 6px}
+.presage,.dernier{border-top:1px solid var(--line);padding-top:8px;display:grid;gap:6px}
+.dernier{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font:600 14px var(--f-ui)}
+.dl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.dp{display:inline-flex;gap:3px;align-items:center}
+.dp .small{margin-left:4px}
+.die{display:inline-grid;grid-template:repeat(3,1fr)/repeat(3,1fr);width:22px;height:22px;border:1.5px solid var(--ink);border-radius:5px;padding:2px;background:var(--card);vertical-align:middle}
+.die i{width:4px;height:4px;border-radius:50%;background:var(--ink);place-self:center}
+.thr{fill:var(--danger);fill-opacity:0;pointer-events:none;transition:fill-opacity .3s}
+.cname.thrtxt{fill:var(--danger);opacity:1;font-size:10px;font-weight:800}
+.fleche.aller.deux{stroke-dasharray:5 3}
+.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.slot{display:grid;gap:2px;text-align:left;font:700 14px var(--f-ui);background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer}
+.slot.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-bg)}
+.opt .val{margin-left:6px;font-weight:800;color:var(--danger)}
+.pl .cache{opacity:.45;font-style:italic}
+.jl.k-appris{color:var(--muted);font-size:13px;padding-left:18px}
+.jl.k-etape{font-weight:700;border-left-color:var(--accent)}
+.jl.k-perdu{color:var(--danger);font-style:italic}
+@media (max-width:560px){.tc .mn,.tc .lieu{font-size:9.5px}.tile{font-size:9.5px}.trk-p .dots{display:none}}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <h1>Couronne aux deux pistes</h1>
+    <p class="sub">Le kit par joueur, avec la tête du Méchant : on ne voit plus ses menaces, on lit ses deux pistes. Chaque joueur pose deux cartes, révélées avant chacune des deux vagues de lancers. Maquette d'étude, de 2 à 6 joueurs.</p>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-partie" aria-selected="true" aria-controls="pan-partie">Partie</button>
+    <button role="tab" id="tab-series" aria-selected="false" aria-controls="pan-series">Séries de bots</button>
+    <button role="tab" id="tab-archives" aria-selected="false" aria-controls="pan-archives">Parties enregistrées</button>
+    <button role="tab" id="tab-regles" aria-selected="false" aria-controls="pan-regles">Règles</button>
+    <div class="status num" id="status" aria-live="polite"></div>
+  </nav>
+
+  <section role="tabpanel" id="pan-partie" aria-labelledby="tab-partie">
+    <div class="table">
+      <div class="side">
+        <div class="board">
+          <svg id="plateau" viewBox="0 0 640 640" role="img" aria-label="La couronne : une tuile par joueur autour du Cœur, avec les arbres, les Machines et les individus"></svg>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="box mech" aria-label="La tête du Méchant"><div class="eyebrow">La tête du Méchant</div><div class="mech" id="mech"></div></div>
+      </div>
+      <div class="side">
+        <div class="box ask" id="ask"></div>
+        <div class="box" id="plBox" hidden><div class="eyebrow">À la table</div><div class="players" id="players"></div></div>
+        <div class="box" id="jBox" hidden>
+          <div class="btn-row" style="justify-content:space-between">
+            <div class="eyebrow">Journal de la partie</div>
+            <label class="small"><input type="checkbox" id="showWhy" checked> raisons des bots</label>
+          </div>
+          <div class="journal" id="journal" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pan-series" aria-labelledby="tab-series" hidden>
+    <div class="table">
+      <div class="box setup">
+        <h2>Comparer les bots</h2>
+        <p class="ctx">Les bots jouent beaucoup de parties sans animation, sur les mêmes dés pour chaque bot (comparaisons appariées). Les réglages sont ceux de la préparation de partie. Les bots qui prévoient prennent quelques secondes par table à 5 et 6 joueurs ; cette série sert à se faire une idée, la campagne du dépôt mesurera.</p>
+        <div class="params">
+          <label for="serN">Parties par bot et par taille<select id="serN"><option selected>6</option><option>12</option><option>24</option></select></label>
+          <label for="serJ">Tailles de table<select id="serJ"><option value="cur">celle de la préparation</option><option value="all" selected>de 2 à 6 joueurs</option></select></label>
+        </div>
+        <div class="btn-row"><button class="btn" id="runSerie">Lancer la série</button><span class="small num" id="serieProg"></span></div>
+      </div>
+      <div class="side"><div class="box" id="serieRes"><div class="empty">Les résultats s'afficheront ici : pour chaque bot et chaque taille de table, la part des ordres qui ont paré une menace, la forêt restante, les ordres perdus, l'agence (part des joueurs qui ont sauvé au moins un arbre) et le couplage (part des parades faites hors de sa tuile).</div></div></div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pan-archives" aria-labelledby="tab-archives" hidden>
+    <div class="box">
+      <div class="btn-row" style="justify-content:space-between">
+        <h2>Parties enregistrées</h2>
+        <div class="btn-row"><button class="btn sec" id="expAll">Exporter tout (JSON)</button></div>
+      </div>
+      <p class="ctx" id="dbState">Chaque partie terminée et chaque série sont enregistrées avec leur journal. Claude peut les relire pour les analyser.</p>
+      <div class="saved" id="saved"></div>
+    </div>
+  </section>
+
+  <section role="tabpanel" id="pan-regles" aria-labelledby="tab-regles" hidden>
+    <div class="regles">
+      <h2>Le but</h2>
+      <p>Une partie dure 4 tours. À chaque tour, les Machines du Méchant abattent des arbres et les joueurs, ensemble, en sauvent le plus possible. On compte à la fin les arbres restants. Il en tombe au moins un à chaque vague, et il en reste toujours.</p>
+      <h2>La mise en place</h2>
+      <ul>
+        <li><b>Chaque joueur pose sa tuile</b> contre le Cœur (3 × 3 cases, 3 arbres par case). Les tuiles forment une couronne : la rangée intérieure touche le Cœur, la rangée extérieure est la lisière, chaque tuile touche ses deux voisines.</li>
+        <li><b>Chaque joueur pose ses individus</b> (3) sur sa tuile. Ensuite, ils vont où ils veulent.</li>
+        <li><b>Les six Machines</b> sont rangées sur la piste des Machines. Il y en a une de plus que de joueurs sur le plateau (au plus six), posées dans l'ordre Grosse Gueule, Rapiat, Mâchoire, Tonton Débard, Ripaille, Zizanie : la Machine du joueur j sur la lisière de sa tuile, une de plus sur une lisière tirée au dé. Les autres attendent au chantier.</li>
+      </ul>
+      <h2>La tête du Méchant : deux pistes</h2>
+      <p>Le Méchant ne dit pas ce qu'il va faire. Il lance deux dés, et ses deux pistes, publiques, disent ce que chaque lancer donnera. La position d'une tuile sur une piste est sa probabilité.</p>
+      <ul>
+        <li><b>La piste des pensées</b>, cases 2 à 12 : la <b>somme</b> des dés désigne une case, et la tuile qui s'y trouve donne la tactique. Le 7 sort 6 fois sur 36, le 2 et le 12 une fois.</li>
+        <li><b>La piste des Machines</b>, six cases imprimées dans l'ordre des probabilités : l'<b>écart</b> des dés désigne la Machine qui obéit. Écart 1 : 10 chances sur 36 ; écart 2 : 8 ; écart 0 (un double) : 6 ; écart 3 : 6 ; écart 4 : 4 ; écart 5 : 2.</li>
+        <li>Somme et écart viennent des mêmes dés : une Machine ne reçoit pas toutes les tactiques. La Machine de l'écart 5 joue toujours la case 7, celle de l'écart 4 les cases 6 ou 8, celle de l'écart 1 les cases impaires de 3 à 11, le double les cases paires. La barre colorée sous chaque Machine le montre.</li>
+      </ul>
+      <h3>Un lancer</h3>
+      <ul>
+        <li>La Machine désignée applique la tactique dans son rayon (sa case et les cases voisines qui ont encore des arbres), sur la forêt du moment. Si sa cible est gardée, la menace est parée et la Machine reste. Sinon elle y entre et abat un arbre.</li>
+        <li>Si la Machine désignée est au chantier, elle entre sur une case de lisière tirée au dé et y abat un arbre (ou, sans arbre là, sur la case boisée la plus proche). Une garde sur cette case la pare.</li>
+        <li><b>Il apprend</b>, après chaque lancer : la tuile de tactique et la Machine désignées s'échangent avec une voisine. Si un arbre est tombé (réussite), la tactique va vers le 7 et la Machine vers le côté probable. Si la menace a été parée (échec), la tactique va vers le bord (au 7, vers le 8) et la Machine vers le côté rare. Au bord, rien ne bouge.</li>
+      </ul>
+      <h2>Un tour</h2>
+      <ol>
+        <li><b>Les cartes.</b> Chaque joueur pose deux cartes d'ordre, numérotées 1 et 2, chacune pour l'un de ses individus (le même peut recevoir les deux), en même temps que les autres.</li>
+        <li><b>Étape 1.</b> On révèle les cartes 1 : déplacements d'abord, puis gardes et sabotages posés.</li>
+        <li><b>Vague 1.</b> Le Méchant lance les dés autant de fois qu'il y a de joueurs, plus une.</li>
+        <li><b>Étape 2.</b> Les gardes et sabotages de l'étape 1 tombent ; on révèle les cartes 2.</li>
+        <li><b>Vague 2.</b> Autant de lancers.</li>
+      </ol>
+      <h3>Les ordres</h3>
+      <ul>
+        <li><b>Garder</b> : l'individu garde sa case. La première menace qui la vise pendant la vague est parée.</li>
+        <li><b>Aller</b> : l'individu va sur une case voisine. Il ne pare rien, mais sa présence compte aussitôt pour les tactiques.</li>
+        <li><b>Saboter</b> : l'individu est sur la case d'une Machine. La première menace de cette Machine pendant la vague est parée ; la Machine va quand même où elle voulait, sans abattre.</li>
+        <li><b>Un ordre devenu impossible est perdu</b> : saboter une Machine qui a quitté la case pendant la vague 1, par exemple.</li>
+      </ul>
+      <h3>Les tactiques</h3>
+      <table><thead><tr><th>Tactique</th><th>Case visée dans le rayon</th></tr></thead><tbody>
+        <tr><td><span class="tac cupidite">Cupidité</span></td><td>la plus boisée</td></tr>
+        <tr><td><span class="tac percee">Percée</span></td><td>la plus proche du Cœur</td></tr>
+        <tr><td><span class="tac opportunisme">Opportunisme</span></td><td>la moins défendue (le moins d'individus)</td></tr>
+        <tr><td><span class="tac represailles">Représailles</span></td><td>la plus défendue</td></tr>
+      </tbody></table>
+      <p class="small">Égalités : la plus boisée, puis la plus proche du Cœur, puis la case de la Machine, puis le plus petit numéro. Sans arbre dans son rayon, une Machine va vers la case boisée la plus proche.</p>
+      <h2>Les réglages</h2>
+      <p>Cartes par joueur (deux, ou une seule comme témoin, sur 8 tours), lancers par vague (un ou deux de plus que de joueurs), rythme de l'apprentissage (après chaque lancer, ou à la fin de chaque vague), présage (les dés de la vague 1 montrés avant les cartes), taille des tuiles, individus, arbres, tours.</p>
+      <p class="small">Maquette d'étude : aucune de ces règles n'est adoptée. Proposition : projet/2-maquettes/proposition-mechant-pistes-deux-etapes.md du dépôt. Les pistes sont celles de l'atelier v2, sans les esprits (le rêve reste différé).</p>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>/* Moteur de « Couronne aux deux pistes » : le kit par joueur (docs/regles_placement.md, P1 à P5 avec la couronne)
+   où l'annonce est remplacée par les deux pistes du Méchant, lues sur deux dés, et où chaque joueur programme deux
+   ordres révélés en deux étapes (projet/2-maquettes/proposition-mechant-pistes-deux-etapes.md). Sans interface.
+
+   Un tour : programmation (une carte par étape et par joueur) → étape 1 → vague 1 (L lancers) → étape 2 → vague 2.
+   Un lancer : somme des dés → tuile de la piste des pensées (une tactique) ; écart → case de la piste des Machines.
+   Apprendre : la tuile de tactique et la Machine désignées s'échangent avec une voisine, selon le même verdict. */
+(function (G) {
+  'use strict';
+  const TACTIQUES = ['cupidite', 'percee', 'opportunisme', 'represailles'];
+  const NOMS_TACTIQUES = { cupidite: 'Cupidité', percee: 'Percée', opportunisme: 'Opportunisme', represailles: 'Représailles' };
+  const RIEN = 'rien', GARDER = 'garder', ALLER = 'aller', SABOTER = 'saboter';
+
+  // Piste des pensées, cases 2 à 12 : la disposition de départ de l'atelier v2 (nœud A2a), sans esprit.
+  const PENSEES_DEPART = { 2: 'percee', 3: 'represailles', 4: 'percee', 5: 'represailles', 6: 'opportunisme', 7: 'cupidite',
+    8: 'opportunisme', 9: 'represailles', 10: 'percee', 11: 'cupidite', 12: 'cupidite' };
+  const CHANCES_SOMME = (s) => 6 - Math.abs(s - 7);          // sur 36
+  // Piste des Machines : six cases imprimées dans l'ordre des probabilités (décision du 16 oct., 13 h 11).
+  const ECARTS = [1, 2, 0, 3, 4, 5];
+  const CHANCES_ECART = { 0: 6, 1: 10, 2: 8, 3: 6, 4: 4, 5: 2 };
+  // Les six Machines (noms de l'atelier) ; la Machine m part sur la case d'écart ECART_DEPART[m].
+  const MACHINES = [
+    { nom: 'Grosse Gueule', court: 'GG' }, { nom: 'Rapiat', court: 'Ra' }, { nom: 'Mâchoire', court: 'Mâ' },
+    { nom: 'Tonton Débard', court: 'TD' }, { nom: 'Ripaille', court: 'Ri' }, { nom: 'Zizanie', court: 'Zi' }];
+  const ECART_DEPART = [1, 2, 3, 4, 5, 0];
+  const NM = MACHINES.length;
+
+  const DEFAUTS = { joueurs: 3, etapes: 2, lancersEnPlus: 1, rythme: 'lancer', presage: false, tuileL: 3, tuileP: 3,
+    individusParJoueur: 3, arbres: 3, coeurArbres: 0, tours: 4, graine: 1 };
+
+  function generateur(graine) {                       // mulberry32 : parties reproductibles
+    let a = (graine >>> 0) || 1;
+    const r = function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    r.entier = (n) => Math.floor(r() * n);
+    r.choix = (xs) => xs[r.entier(xs.length)];
+    r.melange = (xs) => { const ys = xs.slice(); for (let i = ys.length - 1; i > 0; i--) { const j = r.entier(i + 1); [ys[i], ys[j]] = [ys[j], ys[i]]; } return ys; };
+    return r;
+  }
+
+  function params(reglages) {
+    const r = Object.assign({}, DEFAUTS, reglages || {});
+    const p = {
+      J: r.joueurs, l: r.tuileL, q: r.tuileP, a: r.arbres, coeurArbres: r.coeurArbres || r.arbres,
+      I: r.individusParJoueur * r.joueurs, ipj: r.individusParJoueur, E: r.etapes, k: r.joueurs,
+      L: r.joueurs + r.lancersEnPlus, surPlateau: Math.min(r.joueurs + 1, NM), rythme: r.rythme, presage: !!r.presage,
+      tours: r.tours, graine: r.graine, reglages: r,
+    };
+    p.lancersParTour = p.L * p.E;
+    p.ordresParTour = p.k * p.E;
+    p.c0 = p.J * p.l * p.q * p.a + p.coeurArbres;
+    const err = [];
+    if (p.J < 1 || p.J > 6) err.push('de 1 à 6 joueurs');
+    if (p.E < 1 || p.E > 2) err.push('une ou deux étapes');
+    if (p.L <= p.k) err.push('il faut plus de lancers que d\'ordres par vague');
+    if (p.c0 <= p.lancersParTour * p.tours) err.push('la forêt de départ doit dépasser le nombre total de lancers');
+    if (p.rythme !== 'lancer' && p.rythme !== 'vague') err.push('rythme : « lancer » ou « vague »');
+    p.erreurs = err;
+    return p;
+  }
+
+  // P1.1 bis : J tuiles l × q autour du Cœur (case 0) ; identique au kit.
+  function plateau(p) {
+    const { J, l, q } = p;
+    const N = 1 + J * l * q;
+    const idx = (t, r, c) => 1 + t * l * q + r * l + c;
+    const adj = Array.from({ length: N }, () => new Set());
+    const lier = (a, b) => { if (a !== b) { adj[a].add(b); adj[b].add(a); } };
+    for (let t = 0; t < J; t++) {
+      for (let r = 0; r < q; r++) {
+        for (let c = 0; c < l; c++) {
+          if (r + 1 < q) lier(idx(t, r, c), idx(t, r + 1, c));
+          if (c + 1 < l) lier(idx(t, r, c), idx(t, r, c + 1));
+        }
+        if (J >= 2) lier(idx(t, r, l - 1), idx((t + 1) % J, r, 0));
+      }
+      for (let c = 0; c < l; c++) lier(0, idx(t, 0, c));
+    }
+    const voisins = adj.map((s) => Array.from(s).sort((x, y) => x - y));
+    const dist = [];
+    for (let c = 0; c < N; c++) {
+      const d = new Array(N).fill(-1); d[c] = 0; const file = [c];
+      for (let i = 0; i < file.length; i++) { const u = file[i]; for (const w of voisins[u]) if (d[w] < 0) { d[w] = d[u] + 1; file.push(w); } }
+      dist.push(d);
+    }
+    const coeur = dist[0].map((x) => 2 * x);
+    const tuile = [-1]; const rang = [-1]; const col = [-1];
+    for (let t = 0; t < J; t++) for (let r = 0; r < q; r++) for (let c = 0; c < l; c++) { tuile.push(t); rang.push(r); col.push(c); }
+    const lisieres = [];
+    for (let t = 0; t < J; t++) { const li = []; for (let c = 0; c < l; c++) li.push(idx(t, q - 1, c)); lisieres.push(li); }
+    return { N, voisins, dist, coeur, tuile, rang, col, lisieres, idx };
+  }
+
+  const proprietaire = (p, i) => Math.floor(i * p.J / p.I);
+
+  // Tuiles de la piste des pensées : 11 tuiles numérotées (identité), chacune porte une tactique.
+  const TUILES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((s) => PENSEES_DEPART[s]);
+
+  // Mise en place : arbres ; min(J + 1, 6) Machines sur le plateau, posées dans l'ordre 1, 2, 3, 4, 5, 0 (la Machine j < J
+  // sur la lisière de la tuile j, les autres sur une lisière tirée) ; les autres au chantier (−1). Pistes de départ.
+  function miseEnPlace(p, pl, rng) {
+    const arbres = new Array(pl.N).fill(p.a); arbres[0] = p.coeurArbres;
+    const machines = new Array(NM).fill(-1);
+    for (let m = 0; m < p.surPlateau; m++) {
+      const li = m < p.J ? pl.lisieres[m] : pl.lisieres[rng.entier(p.J)];
+      machines[m] = rng.choix(li);
+    }
+    const pensees = new Array(13).fill(-1);
+    for (let s = 2; s <= 12; s++) pensees[s] = s - 2;                 // la tuile n° s − 2 en case s
+    const pisteM = ECARTS.map((d) => ECART_DEPART.indexOf(d));         // position → Machine
+    return { arbres, machines, individus: [], tour: 0, pensees, pisteM };
+  }
+
+  const copie = (e) => ({ arbres: e.arbres.slice(), machines: e.machines.slice(), individus: e.individus.slice(), tour: e.tour,
+    pensees: e.pensees.slice(), pisteM: e.pisteM.slice() });
+  const foret = (e) => e.arbres.reduce((s, x) => s + x, 0);
+  const tactiqueEn = (e, s) => TUILES[e.pensees[s]];
+
+  // Les tirages d'un tour : pour chaque étape, L lancers ; un lancer = deux dés et une entrée (tuile, colonne) qui ne sert
+  // que si la Machine désignée est au chantier. Tous les tirages du jeu sont faits au début de la partie.
+  function tirerLancer(p, rng) { return { d: [1 + rng.entier(6), 1 + rng.entier(6)], t: rng.entier(p.J), c: rng.entier(p.l) }; }
+  function tirerTour(p, rng) {
+    const out = [];
+    for (let v = 0; v < p.E; v++) { const w = []; for (let k = 0; k < p.L; k++) w.push(tirerLancer(p, rng)); out.push(w); }
+    return out;
+  }
+
+  // Ce que désigne un lancer sur les pistes du moment
+  function lire(e, d) {
+    const somme = d[0] + d[1], ecart = Math.abs(d[0] - d[1]);
+    const pos = ECARTS.indexOf(ecart);
+    return { somme, ecart, tuile: e.pensees[somme], tactique: TUILES[e.pensees[somme]], pos, machine: e.pisteM[pos] };
+  }
+
+  function presence(e) { const m = {}; for (const c of e.individus) m[c] = (m[c] || 0) + 1; return m; }
+  function cmp(a, b) { for (let i = 0; i < a.length; i++) { if (a[i] < b[i]) return -1; if (a[i] > b[i]) return 1; } return 0; }
+  function minPar(xs, cle) { let best = xs[0], kb = cle(xs[0]); for (const x of xs.slice(1)) { const k = cle(x); if (cmp(k, kb) < 0) { best = x; kb = k; } } return best; }
+
+  function plusProcheBoisee(pl, e, depuis) {
+    const d = pl.dist[depuis]; const A = e.arbres; const boisees = [];
+    for (let c = 0; c < pl.N; c++) if (A[c] > 0) boisees.push(c);
+    return minPar(boisees, (c) => [d[c], -A[c], pl.coeur[c], c]);
+  }
+
+  // P4.2 à P4.4 : la case visée par une Machine du plateau, lue sur la configuration du moment ; [case, repli]
+  function destination(p, pl, e, machine, tactique) {
+    const pos = e.machines[machine]; const A = e.arbres;
+    const rayon = [pos].concat(pl.voisins[pos]).filter((c) => A[c] > 0);
+    if (!rayon.length) return [plusProcheBoisee(pl, e, pos), true];
+    let cle;
+    if (tactique === 'cupidite') cle = (c) => [-A[c], pl.coeur[c], c !== pos ? 1 : 0, c];
+    else if (tactique === 'percee') cle = (c) => [pl.coeur[c], -A[c], c !== pos ? 1 : 0, c];
+    else {
+      const pres = presence(e);
+      if (tactique === 'opportunisme') cle = (c) => [pres[c] || 0, -A[c], pl.coeur[c], c];
+      else cle = (c) => [-(pres[c] || 0), -A[c], pl.coeur[c], c];
+    }
+    return [minPar(rayon, cle), false];
+  }
+
+  // Une Machine appelée au chantier entre sur la case de lisière tirée et y abat (ou, sans arbre, sur la case boisée
+  // la plus proche) ; [case d'entrée, case visée]
+  function entree(p, pl, e, lancer) {
+    const e0 = pl.lisieres[lancer.t][lancer.c];
+    return [e0, e.arbres[e0] > 0 ? e0 : plusProcheBoisee(pl, e, e0)];
+  }
+
+  // Apprendre (verdict partagé, décision du 16 oct., 13 h 09) : la tuile de tactique et la Machine s'échangent avec une
+  // voisine. Réussite : vers le 7 / vers le côté probable. Échec : vers le bord (au 7, vers le 8) / vers le côté rare.
+  // On cherche la tuile et la Machine par leur identité : avec le rythme « vague », elles ont pu bouger entre-temps.
+  function apprendre(e, tuile, machine, reussite) {
+    const s = e.pensees.indexOf(tuile);
+    let n = null;
+    if (reussite) n = s < 7 ? s + 1 : (s > 7 ? s - 1 : null);
+    else n = s < 7 ? (s > 2 ? s - 1 : null) : (s > 7 ? (s < 12 ? s + 1 : null) : 8);
+    if (n !== null) { const x = e.pensees[s]; e.pensees[s] = e.pensees[n]; e.pensees[n] = x; }
+    const pos = e.pisteM.indexOf(machine);
+    let np = reussite ? (pos > 0 ? pos - 1 : null) : (pos < NM - 1 ? pos + 1 : null);
+    if (np !== null) { const x = e.pisteM[pos]; e.pisteM[pos] = e.pisteM[np]; e.pisteM[np] = x; }
+    return { pensees: [s, n], machines: [pos, np] };
+  }
+
+  // Les ordres possibles d'un individu à une étape, depuis sa position prévue (pos) ; saboter vise une Machine qui est
+  // sur cette case au moment où l'on programme.
+  function ordresPossibles(p, pl, e, i, pos) {
+    if (pos === undefined) pos = e.individus[i];
+    const ops = [[GARDER, pos]];
+    e.machines.forEach((m, j) => { if (m === pos) ops.push([SABOTER, j]); });
+    for (const c of pl.voisins[pos]) ops.push([ALLER, c]);
+    return ops;
+  }
+
+  // Les cartes : cartes[j] = [carte de l'étape 1, carte de l'étape 2], chacune {i, o} ou null.
+  const cartesVides = (p) => Array.from({ length: p.J }, () => new Array(p.E).fill(null));
+  // position prévue de chaque individu avant l'étape v (un individu ne bouge que par ses propres ordres)
+  function positionsPrevues(p, e, cartes, v) {
+    const pos = e.individus.slice();
+    for (let w = 0; w < v; w++) for (const cs of cartes) { const c = cs[w]; if (c && c.o[0] === ALLER) pos[c.i] = c.o[1]; }
+    return pos;
+  }
+  function programmeEtape(p, cartes, v) {
+    const prog = Array.from({ length: p.I }, () => [RIEN, null]);
+    cartes.forEach((cs, j) => { const c = cs[v]; if (c) { if (proprietaire(p, c.i) !== j) throw new Error('un joueur commande l\'individu d\'un autre'); prog[c.i] = c.o; } });
+    return prog;
+  }
+
+  // Révéler une étape : déplacements, puis gardes et sabotages posés (P3.3). Un ordre devenu impossible est perdu.
+  function reveler(p, pl, e, prog) {
+    const gardes = {}, sab = {}, quiG = {}, quiS = {}, perdus = [];
+    prog.forEach(([typ, arg], i) => {
+      if (typ !== ALLER) return;
+      if (pl.dist[e.individus[i]][arg] !== 1) { perdus.push({ i, o: [typ, arg], pourquoi: 'case hors de portée' }); return; }
+      e.individus[i] = arg;
+    });
+    prog.forEach(([typ, arg], i) => {
+      if (typ === GARDER) {
+        const c = e.individus[i];
+        if (arg !== c) { perdus.push({ i, o: [typ, arg], pourquoi: 'l\'individu n\'est pas sur cette case' }); return; }
+        gardes[c] = (gardes[c] || 0) + 1; (quiG[c] = quiG[c] || []).push(i);
+      } else if (typ === SABOTER) {
+        if (e.machines[arg] !== e.individus[i]) { perdus.push({ i, o: [typ, arg], pourquoi: 'la Machine a quitté la case' }); return; }
+        sab[arg] = (sab[arg] || 0) + 1; (quiS[arg] = quiS[arg] || []).push(i);
+      }
+    });
+    return { gardes, sab, quiG, quiS, perdus };
+  }
+
+  // Un lancer ; renvoie l'événement complet (pour le pas à pas, le journal et l'apprentissage)
+  function executerLancer(p, pl, e, pose, lancer, attente) {
+    const L = lire(e, lancer.d); const m = L.machine;
+    const ev = { d: lancer.d, somme: L.somme, ecart: L.ecart, tuile: L.tuile, tactique: L.tactique, machine: m, de: e.machines[m] };
+    if (e.machines[m] < 0) {                               // au chantier : elle entre
+      const [e0, cible] = entree(p, pl, e, lancer);
+      Object.assign(ev, { entree: e0, cible, repli: cible !== e0 });
+      if ((pose.gardes[cible] || 0) > 0) {
+        pose.gardes[cible]--; e.machines[m] = e0;
+        Object.assign(ev, { issue: 'gardee', qui: pose.quiG[cible].shift(), lieu: cible });
+      } else { e.machines[m] = cible; e.arbres[cible]--; ev.issue = 'abattu'; }
+    } else {
+      const [cible, repli] = destination(p, pl, e, m, L.tactique);
+      Object.assign(ev, { cible, repli });
+      if ((pose.sab[m] || 0) > 0) {                        // P4.5 : sabotage d'abord, la Machine s'échappe
+        pose.sab[m]--; const de = e.machines[m]; e.machines[m] = cible;
+        Object.assign(ev, { issue: 'sabotee', qui: pose.quiS[m].shift(), lieu: de });
+      } else if ((pose.gardes[cible] || 0) > 0) {          // P4.6 : la garde, la Machine reste
+        pose.gardes[cible]--;
+        Object.assign(ev, { issue: 'gardee', qui: pose.quiG[cible].shift(), lieu: cible });
+      } else { e.machines[m] = cible; e.arbres[cible]--; ev.issue = 'abattu'; }
+    }
+    const verdict = { tuile: L.tuile, machine: m, reussite: ev.issue === 'abattu' };
+    if (p.rythme === 'lancer') ev.appris = apprendre(e, verdict.tuile, verdict.machine, verdict.reussite);
+    else attente.push(verdict);
+    return ev;
+  }
+  // fin de vague (rythme « vague ») : les échanges en attente, dans l'ordre des lancers
+  function finVague(p, e, attente) { return attente.splice(0).map((v) => apprendre(e, v.tuile, v.machine, v.reussite)); }
+
+  // Un tour complet, sans pas à pas (bots, séries, tests) ; renvoie les événements, étape par étape
+  function jouerTour(p, pl, e, cartes, tirage) {
+    const etapes = [];
+    for (let v = 0; v < p.E; v++) {
+      const pose = reveler(p, pl, e, programmeEtape(p, cartes, v));
+      const attente = [];
+      const evts = tirage[v].map((l) => executerLancer(p, pl, e, pose, l, attente));
+      const appris = finVague(p, e, attente);
+      etapes.push({ perdus: pose.perdus, evts, appris });
+    }
+    e.tour++;
+    return etapes;
+  }
+  const paradesEtapes = (etapes) => etapes.reduce((s, x) => s + x.evts.filter((v) => v.issue !== 'abattu').length, 0);
+
+  // ------------------------------------------------------------ lecture des pistes (ce que voient les joueurs)
+  // Les 36 issues des dés : pour chacune, la tactique et la Machine désignées.
+  const ISSUES = []; for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) ISSUES.push([a, b]);
+  // chances (sur 36) que la prochaine menace soit le fait de chaque Machine, et le profil de ses tactiques
+  function profils(e) {
+    const out = MACHINES.map(() => ({ chances: 0, tactiques: { cupidite: 0, percee: 0, opportunisme: 0, represailles: 0 } }));
+    for (const d of ISSUES) { const L = lire(e, d); out[L.machine].chances++; out[L.machine].tactiques[L.tactique]++; }
+    return out;
+  }
+  // probabilité qu'un lancer frappe chaque case, sur la configuration du moment (les entrées du chantier sont réparties
+  // sur toutes les cases de lisière)
+  function menaceParCase(p, pl, e) {
+    const pr = new Array(pl.N).fill(0);
+    const nl = p.J * p.l;
+    for (const d of ISSUES) {
+      const L = lire(e, d);
+      if (e.machines[L.machine] >= 0) pr[destination(p, pl, e, L.machine, L.tactique)[0]] += 1 / 36;
+      else for (let t = 0; t < p.J; t++) for (let c = 0; c < p.l; c++) pr[entree(p, pl, e, { t, c })[1]] += 1 / 36 / nl;
+    }
+    return pr;
+  }
+  // chance qu'une Machine agisse au moins une fois dans une vague de L lancers (pistes figées)
+  const auMoinsUneFois = (chances, L) => 1 - Math.pow(1 - chances / 36, L);
+
+  const CASES_DEPART = (p, pl, i) => { const j = proprietaire(p, i); const out = []; for (let c = 0; c < pl.N; c++) if (pl.tuile[c] === j) out.push(c); return out; };
+
+  // Placement initial commun : sur sa tuile, devant les Machines du plateau, sans s'empiler (comme le kit)
+  function placementHeuristique(p, pl, e) {
+    const pris = [];
+    const surPl = e.machines.filter((m) => m >= 0);
+    for (let i = 0; i < p.I; i++) {
+      const score = (c) => surPl.reduce((s, m) => s + Math.max(0, 3 - pl.dist[m][c]), 0) + 0.05 * e.arbres[c]
+        - 3 * pris.filter((x) => x === c).length - 0.01 * pl.coeur[c];
+      let best = null, sb = -Infinity;
+      for (const c of CASES_DEPART(p, pl, i)) { const s = score(c); if (s > sb || (s === sb && c < best)) { best = c; sb = s; } }
+      pris.push(best);
+    }
+    return pris;
+  }
+
+  // Une partie entière avec ses tirages (faits d'avance à partir de la graine)
+  function nouvellePartie(reglages) {
+    const p = params(reglages); const pl = plateau(p);
+    const rng = generateur(p.graine);
+    const e = miseEnPlace(p, pl, rng);
+    e.individus = placementHeuristique(p, pl, e);
+    const tirages = []; for (let t = 0; t < p.tours; t++) tirages.push(tirerTour(p, rng));
+    return { p, pl, e, tirages };
+  }
+
+  const API = { TACTIQUES, NOMS_TACTIQUES, RIEN, GARDER, ALLER, SABOTER, DEFAUTS, PENSEES_DEPART, CHANCES_SOMME, ECARTS, CHANCES_ECART,
+    MACHINES, ECART_DEPART, TUILES, generateur, params, plateau, proprietaire, miseEnPlace, copie, foret, tactiqueEn,
+    tirerLancer, tirerTour, lire, destination, entree, apprendre, ordresPossibles, cartesVides, positionsPrevues, programmeEtape,
+    reveler, executerLancer, finVague, jouerTour, paradesEtapes, ISSUES, profils, menaceParCase, auMoinsUneFois,
+    casesDepart: CASES_DEPART, placementHeuristique, presence, nouvellePartie };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API; else G.PISTES = API;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>/* Bots de « Couronne aux deux pistes », siège par siège. Ils ne voient pas les dés : ils lisent les deux pistes (ce que
+   voient les joueurs) et, avec le présage, les dés de la première vague. Chaque bot décide pour les joueurs qu'on lui
+   confie, après les humains et en voyant leurs cartes (une équipe bien coordonnée), et explique ses choix (`raison`).
+   - Réflexe : à chaque étape, garde la case la plus menacée ou sabote la Machine la plus probable, depuis la position
+     prévue ; il ne tient pas compte de ce que la première vague va changer.
+   - Glouton : essaie toutes les paires de cartes de chaque joueur et garde celle qui pare le plus sur des tirages des
+     pistes (le tour complet est simulé, apprentissage compris).
+   - Prévoyant : compare quelques programmes (réflexe, glouton, variantes où un joueur se place) en jouant ce tour et le
+     suivant, sur les mêmes tirages ; garde le meilleur.
+   - Hasard : des cartes permises au hasard (témoin). */
+(function (G) {
+  'use strict';
+  const K = (typeof module !== 'undefined' && module.exports) ? require('./moteur.js') : G.PISTES;
+  const { RIEN, GARDER, ALLER, SABOTER, NOMS_TACTIQUES, MACHINES } = K;
+
+  function nomCase(p, pl, c) {
+    if (c === 0) return 'Cœur';
+    return 'ABCDEF'[pl.tuile[c]] + (pl.rang[c] * p.l + pl.col[c] + 1);
+  }
+  const nomInd = (p, i) => 'J' + (K.proprietaire(p, i) + 1) + String.fromCharCode(97 + (i % p.ipj));
+  const nomM = (m) => MACHINES[m].nom;
+  const pc = (x) => Math.round(100 * x) + ' %';
+  const f2 = (x) => x.toFixed(2).replace('.', ',');
+  const individusDe = (p, j) => { const out = []; for (let i = 0; i < p.I; i++) if (K.proprietaire(p, i) === j) out.push(i); return out; };
+
+  function ordreTexte(p, pl, o) {
+    if (!o || o[0] === RIEN) return 'rien';
+    if (o[0] === GARDER) return 'garde ' + nomCase(p, pl, o[1]);
+    if (o[0] === ALLER) return 'va en ' + nomCase(p, pl, o[1]);
+    return 'sabote ' + nomM(o[1]);
+  }
+
+  function queueBinomiale(n, q, r) {               // P(X ≥ r), X ~ Bin(n, q)
+    if (r <= 0) return 1;
+    let s = 0, c = 1;
+    for (let x = 0; x <= n; x++) { if (x >= r) s += c * Math.pow(q, x) * Math.pow(1 - q, n - x); c = c * (n - x) / (x + 1); }
+    return s;
+  }
+
+  // tirages des pistes pour évaluer un programme ; avec le présage, les dés de la vague 1 sont connus
+  function echantillons(p, rng, S, ctx) {
+    const out = [];
+    for (let s = 0; s < S; s++) {
+      const t = K.tirerTour(p, rng);
+      if (ctx && ctx.connus) t[0].forEach((l, k) => { l.d = ctx.connus[k].slice(); });
+      out.push(t);
+    }
+    return out;
+  }
+  function valeur(p, pl, e, cartes, echant) {
+    let tot = 0;
+    for (const t of echant) { const f = K.copie(e); tot += K.paradesEtapes(K.jouerTour(p, pl, f, cartes, t)); }
+    return tot / echant.length;
+  }
+  const copieCartes = (cartes) => cartes.map((cs) => cs.slice());
+
+  // ------------------------------------------------------------ Réflexe
+  // menace d'une étape vue depuis les positions prévues : par case (lancers qui y frappent) et par Machine (appels)
+  function lectureEtape(p, pl, e, pos, v, ctx) {
+    const f = K.copie(e); f.individus = pos.slice();
+    if (v === 0 && ctx && ctx.connus) {           // présage : les dés de la vague 1 sont connus
+      const hc = {}, hm = {};
+      for (const d of ctx.connus) {
+        const L = K.lire(f, d);
+        hm[L.machine] = (hm[L.machine] || 0) + 1;
+        if (f.machines[L.machine] >= 0) { const c = K.destination(p, pl, f, L.machine, L.tactique)[0]; hc[c] = (hc[c] || 0) + 1; }
+      }
+      return { garde: (c, deja) => ((hc[c] || 0) > deja ? 1 : 0), sabot: (m, deja) => ((hm[m] || 0) > deja ? 1 : 0),
+        pr: K.menaceParCase(p, pl, f), certain: true };
+    }
+    const pr = K.menaceParCase(p, pl, f); const prof = K.profils(f);
+    return { garde: (c, deja) => queueBinomiale(p.L, pr[c], deja + 1), sabot: (m, deja) => queueBinomiale(p.L, prof[m].chances / 36, deja + 1),
+      pr, certain: false };
+  }
+
+  function reflexe(p, pl, e, cartes, joueurs, rng, ctx) {
+    const raisons = {};
+    for (const j of joueurs) {
+      const morceaux = [];
+      for (let v = 0; v < p.E; v++) {
+        const pos = K.positionsPrevues(p, e, cartes, v);
+        const lu = lectureEtape(p, pl, e, pos, v, ctx);
+        const gardes = {}, sabs = {};
+        cartes.forEach((cs) => { const c = cs[v]; if (!c) return; if (c.o[0] === GARDER) gardes[c.o[1]] = (gardes[c.o[1]] || 0) + 1; if (c.o[0] === SABOTER) sabs[c.o[1]] = (sabs[c.o[1]] || 0) + 1; });
+        let best = null;
+        for (const i of individusDe(p, j)) {
+          const c = pos[i];
+          const vg = lu.garde(c, gardes[c] || 0);
+          if (!best || vg > best.v + 1e-9) best = { v: vg, i, o: [GARDER, c] };
+          e.machines.forEach((m, k) => {
+            if (m !== c) return;
+            const vs = lu.sabot(k, sabs[k] || 0) + 0.001;
+            if (vs > best.v + 1e-9) best = { v: vs, i, o: [SABOTER, k] };
+          });
+        }
+        const etq = p.E > 1 ? `Étape ${v + 1} : ` : '';
+        if (best && best.v >= 0.2) {
+          cartes[j][v] = { i: best.i, o: best.o };
+          const pourquoi = lu.certain ? 'le présage montre qu\'une menace y arrivera'
+            : (best.o[0] === GARDER ? `${pc(best.v)} de chances qu'au moins une menace de la vague frappe là` : `${pc(best.v)} de chances que cette Machine agisse dans la vague`);
+          morceaux.push(`${etq}${nomInd(p, best.i)} ${ordreTexte(p, pl, best.o)} (${pourquoi}).`);
+          continue;
+        }
+        // rien d'assez menacé : se placer sur la case voisine la plus menacée, non tenue
+        const tenues = new Set(pos);
+        let mv = null;
+        for (const i of individusDe(p, j)) for (const c of pl.voisins[pos[i]]) {
+          if (tenues.has(c)) continue;
+          const gain = lu.pr[c] - lu.pr[pos[i]];
+          if (gain > 0.02 && (!mv || gain > mv.g)) mv = { g: gain, i, c };
+        }
+        if (mv) { cartes[j][v] = { i: mv.i, o: [ALLER, mv.c] }; morceaux.push(`${etq}${nomInd(p, mv.i)} va en ${nomCase(p, pl, mv.c)}, plus menacée (${pc(lu.pr[mv.c])} par lancer) : il s'y place.`); }
+        else morceaux.push(`${etq}aucun ordre utile.`);
+      }
+      raisons[j] = morceaux.join(' ');
+    }
+    return raisons;
+  }
+
+  // ------------------------------------------------------------ Glouton
+  function optionsCartes(p, pl, e, cartes, j, v) {
+    const pos = K.positionsPrevues(p, e, cartes, v);
+    const out = [null];
+    for (const i of individusDe(p, j)) for (const o of K.ordresPossibles(p, pl, e, i, pos[i])) out.push({ i, o });
+    return out;
+  }
+  function decrireCartes(p, pl, cs) {
+    return cs.map((c, v) => `${p.E > 1 ? `étape ${v + 1}, ` : ''}${c ? nomInd(p, c.i) + ' ' + ordreTexte(p, pl, c.o) : 'rien'}`).join(' ; ');
+  }
+
+  function stratege(p, pl, e, cartes, joueurs, rng, ctx, S) {
+    S = S || 10;
+    const raisons = {};
+    const echant = echantillons(p, rng, S, ctx);
+    for (const j of joueurs) {
+      let best = null;
+      const essai = copieCartes(cartes);
+      const parcourir = (v) => {
+        if (v === p.E) {
+          const val = valeur(p, pl, e, essai, echant) - 0.001 * essai[j].filter((c) => c).length;
+          if (!best || val > best.v + 1e-9) best = { v: val, cs: essai[j].slice() };
+          return;
+        }
+        for (const c of optionsCartes(p, pl, e, essai, j, v)) { essai[j][v] = c; parcourir(v + 1); }
+        essai[j][v] = null;
+      };
+      parcourir(0);
+      cartes[j] = best.cs;
+      raisons[j] = `${decrireCartes(p, pl, best.cs)} : la meilleure paire de cartes de ce joueur, ${f2(best.v + 0.001 * best.cs.filter((c) => c).length)} parade(s) attendue(s) sur ${S} tirages des pistes, ses partenaires étant fixés.`;
+    }
+    return raisons;
+  }
+
+  // ------------------------------------------------------------ Prévoyant
+  function prevoyant(p, pl, e, cartes, joueurs, rng, ctx, R, H) {
+    R = R || 12; H = H === undefined ? 1 : H;
+    const base = copieCartes(cartes);
+    const cands = [];
+    const meme = (a, b) => a.every((cs, j) => cs.every((c, v) => (c === null && b[j][v] === null) || (c && b[j][v] && c.i === b[j][v].i && c.o[0] === b[j][v].o[0] && c.o[1] === b[j][v].o[1])));
+    const ajoute = (cs, raisons, nom) => { if (!cands.some((x) => meme(x.cs, cs))) cands.push({ cs, raisons, nom }); };
+    const c1 = copieCartes(base); ajoute(c1, reflexe(p, pl, e, c1, joueurs, rng, ctx), 'réflexe');
+    const c2 = copieCartes(base); const r2 = stratege(p, pl, e, c2, joueurs, rng, ctx, 8); ajoute(c2, r2, 'glouton');
+    // variantes : un joueur remplace sa dernière carte par un pas vers la case la plus menacée (se placer)
+    for (const j of joueurs) {
+      const v = p.E - 1;
+      const cs = copieCartes(c2);
+      const pos = K.positionsPrevues(p, e, cs, v);
+      const f = K.copie(e); f.individus = pos; const pr = K.menaceParCase(p, pl, f);
+      let mv = null;
+      for (const i of individusDe(p, j)) for (const c of pl.voisins[pos[i]]) if (!pos.includes(c) && (!mv || pr[c] > mv.g)) mv = { g: pr[c], i, c };
+      if (!mv) continue;
+      cs[j][v] = { i: mv.i, o: [ALLER, mv.c] };
+      const raisons = Object.assign({}, r2);
+      raisons[j] = `${decrireCartes(p, pl, cs[j])} : se placer en ${nomCase(p, pl, mv.c)} pour le tour suivant.`;
+      ajoute(cs, raisons, 'placement');
+    }
+    const ech = echantillons(p, rng, R, ctx);
+    const suites = []; for (let k = 0; k < R; k++) suites.push(K.tirerTour(p, rng));
+    const tous = Array.from({ length: p.J }, (_, j) => j);
+    for (const c of cands) {
+      let tot = 0;
+      for (let k = 0; k < R; k++) {
+        const f = K.copie(e);
+        tot += K.paradesEtapes(K.jouerTour(p, pl, f, c.cs, ech[k]));
+        for (let h = 0; h < H && f.tour < p.tours; h++) {
+          const cs = K.cartesVides(p);
+          reflexe(p, pl, f, cs, tous, rng, null);
+          tot += K.paradesEtapes(K.jouerTour(p, pl, f, cs, suites[k]));
+        }
+      }
+      c.v = tot / R;
+    }
+    cands.sort((a, b) => b.v - a.v);
+    const best = cands[0];
+    best.cs.forEach((cs, j) => { cartes[j] = cs.slice(); });
+    const refl = cands.find((x) => x.nom === 'réflexe');
+    const raisons = {};
+    for (const j of joueurs) raisons[j] = (best.raisons[j] || decrireCartes(p, pl, best.cs[j])) + ` [Programme ${best.nom} retenu parmi ${cands.length} : ${f2(best.v)} parades attendues sur ce tour et le suivant${refl && refl !== best ? `, contre ${f2(refl.v)} pour le réflexe` : ''}.]`;
+    return raisons;
+  }
+
+  // ------------------------------------------------------------ Hasard
+  function hasard(p, pl, e, cartes, joueurs, rng) {
+    const raisons = {};
+    for (const j of joueurs) {
+      for (let v = 0; v < p.E; v++) {
+        const pos = K.positionsPrevues(p, e, cartes, v);
+        const i = rng.choix(individusDe(p, j));
+        cartes[j][v] = { i, o: rng.choix(K.ordresPossibles(p, pl, e, i, pos[i])) };
+      }
+      raisons[j] = `${decrireCartes(p, pl, cartes[j])} : tiré au hasard.`;
+    }
+    return raisons;
+  }
+
+  const BOTS = {
+    reflexe: { nom: 'Réflexe', decrit: 'garde la case la plus menacée ou sabote la Machine la plus probable, étape par étape', jouer: reflexe },
+    prevoyant: { nom: 'Prévoyant', decrit: 'compare quelques programmes en jouant ce tour et le suivant', jouer: prevoyant },
+    stratege: { nom: 'Glouton', decrit: 'la meilleure paire de cartes pour ce tour, sur des tirages des pistes', jouer: stratege },
+    hasard: { nom: 'Hasard', decrit: 'des cartes permises au hasard (témoin)', jouer: hasard },
+  };
+
+  // une partie entière jouée par un bot à tous les sièges (séries de la page) ; mêmes tirages du jeu pour tous les bots
+  // à graine égale (comparaisons appariées)
+  function partieAuto(reglages, bot) {
+    const { p, pl, e, tirages } = K.nouvellePartie(reglages);
+    const rb = K.generateur(p.graine * 7919 + 17);
+    const parJoueur = new Array(p.J).fill(0); let S = 0, hors = 0, perdus = 0;
+    const tous = Array.from({ length: p.J }, (_, j) => j);
+    for (let t = 0; t < p.tours; t++) {
+      const cartes = K.cartesVides(p);
+      const ctx = p.presage ? { connus: tirages[t][0].map((l) => l.d.slice()) } : null;
+      BOTS[bot].jouer(p, pl, e, cartes, tous, rb, ctx);
+      for (const et of K.jouerTour(p, pl, e, cartes, tirages[t])) {
+        perdus += et.perdus.length;
+        for (const v of et.evts) {
+          if (v.issue === 'abattu') continue;
+          S++; const j = K.proprietaire(p, v.qui); parJoueur[j]++;
+          if (pl.tuile[v.lieu] !== j) hors++;
+        }
+      }
+    }
+    return { taux: S / (p.ordresParTour * p.tours), foret: K.foret(e) / p.c0, agence: parJoueur.filter((x) => x > 0).length / p.J,
+      couplage: S ? hors / S : 0, parades: S, perdus };
+  }
+
+  const API = { BOTS, nomCase, nomInd, nomM, ordreTexte, individusDe, valeur, echantillons, lectureEtape, queueBinomiale, partieAuto };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API; else G.PISTESBOTS = API;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>/* Page « Couronne aux deux pistes » : préparation, partie pas à pas (humains et bots, deux cartes par joueur, lancer par
+   lancer), séries de bots, parties enregistrées dans la base de l'artefact. L'état d'une partie est un objet JSON
+   simple (S), rejouable : tous les tirages sont faits au départ à partir de la graine. */
+(function () {
+  'use strict';
+  const K = window.PISTES, B = window.PISTESBOTS;
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const pct = (x) => Math.round(100 * x) + ' %';
+  const f1 = (x) => x.toFixed(1).replace('.', ',');
+  const COUL = (j) => `var(--j${j + 1})`;
+  const SIEGES = { humain: 'Humain', prevoyant: 'Bot prévoyant', reflexe: 'Bot réflexe', stratege: 'Bot glouton', hasard: 'Bot hasard' };
+  const NT = K.NOMS_TACTIQUES;
+  const COURT = { cupidite: 'Cupi', percee: 'Perc', opportunisme: 'Oppo', represailles: 'Repr' };
+  const MN = (m) => K.MACHINES[m].nom;
+
+  let cfg = { reglages: Object.assign({}, K.DEFAUTS, { graine: 1 + Math.floor(Math.random() * 99999) }),
+    sieges: ['humain', 'prevoyant', 'prevoyant', 'prevoyant', 'prevoyant', 'prevoyant'], aide: true };
+  try { const m = JSON.parse(localStorage.getItem('pistes-cfg') || 'null'); if (m && m.reglages && m.sieges) cfg = Object.assign(cfg, m); } catch (e) { /* stockage indisponible */ }
+  const garderCfg = () => { try { localStorage.setItem('pistes-cfg', JSON.stringify(cfg)); } catch (e) { /* rien */ } };
+
+  let S = null;                 // la partie en cours
+  let P = null, PL = null;      // réglages calculés et plateau
+  const UI = { db: null, dl: null, sel: null, index: [], geo: null, serie: null };
+
+  // ------------------------------------------------------------------ outils
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => { t.hidden = true; }, 2800); }
+  const nomC = (c) => B.nomCase(P, PL, c);
+  const nomI = (i) => B.nomInd(P, i);
+  const tour = () => S.e.tour;
+  const ordreTexte = (o) => B.ordreTexte(P, PL, o);
+  const carteTexte = (c) => (c ? nomI(c.i) + ' ' + ordreTexte(c.o) : 'rien');
+  function log(k, txt, why, tag) { S.journal.push({ k, txt, why: why || '', tag: tag || '' }); }
+  function de(n) {
+    const P9 = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] }[n];
+    return `<span class="die" role="img" aria-label="${n}">${P9.map((k) => `<i style="grid-area:${1 + Math.floor((k - 1) / 3)}/${1 + (k - 1) % 3}"></i>`).join('')}</span>`;
+  }
+  const des = (d) => de(d[0]) + de(d[1]);
+  const ctxBots = () => (P.presage ? { connus: S.tirages[tour()][0].map((l) => l.d.slice()) } : null);
+
+  // ------------------------------------------------------------------ géométrie de la couronne (comme le kit)
+  const CX = 320, CY = 320, RH = 54, R0 = 54, R1 = 286;
+  function geometrie(p, pl) {
+    const A = 2 * Math.PI / p.J, a0 = -Math.PI / 2 - A / 2, w = (R1 - R0) / p.q;
+    const pt = (r, a) => [CX + r * Math.cos(a), CY + r * Math.sin(a)];
+    const cells = [{ c: 0, path: null, cx: CX, cy: CY, r: RH, tan: [1, 0], rad: [0, 1] }];
+    for (let c = 1; c < pl.N; c++) {
+      const t = pl.tuile[c], r = pl.rang[c], k = pl.col[c];
+      const ga = a0 + t * A + k * A / p.l, gb = ga + A / p.l, ra = R0 + r * w, rb = ra + w;
+      const [x1, y1] = pt(ra, ga), [x2, y2] = pt(rb, ga), [x3, y3] = pt(rb, gb), [x4, y4] = pt(ra, gb);
+      const big = (gb - ga) > Math.PI ? 1 : 0;
+      const path = `M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)} A${rb},${rb} 0 ${big} 1 ${x3.toFixed(1)},${y3.toFixed(1)} L${x4.toFixed(1)},${y4.toFixed(1)} A${ra},${ra} 0 ${big} 0 ${x1.toFixed(1)},${y1.toFixed(1)} Z`;
+      const am = (ga + gb) / 2, rm = (ra + rb) / 2;
+      const [cx, cy] = pt(rm, am);
+      const [nx, ny] = pt(rb - 9, am), [lx, ly] = pt(ra + 8, am);
+      cells.push({ c, path, cx, cy, nx, ny, lx, ly, tan: [-Math.sin(am), Math.cos(am)], rad: [Math.cos(am), Math.sin(am)], arc: rm * (gb - ga), w });
+    }
+    const seps = [];
+    for (let t = 0; t < p.J; t++) { const a = a0 + t * A; const [x1, y1] = pt(R0 - 4, a), [x2, y2] = pt(R1 + 4, a); seps.push([x1, y1, x2, y2]); }
+    const noms = [];
+    for (let t = 0; t < p.J; t++) { const [x, y] = pt(R1 + 18, a0 + (t + 0.5) * A); noms.push([x, y]); }
+    return { cells, seps, noms };
+  }
+
+  function positions(e) {
+    const par = {};
+    e.machines.forEach((c, j) => { if (c >= 0) (par[c] = par[c] || []).push('m' + j); });
+    e.individus.forEach((c, i) => { (par[c] = par[c] || []).push('i' + i); });
+    const pos = {};
+    for (const c in par) {
+      const g = UI.geo.cells[c]; const ids = par[c]; const n = ids.length;
+      const parRang = c == 0 ? 4 : Math.max(1, Math.min(4, Math.floor((g.arc - 4) / 23)));
+      ids.forEach((id, k) => {
+        const rang = Math.floor(k / parRang), col = k % parRang, dansRang = Math.min(parRang, n - rang * parRang);
+        const off = (col - (dansRang - 1) / 2) * 23, offR = (rang - (Math.ceil(n / parRang) - 1) / 2) * 19;
+        pos[id] = [g.cx + g.tan[0] * off + g.rad[0] * offR, g.cy + g.tan[1] * off + g.rad[1] * offR];
+      });
+    }
+    return pos;
+  }
+
+  function construirePlateau(p, pl) {
+    UI.geo = geometrie(p, pl);
+    const g = UI.geo; const svg = $('plateau');
+    let h = '<defs><marker id="tete" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/></marker>'
+      + '<marker id="teteV" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker></defs><g id="gCells">';
+    h += `<circle id="cell0" class="cell a3" cx="${CX}" cy="${CY}" r="${RH}" data-c="0"/>`;
+    for (const x of g.cells.slice(1)) h += `<path id="cell${x.c}" class="cell" d="${x.path}" data-c="${x.c}"/>`;
+    h += '</g><g id="gThr">';
+    h += `<circle id="thr0" class="thr" cx="${CX}" cy="${CY}" r="${RH}"/>`;
+    for (const x of g.cells.slice(1)) h += `<path id="thr${x.c}" class="thr" d="${x.path}"/>`;
+    h += '</g><g id="gSeps">';
+    for (const [x1, y1, x2, y2] of g.seps) h += `<line class="tile-sep" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
+    g.noms.forEach(([x, y], t) => { h += `<text class="tile-name" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="${COUL(t)}">Joueur ${t + 1}</text>`; });
+    h += '</g><g id="gLabels">';
+    h += `<text id="cn0" class="cname" x="${CX}" y="${CY - 30}" text-anchor="middle">Cœur</text><text id="nt0" class="ntree" x="${CX}" y="${CY + 38}" text-anchor="middle"></text>`;
+    for (const x of g.cells.slice(1)) {
+      h += `<text id="nt${x.c}" class="ntree" x="${x.nx.toFixed(1)}" y="${x.ny.toFixed(1)}" text-anchor="middle" dominant-baseline="middle"></text>`;
+      h += `<text id="cn${x.c}" class="cname" x="${x.lx.toFixed(1)}" y="${x.ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" data-nom="${x.w > 30 && x.arc > 30 ? B.nomCase(p, pl, x.c) : ''}"></text>`;
+    }
+    h += '</g><g id="gFleches"></g><g id="gToks"></g>';
+    svg.innerHTML = h;
+    $('gCells').addEventListener('click', (ev) => { const c = ev.target.getAttribute && ev.target.getAttribute('data-c'); if (c !== null && c !== undefined) clicCase(+c); });
+    $('gToks').addEventListener('click', (ev) => { const t = ev.target.closest && ev.target.closest('[data-i]'); if (t) clicIndividu(+t.getAttribute('data-i')); });
+    UI.tokBuilt = false;
+  }
+
+  function dessinerPlateau(e, opts) {
+    opts = opts || {};
+    for (let c = 0; c < PL.N; c++) {
+      const el = $('cell' + c); if (!el) continue;
+      el.setAttribute('class', 'cell a' + Math.min(5, e.arbres[c]) + (opts.cand && opts.cand.has(c) ? ' cand' : '') + (opts.cible === c ? ' cible' : '') + (opts.pare === c ? ' pare' : ''));
+      $('nt' + c).textContent = e.arbres[c];
+      const th = opts.menace ? opts.menace[c] : 0;
+      $('thr' + c).style.fillOpacity = th > 0.01 ? Math.min(0.6, 0.12 + th * 0.75).toFixed(2) : '0';
+      const cn = $('cn' + c);
+      if (c > 0) {
+        if (th >= 0.1) { cn.textContent = pct(th); cn.setAttribute('class', 'cname thrtxt'); }
+        else { cn.textContent = cn.getAttribute('data-nom'); cn.setAttribute('class', 'cname'); }
+      } else { cn.textContent = th >= 0.1 ? 'Cœur · ' + pct(th) : 'Cœur'; cn.setAttribute('class', th >= 0.1 ? 'cname thrtxt' : 'cname'); }
+    }
+    let fl = '';
+    const fleche = (a, b, cls) => {
+      const ga = UI.geo.cells[a], gb = UI.geo.cells[b];
+      if (a === b) return `<circle class="fleche ${cls}" cx="${ga.cx.toFixed(1)}" cy="${ga.cy.toFixed(1)}" r="14"/>`;
+      const mx = (ga.cx + gb.cx) / 2 + (CX - (ga.cx + gb.cx) / 2) * 0.12, my = (ga.cy + gb.cy) / 2 + (CY - (ga.cy + gb.cy) / 2) * 0.12;
+      return `<path class="fleche ${cls}" d="M${ga.cx.toFixed(1)},${ga.cy.toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${gb.cx.toFixed(1)},${gb.cy.toFixed(1)}" marker-end="url(#${cls.includes('aller') ? 'teteV' : 'tete'})"/>`;
+    };
+    for (const a of opts.allers || []) fl += fleche(a[0], a[1], 'aller' + (a[2] ? ' deux' : ''));
+    if (opts.trajet) fl += fleche(opts.trajet[0], opts.trajet[1], '');
+    $('gFleches').innerHTML = fl;
+    const tk = $('gToks');
+    if (!UI.tokBuilt) {
+      let h = '';
+      e.machines.forEach((_, j) => { h += `<g id="m${j}" class="tok mach"><rect x="-12" y="-9" width="24" height="18" rx="4"/><text text-anchor="middle" dominant-baseline="central">${K.MACHINES[j].court}</text></g>`; });
+      e.individus.forEach((_, i) => { const pj = K.proprietaire(P, i); h += `<g id="i${i}" class="tok ind" data-i="${i}"><circle r="8.5" fill="${COUL(pj)}"/><text text-anchor="middle" dominant-baseline="central">${String.fromCharCode(97 + (i % P.ipj))}</text></g>`; });
+      tk.innerHTML = h; UI.tokBuilt = true; UI.vus = {};
+    }
+    const pos = positions(e);
+    e.machines.forEach((c, j) => {
+      const g = $('m' + j);
+      if (c < 0) { g.style.display = 'none'; UI.vus[j] = false; return; }
+      const [x, y] = pos['m' + j];
+      if (!UI.vus[j]) { g.style.transition = 'none'; g.style.display = ''; g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`); void g.getBBox; requestAnimationFrame(() => { g.style.transition = ''; }); UI.vus[j] = true; }
+      else g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`);
+      g.setAttribute('class', 'tok mach' + (opts.actif === j ? ' actif' : ''));
+    });
+    e.individus.forEach((_, i) => {
+      const g = $('i' + i); const [x, y] = pos['i' + i]; g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`);
+      g.setAttribute('class', 'tok ind' + (UI.sel === i ? ' sel' : '') + (opts.cliquables && opts.cliquables.has(i) ? ' cliquable' : ''));
+    });
+    $('legend').innerHTML = '<span><i style="background:var(--f3)"></i>case boisée (le chiffre : ses arbres)</span><span><i style="background:var(--f0)"></i>case rasée</span>'
+      + '<span><i style="background:var(--machine)"></i>Machine sur le plateau</span>'
+      + (opts.menace ? `<span><i style="background:var(--danger);opacity:.55"></i>chance qu'au moins une menace de la vague frappe la case (pourcentage dès 10 %)</span>` : '')
+      + '<span><i style="background:var(--accent)"></i>déplacement programmé</span>';
+  }
+
+  // ------------------------------------------------------------------ la tête du Méchant : les deux pistes
+  function rendreMechant(opts) {
+    opts = opts || {};
+    const e = S ? S.e : opts.e; if (!e) return;
+    const ev = opts.ev; const ap = ev && ev.appris ? ev.appris : null; const apV = opts.appVague || [];
+    const bougeP = new Set(), bougeM = new Set();
+    for (const a of (ap ? [ap] : []).concat(apV)) { if (a.pensees[1] !== null) { bougeP.add(a.pensees[0]); bougeP.add(a.pensees[1]); } if (a.machines[1] !== null) { bougeM.add(a.machines[0]); bougeM.add(a.machines[1]); } }
+    let h = '<div class="trk-h"><span class="eyebrow">Piste des pensées</span><span class="small">la <b>somme</b> des deux dés désigne la tactique</span></div><div class="track trk-p">';
+    for (let s = 2; s <= 12; s++) {
+      const t = K.tactiqueEn(e, s); const ch = K.CHANCES_SOMME(s);
+      h += `<div class="tc ${ev && ev.somme === s ? 'vise' : ''} ${bougeP.has(s) ? 'bouge' : ''} ${s === 7 ? 'sept' : ''}"><span class="n">${s}</span><span class="dots" aria-label="${ch} chances sur 36">${'<i></i>'.repeat(ch)}</span><span class="tile ${t}" title="${NT[t]}">${COURT[t]}</span></div>`;
+    }
+    h += '</div><p class="small sens">Réussite : vers le 7. Échec : vers le bord (au 7, vers le 8).</p>';
+    const prof = K.profils(e);
+    h += '<div class="trk-h"><span class="eyebrow">Piste des Machines</span><span class="small">l\'<b>écart</b> des deux dés désigne la Machine</span></div><div class="track trk-m">';
+    K.ECARTS.forEach((d, pos) => {
+      const m = e.pisteM[pos]; const pr = prof[m]; const lieu = e.machines[m] < 0 ? 'au chantier' : 'en ' + nomC(e.machines[m]);
+      const bar = K.TACTIQUES.filter((t) => pr.tactiques[t]).map((t) => `<span class="${t}" style="flex:${pr.tactiques[t]}" title="${NT[t]} ${pr.tactiques[t]}/36"></span>`).join('');
+      const agit = opts.L ? `<span class="agit">${pct(K.auMoinsUneFois(K.CHANCES_ECART[d], opts.L))} dans la vague</span>` : '';
+      h += `<div class="tc mc ${ev && ev.ecart === d ? 'vise' : ''} ${bougeM.has(pos) ? 'bouge' : ''}"><span class="n">écart ${d}</span><span class="ch num">${K.CHANCES_ECART[d]}/36</span><span class="mtag ${e.machines[m] < 0 ? 'off' : ''}">${K.MACHINES[m].court}</span><span class="mn">${esc(MN(m))}</span><span class="lieu">${esc(lieu)}</span><span class="pbar" aria-label="tactiques possibles">${bar}</span>${agit}</div>`;
+    });
+    h += '</div><p class="small sens">← côté probable · réussite vers la gauche, échec vers la droite · côté rare →</p>';
+    h += '<div class="tleg">' + K.TACTIQUES.map((t) => `<span><span class="tile ${t}">${COURT[t]}</span> ${NT[t]}</span>`).join('') + '<span class="small">La barre sous chaque Machine : les tactiques qu\'elle peut recevoir.</span></div>';
+    if (opts.presage) h += `<div class="presage"><span class="eyebrow">Présage · les dés de la vague 1</span><div class="dl">${opts.presage.map((d) => { const L = K.lire(e, d); return `<span class="dp">${des(d)}<span class="small">${COURT[L.tactique]} · ${K.MACHINES[L.machine].court}</span></span>`; }).join('')}</div><p class="small">Lus sur les pistes actuelles. ${P.rythme === 'lancer' ? 'Les pistes bougent après chaque lancer : la lecture des derniers dés peut changer.' : 'Les pistes ne bougent qu\'à la fin de la vague : cette lecture tiendra.'}</p></div>`;
+    if (ev) h += `<div class="dernier"><span class="dl">${des(ev.d)}</span><span>somme <b>${ev.somme}</b> : ${NT[ev.tactique]} · écart <b>${ev.ecart}</b> : ${esc(MN(ev.machine))}</span></div>`;
+    $('mech').innerHTML = h;
+  }
+
+  // ------------------------------------------------------------------ préparation
+  function apercu() {
+    P = K.params(cfg.reglages); PL = K.plateau(P);
+    construirePlateau(P, PL);
+    const rng = K.generateur(cfg.reglages.graine);
+    const e = K.miseEnPlace(P, PL, rng); e.individus = K.placementHeuristique(P, PL, e);
+    dessinerPlateau(e, { menace: cfg.aide ? menaceVague(e) : null });
+    rendreMechant({ e, L: P.L });
+  }
+  const menaceVague = (e) => K.menaceParCase(P, PL, e).map((x) => 1 - Math.pow(1 - x, P.L));
+
+  function rendrePreparation() {
+    const r = cfg.reglages; const J = r.joueurs; const p = K.params(r);
+    let h = '<div class="eyebrow">Nouvelle partie</div><h2>Préparer la table</h2>';
+    h += '<p class="ctx">Chaque siège est un joueur humain ou un bot. Un humain peut tenir plusieurs sièges : il pose alors les cartes de chacun, à tour de rôle.</p>';
+    h += `<div class="params"><label for="pJ">Joueurs<select id="pJ">${[2, 3, 4, 5, 6].map((x) => `<option ${x === J ? 'selected' : ''}>${x}</option>`).join('')}</select></label></div>`;
+    h += '<div class="setup" id="seats">';
+    for (let j = 0; j < J; j++) {
+      h += `<div class="seat"><span class="dot" style="background:${COUL(j)}"></span><span>Joueur ${j + 1}</span><select id="s${j}" aria-label="Joueur ${j + 1}">`
+        + Object.entries(SIEGES).map(([k, v]) => `<option value="${k}" ${cfg.sieges[j] === k ? 'selected' : ''}>${v}</option>`).join('') + '</select></div>';
+    }
+    h += '</div><details><summary class="small" style="cursor:pointer;color:var(--accent);font-weight:800">Réglages</summary><div class="params" style="margin-top:8px">';
+    const sel = (id, lab, val, opts) => `<label for="${id}">${lab}<select id="${id}">${opts.map(([v, t]) => `<option value="${v}" ${String(v) === String(val) ? 'selected' : ''}>${t}</option>`).join('')}</select></label>`;
+    h += sel('pE', 'Cartes par joueur et par tour', r.etapes, [[2, 'deux (deux étapes)'], [1, 'une (témoin)']]);
+    h += sel('pL', 'Lancers par vague', r.lancersEnPlus, [[1, 'un de plus que de joueurs'], [2, 'deux de plus que de joueurs']]);
+    h += sel('pY', 'Les pistes apprennent', r.rythme, [['lancer', 'après chaque lancer'], ['vague', 'à la fin de chaque vague']]);
+    h += sel('pP', 'Présage', r.presage ? 1 : 0, [[0, 'non'], [1, 'les dés de la vague 1 sont montrés']]);
+    h += sel('pT', 'Tuile', r.tuileL + 'x' + r.tuileP, [['3x3', '3 × 3 cases'], ['3x4', '3 × 4 cases'], ['4x4', '4 × 4 cases']]);
+    h += sel('pI', 'Individus par joueur', r.individusParJoueur, [[2, '2'], [3, '3']]);
+    h += sel('pA', 'Arbres par case', r.arbres, [[2, '2'], [3, '3'], [4, '4']]);
+    h += sel('pR', 'Tours', r.tours, (r.etapes === 2 ? [3, 4, 5] : [6, 8, 10]).map((x) => [x, String(x)]));
+    h += `<label for="pG">Graine (même graine, mêmes dés)<input type="number" id="pG" min="1" value="${r.graine}"></label>`;
+    h += '</div><p class="small">Par défaut : deux cartes, un lancer de plus que de joueurs par vague, les pistes apprennent après chaque lancer, pas de présage, 4 tours. Avec une carte, la partie passe à 8 tours : même nombre d\'ordres et de lancers.</p></details>';
+    h += `<div class="resume num"><span><b>${1 + J * r.tuileL * r.tuileP}</b> cases</span><span><b>${p.I}</b> individus</span><span><b>${p.ordresParTour}</b> ordres par tour</span><span><b>${p.lancersParTour}</b> lancers par tour</span><span><b>${p.surPlateau}</b> Machines sur le plateau, ${6 - p.surPlateau} au chantier</span><span><b>${p.c0}</b> arbres</span></div>`;
+    if (p.erreurs.length) h += `<div class="hint warn">${esc(p.erreurs.join(' ; '))}.</div>`;
+    h += `<div class="btn-row"><button class="btn" id="go" ${p.erreurs.length ? 'disabled' : ''}>Commencer la partie</button><button class="btn sec" id="newSeed">Autre graine</button></div>`;
+    $('ask').innerHTML = h;
+    ['plBox', 'jBox'].forEach((id) => { $(id).hidden = true; });
+    $('status').innerHTML = '';
+    const maj = (ev) => {
+      const [l, q] = $('pT').value.split('x').map(Number);
+      const E = +$('pE').value;
+      let tours = +$('pR').value;
+      if (ev && ev.target.id === 'pE') tours = E === 2 ? 4 : 8;
+      cfg.reglages = Object.assign({}, cfg.reglages, { joueurs: +$('pJ').value, etapes: E, lancersEnPlus: +$('pL').value, rythme: $('pY').value, presage: $('pP').value === '1',
+        tuileL: l, tuileP: q, individusParJoueur: +$('pI').value, arbres: +$('pA').value, tours, graine: Math.max(1, +$('pG').value || 1) });
+      for (let j = 0; j < 6; j++) if ($('s' + j)) cfg.sieges[j] = $('s' + j).value;
+      garderCfg(); rendrePreparation(); apercu();
+    };
+    $('ask').querySelectorAll('select,input').forEach((x) => x.addEventListener('change', maj));
+    $('go').addEventListener('click', demarrer);
+    $('newSeed').addEventListener('click', () => { cfg.reglages.graine = 1 + Math.floor(Math.random() * 99999); garderCfg(); rendrePreparation(); apercu(); });
+  }
+
+  // ------------------------------------------------------------------ partie
+  function demarrer() {
+    const reg = Object.assign({}, cfg.reglages);
+    const np = K.nouvellePartie(reg);
+    P = np.p; PL = np.pl;
+    if (P.erreurs.length) { toast(P.erreurs.join(' ; ')); return; }
+    S = { id: 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36), date: new Date().toISOString(), reglages: reg,
+      sieges: cfg.sieges.slice(0, P.J), e: np.e, depart: K.copie(np.e), tirages: np.tirages, phase: 'cartes', v: 0, pas: 0,
+      cartes: null, raisons: {}, par: {}, fait: [], courant: null, slot: 0, brouillon: null, pose: null, attente: [], vague: [],
+      etapesTour: [], dernier: null, appVague: [], historique: [], journal: [], parJoueur: new Array(P.J).fill(0), hors: 0, S: 0, perdus: 0, enregistre: false };
+    UI.sel = null;
+    construirePlateau(P, PL);
+    debutTour();
+  }
+
+  function debutTour() {
+    const t = tour();
+    S.cartes = K.cartesVides(P);
+    S.raisons = {}; S.par = {}; S.fait = []; S.pose = null; S.v = 0; S.pas = 0; S.vague = []; S.etapesTour = []; S.dernier = null; S.appVague = [];
+    S.phase = 'cartes'; UI.sel = null;
+    log('tour', `Tour ${t + 1} sur ${P.tours}`);
+    if (P.presage) log('ann', 'Présage : les dés de la vague 1 sont ' + S.tirages[t][0].map((l) => `${l.d[0]}-${l.d[1]}`).join(', ') + '.');
+    suiteCartes();
+  }
+
+  const humainSuivant = () => { for (let j = 0; j < P.J; j++) if (S.sieges[j] === 'humain' && !S.fait.includes(j)) return j; return null; };
+
+  function suiteCartes() {
+    const j = humainSuivant();
+    if (j !== null) { S.courant = j; S.slot = 0; S.brouillon = S.cartes[j].slice(); rendre(); return; }
+    const t = tour();
+    Object.keys(B.BOTS).forEach((type, n) => {
+      const qui = []; for (let k = 0; k < P.J; k++) if (S.sieges[k] === type) qui.push(k);
+      if (!qui.length) return;
+      const rb = K.generateur(S.reglages.graine * 1009 + t * 31 + n + 1);
+      const raisons = B.BOTS[type].jouer(P, PL, S.e, S.cartes, qui, rb, ctxBots());
+      for (const k of qui) { S.raisons[k] = raisons[k] || ''; S.par[k] = type; }
+    });
+    for (let k = 0; k < P.J; k++) {
+      log('ordre', `Joueur ${k + 1} : ` + S.cartes[k].map((c, v) => (P.E > 1 ? `carte ${v + 1} ` : '') + carteTexte(c)).join(' · '), S.par[k] !== 'humain' ? S.raisons[k] : '', SIEGES[S.sieges[k]]);
+    }
+    S.courant = null;
+    revelerEtape(0);
+  }
+
+  function revelerEtape(v) {
+    S.v = v; S.pas = 0; S.vague = []; S.attente = []; S.dernier = null; S.appVague = [];
+    const prog = K.programmeEtape(P, S.cartes, v);
+    S.pose = K.reveler(P, PL, S.e, prog);
+    const vus = S.cartes.map((cs) => cs[v]).filter((c) => c);
+    log('etape', `${P.E > 1 ? `Étape ${v + 1} : on révèle les cartes ${v + 1}` : 'On révèle les cartes'}${vus.length ? ' (' + vus.map(carteTexte).join(', ') + ')' : ''}.`);
+    for (const x of S.pose.perdus) { log('perdu', `Ordre perdu : ${nomI(x.i)} ${ordreTexte(x.o)} (${x.pourquoi}).`); S.perdus++; }
+    S.phase = 'vague';
+    rendre();
+  }
+
+  function texteLancer(ev) {
+    const m = MN(ev.machine); const rep = ev.repli ? ' (repli : plus d\'arbre autour d\'elle)' : '';
+    let s = `Dés ${ev.d[0]} et ${ev.d[1]} : somme ${ev.somme}, ${NT[ev.tactique]} ; écart ${ev.ecart}, ${m}. `;
+    if (ev.entree !== undefined) {
+      s += `${m} sort du chantier et entre en ${nomC(ev.entree)}`;
+      if (ev.issue === 'abattu') s += ev.cible !== ev.entree ? `, puis abat en ${nomC(ev.cible)}${rep}.` : ' et y abat un arbre.';
+      else s += `, gardée par ${nomI(ev.qui)} : parée.`;
+    } else if (ev.issue === 'abattu') s += `${m} entre en ${nomC(ev.cible)} et abat un arbre${rep}.`;
+    else if (ev.issue === 'gardee') s += `${m} vise ${nomC(ev.cible)}, gardée par ${nomI(ev.qui)} : parée.`;
+    else s += `${m} est sabotée par ${nomI(ev.qui)} : elle va en ${nomC(ev.cible)} sans abattre.`;
+    return s;
+  }
+  function texteAppris(a, tactique, machine) {
+    const p = a.pensees[1] === null ? `${NT[tactique]} reste en ${a.pensees[0]}` : `${NT[tactique]} ${a.pensees[0]} → ${a.pensees[1]}`;
+    const m = a.machines[1] === null ? `${MN(machine)} reste sur l'écart ${K.ECARTS[a.machines[0]]}` : `${MN(machine)} écart ${K.ECARTS[a.machines[0]]} → ${K.ECARTS[a.machines[1]]}`;
+    return `${p} ; ${m}.`;
+  }
+
+  function lancerSuivant() {
+    const t = tour(); const l = S.tirages[t][S.v][S.pas];
+    const ev = K.executerLancer(P, PL, S.e, S.pose, l, S.attente);
+    S.vague.push(ev); S.pas++; S.dernier = ev;
+    if (ev.issue === 'abattu') log('abattu', texteLancer(ev));
+    else { const j = K.proprietaire(P, ev.qui); S.parJoueur[j]++; S.S++; if (PL.tuile[ev.lieu] !== j) S.hors++; log('pare', texteLancer(ev)); }
+    if (ev.appris) log('appris', (ev.issue === 'abattu' ? 'Réussite, il apprend : ' : 'Échec, il apprend : ') + texteAppris(ev.appris, ev.tactique, ev.machine));
+    if (S.pas === P.L) finVague(); else rendre();
+  }
+
+  function finVague() {
+    const appris = K.finVague(P, S.e, S.attente);
+    if (appris.length) {
+      log('appris', 'Fin de la vague, il apprend : ' + appris.map((a, k) => texteAppris(a, S.vague[k].tactique, S.vague[k].machine)).join(' '));
+      S.appVague = appris;
+    }
+    S.etapesTour.push({ etape: S.v + 1, perdus: S.pose.perdus, evenements: S.vague, appris });
+    const par = S.vague.filter((x) => x.issue !== 'abattu').length;
+    log('bilan', `Vague ${S.v + 1} : ${par} parade(s), ${P.L - par} arbre(s) abattu(s).`);
+    if (S.v + 1 < P.E) { S.phase = 'inter'; rendre(); } else finTour();
+  }
+
+  function finTour() {
+    const t = tour(); S.e.tour++;
+    const par = S.etapesTour.reduce((s, x) => s + x.evenements.filter((v) => v.issue !== 'abattu').length, 0);
+    S.historique.push({ tour: t + 1, des: S.tirages[t].map((w) => w.map((l) => l.d)),
+      cartes: Array.from({ length: P.J }, (_, j) => ({ joueur: j + 1, siege: S.sieges[j], cartes: S.cartes[j], raison: S.raisons[j] || '' })),
+      etapes: S.etapesTour, parades: par, foret: K.foret(S.e), pensees: S.e.pensees.slice(2).map((x) => K.TUILES[x]), pisteMachines: S.e.pisteM.map(MN) });
+    log('bilan', `Fin du tour ${t + 1} : ${par} parade(s), ${P.lancersParTour - par} arbre(s) abattu(s). Forêt : ${K.foret(S.e)} arbres.`);
+    if (S.e.tour >= P.tours) { S.phase = 'fin'; log('fin', `Fin de la partie : ${K.foret(S.e)} arbres sur ${P.c0} (${pct(K.foret(S.e) / P.c0)}), ${S.S} parades pour ${P.ordresParTour * P.tours} ordres.`); enregistrer(); }
+    else S.phase = 'entre';
+    rendre();
+  }
+
+  function toutLaVague() { const v = S.v; while (S.phase === 'vague' && S.v === v) lancerSuivant(); }
+  function toutLeTour() { let g = 50; while ((S.phase === 'vague' || S.phase === 'inter') && g--) { if (S.phase === 'inter') revelerEtape(S.v + 1); else toutLaVague(); } }
+  function jusquAuBout() { let g = 200; while (S.phase !== 'fin' && g--) { if (S.phase === 'entre') debutTour(); else if (S.phase === 'vague' || S.phase === 'inter') toutLeTour(); else break; } }
+
+  // ------------------------------------------------------------------ cartes des humains
+  function cartesAvecBrouillon() { const cs = S.cartes.map((x) => x.slice()); cs[S.courant] = S.brouillon.slice(); return cs; }
+  function posPrevues(v) { return K.positionsPrevues(P, S.e, cartesAvecBrouillon(), v); }
+  function optionsSlot(i, v) { return K.ordresPossibles(P, PL, S.e, i, posPrevues(v)[i]); }
+  // une carte qui ne tient plus après un changement d'une carte précédente est retirée
+  function verifierSuite(depuis) {
+    for (let v = depuis + 1; v < P.E; v++) {
+      const c = S.brouillon[v]; if (!c) continue;
+      if (!optionsSlot(c.i, v).some((o) => o[0] === c.o[0] && o[1] === c.o[1])) { S.brouillon[v] = null; toast(`La carte ${v + 1} ne tenait plus : retirée.`); }
+    }
+  }
+  function choisir(i, o) {
+    S.brouillon[S.slot] = { i, o }; verifierSuite(S.slot);
+    if (S.slot < P.E - 1) S.slot++;
+    UI.sel = i; rendre();
+  }
+  function validerCartes() {
+    const j = S.courant;
+    S.cartes[j] = S.brouillon.slice();
+    S.par[j] = 'humain'; S.fait.push(j); UI.sel = null; S.brouillon = null;
+    suiteCartes();
+  }
+  function clicIndividu(i) {
+    if (!S || S.phase !== 'cartes' || S.courant === null) return;
+    if (K.proprietaire(P, i) !== S.courant) return;
+    UI.sel = UI.sel === i ? null : i; rendre();
+  }
+  function clicCase(c) {
+    if (!S || S.phase !== 'cartes' || S.courant === null || UI.sel === null) return;
+    const i = UI.sel; const pos = posPrevues(S.slot)[i];
+    if (c === pos) choisir(i, [K.GARDER, pos]);
+    else if (PL.dist[pos][c] === 1) choisir(i, [K.ALLER, c]);
+  }
+
+  // ------------------------------------------------------------------ rendu de la partie
+  function rendre() {
+    if (!S) { rendrePreparation(); apercu(); return; }
+    const opts = {};
+    let mopts = { ev: null };
+    if (S.phase === 'cartes' && S.courant !== null) {
+      const cs = cartesAvecBrouillon();
+      const pos = K.positionsPrevues(P, S.e, cs, S.slot);
+      if (cfg.aide) { const f = K.copie(S.e); f.individus = pos; opts.menace = S.slot === 0 && P.presage ? null : menaceVague(f); }
+      const allers = [];
+      cs.forEach((x) => x.forEach((c, v) => { if (c && c.o[0] === K.ALLER) allers.push([K.positionsPrevues(P, S.e, cs, v)[c.i], c.o[1], v > 0]); }));
+      opts.allers = allers;
+      opts.cliquables = new Set(B.individusDe(P, S.courant));
+      if (UI.sel !== null) opts.cand = new Set([pos[UI.sel]].concat(PL.voisins[pos[UI.sel]]));
+      mopts = { L: P.L, presage: P.presage ? S.tirages[tour()][0].map((l) => l.d) : null };
+    } else if (S.phase === 'vague') {
+      const ev = S.dernier;
+      if (ev) { opts.actif = ev.machine; if (ev.issue === 'abattu') opts.cible = ev.cible; else opts.pare = ev.lieu; if (ev.de >= 0 && ev.de !== ev.cible && ev.issue !== 'gardee') opts.trajet = [ev.de, ev.cible]; }
+      mopts = { ev };
+    } else if (S.phase === 'inter') {
+      if (cfg.aide) opts.menace = menaceVague(S.e);
+      const allers = []; S.cartes.forEach((cs) => { const c = cs[S.v + 1]; if (c && c.o[0] === K.ALLER) allers.push([S.e.individus[c.i], c.o[1], true]); });
+      opts.allers = allers;
+      mopts = { L: P.L, appVague: S.appVague, ev: P.rythme === 'vague' ? null : S.dernier };
+    } else if (S.phase === 'entre' || S.phase === 'fin') {
+      mopts = { appVague: S.appVague, ev: P.rythme === 'vague' ? null : S.dernier };
+    }
+    dessinerPlateau(S.e, opts);
+    rendreMechant(mopts);
+    rendreStatus(); rendreAsk(); rendreJoueurs(); rendreJournal();
+  }
+
+  function rendreStatus() {
+    const tt = Math.min(tour() + (S.phase === 'entre' || S.phase === 'fin' ? 0 : 1), P.tours);
+    $('status').innerHTML = `<span>Tour <b>${tt}</b>/${P.tours}</span><span>Forêt <b>${K.foret(S.e)}</b>/${P.c0}</span><span>Parades <b>${S.S}</b></span><button class="opt" id="quit">Nouvelle partie</button>`;
+    $('quit').addEventListener('click', () => { S = null; UI.sel = null; rendre(); });
+  }
+
+  function rendreAsk() {
+    let h = '';
+    if (S.phase === 'cartes' && S.courant !== null) {
+      const j = S.courant; const v = S.slot;
+      h += `<div class="eyebrow" style="color:${COUL(j)}">Joueur ${j + 1} · à toi</div><h2>${P.E > 1 ? 'Tes deux cartes du tour' : 'Ta carte du tour'}</h2>`;
+      h += `<p class="ctx">${P.E > 1 ? 'La carte 1 est révélée avant la première vague de lancers, la carte 2 avant la seconde. Entre les deux, les Machines bougent et les pistes apprennent. ' : ''}Clique un de tes pions puis sa case pour <b>garder</b>, ou une case voisine pour y <b>aller</b> ; ou choisis ci-dessous.</p>`;
+      if (P.E > 1) {
+        h += '<div class="slots">' + S.brouillon.map((c, k) => `<button class="slot ${k === v ? 'on' : ''}" aria-pressed="${k === v}" data-slot="${k}"><span class="eyebrow">Carte ${k + 1} · étape ${k + 1}</span><span>${esc(carteTexte(c))}</span></button>`).join('') + '</div>';
+      }
+      const pos = posPrevues(v);
+      const lu = cfg.aide ? B.lectureEtape(P, PL, S.e, pos, v, ctxBots()) : null;
+      const autres = S.cartes.map((cs, k) => (k === j ? null : cs[v])).filter((c) => c);
+      const dejaG = (c) => autres.filter((x) => x.o[0] === K.GARDER && x.o[1] === c).length;
+      const dejaS = (m) => autres.filter((x) => x.o[0] === K.SABOTER && x.o[1] === m).length;
+      for (const i of B.individusDe(P, j)) {
+        const ops = optionsSlot(i, v);
+        const btn = (o) => {
+          const c = S.brouillon[v]; const on = c && c.i === i && c.o[0] === o[0] && c.o[1] === o[1];
+          let aide = '';
+          if (lu) {
+            if (o[0] === K.GARDER) aide = pct(lu.garde(o[1], dejaG(o[1])));
+            else if (o[0] === K.SABOTER) aide = pct(lu.sabot(o[1], dejaS(o[1])));
+            else aide = 'menace ' + pct(1 - Math.pow(1 - lu.pr[o[1]], P.L));
+          }
+          return `<button class="opt k-${o[0]}" aria-pressed="${!!on}" data-i="${i}" data-o="${o[0]}" data-a="${o[1]}">${esc(ordreTexte(o))}${aide ? `<span class="val">${aide}</span>` : ''}</button>`;
+        };
+        const moved = pos[i] !== S.e.individus[i];
+        h += `<div class="indrow"><span class="pion" style="background:${COUL(j)}">${String.fromCharCode(97 + (i % P.ipj))}</span><div><div class="small"><b>${nomI(i)}</b> ${moved ? `sera en ${nomC(pos[i])} (après sa carte ${v})` : `en ${nomC(pos[i])}`}, ${S.e.arbres[pos[i]]} arbres</div><div class="btn-row" style="margin-top:4px">${ops.map(btn).join('')}</div></div></div>`;
+      }
+      if (lu) h += `<p class="small">${lu.certain ? 'Présage : 100 % veut dire qu\'un des dés montrés désigne cette Machine ou cette case (lus sur les pistes actuelles).' : `Garder : chance qu'au moins une menace de la vague frappe la case. Saboter : chance que la Machine agisse dans la vague (${P.L} lancers). Estimations sur les pistes et positions ${v ? 'prévues, sans ce que la vague 1 changera' : 'actuelles'}.`}</p>`;
+      h += `<label class="small"><input type="checkbox" id="aide" ${cfg.aide ? 'checked' : ''}> afficher les chances (aide à la lecture des pistes)</label>`;
+      const nb = S.brouillon.filter((c) => c).length;
+      h += `<div class="btn-row"><button class="btn" id="valider">${nb ? `Valider ${P.E > 1 ? 'mes cartes' : 'ma carte'}` : 'Ne rien faire ce tour'}</button>${S.brouillon[v] ? '<button class="btn sec" id="retirer">Retirer cette carte</button>' : ''}</div>`;
+      $('ask').innerHTML = h;
+      $('ask').querySelectorAll('button[data-o]').forEach((b) => b.addEventListener('click', () => {
+        const a = b.dataset.a === 'null' ? null : +b.dataset.a; choisir(+b.dataset.i, [b.dataset.o, a]); }));
+      $('ask').querySelectorAll('button[data-slot]').forEach((b) => b.addEventListener('click', () => { S.slot = +b.dataset.slot; rendre(); }));
+      $('aide').addEventListener('change', () => { cfg.aide = $('aide').checked; garderCfg(); rendre(); });
+      $('valider').addEventListener('click', validerCartes);
+      if ($('retirer')) $('retirer').addEventListener('click', () => { S.brouillon[v] = null; verifierSuite(v); rendre(); });
+      return;
+    }
+    const auto = !S.sieges.includes('humain');
+    if (S.phase === 'vague') {
+      const ev = S.dernier;
+      h += `<div class="eyebrow">${P.E > 1 ? `Vague ${S.v + 1} · ` : ''}lancer ${Math.min(S.pas + 1, P.L)} sur ${P.L}</div>`;
+      if (ev) h += `<h2>${ev.issue === 'abattu' ? 'Un arbre tombe' : 'Menace parée'}</h2><p class="ctx">${esc(texteLancer(ev))}</p>${ev.appris ? `<p class="ctx">${ev.issue === 'abattu' ? 'Réussite' : 'Échec'} : ${esc(texteAppris(ev.appris, ev.tactique, ev.machine))}</p>` : ''}`;
+      else h += `<h2>Cartes ${P.E > 1 ? S.v + 1 + ' ' : ''}révélées</h2><p class="ctx">Les déplacements ont eu lieu, les gardes et les sabotages sont posés pour cette vague. Le Méchant lance les dés ${P.L} fois : la somme désigne une tactique, l'écart une Machine.</p>`;
+      if (S.pose.perdus.length && !ev) h += `<div class="hint warn">${S.pose.perdus.map((x) => esc(`${nomI(x.i)} : ${ordreTexte(x.o)} perdu (${x.pourquoi}).`)).join('<br>')}</div>`;
+      h += `<div class="btn-row"><button class="btn" id="suiv">Lancer les dés</button><button class="btn sec" id="vg">Toute la vague</button>${auto ? '<button class="btn sec" id="bout">Jouer jusqu\'au bout</button>' : ''}</div>`;
+      $('ask').innerHTML = h;
+      $('suiv').addEventListener('click', lancerSuivant); $('vg').addEventListener('click', () => { toutLaVague(); });
+      if (auto) $('bout').addEventListener('click', () => { jusquAuBout(); rendre(); });
+      return;
+    }
+    if (S.phase === 'inter') {
+      const last = S.etapesTour[S.etapesTour.length - 1]; const par = last.evenements.filter((x) => x.issue !== 'abattu').length;
+      h += `<div class="eyebrow">Vague ${S.v + 1} terminée</div><h2>${par} parade${par > 1 ? 's' : ''}, ${P.L - par} arbre${P.L - par > 1 ? 's' : ''} abattu${P.L - par > 1 ? 's' : ''}</h2>`;
+      h += `<p class="ctx">Les gardes et les sabotages de l'étape ${S.v + 1} tombent. Les Machines ont bougé et les pistes ont appris : regarde ce qui a changé avant de révéler les cartes ${S.v + 2}. Un sabotage dont la Machine a quitté la case sera perdu.</p>`;
+      h += `<div class="btn-row"><button class="btn" id="rev">Révéler les cartes ${S.v + 2}</button>${auto ? '<button class="btn sec" id="bout">Jouer jusqu\'au bout</button>' : ''}</div>`;
+      $('ask').innerHTML = h;
+      $('rev').addEventListener('click', () => revelerEtape(S.v + 1));
+      if (auto) $('bout').addEventListener('click', () => { jusquAuBout(); rendre(); });
+      return;
+    }
+    if (S.phase === 'entre') {
+      const last = S.historique[S.historique.length - 1];
+      h += `<div class="eyebrow">Tour ${last.tour} terminé</div><h2>${last.parades} parade${last.parades > 1 ? 's' : ''}, ${P.lancersParTour - last.parades} arbre${P.lancersParTour - last.parades > 1 ? 's' : ''} abattu${P.lancersParTour - last.parades > 1 ? 's' : ''}</h2>`;
+      h += `<div class="btn-row"><button class="btn" id="next">Tour suivant</button>${auto ? '<button class="btn sec" id="auto">Jouer jusqu\'au bout</button>' : ''}</div>`;
+      $('ask').innerHTML = h;
+      $('next').addEventListener('click', () => { debutTour(); });
+      if (auto) $('auto').addEventListener('click', () => { jusquAuBout(); rendre(); });
+      return;
+    }
+    if (S.phase === 'fin') {
+      const r = K.foret(S.e);
+      h += `<div class="eyebrow">Partie terminée</div><h2>${r} arbres sur ${P.c0} (${pct(r / P.c0)})</h2>`;
+      h += `<p class="ctx">${S.S} parades pour ${P.ordresParTour * P.tours} ordres, soit <b>${pct(S.S / (P.ordresParTour * P.tours))}</b> des ordres qui ont sauvé un arbre. ${S.perdus} ordre${S.perdus > 1 ? 's' : ''} perdu${S.perdus > 1 ? 's' : ''}. ${S.S ? `${pct(S.hors / S.S)} des parades faites hors de sa propre tuile.` : ''}</p>`;
+      const mx = Math.max(1, ...S.parJoueur);
+      h += '<div class="bars">' + S.parJoueur.map((x, j) => `<div class="barl"><span>Joueur ${j + 1}</span><span class="bart"><span style="width:${(100 * x / mx).toFixed(0)}%;background:${COUL(j)}"></span></span><span class="num">${x}</span></div>`).join('') + '</div>';
+      h += `<p class="small">${S.enregistre ? 'Partie enregistrée.' : (UI.db ? 'Enregistrement…' : 'Enregistrement indisponible dans cette vue : exportez la partie depuis l\'onglet « Parties enregistrées ».')}</p>`;
+      h += '<div class="btn-row"><button class="btn" id="again">Nouvelle partie</button><button class="btn sec" id="same">Rejouer la même graine</button></div>';
+      $('ask').innerHTML = h;
+      $('again').addEventListener('click', () => { cfg.reglages.graine = 1 + Math.floor(Math.random() * 99999); garderCfg(); S = null; rendre(); });
+      $('same').addEventListener('click', () => { demarrer(); });
+    }
+  }
+
+  function rendreJoueurs() {
+    $('plBox').hidden = false;
+    const revele = (v) => S.phase !== 'cartes' && (v < S.v || (v === S.v));
+    $('players').innerHTML = S.sieges.map((s, j) => {
+      let cartes;
+      if (S.phase === 'cartes' && !S.fait.includes(j)) cartes = S.courant === j ? 'pose ses cartes…' : 'attend';
+      else cartes = S.cartes[j].map((c, v) => `<span class="${S.phase !== 'cartes' && !revele(v) ? 'cache' : ''}">${P.E > 1 ? `${v + 1}. ` : ''}${esc(carteTexte(c))}</span>`).join(' ');
+      return `<div class="pl ${S.courant === j ? 'actif' : ''}"><span class="dot" style="background:${COUL(j)}"></span><span>Joueur ${j + 1} <span class="who">${SIEGES[s]}</span><br><span class="ord">${cartes}</span></span><span class="num small">${S.parJoueur[j]} parade${S.parJoueur[j] > 1 ? 's' : ''}</span></div>`;
+    }).join('');
+  }
+
+  function rendreJournal() {
+    $('jBox').hidden = false;
+    const why = $('showWhy').checked;
+    $('journal').innerHTML = S.journal.map((l) => `<div class="jl k-${l.k}">${l.tag ? `<span class="tag">${esc(l.tag)}</span>` : ''}${esc(l.txt)}${why && l.why ? `<span class="why">${esc(l.why)}</span>` : ''}</div>`).join('');
+    $('journal').scrollTop = $('journal').scrollHeight;
+  }
+  $('showWhy').addEventListener('change', () => { if (S) rendreJournal(); });
+
+  // ------------------------------------------------------------------ enregistrement
+  function resume(rec) {
+    if (rec.type === 'serie') return { id: rec.id, type: 'serie', date: rec.date, titre: `Série : ${rec.lignes.length} lignes, ${rec.parties} parties par bot et par taille` };
+    return { id: rec.id, type: 'partie', date: rec.date, titre: `${rec.reglages.joueurs} joueurs (${rec.sieges.map((s) => SIEGES[s]).join(', ')}) : ${rec.resultat.foret}/${rec.resultat.c0} arbres, ${pct(rec.resultat.taux)} de parades` };
+  }
+  function recordPartie() {
+    return { id: S.id, type: 'partie', modele: 'pistes', date: S.date, version: 1, reglages: S.reglages, sieges: S.sieges, depart: S.depart, tours: S.historique,
+      resultat: { foret: K.foret(S.e), c0: P.c0, parades: S.S, taux: S.S / (P.ordresParTour * P.tours), perdus: S.perdus, parJoueur: S.parJoueur, horsTuile: S.hors } };
+  }
+  async function enregistrer() {
+    const rec = recordPartie(); UI.local = UI.local || []; UI.local.unshift(rec);
+    if (!UI.db) { rendreArchives(); return; }
+    try { await UI.db.collection('parties').doc(rec.id).set(rec); await UI.db.collection('index').doc(rec.id).set(resume(rec)); S.enregistre = true; toast('Partie enregistrée.'); }
+    catch (e) { toast('La partie n\'a pas pu être enregistrée : ' + (e && e.message ? e.message : 'erreur')); }
+    if (S && S.phase === 'fin') rendreAsk();
+  }
+
+  function rendreArchives() {
+    const lignes = UI.index.length ? UI.index : (UI.local || []).map(resume);
+    $('dbState').textContent = UI.db ? 'Chaque partie terminée et chaque série sont enregistrées avec leur journal : réglages, graine, dés, cartes, raisons des bots, lancers, parades et échanges sur les pistes. Claude peut les relire pour les analyser.'
+      : 'L\'enregistrement partagé n\'est pas disponible dans cette vue. Les parties de cette session restent listées ici et peuvent être exportées.';
+    $('saved').innerHTML = lignes.length ? lignes.map((x) => `<div class="sv"><span>${esc(x.titre)}<br><span class="m">${new Date(x.date).toLocaleString('fr-FR')} · ${x.type === 'serie' ? 'série' : 'partie'}</span></span><button class="opt" data-id="${esc(x.id)}" data-c="${x.type === 'serie' ? 'series' : 'parties'}">Exporter</button></div>`).join('')
+      : '<div class="empty">Aucune partie enregistrée pour l\'instant. Les parties terminées et les séries de bots apparaîtront ici.</div>';
+    $('saved').querySelectorAll('button[data-id]').forEach((b) => b.addEventListener('click', () => exporter(b.dataset.c, b.dataset.id)));
+  }
+  async function lire(coll, id) {
+    const loc = (UI.local || []).find((r) => r.id === id); if (loc) return loc;
+    if (!UI.db) return null;
+    try { const s = await UI.db.collection(coll).doc(id).get(); return s.exists ? s.data() : null; } catch (e) { return null; }
+  }
+  async function sauver(nom, obj) {
+    if (!UI.dl) { toast('Le téléchargement n\'est pas disponible dans cette vue.'); return; }
+    try { await UI.dl.save({ filename: nom, data: JSON.stringify(obj, null, 1) }); } catch (e) { /* refusé par le lecteur */ }
+  }
+  async function exporter(coll, id) { const r = await lire(coll, id); if (r) sauver(`couronne-pistes-${id}.json`, r); else toast('Introuvable.'); }
+  $('expAll').addEventListener('click', async () => {
+    const tout = [];
+    for (const x of (UI.index.length ? UI.index : (UI.local || []).map(resume))) { const r = await lire(x.type === 'serie' ? 'series' : 'parties', x.id); if (r) tout.push(r); }
+    sauver('couronne-pistes-tout.json', tout);
+  });
+
+  // ------------------------------------------------------------------ séries de bots
+  function lancerSerie() {
+    if (UI.serie) return;
+    const N = +$('serN').value; const Js = $('serJ').value === 'all' ? [2, 3, 4, 5, 6] : [cfg.reglages.joueurs];
+    const bots = ['hasard', 'reflexe', 'stratege', 'prevoyant'];
+    const taches = []; for (const J of Js) for (let g = 1; g <= N; g++) for (const b of bots) taches.push([J, g, b]);
+    const acc = {}; let k = 0;
+    UI.serie = true; $('runSerie').disabled = true;
+    const pas = () => {
+      const t0 = performance.now();
+      while (k < taches.length && performance.now() - t0 < 40) {
+        const [J, g, b] = taches[k++];
+        const reg = Object.assign({}, cfg.reglages, { joueurs: J, graine: 1000 + g });
+        const r = B.partieAuto(reg, b);
+        const a = acc[J + '|' + b] = acc[J + '|' + b] || { J, b, n: 0, taux: 0, foret: 0, agence: 0, couplage: 0, perdus: 0 };
+        a.n++; a.taux += r.taux; a.foret += r.foret; a.agence += r.agence; a.couplage += r.couplage; a.perdus += r.perdus;
+      }
+      $('serieProg').textContent = `${Math.floor(k / bots.length)} / ${taches.length / bots.length} tables`;
+      if (k < taches.length) { setTimeout(pas, 0); return; }
+      UI.serie = null; $('runSerie').disabled = false;
+      const lignes = Object.values(acc).map((a) => ({ joueurs: a.J, bot: a.b, parties: a.n, taux: a.taux / a.n, foret: a.foret / a.n, agence: a.agence / a.n, couplage: a.couplage / a.n, perdus: a.perdus / a.n }));
+      afficherSerie(lignes, Js);
+      const rec = { id: 's' + Date.now().toString(36), type: 'serie', modele: 'pistes', date: new Date().toISOString(), reglages: cfg.reglages, parties: N, lignes };
+      UI.local = UI.local || []; UI.local.unshift(rec);
+      if (UI.db) UI.db.collection('series').doc(rec.id).set(rec).then(() => UI.db.collection('index').doc(rec.id).set(resume(rec))).then(() => toast('Série enregistrée.')).catch(() => {});
+      else rendreArchives();
+    };
+    pas();
+  }
+  function afficherSerie(lignes, Js) {
+    const NB = { hasard: 'Hasard', reflexe: 'Réflexe', stratege: 'Glouton', prevoyant: 'Prévoyant' };
+    let h = '<div class="eyebrow">Résultats</div><h2>Ordres qui ont paré une menace</h2><div class="tw"><table class="res num"><thead><tr><th>Joueurs</th>'
+      + Object.values(NB).map((n) => `<th>${n}</th>`).join('') + '<th>Forêt*</th><th>Perdus*</th><th>Agence*</th><th>Couplage*</th></tr></thead><tbody>';
+    for (const J of Js) {
+      const L = (b) => lignes.find((x) => x.joueurs === J && x.bot === b);
+      const pv = L('prevoyant');
+      h += `<tr><td>${J}</td>` + Object.keys(NB).map((b) => `<td>${pct(L(b).taux)}</td>`).join('') + `<td>${pct(pv.foret)}</td><td>${f1(pv.perdus)}</td><td>${pct(pv.agence)}</td><td>${pct(pv.couplage)}</td></tr>`;
+    }
+    h += '</tbody></table></div><p class="small">* pour le bot prévoyant. Forêt : arbres restants en fin de partie. Perdus : ordres perdus par partie (un sabotage dont la Machine est partie). Agence : part des joueurs qui ont paré au moins une menace. Couplage : part des parades faites hors de sa tuile.</p>';
+    const ecarts = Js.map((J) => { const a = lignes.find((x) => x.joueurs === J && x.bot === 'prevoyant'), b = lignes.find((x) => x.joueurs === J && x.bot === 'reflexe'); return 100 * (a.taux - b.taux); });
+    h += `<div class="verdict">Prévoyant moins Réflexe : ${ecarts.map((x, n) => `${Js[n]} joueurs ${x >= 0 ? '+' : ''}${f1(x)} pt`).join(' · ')}. C'est ce que rapporte de prévoir la vague suivante et le tour suivant.</div>`;
+    $('serieRes').innerHTML = h;
+  }
+  $('runSerie').addEventListener('click', lancerSerie);
+
+  // ------------------------------------------------------------------ onglets, base, reprise
+  document.querySelectorAll('.tabs [role="tab"]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs [role="tab"]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    document.querySelectorAll('section[role="tabpanel"]').forEach((s) => { s.hidden = s.id !== b.getAttribute('aria-controls'); });
+    if (b.id === 'tab-archives') rendreArchives();
+  }));
+
+  function demarrerPage(data) {
+    if (data && data.S && data.S.tirages) { S = data.S; cfg = data.cfg || cfg; P = K.params(S.reglages); PL = K.plateau(P); construirePlateau(P, PL); }
+    rendre();
+    rendreArchives();
+  }
+  if (window.claude && window.claude.hot) window.claude.hot.snapshot(() => ({ S, cfg }));
+  if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(demarrerPage);
+  else demarrerPage((window.claude && window.claude.hot && window.claude.hot.data) || {});
+
+  if (window.claude && window.claude.use) {
+    window.claude.use('db').then((db) => {
+      if (!db) return; UI.db = db;
+      db.collection('index').orderBy('date', 'desc').limit(200).onSnapshot((snap) => {
+        UI.index = snap.docs.map((d) => d.data()); if (!$('pan-archives').hidden) rendreArchives();
+      }, () => {});
+      rendreArchives();
+    }).catch(() => {});
+    window.claude.use('downloads').then((d) => { UI.dl = d; }).catch(() => {});
+  }
+})();
+</script>
