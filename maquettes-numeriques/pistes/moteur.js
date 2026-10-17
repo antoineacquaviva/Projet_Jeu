@@ -26,7 +26,7 @@
   const NM = MACHINES.length;
 
   const DEFAUTS = { joueurs: 3, etapes: 2, lancersEnPlus: 1, rythme: 'lancer', presage: false, tuileL: 3, tuileP: 3,
-    individusParJoueur: 3, arbres: 3, coeurArbres: 0, tours: 4, graine: 1 };
+    individusParJoueur: 3, arbres: 3, coeurArbres: 0, tours: 4, apprentissage: true, sabotage: 'echappe', graine: 1 };
 
   function generateur(graine) {                       // mulberry32 : parties reproductibles
     let a = (graine >>> 0) || 1;
@@ -49,6 +49,7 @@
       J: r.joueurs, l: r.tuileL, q: r.tuileP, a: r.arbres, coeurArbres: r.coeurArbres || r.arbres,
       I: r.individusParJoueur * r.joueurs, ipj: r.individusParJoueur, E: r.etapes, k: r.joueurs,
       L: r.joueurs + r.lancersEnPlus, surPlateau: Math.min(r.joueurs + 1, NM), rythme: r.rythme, presage: !!r.presage,
+      apprentissage: r.apprentissage !== false, sabotage: r.sabotage || 'echappe',
       tours: r.tours, graine: r.graine, reglages: r,
     };
     p.lancersParTour = p.L * p.E;
@@ -60,6 +61,7 @@
     if (p.L <= p.k) err.push('il faut plus de lancers que d\'ordres par vague');
     if (p.c0 <= p.lancersParTour * p.tours) err.push('la forêt de départ doit dépasser le nombre total de lancers');
     if (p.rythme !== 'lancer' && p.rythme !== 'vague') err.push('rythme : « lancer » ou « vague »');
+    if (!['echappe', 'fige', 'chantier', 'aucun'].includes(p.sabotage)) err.push('sabotage : echappe, fige, chantier ou aucun');
     p.erreurs = err;
     return p;
   }
@@ -190,7 +192,7 @@
   function ordresPossibles(p, pl, e, i, pos) {
     if (pos === undefined) pos = e.individus[i];
     const ops = [[GARDER, pos]];
-    e.machines.forEach((m, j) => { if (m === pos) ops.push([SABOTER, j]); });
+    if (p.sabotage !== 'aucun') e.machines.forEach((m, j) => { if (m === pos) ops.push([SABOTER, j]); });
     for (const c of pl.voisins[pos]) ops.push([ALLER, c]);
     return ops;
   }
@@ -244,8 +246,11 @@
     } else {
       const [cible, repli] = destination(p, pl, e, m, L.tactique);
       Object.assign(ev, { cible, repli });
-      if ((pose.sab[m] || 0) > 0) {                        // P4.5 : sabotage d'abord, la Machine s'échappe
-        pose.sab[m]--; const de = e.machines[m]; e.machines[m] = cible;
+      if ((pose.sab[m] || 0) > 0) {                        // P4.5 : sabotage d'abord
+        pose.sab[m]--; const de = e.machines[m];
+        if (p.sabotage === 'fige') e.machines[m] = de;
+        else if (p.sabotage === 'chantier') e.machines[m] = -1;
+        else e.machines[m] = cible;
         Object.assign(ev, { issue: 'sabotee', qui: pose.quiS[m].shift(), lieu: de });
       } else if ((pose.gardes[cible] || 0) > 0) {          // P4.6 : la garde, la Machine reste
         pose.gardes[cible]--;
@@ -253,12 +258,17 @@
       } else { e.machines[m] = cible; e.arbres[cible]--; ev.issue = 'abattu'; }
     }
     const verdict = { tuile: L.tuile, machine: m, reussite: ev.issue === 'abattu' };
-    if (p.rythme === 'lancer') ev.appris = apprendre(e, verdict.tuile, verdict.machine, verdict.reussite);
+    const app = (v) => p.apprentissage ? apprendre(e, v.tuile, v.machine, v.reussite)
+      : { pensees: [e.pensees.indexOf(v.tuile), null], machines: [e.pisteM.indexOf(v.machine), null] };
+    if (p.rythme === 'lancer') ev.appris = app(verdict);
     else attente.push(verdict);
     return ev;
   }
   // fin de vague (rythme « vague ») : les échanges en attente, dans l'ordre des lancers
-  function finVague(p, e, attente) { return attente.splice(0).map((v) => apprendre(e, v.tuile, v.machine, v.reussite)); }
+  function finVague(p, e, attente) {
+    return attente.splice(0).map((v) => p.apprentissage ? apprendre(e, v.tuile, v.machine, v.reussite)
+      : { pensees: [e.pensees.indexOf(v.tuile), null], machines: [e.pisteM.indexOf(v.machine), null] });
+  }
 
   // Un tour complet, sans pas à pas (bots, séries, tests) ; renvoie les événements, étape par étape
   function jouerTour(p, pl, e, cartes, tirage) {

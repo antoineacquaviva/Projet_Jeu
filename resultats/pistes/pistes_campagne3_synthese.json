@@ -1,0 +1,2099 @@
+{
+  "plan": {
+    "nom": "Campagne 3 — Couronne aux deux pistes (Évaluation structurelle & variantes)",
+    "description": "Compare la proposition de base (2 à 6 joueurs), les deux rythmes d'apprentissage (lancer vs vague), le présage, 1 vs 2 étapes, le témoin sans apprentissage et les pistes du Palier 1 (sabotage figé / chantier, Cœur boisé).",
+    "type": "liste",
+    "graine": 301,
+    "parties": 24,
+    "base": {
+      "joueurs": 3,
+      "etapes": 2,
+      "tours": 4,
+      "rythme": "lancer",
+      "presage": false,
+      "lancersEnPlus": 1,
+      "tuileL": 3,
+      "tuileP": 3,
+      "individusParJoueur": 3,
+      "arbres": 3,
+      "coeurArbres": 3,
+      "apprentissage": true,
+      "sabotage": "echappe"
+    },
+    "bots": [
+      "hasard",
+      "sentinelle",
+      "marquage",
+      "regroupement",
+      "reflexe",
+      "glouton_aveugle",
+      "glouton_immobile",
+      "glouton_sans_sabotage",
+      "glouton_myope",
+      "glouton",
+      "prevoyant"
+    ],
+    "variantes": {
+      "J2_base": {
+        "joueurs": 2
+      },
+      "J3_base": {
+        "joueurs": 3
+      },
+      "J4_base": {
+        "joueurs": 4
+      },
+      "J5_base": {
+        "joueurs": 5
+      },
+      "J6_base": {
+        "joueurs": 6
+      },
+      "J2_rythme_vague": {
+        "joueurs": 2,
+        "rythme": "vague"
+      },
+      "J3_rythme_vague": {
+        "joueurs": 3,
+        "rythme": "vague"
+      },
+      "J4_rythme_vague": {
+        "joueurs": 4,
+        "rythme": "vague"
+      },
+      "J6_rythme_vague": {
+        "joueurs": 6,
+        "rythme": "vague"
+      },
+      "J2_presage": {
+        "joueurs": 2,
+        "presage": true
+      },
+      "J3_presage": {
+        "joueurs": 3,
+        "presage": true
+      },
+      "J4_presage": {
+        "joueurs": 4,
+        "presage": true
+      },
+      "J6_presage": {
+        "joueurs": 6,
+        "presage": true
+      },
+      "J3_1ordre_8tours": {
+        "joueurs": 3,
+        "etapes": 1,
+        "tours": 8
+      },
+      "J3_1ordre_presage": {
+        "joueurs": 3,
+        "etapes": 1,
+        "tours": 8,
+        "presage": true
+      },
+      "J3_pression_Jplus2": {
+        "joueurs": 3,
+        "lancersEnPlus": 2
+      },
+      "J4_pression_Jplus2": {
+        "joueurs": 4,
+        "lancersEnPlus": 2
+      },
+      "J3_sans_apprentissage": {
+        "joueurs": 3,
+        "apprentissage": false
+      },
+      "J3_sabotage_fige": {
+        "joueurs": 3,
+        "sabotage": "fige"
+      },
+      "J3_sabotage_chantier": {
+        "joueurs": 3,
+        "sabotage": "chantier"
+      },
+      "J3_coeur_boise6": {
+        "joueurs": 3,
+        "coeurArbres": 6
+      }
+    }
+  },
+  "parties": 24,
+  "variantes": {
+    "J2_base": {
+      "params": {
+        "joueurs": 2,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 5.46875,
+          "sentinelle": 16.666666666666668,
+          "marquage": 29.166666666666668,
+          "regroupement": 7.8125,
+          "reflexe": 36.979166666666664,
+          "glouton_aveugle": 28.645833333333332,
+          "glouton_immobile": 32.8125,
+          "glouton_sans_sabotage": 30.989583333333332,
+          "glouton_myope": 30.729166666666668,
+          "glouton": 31.510416666666668,
+          "prevoyant": 36.197916666666664
+        },
+        "fort": "prevoyant",
+        "taux_fort": 36.197916666666664,
+        "foret_finale": 68.05555555555556,
+        "agence": 97.91666666666667,
+        "couplage": 1.388888888888889,
+        "perdus_pct": 11.458333333333334,
+        "T1": {
+          "parades_garde": 2.5416666666666665,
+          "parades_sabotage": 3.25,
+          "entrees_chantier": 2.6666666666666665,
+          "echanges_pistes": 39.375,
+          "ordres_aller": 1.2083333333333333,
+          "ordres_garder": 5.833333333333333,
+          "ordres_saboter": 8.958333333333334
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 96,
+            "placer_pct": 4,
+            "proteger_pct": 46,
+            "neutre_pct": 50
+          },
+          "saboter_vs_garder": {
+            "decisions": 82,
+            "saboter_pct": 35,
+            "garder_pct": 2,
+            "neutre_pct": 62
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 7.03125,
+        "lecture_ic": 5.383888683804806,
+        "profondeur": -0.78125,
+        "profondeur_ic": 4.504107236432389,
+        "info": 2.8645833333333335,
+        "info_ic": 5.851672372721244,
+        "placement": -1.3020833333333333,
+        "placement_ic": 2.552083333333334,
+        "maitrise": 4.6875,
+        "maitrise_ic": 5.278718253035251,
+        "plan_2etapes": 5.46875,
+        "plan_2etapes_ic": 5.333155974604205,
+        "gain_sabotage": 0.5208333333333334,
+        "gain_sabotage_ic": 6.29643828801127,
+        "notes": {
+          "lecture": 0.5758928571428571,
+          "profondeur": 0,
+          "info": 0.6215277777777778,
+          "placement": 0,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "rouge",
+          "info": "orange",
+          "placement": "rouge",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_base": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 5.555555555555556,
+          "sentinelle": 11.284722222222223,
+          "marquage": 25.34722222222223,
+          "regroupement": 7.638888888888888,
+          "reflexe": 30.381944444444454,
+          "glouton_aveugle": 23.61111111111111,
+          "glouton_immobile": 26.215277777777775,
+          "glouton_sans_sabotage": 23.4375,
+          "glouton_myope": 27.777777777777786,
+          "glouton": 27.60416666666667,
+          "prevoyant": 29.340277777777775
+        },
+        "fort": "prevoyant",
+        "taux_fort": 29.340277777777775,
+        "foret_finale": 70.28769841269842,
+        "agence": 95.83333333333333,
+        "couplage": 2.7695105820105823,
+        "perdus_pct": 10.416666666666666,
+        "T1": {
+          "parades_garde": 2.2916666666666665,
+          "parades_sabotage": 4.75,
+          "entrees_chantier": 1.9166666666666667,
+          "echanges_pistes": 51.166666666666664,
+          "ordres_aller": 3.25,
+          "ordres_garder": 8.041666666666666,
+          "ordres_saboter": 12.708333333333334
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 144,
+            "placer_pct": 3,
+            "proteger_pct": 49,
+            "neutre_pct": 48
+          },
+          "saboter_vs_garder": {
+            "decisions": 112,
+            "saboter_pct": 34,
+            "garder_pct": 3,
+            "neutre_pct": 63
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 3.993055555555556,
+        "lecture_ic": 3.7591605659902867,
+        "profondeur": -1.0416666666666667,
+        "profondeur_ic": 4.458186597431755,
+        "info": 3.993055555555555,
+        "info_ic": 5.166905082221879,
+        "placement": 1.388888888888889,
+        "placement_ic": 2.490433925634154,
+        "maitrise": 1.736111111111111,
+        "maitrise_ic": 3.609539559554849,
+        "plan_2etapes": 1.5624999999999998,
+        "plan_2etapes_ic": 4.018085279032953,
+        "gain_sabotage": 4.166666666666667,
+        "gain_sabotage_ic": 4.61138757101512,
+        "notes": {
+          "lecture": 0.1418650793650794,
+          "profondeur": 0,
+          "info": 0.997685185185185,
+          "placement": 0.12962962962962968,
+          "maitrise": 0.824074074074074,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "rouge",
+          "info": "orange",
+          "placement": "orange",
+          "maitrise": "orange",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J4_base": {
+      "params": {
+        "joueurs": 4,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 2.734375,
+          "sentinelle": 10.286458333333334,
+          "marquage": 25,
+          "regroupement": 5.729166666666667,
+          "reflexe": 30.729166666666668,
+          "glouton_aveugle": 23.958333333333332,
+          "glouton_immobile": 30.729166666666668,
+          "glouton_sans_sabotage": 24.609375,
+          "glouton_myope": 28.125,
+          "glouton": 30.208333333333332,
+          "prevoyant": 33.333333333333336
+        },
+        "fort": "prevoyant",
+        "taux_fort": 33.333333333333336,
+        "foret_finale": 73.57357357357357,
+        "agence": 97.91666666666667,
+        "couplage": 3.966750841750842,
+        "perdus_pct": 10.9375,
+        "T1": {
+          "parades_garde": 3.9583333333333335,
+          "parades_sabotage": 6.708333333333333,
+          "entrees_chantier": 1,
+          "echanges_pistes": 64.79166666666667,
+          "ordres_aller": 5.125,
+          "ordres_garder": 11.166666666666666,
+          "ordres_saboter": 15.708333333333334
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 192,
+            "placer_pct": 6,
+            "proteger_pct": 38,
+            "neutre_pct": 56
+          },
+          "saboter_vs_garder": {
+            "decisions": 117,
+            "saboter_pct": 44,
+            "garder_pct": 0,
+            "neutre_pct": 56
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 8.333333333333334,
+        "lecture_ic": 4.049908487365937,
+        "profondeur": 2.6041666666666665,
+        "profondeur_ic": 3.4911383891813097,
+        "info": 6.25,
+        "info_ic": 3.5169990269826776,
+        "placement": -0.5208333333333334,
+        "placement_ic": 2.2324784081811786,
+        "maitrise": 3.125,
+        "maitrise_ic": 2.783485606135806,
+        "plan_2etapes": 5.208333333333333,
+        "plan_2etapes_ic": 2.8716176806574962,
+        "gain_sabotage": 5.598958333333333,
+        "gain_sabotage_ic": 3.149568091783315,
+        "notes": {
+          "lecture": 0.761904761904762,
+          "profondeur": 0.5347222222222222,
+          "info": 1,
+          "placement": 0,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "orange",
+          "info": "vert",
+          "placement": "rouge",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J5_base": {
+      "params": {
+        "joueurs": 5,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 3.2291666666666665,
+          "sentinelle": 9.895833333333334,
+          "marquage": 24.895833333333332,
+          "regroupement": 6.979166666666667,
+          "reflexe": 29.6875,
+          "glouton_aveugle": 23.333333333333332,
+          "glouton_immobile": 26.458333333333332,
+          "glouton_sans_sabotage": 26.5625,
+          "glouton_myope": 24.583333333333332,
+          "glouton": 29.895833333333332,
+          "prevoyant": 31.25
+        },
+        "fort": "prevoyant",
+        "taux_fort": 31.25,
+        "foret_finale": 74.27536231884058,
+        "agence": 98.33333333333333,
+        "couplage": 5.242228835978836,
+        "perdus_pct": 9.270833333333334,
+        "T1": {
+          "parades_garde": 4.583333333333333,
+          "parades_sabotage": 7.916666666666667,
+          "entrees_chantier": 0,
+          "echanges_pistes": 77.41666666666667,
+          "ordres_aller": 7.291666666666667,
+          "ordres_garder": 15.5,
+          "ordres_saboter": 17.208333333333332
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 240,
+            "placer_pct": 12,
+            "proteger_pct": 32,
+            "neutre_pct": 56
+          },
+          "saboter_vs_garder": {
+            "decisions": 138,
+            "saboter_pct": 46,
+            "garder_pct": 1,
+            "neutre_pct": 52
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 6.354166666666667,
+        "lecture_ic": 2.93436028116212,
+        "profondeur": 1.5625,
+        "profondeur_ic": 2.9906424864707684,
+        "info": 6.5625,
+        "info_ic": 3.10481634092414,
+        "placement": 3.4375,
+        "placement_ic": 2.428826075509003,
+        "maitrise": 1.3541666666666667,
+        "maitrise_ic": 3.190037589884988,
+        "plan_2etapes": 6.666666666666667,
+        "plan_2etapes_ic": 3.102772641949915,
+        "gain_sabotage": 3.3333333333333335,
+        "gain_sabotage_ic": 4.12572201264262,
+        "notes": {
+          "lecture": 0.4791666666666667,
+          "profondeur": 0.1875,
+          "info": 1,
+          "placement": 0.8125,
+          "maitrise": 0.5694444444444445,
+          "difficulte": 1
+        },
+        "score": 0.1875,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "orange",
+          "info": "vert",
+          "placement": "orange",
+          "maitrise": "orange",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J6_base": {
+      "params": {
+        "joueurs": 6,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 2.777777777777778,
+          "sentinelle": 9.635416666666666,
+          "marquage": 24.21875,
+          "regroupement": 5.729166666666665,
+          "reflexe": 30.121527777777775,
+          "glouton_aveugle": 24.826388888888886,
+          "glouton_immobile": 24.913194444444446,
+          "glouton_sans_sabotage": 25.694444444444446,
+          "glouton_myope": 26.215277777777775,
+          "glouton": 29.60069444444444,
+          "prevoyant": 31.07638888888889
+        },
+        "fort": "prevoyant",
+        "taux_fort": 31.07638888888889,
+        "foret_finale": 75.10101010101009,
+        "agence": 99.30555555555554,
+        "couplage": 8.315448401071466,
+        "perdus_pct": 10.069444444444446,
+        "T1": {
+          "parades_garde": 6.875,
+          "parades_sabotage": 8.041666666666666,
+          "entrees_chantier": 0,
+          "echanges_pistes": 90.25,
+          "ordres_aller": 9.458333333333334,
+          "ordres_garder": 20.791666666666668,
+          "ordres_saboter": 17.75
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 288,
+            "placer_pct": 9,
+            "proteger_pct": 31,
+            "neutre_pct": 60
+          },
+          "saboter_vs_garder": {
+            "decisions": 145,
+            "saboter_pct": 46,
+            "garder_pct": 1,
+            "neutre_pct": 54
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 6.85763888888889,
+        "lecture_ic": 2.048743522086189,
+        "profondeur": 0.9548611111111106,
+        "profondeur_ic": 2.252402876700361,
+        "info": 4.774305555555554,
+        "info_ic": 2.7642020880430094,
+        "placement": 4.687499999999999,
+        "placement_ic": 1.8269490425146642,
+        "maitrise": 1.4756944444444449,
+        "maitrise_ic": 2.1353734628990333,
+        "plan_2etapes": 4.861111111111112,
+        "plan_2etapes_ic": 2.883863440606838,
+        "gain_sabotage": 3.9062499999999987,
+        "gain_sabotage_ic": 3.6482102758872568,
+        "notes": {
+          "lecture": 0.55109126984127,
+          "profondeur": 0,
+          "info": 1,
+          "placement": 1,
+          "maitrise": 0.6504629629629632,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "rouge",
+          "info": "vert",
+          "placement": "vert",
+          "maitrise": "orange",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J2_rythme_vague": {
+      "params": {
+        "joueurs": 2,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "vague",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 7.8125,
+          "sentinelle": 17.708333333333332,
+          "marquage": 32.03125,
+          "regroupement": 6.770833333333333,
+          "reflexe": 34.375,
+          "glouton_aveugle": 33.072916666666664,
+          "glouton_immobile": 33.333333333333336,
+          "glouton_sans_sabotage": 27.864583333333332,
+          "glouton_myope": 33.072916666666664,
+          "glouton": 32.8125,
+          "prevoyant": 36.197916666666664
+        },
+        "fort": "prevoyant",
+        "taux_fort": 36.197916666666664,
+        "foret_finale": 68.05555555555559,
+        "agence": 100,
+        "couplage": 4.583333333333333,
+        "perdus_pct": 11.458333333333334,
+        "T1": {
+          "parades_garde": 2.375,
+          "parades_sabotage": 3.4166666666666665,
+          "entrees_chantier": 2.75,
+          "echanges_pistes": 39.375,
+          "ordres_aller": 0.9583333333333334,
+          "ordres_garder": 5.75,
+          "ordres_saboter": 9.291666666666666
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 96,
+            "placer_pct": 4,
+            "proteger_pct": 51,
+            "neutre_pct": 45
+          },
+          "saboter_vs_garder": {
+            "decisions": 79,
+            "saboter_pct": 35,
+            "garder_pct": 1,
+            "neutre_pct": 63
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 4.166666666666667,
+        "lecture_ic": 4.702197168618133,
+        "profondeur": 1.8229166666666667,
+        "profondeur_ic": 2.8057781657928866,
+        "info": -0.2604166666666667,
+        "info_ic": 6.4061203886971,
+        "placement": -0.5208333333333334,
+        "placement_ic": 1.9392329012186962,
+        "maitrise": 3.3854166666666665,
+        "maitrise_ic": 4.720229436635542,
+        "plan_2etapes": 3.125,
+        "plan_2etapes_ic": 3.7598301110247148,
+        "gain_sabotage": 4.947916666666667,
+        "gain_sabotage_ic": 5.16044606750619,
+        "notes": {
+          "lecture": 0.1666666666666667,
+          "profondeur": 0.2743055555555556,
+          "info": 0,
+          "placement": 0,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "orange",
+          "info": "rouge",
+          "placement": "rouge",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_rythme_vague": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "vague",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 4.861111111111112,
+          "sentinelle": 10.9375,
+          "marquage": 27.60416666666666,
+          "regroupement": 6.9444444444444455,
+          "reflexe": 31.423611111111104,
+          "glouton_aveugle": 24.305555555555554,
+          "glouton_immobile": 27.60416666666666,
+          "glouton_sans_sabotage": 25.17361111111111,
+          "glouton_myope": 27.256944444444443,
+          "glouton": 28.29861111111111,
+          "prevoyant": 33.33333333333333
+        },
+        "fort": "prevoyant",
+        "taux_fort": 33.33333333333333,
+        "foret_finale": 71.42857142857143,
+        "agence": 98.61111111111113,
+        "couplage": 6.6851551226551225,
+        "perdus_pct": 10.590277777777779,
+        "T1": {
+          "parades_garde": 2.9583333333333335,
+          "parades_sabotage": 5.041666666666667,
+          "entrees_chantier": 2,
+          "echanges_pistes": 52.5,
+          "ordres_aller": 3.4166666666666665,
+          "ordres_garder": 7.875,
+          "ordres_saboter": 12.708333333333334
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 144,
+            "placer_pct": 4,
+            "proteger_pct": 44,
+            "neutre_pct": 52
+          },
+          "saboter_vs_garder": {
+            "decisions": 104,
+            "saboter_pct": 36,
+            "garder_pct": 0,
+            "neutre_pct": 64
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 5.729166666666667,
+        "lecture_ic": 3.864812624225187,
+        "profondeur": 1.909722222222222,
+        "profondeur_ic": 4.199424122377753,
+        "info": 3.9930555555555567,
+        "info_ic": 3.3872077356773254,
+        "placement": 0.6944444444444451,
+        "placement_ic": 1.8172789229623671,
+        "maitrise": 5.034722222222224,
+        "maitrise_ic": 3.3693252997760874,
+        "plan_2etapes": 6.076388888888889,
+        "plan_2etapes_ic": 4.4779044583409835,
+        "gain_sabotage": 3.1249999999999987,
+        "gain_sabotage_ic": 2.959676839923472,
+        "notes": {
+          "lecture": 0.38988095238095244,
+          "profondeur": 0.3032407407407407,
+          "info": 0.9976851851851856,
+          "placement": 0,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "orange",
+          "info": "orange",
+          "placement": "rouge",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J4_rythme_vague": {
+      "params": {
+        "joueurs": 4,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "vague",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 4.166666666666667,
+          "sentinelle": 11.067708333333334,
+          "marquage": 24.088541666666668,
+          "regroupement": 7.03125,
+          "reflexe": 31.640625,
+          "glouton_aveugle": 26.171875,
+          "glouton_immobile": 28.255208333333332,
+          "glouton_sans_sabotage": 26.302083333333332,
+          "glouton_myope": 28.255208333333332,
+          "glouton": 28.645833333333332,
+          "prevoyant": 32.421875
+        },
+        "fort": "prevoyant",
+        "taux_fort": 32.421875,
+        "foret_finale": 73.31081081081082,
+        "agence": 96.875,
+        "couplage": 6.909005346505346,
+        "perdus_pct": 11.197916666666666,
+        "T1": {
+          "parades_garde": 3.5416666666666665,
+          "parades_sabotage": 6.833333333333333,
+          "entrees_chantier": 1,
+          "echanges_pistes": 64.79166666666667,
+          "ordres_aller": 4.833333333333333,
+          "ordres_garder": 10.291666666666666,
+          "ordres_saboter": 16.875
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 192,
+            "placer_pct": 8,
+            "proteger_pct": 36,
+            "neutre_pct": 56
+          },
+          "saboter_vs_garder": {
+            "decisions": 111,
+            "saboter_pct": 40,
+            "garder_pct": 1,
+            "neutre_pct": 59
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 8.333333333333334,
+        "lecture_ic": 2.7753348255156185,
+        "profondeur": 0.78125,
+        "profondeur_ic": 3.240416210099239,
+        "info": 2.4739583333333335,
+        "info_ic": 2.807291666666667,
+        "placement": 0.390625,
+        "placement_ic": 2.6409680014774692,
+        "maitrise": 3.7760416666666665,
+        "maitrise_ic": 2.0520428134563495,
+        "plan_2etapes": 4.166666666666667,
+        "plan_2etapes_ic": 3.099266022661988,
+        "gain_sabotage": 2.34375,
+        "gain_sabotage_ic": 3.5024759132140977,
+        "notes": {
+          "lecture": 0.761904761904762,
+          "profondeur": 0,
+          "info": 0.4913194444444445,
+          "placement": 0,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "rouge",
+          "info": "orange",
+          "placement": "rouge",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J6_rythme_vague": {
+      "params": {
+        "joueurs": 6,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "vague",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 3.125,
+          "sentinelle": 9.375,
+          "marquage": 25.00000000000001,
+          "regroupement": 6.597222222222222,
+          "reflexe": 28.385416666666668,
+          "glouton_aveugle": 22.569444444444443,
+          "glouton_immobile": 26.38888888888889,
+          "glouton_sans_sabotage": 27.08333333333333,
+          "glouton_myope": 26.388888888888896,
+          "glouton": 29.253472222222218,
+          "prevoyant": 30.902777777777775
+        },
+        "fort": "prevoyant",
+        "taux_fort": 30.902777777777775,
+        "foret_finale": 75.05050505050507,
+        "agence": 100,
+        "couplage": 7.15468881393804,
+        "perdus_pct": 9.114583333333334,
+        "T1": {
+          "parades_garde": 5.833333333333333,
+          "parades_sabotage": 9,
+          "entrees_chantier": 0,
+          "echanges_pistes": 91.08333333333333,
+          "ordres_aller": 9.166666666666666,
+          "ordres_garder": 19.291666666666668,
+          "ordres_saboter": 19.541666666666668
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 288,
+            "placer_pct": 11,
+            "proteger_pct": 32,
+            "neutre_pct": 57
+          },
+          "saboter_vs_garder": {
+            "decisions": 145,
+            "saboter_pct": 45,
+            "garder_pct": 0,
+            "neutre_pct": 55
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 5.902777777777779,
+        "lecture_ic": 1.866477320308208,
+        "profondeur": 2.5173611111111103,
+        "profondeur_ic": 1.72014868916873,
+        "info": 6.684027777777778,
+        "info_ic": 2.331477755787378,
+        "placement": 2.864583333333334,
+        "placement_ic": 2.3163135119252267,
+        "maitrise": 1.6493055555555565,
+        "maitrise_ic": 2.2389522291704913,
+        "plan_2etapes": 4.51388888888889,
+        "plan_2etapes_ic": 1.6790502101363391,
+        "gain_sabotage": 2.170138888888889,
+        "gain_sabotage_ic": 3.5232559239891432,
+        "notes": {
+          "lecture": 0.4146825396825398,
+          "profondeur": 0.5057870370370368,
+          "info": 1,
+          "placement": 0.621527777777778,
+          "maitrise": 0.7662037037037043,
+          "difficulte": 1
+        },
+        "score": 0.4146825396825398,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "orange",
+          "info": "vert",
+          "placement": "orange",
+          "maitrise": "orange",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J2_presage": {
+      "params": {
+        "joueurs": 2,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": true,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 5.46875,
+          "sentinelle": 16.666666666666668,
+          "marquage": 29.166666666666668,
+          "regroupement": 7.8125,
+          "reflexe": 37.760416666666664,
+          "glouton_aveugle": 28.645833333333332,
+          "glouton_immobile": 46.614583333333336,
+          "glouton_sans_sabotage": 36.458333333333336,
+          "glouton_myope": 41.40625,
+          "glouton": 46.875,
+          "prevoyant": 48.177083333333336
+        },
+        "fort": "prevoyant",
+        "taux_fort": 48.177083333333336,
+        "foret_finale": 71.41812865497076,
+        "agence": 100,
+        "couplage": 5.863095238095238,
+        "perdus_pct": 2.34375,
+        "T1": {
+          "parades_garde": 3.9166666666666665,
+          "parades_sabotage": 3.7916666666666665,
+          "entrees_chantier": 2.7083333333333335,
+          "echanges_pistes": 40,
+          "ordres_aller": 2.75,
+          "ordres_garder": 7.041666666666667,
+          "ordres_saboter": 6.208333333333333
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 96,
+            "placer_pct": 13,
+            "proteger_pct": 38,
+            "neutre_pct": 50
+          },
+          "saboter_vs_garder": {
+            "decisions": 83,
+            "saboter_pct": 36,
+            "garder_pct": 8,
+            "neutre_pct": 55
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 19.010416666666668,
+        "lecture_ic": 5.080811603515988,
+        "profondeur": 10.416666666666666,
+        "profondeur_ic": 3.010273271495817,
+        "info": 18.229166666666668,
+        "info_ic": 5.3638643636687675,
+        "placement": 0.2604166666666667,
+        "placement_ic": 2.9932925910992987,
+        "maitrise": 1.3020833333333333,
+        "maitrise_ic": 4.29821276386665,
+        "plan_2etapes": 6.770833333333333,
+        "plan_2etapes_ic": 5.755056784515265,
+        "gain_sabotage": 10.416666666666666,
+        "gain_sabotage_ic": 5.501475153514219,
+        "notes": {
+          "lecture": 1,
+          "profondeur": 1,
+          "info": 1,
+          "placement": 0,
+          "maitrise": 0.5347222222222222,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "vert",
+          "profondeur": "vert",
+          "info": "vert",
+          "placement": "rouge",
+          "maitrise": "orange",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_presage": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": true,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 5.555555555555556,
+          "sentinelle": 11.284722222222223,
+          "marquage": 25.34722222222223,
+          "regroupement": 7.638888888888888,
+          "reflexe": 34.201388888888886,
+          "glouton_aveugle": 23.61111111111111,
+          "glouton_immobile": 34.89583333333332,
+          "glouton_sans_sabotage": 31.076388888888886,
+          "glouton_myope": 32.465277777777786,
+          "glouton": 38.19444444444444,
+          "prevoyant": 42.18749999999999
+        },
+        "fort": "prevoyant",
+        "taux_fort": 42.18749999999999,
+        "foret_finale": 73.95833333333334,
+        "agence": 100,
+        "couplage": 8.150900025900027,
+        "perdus_pct": 2.777777777777778,
+        "T1": {
+          "parades_garde": 4.458333333333333,
+          "parades_sabotage": 5.666666666666667,
+          "entrees_chantier": 1.9583333333333333,
+          "echanges_pistes": 51.708333333333336,
+          "ordres_aller": 5.333333333333333,
+          "ordres_garder": 8.916666666666666,
+          "ordres_saboter": 9.75
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 144,
+            "placer_pct": 15,
+            "proteger_pct": 36,
+            "neutre_pct": 49
+          },
+          "saboter_vs_garder": {
+            "decisions": 105,
+            "saboter_pct": 34,
+            "garder_pct": 7,
+            "neutre_pct": 59
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 16.840277777777775,
+        "lecture_ic": 3.4925801147803153,
+        "profondeur": 7.986111111111111,
+        "profondeur_ic": 4.5031291306442816,
+        "info": 14.58333333333333,
+        "info_ic": 5.690398586290196,
+        "placement": 3.298611111111111,
+        "placement_ic": 3.5098346295915404,
+        "maitrise": 3.993055555555556,
+        "maitrise_ic": 3.6283194470067874,
+        "plan_2etapes": 9.722222222222223,
+        "plan_2etapes_ic": 4.161490343457531,
+        "gain_sabotage": 7.1180555555555545,
+        "gain_sabotage_ic": 4.437246728689624,
+        "notes": {
+          "lecture": 1,
+          "profondeur": 1,
+          "info": 1,
+          "placement": 0.7662037037037037,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0.7662037037037037,
+        "bande": {
+          "lecture": "vert",
+          "profondeur": "vert",
+          "info": "vert",
+          "placement": "orange",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J4_presage": {
+      "params": {
+        "joueurs": 4,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": true,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 2.734375,
+          "sentinelle": 10.286458333333334,
+          "marquage": 25,
+          "regroupement": 5.729166666666667,
+          "reflexe": 30.859375,
+          "glouton_aveugle": 23.958333333333332,
+          "glouton_immobile": 35.677083333333336,
+          "glouton_sans_sabotage": 33.203125,
+          "glouton_myope": 30.729166666666668,
+          "glouton": 37.760416666666664,
+          "prevoyant": 40.625
+        },
+        "fort": "prevoyant",
+        "taux_fort": 40.625,
+        "foret_finale": 75.67567567567569,
+        "agence": 98.95833333333333,
+        "couplage": 14.311428702876071,
+        "perdus_pct": 4.296875,
+        "T1": {
+          "parades_garde": 5.916666666666667,
+          "parades_sabotage": 7.083333333333333,
+          "entrees_chantier": 1,
+          "echanges_pistes": 64.45833333333333,
+          "ordres_aller": 7.25,
+          "ordres_garder": 11.875,
+          "ordres_saboter": 12.875
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 192,
+            "placer_pct": 19,
+            "proteger_pct": 29,
+            "neutre_pct": 52
+          },
+          "saboter_vs_garder": {
+            "decisions": 129,
+            "saboter_pct": 40,
+            "garder_pct": 5,
+            "neutre_pct": 56
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 15.625,
+        "lecture_ic": 3.919139964532296,
+        "profondeur": 9.765625,
+        "profondeur_ic": 3.283389248298531,
+        "info": 13.802083333333334,
+        "info_ic": 4.186066139075273,
+        "placement": 2.0833333333333335,
+        "placement_ic": 3.680666927036156,
+        "maitrise": 2.8645833333333335,
+        "maitrise_ic": 2.6819321818343838,
+        "plan_2etapes": 9.895833333333334,
+        "plan_2etapes_ic": 3.9479363838366566,
+        "gain_sabotage": 4.557291666666667,
+        "gain_sabotage_ic": 3.3584283437557376,
+        "notes": {
+          "lecture": 1,
+          "profondeur": 1,
+          "info": 1,
+          "placement": 0.36111111111111116,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0.36111111111111116,
+        "bande": {
+          "lecture": "vert",
+          "profondeur": "vert",
+          "info": "vert",
+          "placement": "orange",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J6_presage": {
+      "params": {
+        "joueurs": 6,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": true,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 2.777777777777778,
+          "sentinelle": 9.635416666666666,
+          "marquage": 24.21875,
+          "regroupement": 5.729166666666665,
+          "reflexe": 25.434027777777782,
+          "glouton_aveugle": 24.826388888888886,
+          "glouton_immobile": 29.687500000000004,
+          "glouton_sans_sabotage": 31.249999999999996,
+          "glouton_myope": 26.73611111111111,
+          "glouton": 36.979166666666664,
+          "prevoyant": 37.3263888888889
+        },
+        "fort": "prevoyant",
+        "taux_fort": 37.3263888888889,
+        "foret_finale": 76.9191919191919,
+        "agence": 97.22222222222221,
+        "couplage": 13.32959529505582,
+        "perdus_pct": 2.34375,
+        "T1": {
+          "parades_garde": 8.458333333333334,
+          "parades_sabotage": 9.458333333333334,
+          "entrees_chantier": 0,
+          "echanges_pistes": 90.58333333333333,
+          "ordres_aller": 12,
+          "ordres_garder": 19.5,
+          "ordres_saboter": 16.5
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 288,
+            "placer_pct": 23,
+            "proteger_pct": 21,
+            "neutre_pct": 56
+          },
+          "saboter_vs_garder": {
+            "decisions": 144,
+            "saboter_pct": 30,
+            "garder_pct": 8,
+            "neutre_pct": 63
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 13.107638888888891,
+        "lecture_ic": 2.6753542023173216,
+        "profondeur": 11.892361111111109,
+        "profondeur_ic": 2.5002691037063864,
+        "info": 12.152777777777779,
+        "info_ic": 2.5025332709896366,
+        "placement": 7.291666666666665,
+        "placement_ic": 2.4701366521946304,
+        "maitrise": 0.34722222222222276,
+        "maitrise_ic": 2.597299722422207,
+        "plan_2etapes": 10.590277777777777,
+        "plan_2etapes_ic": 3.078894656761457,
+        "gain_sabotage": 5.729166666666669,
+        "gain_sabotage_ic": 3.2630584692388664,
+        "notes": {
+          "lecture": 1,
+          "profondeur": 1,
+          "info": 1,
+          "placement": 1,
+          "maitrise": 0,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "vert",
+          "profondeur": "vert",
+          "info": "vert",
+          "placement": "vert",
+          "maitrise": "rouge",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_1ordre_8tours": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 1,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 8,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 6.076388888888889,
+          "sentinelle": 11.979166666666666,
+          "marquage": 33.50694444444445,
+          "regroupement": 6.770833333333333,
+          "reflexe": 36.28472222222223,
+          "glouton_aveugle": 28.298611111111114,
+          "glouton_immobile": 32.81250000000001,
+          "glouton_sans_sabotage": 21.701388888888886,
+          "glouton_myope": 32.81250000000001,
+          "glouton": 32.81250000000001,
+          "prevoyant": 36.28472222222222
+        },
+        "fort": "prevoyant",
+        "taux_fort": 36.28472222222222,
+        "foret_finale": 72.27182539682539,
+        "agence": 100,
+        "couplage": 1.2121212121212122,
+        "perdus_pct": 0,
+        "T1": {
+          "parades_garde": 2,
+          "parades_sabotage": 6.708333333333333,
+          "entrees_chantier": 2,
+          "echanges_pistes": 51.541666666666664,
+          "ordres_aller": 3.5,
+          "ordres_garder": 6.916666666666667,
+          "ordres_saboter": 13.583333333333334
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 288,
+            "placer_pct": 0,
+            "proteger_pct": 68,
+            "neutre_pct": 32
+          },
+          "saboter_vs_garder": {
+            "decisions": 195,
+            "saboter_pct": 37,
+            "garder_pct": 2,
+            "neutre_pct": 61
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 2.777777777777778,
+        "lecture_ic": 3.9834812227042247,
+        "profondeur": -2.9605947323337506e-16,
+        "profondeur_ic": 1.966302267067564,
+        "info": 4.513888888888888,
+        "info_ic": 3.8050827926662194,
+        "placement": 0,
+        "placement_ic": 0,
+        "maitrise": 3.4722222222222214,
+        "maitrise_ic": 3.92235000681387,
+        "plan_2etapes": 3.4722222222222214,
+        "plan_2etapes_ic": 3.92235000681387,
+        "gain_sabotage": 11.111111111111109,
+        "gain_sabotage_ic": 2.852268122159462,
+        "notes": {
+          "lecture": 0,
+          "profondeur": 0,
+          "info": 1,
+          "placement": 0,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "rouge",
+          "profondeur": "rouge",
+          "info": "vert",
+          "placement": "rouge",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_1ordre_presage": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 1,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": true,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 8,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 6.076388888888889,
+          "sentinelle": 11.979166666666666,
+          "marquage": 33.50694444444445,
+          "regroupement": 6.770833333333333,
+          "reflexe": 44.618055555555564,
+          "glouton_aveugle": 28.298611111111114,
+          "glouton_immobile": 39.583333333333336,
+          "glouton_sans_sabotage": 27.430555555555557,
+          "glouton_myope": 39.583333333333336,
+          "glouton": 39.583333333333336,
+          "prevoyant": 48.26388888888889
+        },
+        "fort": "prevoyant",
+        "taux_fort": 48.26388888888889,
+        "foret_finale": 75.69444444444444,
+        "agence": 100,
+        "couplage": 6.072723572723572,
+        "perdus_pct": 0,
+        "T1": {
+          "parades_garde": 4.375,
+          "parades_sabotage": 7.208333333333333,
+          "entrees_chantier": 1.9583333333333333,
+          "echanges_pistes": 52.208333333333336,
+          "ordres_aller": 6.875,
+          "ordres_garder": 8.333333333333334,
+          "ordres_saboter": 8.791666666666666
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 288,
+            "placer_pct": 0,
+            "proteger_pct": 42,
+            "neutre_pct": 58
+          },
+          "saboter_vs_garder": {
+            "decisions": 174,
+            "saboter_pct": 24,
+            "garder_pct": 7,
+            "neutre_pct": 69
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 14.756944444444445,
+        "lecture_ic": 3.2226955835670332,
+        "profondeur": 3.6458333333333335,
+        "profondeur_ic": 3.6888644136425404,
+        "info": 11.284722222222221,
+        "info_ic": 3.3150992698481803,
+        "placement": 0,
+        "placement_ic": 0,
+        "maitrise": 8.680555555555555,
+        "maitrise_ic": 3.4027777777777772,
+        "plan_2etapes": 8.680555555555555,
+        "plan_2etapes_ic": 3.4027777777777772,
+        "gain_sabotage": 12.152777777777777,
+        "gain_sabotage_ic": 3.9300434107543047,
+        "notes": {
+          "lecture": 1,
+          "profondeur": 0.8819444444444445,
+          "info": 1,
+          "placement": 0,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "vert",
+          "profondeur": "orange",
+          "info": "vert",
+          "placement": "rouge",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_pression_Jplus2": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 2,
+        "lancersEnPlus": 2,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 7.118055555555556,
+          "sentinelle": 12.847222222222223,
+          "marquage": 29.340277777777775,
+          "regroupement": 6.770833333333332,
+          "reflexe": 31.597222222222218,
+          "glouton_aveugle": 25.347222222222225,
+          "glouton_immobile": 30.902777777777775,
+          "glouton_sans_sabotage": 25.694444444444446,
+          "glouton_myope": 28.819444444444443,
+          "glouton": 33.854166666666664,
+          "prevoyant": 34.02777777777778
+        },
+        "fort": "prevoyant",
+        "taux_fort": 34.02777777777778,
+        "foret_finale": 62.1031746031746,
+        "agence": 97.22222222222223,
+        "couplage": 5.67655723905724,
+        "perdus_pct": 10.243055555555555,
+        "T1": {
+          "parades_garde": 3.375,
+          "parades_sabotage": 4.791666666666667,
+          "entrees_chantier": 2,
+          "echanges_pistes": 63.166666666666664,
+          "ordres_aller": 3.5416666666666665,
+          "ordres_garder": 9.541666666666666,
+          "ordres_saboter": 10.916666666666666
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 144,
+            "placer_pct": 7,
+            "proteger_pct": 46,
+            "neutre_pct": 47
+          },
+          "saboter_vs_garder": {
+            "decisions": 102,
+            "saboter_pct": 42,
+            "garder_pct": 4,
+            "neutre_pct": 54
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 4.6875,
+        "lecture_ic": 4.377852331064708,
+        "profondeur": 2.430555555555555,
+        "profondeur_ic": 4.110367433389192,
+        "info": 8.506944444444445,
+        "info_ic": 4.067893009817036,
+        "placement": 2.9513888888888893,
+        "placement_ic": 2.623336048932867,
+        "maitrise": 0.17361111111111102,
+        "maitrise_ic": 3.0493208102875315,
+        "plan_2etapes": 5.208333333333331,
+        "plan_2etapes_ic": 3.8156524874511244,
+        "gain_sabotage": 8.159722222222223,
+        "gain_sabotage_ic": 3.7591605659902867,
+        "notes": {
+          "lecture": 0.24107142857142858,
+          "profondeur": 0.47685185185185164,
+          "info": 1,
+          "placement": 0.6504629629629631,
+          "maitrise": 0,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "orange",
+          "info": "vert",
+          "placement": "orange",
+          "maitrise": "rouge",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J4_pression_Jplus2": {
+      "params": {
+        "joueurs": 4,
+        "etapes": 2,
+        "lancersEnPlus": 2,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 3.515625,
+          "sentinelle": 12.239583333333334,
+          "marquage": 25.911458333333332,
+          "regroupement": 5.598958333333333,
+          "reflexe": 32.682291666666664,
+          "glouton_aveugle": 28.385416666666668,
+          "glouton_immobile": 31.119791666666668,
+          "glouton_sans_sabotage": 27.604166666666668,
+          "glouton_myope": 30.859375,
+          "glouton": 33.59375,
+          "prevoyant": 34.765625
+        },
+        "fort": "prevoyant",
+        "taux_fort": 34.765625,
+        "foret_finale": 66.7792792792793,
+        "agence": 98.95833333333333,
+        "couplage": 2.863756613756614,
+        "perdus_pct": 12.239583333333334,
+        "T1": {
+          "parades_garde": 4.625,
+          "parades_sabotage": 6.5,
+          "entrees_chantier": 1,
+          "echanges_pistes": 76.875,
+          "ordres_aller": 5.375,
+          "ordres_garder": 12.291666666666666,
+          "ordres_saboter": 14.333333333333334
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 192,
+            "placer_pct": 6,
+            "proteger_pct": 41,
+            "neutre_pct": 53
+          },
+          "saboter_vs_garder": {
+            "decisions": 120,
+            "saboter_pct": 45,
+            "garder_pct": 4,
+            "neutre_pct": 51
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 8.854166666666666,
+        "lecture_ic": 3.331761971108621,
+        "profondeur": 2.0833333333333335,
+        "profondeur_ic": 2.75073757675711,
+        "info": 5.208333333333333,
+        "info_ic": 2.8238866387998423,
+        "placement": 2.4739583333333335,
+        "placement_ic": 2.4170216876752746,
+        "maitrise": 1.171875,
+        "maitrise_ic": 3.551851397874287,
+        "plan_2etapes": 3.90625,
+        "plan_2etapes_ic": 3.155406868302246,
+        "gain_sabotage": 5.989583333333333,
+        "gain_sabotage_ic": 3.648210275887256,
+        "notes": {
+          "lecture": 0.8363095238095237,
+          "profondeur": 0.36111111111111116,
+          "info": 1,
+          "placement": 0.4913194444444445,
+          "maitrise": 0.4479166666666667,
+          "difficulte": 1
+        },
+        "score": 0.36111111111111116,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "orange",
+          "info": "vert",
+          "placement": "orange",
+          "maitrise": "orange",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_sans_apprentissage": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": false,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 6.423611111111112,
+          "sentinelle": 12.326388888888886,
+          "marquage": 30.902777777777782,
+          "regroupement": 6.25,
+          "reflexe": 36.63194444444445,
+          "glouton_aveugle": 27.777777777777775,
+          "glouton_immobile": 36.458333333333336,
+          "glouton_sans_sabotage": 32.63888888888889,
+          "glouton_myope": 35.243055555555564,
+          "glouton": 37.32638888888889,
+          "prevoyant": 38.54166666666667
+        },
+        "fort": "prevoyant",
+        "taux_fort": 38.54166666666667,
+        "foret_finale": 72.91666666666666,
+        "agence": 100,
+        "couplage": 5.116191678691679,
+        "perdus_pct": 9.201388888888888,
+        "T1": {
+          "parades_garde": 3.4583333333333335,
+          "parades_sabotage": 5.791666666666667,
+          "entrees_chantier": 1.9166666666666667,
+          "echanges_pistes": 0,
+          "ordres_aller": 2.625,
+          "ordres_garder": 8.75,
+          "ordres_saboter": 12.625
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 144,
+            "placer_pct": 5,
+            "proteger_pct": 47,
+            "neutre_pct": 48
+          },
+          "saboter_vs_garder": {
+            "decisions": 103,
+            "saboter_pct": 36,
+            "garder_pct": 0,
+            "neutre_pct": 64
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 7.638888888888888,
+        "lecture_ic": 4.013697695327755,
+        "profondeur": 1.9097222222222217,
+        "profondeur_ic": 3.1468196244236943,
+        "info": 9.548611111111112,
+        "info_ic": 4.382449709418512,
+        "placement": 0.8680555555555552,
+        "placement_ic": 1.3885740887204432,
+        "maitrise": 1.215277777777777,
+        "maitrise_ic": 2.9280399229733938,
+        "plan_2etapes": 3.2986111111111103,
+        "plan_2etapes_ic": 3.3693252997760865,
+        "gain_sabotage": 4.687499999999999,
+        "gain_sabotage_ic": 2.7943163303437513,
+        "notes": {
+          "lecture": 0.6626984126984127,
+          "profondeur": 0.30324074074074053,
+          "info": 1,
+          "placement": 0,
+          "maitrise": 0.47685185185185136,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "orange",
+          "info": "vert",
+          "placement": "rouge",
+          "maitrise": "orange",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_sabotage_fige": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "fige",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 5.555555555555556,
+          "sentinelle": 11.284722222222223,
+          "marquage": 38.36805555555556,
+          "regroupement": 7.638888888888888,
+          "reflexe": 37.32638888888889,
+          "glouton_aveugle": 27.430555555555554,
+          "glouton_immobile": 35.590277777777786,
+          "glouton_sans_sabotage": 23.4375,
+          "glouton_myope": 36.28472222222222,
+          "glouton": 35.06944444444444,
+          "prevoyant": 39.93055555555555
+        },
+        "fort": "prevoyant",
+        "taux_fort": 39.93055555555555,
+        "foret_finale": 73.31349206349206,
+        "agence": 98.61111111111113,
+        "couplage": 2.953192640692641,
+        "perdus_pct": 4.687500000000001,
+        "T1": {
+          "parades_garde": 1.625,
+          "parades_sabotage": 7.958333333333333,
+          "entrees_chantier": 2,
+          "echanges_pistes": 51.625,
+          "ordres_aller": 1.5416666666666667,
+          "ordres_garder": 4.458333333333333,
+          "ordres_saboter": 18
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 144,
+            "placer_pct": 1,
+            "proteger_pct": 58,
+            "neutre_pct": 41
+          },
+          "saboter_vs_garder": {
+            "decisions": 133,
+            "saboter_pct": 39,
+            "garder_pct": 3,
+            "neutre_pct": 58
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 1.5625000000000009,
+        "lecture_ic": 4.391630027851821,
+        "profondeur": 2.604166666666667,
+        "profondeur_ic": 3.327225873741567,
+        "info": 7.638888888888889,
+        "info_ic": 6.172487677842591,
+        "placement": -0.5208333333333336,
+        "placement_ic": 2.615648600759858,
+        "maitrise": 4.86111111111111,
+        "maitrise_ic": 4.782872802935559,
+        "plan_2etapes": 3.645833333333334,
+        "plan_2etapes_ic": 3.8176310473390545,
+        "gain_sabotage": 11.631944444444443,
+        "gain_sabotage_ic": 4.312974508500709,
+        "notes": {
+          "lecture": 0,
+          "profondeur": 0.5347222222222223,
+          "info": 1,
+          "placement": 0,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "rouge",
+          "profondeur": "orange",
+          "info": "vert",
+          "placement": "rouge",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_sabotage_chantier": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 3,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "chantier",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 5.729166666666668,
+          "sentinelle": 11.284722222222223,
+          "marquage": 25.52083333333334,
+          "regroupement": 7.638888888888888,
+          "reflexe": 28.819444444444446,
+          "glouton_aveugle": 22.916666666666668,
+          "glouton_immobile": 29.86111111111111,
+          "glouton_sans_sabotage": 23.4375,
+          "glouton_myope": 27.77777777777777,
+          "glouton": 28.472222222222218,
+          "prevoyant": 30.555555555555554
+        },
+        "fort": "prevoyant",
+        "taux_fort": 30.555555555555554,
+        "foret_finale": 70.63492063492062,
+        "agence": 98.6111111111111,
+        "couplage": 0.9259259259259259,
+        "perdus_pct": 10.763888888888891,
+        "T1": {
+          "parades_garde": 2.5416666666666665,
+          "parades_sabotage": 4.791666666666667,
+          "entrees_chantier": 5.958333333333333,
+          "echanges_pistes": 51.166666666666664,
+          "ordres_aller": 2.8333333333333335,
+          "ordres_garder": 9.916666666666666,
+          "ordres_saboter": 11.25
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 144,
+            "placer_pct": 3,
+            "proteger_pct": 52,
+            "neutre_pct": 44
+          },
+          "saboter_vs_garder": {
+            "decisions": 106,
+            "saboter_pct": 31,
+            "garder_pct": 4,
+            "neutre_pct": 65
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 5.034722222222222,
+        "lecture_ic": 3.743055555555556,
+        "profondeur": 1.7361111111111107,
+        "profondeur_ic": 3.066606881287291,
+        "info": 5.5555555555555545,
+        "info_ic": 5.100713405104146,
+        "placement": -1.3888888888888882,
+        "placement_ic": 2.7662502354274974,
+        "maitrise": 2.0833333333333335,
+        "maitrise_ic": 3.8706698833943176,
+        "plan_2etapes": 2.7777777777777772,
+        "plan_2etapes_ic": 3.6011615067268035,
+        "gain_sabotage": 5.034722222222224,
+        "gain_sabotage_ic": 4.636971809821923,
+        "notes": {
+          "lecture": 0.2906746031746032,
+          "profondeur": 0.24537037037037024,
+          "info": 1,
+          "placement": 0,
+          "maitrise": 1,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "orange",
+          "info": "vert",
+          "placement": "rouge",
+          "maitrise": "vert",
+          "difficulte": "vert"
+        }
+      }
+    },
+    "J3_coeur_boise6": {
+      "params": {
+        "joueurs": 3,
+        "etapes": 2,
+        "lancersEnPlus": 1,
+        "rythme": "lancer",
+        "presage": false,
+        "tuileL": 3,
+        "tuileP": 3,
+        "individusParJoueur": 3,
+        "arbres": 3,
+        "coeurArbres": 6,
+        "tours": 4,
+        "apprentissage": true,
+        "sabotage": "echappe",
+        "graine": 1
+      },
+      "mesures": {
+        "taux": {
+          "hasard": 4.513888888888889,
+          "sentinelle": 10.243055555555559,
+          "marquage": 25.694444444444454,
+          "regroupement": 7.118055555555553,
+          "reflexe": 31.076388888888882,
+          "glouton_aveugle": 24.131944444444446,
+          "glouton_immobile": 25.52083333333333,
+          "glouton_sans_sabotage": 21.70138888888889,
+          "glouton_myope": 27.604166666666675,
+          "glouton": 28.993055555555557,
+          "prevoyant": 30.902777777777775
+        },
+        "fort": "prevoyant",
+        "taux_fort": 30.902777777777775,
+        "foret_finale": 71.74329501915707,
+        "agence": 100,
+        "couplage": 4.733796296296297,
+        "perdus_pct": 9.722222222222221,
+        "T1": {
+          "parades_garde": 2.7083333333333335,
+          "parades_sabotage": 4.708333333333333,
+          "entrees_chantier": 1.9166666666666667,
+          "echanges_pistes": 50.708333333333336,
+          "ordres_aller": 3.125,
+          "ordres_garder": 7.875,
+          "ordres_saboter": 13
+        },
+        "T4": {
+          "placer_vs_proteger": {
+            "decisions": 144,
+            "placer_pct": 6,
+            "proteger_pct": 44,
+            "neutre_pct": 50
+          },
+          "saboter_vs_garder": {
+            "decisions": 113,
+            "saboter_pct": 37,
+            "garder_pct": 4,
+            "neutre_pct": 59
+          }
+        },
+        "meilleure_boucle": "marquage",
+        "lecture": 5.208333333333334,
+        "lecture_ic": 3.8784658024373937,
+        "profondeur": -0.17361111111111147,
+        "profondeur_ic": 3.916570036410348,
+        "info": 4.861111111111111,
+        "info_ic": 5.100713405104145,
+        "placement": 3.472222222222222,
+        "placement_ic": 2.288159737994878,
+        "maitrise": 1.909722222222222,
+        "maitrise_ic": 3.870019514594735,
+        "plan_2etapes": 3.2986111111111107,
+        "plan_2etapes_ic": 4.141481604923989,
+        "gain_sabotage": 7.291666666666668,
+        "gain_sabotage_ic": 3.414593013945538,
+        "notes": {
+          "lecture": 0.3154761904761906,
+          "profondeur": 0,
+          "info": 1,
+          "placement": 0.824074074074074,
+          "maitrise": 0.9398148148148148,
+          "difficulte": 1
+        },
+        "score": 0,
+        "bande": {
+          "lecture": "orange",
+          "profondeur": "rouge",
+          "info": "vert",
+          "placement": "orange",
+          "maitrise": "orange",
+          "difficulte": "vert"
+        }
+      }
+    }
+  },
+  "duree_s": 462
+}

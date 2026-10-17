@@ -1,6 +1,6 @@
-/* Page « Couronne aux deux pistes » : préparation, partie pas à pas (humains et bots, deux cartes par joueur, lancer par
-   lancer), séries de bots, parties enregistrées dans la base de l'artefact. L'état d'une partie est un objet JSON
-   simple (S), rejouable : tous les tirages sont faits au départ à partir de la graine. */
+/* Page « Couronne aux deux pistes » : plateau vivant en SVG (arbres, souches, chantier, gardes, sabotages, fantômes),
+   pistes interactives reliées au plateau au survol, matrice Somme × Écart, programmation directe sur le plateau et
+   résolution animée des vagues. Aucune règle du moteur (moteur.js / bots.js) n'est modifiée. */
 (function () {
   'use strict';
   const K = window.PISTES, B = window.PISTESBOTS;
@@ -12,175 +12,694 @@
   const SIEGES = { humain: 'Humain', prevoyant: 'Bot prévoyant', reflexe: 'Bot réflexe', stratege: 'Bot glouton', hasard: 'Bot hasard' };
   const NT = K.NOMS_TACTIQUES;
   const COURT = { cupidite: 'Cupi', percee: 'Perc', opportunisme: 'Oppo', represailles: 'Repr' };
+  const ICO_T = { cupidite: '🌳', percee: '🎯', opportunisme: '👁️', represailles: '⚔️' };
+  const COUL_T = { cupidite: 'var(--t-cup)', percee: 'var(--t-per)', opportunisme: 'var(--t-opp)', represailles: 'var(--t-rep)' };
+  const ICO_O = { garder: '🛡️', aller: '🥾', saboter: '🔧', rien: '—' };
   const MN = (m) => K.MACHINES[m].nom;
 
-  let cfg = { reglages: Object.assign({}, K.DEFAUTS, { graine: 1 + Math.floor(Math.random() * 99999) }),
-    sieges: ['humain', 'prevoyant', 'prevoyant', 'prevoyant', 'prevoyant', 'prevoyant'], aide: true };
-  try { const m = JSON.parse(localStorage.getItem('pistes-cfg') || 'null'); if (m && m.reglages && m.sieges) cfg = Object.assign(cfg, m); } catch (e) { /* stockage indisponible */ }
-  const garderCfg = () => { try { localStorage.setItem('pistes-cfg', JSON.stringify(cfg)); } catch (e) { /* rien */ } };
+  let cfg = {
+    reglages: Object.assign({}, K.DEFAUTS, { graine: 1 + Math.floor(Math.random() * 99999) }),
+    sieges: ['humain', 'prevoyant', 'prevoyant', 'prevoyant', 'prevoyant', 'prevoyant'],
+    aide: true,
+    intentions: false,
+    heatmap: false,
+    codes: true,
+    pyramide: false
+  };
+  try {
+    const m = JSON.parse(localStorage.getItem('pistes-cfg') || 'null');
+    if (m && m.reglages && m.sieges) {
+      cfg = Object.assign(cfg, m);
+      if (m.codes === undefined || m.codesV2 === undefined) { cfg.codes = true; cfg.codesV2 = true; }
+      if (m.intentionsV2 === undefined) { cfg.intentions = false; cfg.intentionsV2 = true; }
+    }
+  } catch (e) { /* stockage indisponible */ }
+  const garderCfg = () => { try { cfg.codesV2 = true; cfg.intentionsV2 = true; localStorage.setItem('pistes-cfg', JSON.stringify(cfg)); } catch (e) { /* rien */ } };
 
   let S = null;                 // la partie en cours
   let P = null, PL = null;      // réglages calculés et plateau
-  const UI = { db: null, dl: null, sel: null, index: [], geo: null, serie: null };
+  const UI = {
+    db: null, dl: null, sel: null, index: [], geo: null, serie: null,
+    hover: null,                // { type: 'machine'|'somme'|'case', id: number }
+    popCell: null,              // case où le menu contextuel est ouvert
+    animTimer: null             // timer de lecture animée de la vague
+  };
 
   // ------------------------------------------------------------------ outils
-  function toast(msg) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => { t.hidden = true; }, 2800); }
+  function toast(msg) {
+    const t = $('toast'); if (!t) return;
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toast.h);
+    toast.h = setTimeout(() => { t.hidden = true; }, 2800);
+  }
   const nomC = (c) => B.nomCase(P, PL, c);
+  function nomCaseHumain(c) {
+    if (c === 0) return 'le Cœur';
+    const t = PL.tuile[c], r = PL.rang[c];
+    const rangNom = r === 0 ? 'intérieure' : (r === P.q - 1 ? 'lisière' : 'milieu');
+    return `${ nomC(c) } (J${ t + 1 } ${ rangNom })`;
+  }
   const nomI = (i) => B.nomInd(P, i);
   const tour = () => S.e.tour;
   const ordreTexte = (o) => B.ordreTexte(P, PL, o);
-  const carteTexte = (c) => (c ? nomI(c.i) + ' ' + ordreTexte(c.o) : 'rien');
-  function log(k, txt, why, tag) { S.journal.push({ k, txt, why: why || '', tag: tag || '' }); }
-  function de(n) {
-    const P9 = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] }[n];
-    return `<span class="die" role="img" aria-label="${n}">${P9.map((k) => `<i style="grid-area:${1 + Math.floor((k - 1) / 3)}/${1 + (k - 1) % 3}"></i>`).join('')}</span>`;
+  function ordreRiche(o) {
+    if (!o || o[0] === K.RIEN) return '— rien —';
+    if (o[0] === K.GARDER) return `🛡️ Garder ${ nomC(o[1]) }`;
+    if (o[0] === K.ALLER) return `🥾 Aller en ${ nomC(o[1]) }`;
+    return `🔧 Saboter ${ MN(o[1]) }`;
   }
-  const des = (d) => de(d[0]) + de(d[1]);
+  const carteTexte = (c) => (c ? nomI(c.i) + ' ' + ordreTexte(c.o) : 'rien');
+  const carteRiche = (c) => (c ? `${ nomI(c.i) } : ${ ordreRiche(c.o) }` : 'Aucune action choisie');
+  function log(k, txt, why, tag) { S.journal.push({ k, txt, why: why || '', tag: tag || '' }); }
+
+  function de(n, anim) {
+    const P9 = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] }[n] || [5];
+    return `<span class="die${ anim ? ' roll' : '' }" role="img" aria-label="dé ${ n }">${ P9.map((k) => `<i style="grid-area:${ 1 + Math.floor((k - 1) / 3) }/${ 1 + (k - 1) % 3 }"></i>`).join('') }</span>`;
+  }
+  const des = (d, anim) => de(d[0], anim) + ' ' + de(d[1], anim);
   const ctxBots = () => (P.presage ? { connus: S.tirages[tour()][0].map((l) => l.d.slice()) } : null);
 
-  // ------------------------------------------------------------------ géométrie de la couronne (comme le kit)
-  const CX = 320, CY = 320, RH = 54, R0 = 54, R1 = 286;
+  function stopAnimVague() {
+    if (UI.animTimer) { clearTimeout(UI.animTimer); UI.animTimer = null; }
+  }
+
+  // Sommes et écarts compatibles sur 2D6
+  function sommesPourEcart(ecart) {
+    const s = new Set();
+    for (const [a, b] of K.ISSUES) if (Math.abs(a - b) === ecart) s.add(a + b);
+    return s;
+  }
+  function ecartsPourSomme(somme) {
+    const s = new Set();
+    for (const [a, b] of K.ISSUES) if (a + b === somme) s.add(Math.abs(a - b));
+    return s;
+  }
+
+  // ------------------------------------------------------------------ géométrie de la couronne + Chantier
+  const CX = 315, CY = 330, RH = 54, R0 = 54, R1 = 282;
   function geometrie(p, pl) {
     const A = 2 * Math.PI / p.J, a0 = -Math.PI / 2 - A / 2, w = (R1 - R0) / p.q;
     const pt = (r, a) => [CX + r * Math.cos(a), CY + r * Math.sin(a)];
-    const cells = [{ c: 0, path: null, cx: CX, cy: CY, r: RH, tan: [1, 0], rad: [0, 1] }];
+    const cells = [{ c: 0, path: null, cx: CX, cy: CY, r: RH, tan: [1, 0], rad: [0, 1], arc: 90, w: 90 }];
     for (let c = 1; c < pl.N; c++) {
       const t = pl.tuile[c], r = pl.rang[c], k = pl.col[c];
       const ga = a0 + t * A + k * A / p.l, gb = ga + A / p.l, ra = R0 + r * w, rb = ra + w;
       const [x1, y1] = pt(ra, ga), [x2, y2] = pt(rb, ga), [x3, y3] = pt(rb, gb), [x4, y4] = pt(ra, gb);
       const big = (gb - ga) > Math.PI ? 1 : 0;
-      const path = `M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)} A${rb},${rb} 0 ${big} 1 ${x3.toFixed(1)},${y3.toFixed(1)} L${x4.toFixed(1)},${y4.toFixed(1)} A${ra},${ra} 0 ${big} 0 ${x1.toFixed(1)},${y1.toFixed(1)} Z`;
+      const path = `M${ x1.toFixed(1) },${ y1.toFixed(1) } L${ x2.toFixed(1) },${ y2.toFixed(1) } A${ rb },${ rb } 0 ${ big } 1 ${ x3.toFixed(1) },${ y3.toFixed(1) } L${ x4.toFixed(1) },${ y4.toFixed(1) } A${ ra },${ ra } 0 ${ big } 0 ${ x1.toFixed(1) },${ y1.toFixed(1) } Z`;
       const am = (ga + gb) / 2, rm = (ra + rb) / 2;
       const [cx, cy] = pt(rm, am);
-      const [nx, ny] = pt(rb - 9, am), [lx, ly] = pt(ra + 8, am);
-      cells.push({ c, path, cx, cy, nx, ny, lx, ly, tan: [-Math.sin(am), Math.cos(am)], rad: [Math.cos(am), Math.sin(am)], arc: rm * (gb - ga), w });
+      const tan = [-Math.sin(am), Math.cos(am)];
+      const rad = [Math.cos(am), Math.sin(am)];
+      // Position des arbres vers le bord extérieur de la case, et chiffre d'arbres décalé à gauche des arbres
+      const [tx0, ty0] = pt(rb - Math.min(13, w * 0.20), am);
+      const tx = tx0 + tan[0] * 5, ty = ty0 + tan[1] * 5;
+      const nx = tx0 - tan[0] * 17, ny = ty0 - tan[1] * 17;
+      // Nom de la case (A1, B2...) vers le bord intérieur de la case
+      const [lx, ly] = pt(ra + 11, am);
+      cells.push({
+        c, path, cx, cy, nx, ny, lx, ly, tx, ty, am, rm,
+        tan, rad,
+        arc: rm * (gb - ga), w
+      });
     }
     const seps = [];
-    for (let t = 0; t < p.J; t++) { const a = a0 + t * A; const [x1, y1] = pt(R0 - 4, a), [x2, y2] = pt(R1 + 4, a); seps.push([x1, y1, x2, y2]); }
+    const arcs = [];
+    for (let t = 0; t < p.J; t++) {
+      const ga = a0 + t * A, gb = ga + A;
+      const [x1, y1] = pt(R0 - 3, ga), [x2, y2] = pt(R1 + 5, ga);
+      seps.push([x1, y1, x2, y2]);
+      const ra = R1 + 7;
+      const [ax1, ay1] = pt(ra, ga + 0.03), [ax2, ay2] = pt(ra, gb - 0.03);
+      const big = (gb - ga) > Math.PI ? 1 : 0;
+      arcs.push({ t, d: `M${ ax1.toFixed(1) },${ ay1.toFixed(1) } A${ ra },${ ra } 0 ${ big } 1 ${ ax2.toFixed(1) },${ ay2.toFixed(1) }` });
+    }
     const noms = [];
-    for (let t = 0; t < p.J; t++) { const [x, y] = pt(R1 + 18, a0 + (t + 0.5) * A); noms.push([x, y]); }
-    return { cells, seps, noms };
+    for (let t = 0; t < p.J; t++) {
+      const [x, y] = pt(R1 + 22, a0 + (t + 0.5) * A);
+      noms.push([x, y]);
+    }
+    // Positions de parking dans le Chantier (en haut à droite du SVG)
+    const chantierSlots = [];
+    for (let m = 0; m < 6; m++) {
+      const col = m % 3, row = Math.floor(m / 3);
+      chantierSlots.push([568 + col * 38, 42 + row * 28]);
+    }
+    return { cells, seps, arcs, noms, chantierSlots };
   }
 
-  function positions(e) {
+  function positions(e, fantomes) {
     const par = {};
     e.machines.forEach((c, j) => { if (c >= 0) (par[c] = par[c] || []).push('m' + j); });
     e.individus.forEach((c, i) => { (par[c] = par[c] || []).push('i' + i); });
+    if (fantomes) {
+      fantomes.forEach((f) => { (par[f.c] = par[f.c] || []).push('g' + f.i); });
+    }
     const pos = {};
     for (const c in par) {
       const g = UI.geo.cells[c]; const ids = par[c]; const n = ids.length;
-      const parRang = c == 0 ? 4 : Math.max(1, Math.min(4, Math.floor((g.arc - 4) / 23)));
+      const parRang = +c === 0 ? 4 : Math.max(1, Math.min(4, Math.floor((g.arc - 4) / 24)));
       ids.forEach((id, k) => {
         const rang = Math.floor(k / parRang), col = k % parRang, dansRang = Math.min(parRang, n - rang * parRang);
-        const off = (col - (dansRang - 1) / 2) * 23, offR = (rang - (Math.ceil(n / parRang) - 1) / 2) * 19;
+        const off = (col - (dansRang - 1) / 2) * 23, offR = (rang - (Math.ceil(n / parRang) - 1) / 2) * 18 - 1;
         pos[id] = [g.cx + g.tan[0] * off + g.rad[0] * offR, g.cy + g.tan[1] * off + g.rad[1] * offR];
       });
     }
+    // Machines au chantier
+    let chIdx = 0;
+    e.machines.forEach((c, j) => {
+      if (c < 0) {
+        pos['m' + j] = UI.geo.chantierSlots[chIdx++] || [600, 45];
+      }
+    });
     return pos;
+  }
+
+  // Dessin SVG d'un petit arbre ou d'une souche
+  function svgArbre(x, y, scale) {
+    const s = scale || 1;
+    return `<g transform="translate(${ x.toFixed(1) },${ y.toFixed(1) }) scale(${ s })" pointer-events="none">`
+      + `<rect x="-1.2" y="1" width="2.4" height="4.5" rx="0.6" fill="#5A3E28"/>`
+      + `<path d="M0,-7.5 L-5.2,1.5 L5.2,1.5 Z" fill="#235732" stroke="#163820" stroke-width="0.7"/>`
+      + `<path d="M0,-9.5 L-4,-2 L4,-2 Z" fill="#2E6F40"/>`
+      + `</g>`;
+  }
+  function svgSouche(x, y, scale) {
+    const s = scale || 1;
+    return `<g transform="translate(${ x.toFixed(1) },${ y.toFixed(1) }) scale(${ s })" pointer-events="none">`
+      + `<path d="M-3.5,3 L-2.5,-1 L2.5,-1 L3.5,3 Z" fill="#8C6239" stroke="#4A3219" stroke-width="0.7"/>`
+      + `<ellipse cx="0" cy="-1" rx="2.5" ry="1.1" fill="#D9B382" stroke="#4A3219" stroke-width="0.6"/>`
+      + `</g>`;
+  }
+
+  function dessinerForetCase(c, nbArbres) {
+    const maxA = c === 0 ? P.coeurArbres : P.a;
+    const g = UI.geo.cells[c];
+    let h = '';
+    if (c === 0) {
+      // Arbre-Monde au centre + petits arbres autour
+      if (nbArbres > 0) {
+        h += `<g transform="translate(${ CX },${ CY - 16 }) scale(1.25)" pointer-events="none">`
+          + `<rect x="-2" y="1" width="4" height="6" rx="1" fill="#5A3E28"/>`
+          + `<circle cx="0" cy="-4" r="7" fill="#235732" stroke="#163820" stroke-width="0.8"/>`
+          + `<circle cx="-4" cy="-2" r="4.5" fill="#2E6F40"/>`
+          + `<circle cx="4" cy="-2" r="4.5" fill="#2E6F40"/>`
+          + `<circle cx="0" cy="-6" r="5" fill="#3B854E"/>`
+          + `</g>`;
+      }
+      const tot = Math.min(6, Math.max(maxA, nbArbres));
+      for (let k = 0; k < tot; k++) {
+        const ox = (k - (tot - 1) / 2) * 11 + 6;
+        if (k < nbArbres) h += svgArbre(CX + ox, CY + 28, 0.85);
+        else h += svgSouche(CX + ox, CY + 28, 0.85);
+      }
+      return h;
+    }
+    const tot = Math.min(5, Math.max(maxA, nbArbres));
+    const step = Math.min(9.5, Math.max(6, (g.arc - 24) / Math.max(1, tot)));
+    for (let k = 0; k < tot; k++) {
+      const off = (k - (tot - 1) / 2) * step;
+      const x = g.tx + g.tan[0] * off, y = g.ty + g.tan[1] * off;
+      if (k < nbArbres) h += svgArbre(x, y, 0.84);
+      else h += svgSouche(x, y, 0.84);
+    }
+    return h;
   }
 
   function construirePlateau(p, pl) {
     UI.geo = geometrie(p, pl);
     const g = UI.geo; const svg = $('plateau');
-    let h = '<defs><marker id="tete" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/></marker>'
-      + '<marker id="teteV" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker></defs><g id="gCells">';
-    h += `<circle id="cell0" class="cell a3" cx="${CX}" cy="${CY}" r="${RH}" data-c="0"/>`;
-    for (const x of g.cells.slice(1)) h += `<path id="cell${x.c}" class="cell" d="${x.path}" data-c="${x.c}"/>`;
+    let h = '<defs>'
+      + '<marker id="tete" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/></marker>'
+      + '<marker id="teteV" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker>'
+      + '<marker id="tete-cupidite" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--t-cup)"/></marker>'
+      + '<marker id="tete-percee" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--t-per)"/></marker>'
+      + '<marker id="tete-opportunisme" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--t-opp)"/></marker>'
+      + '<marker id="tete-represailles" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--t-rep)"/></marker>'
+      + '</defs>';
+
+    // Zone du Chantier en haut à droite
+    h += `<g id="gChantier">`
+      + `<rect class="chantier-box" x="540" y="8" width="132" height="78" rx="10"/>`
+      + `<text class="chantier-title" x="606" y="22" text-anchor="middle">🏗️ Chantier (réserve)</text>`
+      + `</g>`;
+
+    h += '<g id="gCells">';
+    h += `<circle id="cell0" class="cell a3" cx="${ CX }" cy="${ CY }" r="${ RH }" data-c="0"/>`;
+    for (const x of g.cells.slice(1)) h += `<path id="cell${ x.c }" class="cell" d="${ x.path }" data-c="${ x.c }"/>`;
     h += '</g><g id="gThr">';
-    h += `<circle id="thr0" class="thr" cx="${CX}" cy="${CY}" r="${RH}"/>`;
-    for (const x of g.cells.slice(1)) h += `<path id="thr${x.c}" class="thr" d="${x.path}"/>`;
-    h += '</g><g id="gSeps">';
-    for (const [x1, y1, x2, y2] of g.seps) h += `<line class="tile-sep" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;
-    g.noms.forEach(([x, y], t) => { h += `<text class="tile-name" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="${COUL(t)}">Joueur ${t + 1}</text>`; });
+    h += `<circle id="thr0" class="thr" cx="${ CX }" cy="${ CY }" r="${ RH }"/>`;
+    for (const x of g.cells.slice(1)) h += `<path id="thr${ x.c }" class="thr" d="${ x.path }"/>`;
+    h += '</g><g id="gTrees"></g><g id="gSeps">';
+    for (const [x1, y1, x2, y2] of g.seps) h += `<line class="tile-sep" x1="${ x1.toFixed(1) }" y1="${ y1.toFixed(1) }" x2="${ x2.toFixed(1) }" y2="${ y2.toFixed(1) }"/>`;
+    for (const a of g.arcs) h += `<path class="tile-arc" d="${ a.d }" stroke="${ COUL(a.t) }"/>`;
+    g.noms.forEach(([x, y], t) => {
+      const codeT = 'ABCDEF'[t];
+      h += `<text class="tile-name" x="${ x.toFixed(1) }" y="${ y.toFixed(1) }" text-anchor="middle" dominant-baseline="middle" fill="${ COUL(t) }">Joueur ${ t + 1 } (${ codeT })</text>`;
+    });
     h += '</g><g id="gLabels">';
-    h += `<text id="cn0" class="cname" x="${CX}" y="${CY - 30}" text-anchor="middle">Cœur</text><text id="nt0" class="ntree" x="${CX}" y="${CY + 38}" text-anchor="middle"></text>`;
+    h += `<text id="cn0" class="cname" x="${ CX }" y="${ CY - 34 }" text-anchor="middle">Cœur</text><text id="nt0" class="ntree" x="${ CX }" y="${ CY + 41 }" text-anchor="middle"></text>`;
     for (const x of g.cells.slice(1)) {
-      h += `<text id="nt${x.c}" class="ntree" x="${x.nx.toFixed(1)}" y="${x.ny.toFixed(1)}" text-anchor="middle" dominant-baseline="middle"></text>`;
-      h += `<text id="cn${x.c}" class="cname" x="${x.lx.toFixed(1)}" y="${x.ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" data-nom="${x.w > 30 && x.arc > 30 ? B.nomCase(p, pl, x.c) : ''}"></text>`;
+      h += `<text id="nt${ x.c }" class="ntree" x="${ x.nx.toFixed(1) }" y="${ x.ny.toFixed(1) }" text-anchor="middle" dominant-baseline="middle"></text>`;
+      h += `<text id="cn${ x.c }" class="cname" x="${ x.lx.toFixed(1) }" y="${ x.ly.toFixed(1) }" text-anchor="middle" dominant-baseline="middle" data-nom="${ B.nomCase(p, pl, x.c) }"></text>`;
     }
-    h += '</g><g id="gFleches"></g><g id="gToks"></g>';
+    h += '</g><g id="gIntentions"></g><g id="gFleches"></g><g id="gBadges"></g><g id="gGhosts"></g><g id="gToks"></g>';
     svg.innerHTML = h;
-    $('gCells').addEventListener('click', (ev) => { const c = ev.target.getAttribute && ev.target.getAttribute('data-c'); if (c !== null && c !== undefined) clicCase(+c); });
-    $('gToks').addEventListener('click', (ev) => { const t = ev.target.closest && ev.target.closest('[data-i]'); if (t) clicIndividu(+t.getAttribute('data-i')); });
+
+    // Événements de clic et de survol sur les cases
+    $('gCells').addEventListener('click', (ev) => {
+      const c = ev.target.getAttribute && ev.target.getAttribute('data-c');
+      if (c !== null && c !== undefined) clicCase(+c, ev);
+    });
+    $('gCells').addEventListener('mouseover', (ev) => {
+      const c = ev.target.getAttribute && ev.target.getAttribute('data-c');
+      if (c !== null && c !== undefined) setHover({ type: 'case', id: +c });
+    });
+    $('gCells').addEventListener('mouseout', () => setHover(null));
+
+    // Événements sur les pions et Machines
+    $('gToks').addEventListener('click', (ev) => {
+      const ti = ev.target.closest && ev.target.closest('[data-i]');
+      if (ti) { ev.stopPropagation(); clicIndividu(+ti.getAttribute('data-i'), ev); return; }
+      const tm = ev.target.closest && ev.target.closest('[data-m]');
+      if (tm) { ev.stopPropagation(); clicMachinePlateau(+tm.getAttribute('data-m'), ev); }
+    });
+    $('gToks').addEventListener('mouseover', (ev) => {
+      const tm = ev.target.closest && ev.target.closest('[data-m]');
+      if (tm) { setHover({ type: 'machine', id: +tm.getAttribute('data-m') }); return; }
+      const ti = ev.target.closest && ev.target.closest('[data-i]');
+      if (ti && S) { const i = +ti.getAttribute('data-i'); setHover({ type: 'case', id: S.e.individus[i] }); }
+    });
+    $('gToks').addEventListener('mouseout', () => setHover(null));
     UI.tokBuilt = false;
+  }
+
+  // Calcule les trajectoires possibles par (Machine, Tactique) sur le plateau
+  function calculerIntentions(e, filterMachine, filterSomme) {
+    const res = [];
+    for (let m = 0; m < K.MACHINES.length; m++) {
+      if (filterMachine !== undefined && filterMachine !== null && m !== filterMachine) continue;
+      if (e.machines[m] < 0) continue; // au chantier
+      const posM = e.pisteM.indexOf(m);
+      const ecart = K.ECARTS[posM];
+      const parTact = {};
+      for (const [a, b] of K.ISSUES) {
+        if (Math.abs(a - b) !== ecart) continue;
+        const s = a + b;
+        if (filterSomme !== undefined && filterSomme !== null && s !== filterSomme) continue;
+        const tact = K.tactiqueEn(e, s);
+        const [cible, repli] = K.destination(P, PL, e, m, tact);
+        const cle = tact + '|' + cible;
+        if (!parTact[cle]) parTact[cle] = { m, de: e.machines[m], cible, tactique: tact, chances: 0, tactiques: new Set([tact]), repli };
+        parTact[cle].chances++;
+      }
+      const list = Object.values(parTact);
+      // Décaler légèrement les flèches qui partent de la même Machine vers la même case
+      const parCibleCount = {}, parCibleIdx = {};
+      for (const x of list) parCibleCount[x.cible] = (parCibleCount[x.cible] || 0) + 1;
+      for (const x of list) {
+        const idx = parCibleIdx[x.cible] || 0;
+        parCibleIdx[x.cible] = idx + 1;
+        x.offset = (idx - (parCibleCount[x.cible] - 1) / 2) * 14;
+        res.push(x);
+      }
+    }
+    return res;
+  }
+
+  // Dessine un badge Bouclier (Garde) ou Clé (Sabotage) sur le plateau
+  function svgBadgeGarde(x, y, etapeTxt, actif) {
+    return `<g class="badge-garde" transform="translate(${ x.toFixed(1) },${ y.toFixed(1) })">`
+      + `<path d="M0,-10 L8,-6 L8,1 C8,6.5 0,10.5 0,10.5 C0,10.5 -8,6.5 -8,1 L-8,-6 Z" fill="${ actif ? '#1E7A44' : '#2D6A44' }" stroke="#FFFFFF" stroke-width="1.5"/>`
+      + `<text y="1" text-anchor="middle" dominant-baseline="central" font-family="var(--f-ui)" font-weight="800" font-size="8.5" fill="#FFFFFF">${ esc(etapeTxt || '🛡️') }</text>`
+      + `</g>`;
+  }
+  function svgBadgeSabot(x, y, etapeTxt) {
+    return `<g class="badge-sabot" transform="translate(${ x.toFixed(1) },${ y.toFixed(1) })">`
+      + `<circle r="8.5" fill="#D9531E" stroke="#FFFFFF" stroke-width="1.5"/>`
+      + `<text y="0.5" text-anchor="middle" dominant-baseline="central" font-family="var(--f-ui)" font-weight="800" font-size="8.5" fill="#FFFFFF">${ esc(etapeTxt || '🔧') }</text>`
+      + `</g>`;
   }
 
   function dessinerPlateau(e, opts) {
     opts = opts || {};
+    const hm = cfg.heatmap && opts.menace ? opts.menace : null;
+
+    // Cases illuminées par le survol d'une Machine (son rayon)
+    const rayonSet = new Set();
+    let hoverM = null, hoverS = null;
+    if (UI.hover && UI.hover.type === 'machine') {
+      hoverM = UI.hover.id;
+      const cm = e.machines[hoverM];
+      if (cm >= 0) {
+        rayonSet.add(cm);
+        for (const v of PL.voisins[cm]) if (e.arbres[v] > 0) rayonSet.add(v);
+      }
+    } else if (UI.hover && UI.hover.type === 'somme') {
+      hoverS = UI.hover.id;
+    }
+
+    let treesHtml = '';
     for (let c = 0; c < PL.N; c++) {
       const el = $('cell' + c); if (!el) continue;
-      el.setAttribute('class', 'cell a' + Math.min(5, e.arbres[c]) + (opts.cand && opts.cand.has(c) ? ' cand' : '') + (opts.cible === c ? ' cible' : '') + (opts.pare === c ? ' pare' : ''));
+      const isCand = opts.cand && opts.cand.has(c);
+      const isCandMove = isCand && opts.candOrigin !== undefined && opts.candOrigin !== c;
+      el.setAttribute('class', 'cell a' + Math.min(5, e.arbres[c])
+        + (isCand ? (isCandMove ? ' cand-move' : ' cand') : '')
+        + (opts.cible === c ? ' cible' : '')
+        + (opts.pare === c ? ' pare' : '')
+        + (rayonSet.has(c) ? ' rayon-hl' : ''));
+
       $('nt' + c).textContent = e.arbres[c];
-      const th = opts.menace ? opts.menace[c] : 0;
-      $('thr' + c).style.fillOpacity = th > 0.01 ? Math.min(0.6, 0.12 + th * 0.75).toFixed(2) : '0';
+      treesHtml += dessinerForetCase(c, e.arbres[c]);
+
+      const th = hm ? hm[c] : (opts.menace && UI.hover && UI.hover.type === 'case' && UI.hover.id === c ? opts.menace[c] : 0);
+      $('thr' + c).style.fillOpacity = th > 0.01 ? Math.min(0.58, 0.10 + th * 0.72).toFixed(2) : '0';
+
+      const isHoveredCell = (UI.hover && UI.hover.type === 'case' && UI.hover.id === c) || rayonSet.has(c);
       const cn = $('cn' + c);
       if (c > 0) {
-        if (th >= 0.1) { cn.textContent = pct(th); cn.setAttribute('class', 'cname thrtxt'); }
-        else { cn.textContent = cn.getAttribute('data-nom'); cn.setAttribute('class', 'cname'); }
-      } else { cn.textContent = th >= 0.1 ? 'Cœur · ' + pct(th) : 'Cœur'; cn.setAttribute('class', th >= 0.1 ? 'cname thrtxt' : 'cname'); }
+        if (hm && th >= 0.08 && !isHoveredCell) {
+          cn.textContent = pct(th);
+          cn.setAttribute('class', 'cname thrtxt');
+        } else {
+          cn.textContent = (cfg.codes || isHoveredCell) ? cn.getAttribute('data-nom') : '';
+          cn.setAttribute('class', 'cname' + (isHoveredCell ? ' hl' : ''));
+        }
+      } else {
+        cn.textContent = hm && th >= 0.08 && !isHoveredCell ? 'Cœur · ' + pct(th) : 'Cœur';
+        cn.setAttribute('class', 'cname' + (isHoveredCell ? ' hl' : (hm && th >= 0.08 ? ' thrtxt' : '')));
+      }
     }
-    let fl = '';
-    const fleche = (a, b, cls) => {
+    $('gTrees').innerHTML = treesHtml;
+
+    // Flèches de déplacement et de trajet
+    const fleche = (a, b, cls, marker, label, offset) => {
       const ga = UI.geo.cells[a], gb = UI.geo.cells[b];
-      if (a === b) return `<circle class="fleche ${cls}" cx="${ga.cx.toFixed(1)}" cy="${ga.cy.toFixed(1)}" r="14"/>`;
-      const mx = (ga.cx + gb.cx) / 2 + (CX - (ga.cx + gb.cx) / 2) * 0.12, my = (ga.cy + gb.cy) / 2 + (CY - (ga.cy + gb.cy) / 2) * 0.12;
-      return `<path class="fleche ${cls}" d="M${ga.cx.toFixed(1)},${ga.cy.toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${gb.cx.toFixed(1)},${gb.cy.toFixed(1)}" marker-end="url(#${cls.includes('aller') ? 'teteV' : 'tete'})"/>`;
+      if (!ga || !gb) return '';
+      const off = offset || 0;
+      if (a === b) {
+        const r = 16 + Math.abs(off) * 0.35;
+        let s = `<circle class="fleche ${ cls }" cx="${ ga.cx.toFixed(1) }" cy="${ ga.cy.toFixed(1) }" r="${ r.toFixed(1) }"/>`;
+        if (label) {
+          s += `<text x="${ ga.cx.toFixed(1) }" y="${ (ga.cy - r - 3).toFixed(1) }" text-anchor="middle" font-family="var(--f-ui)" font-weight="800" font-size="10" fill="var(--ink)" stroke="var(--card)" stroke-width="3" paint-order="stroke" pointer-events="none">${ esc(label) }</text>`;
+        }
+        return s;
+      }
+      const dx = gb.cx - ga.cx, dy = gb.cy - ga.cy, len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len, ny = dx / len;
+      const mx = (ga.cx + gb.cx) / 2 + (CX - (ga.cx + gb.cx) / 2) * 0.14 + nx * off;
+      const my = (ga.cy + gb.cy) / 2 + (CY - (ga.cy + gb.cy) / 2) * 0.14 + ny * off;
+      let s = `<path class="fleche ${ cls }" d="M${ ga.cx.toFixed(1) },${ ga.cy.toFixed(1) } Q${ mx.toFixed(1) },${ my.toFixed(1) } ${ gb.cx.toFixed(1) },${ gb.cy.toFixed(1) }" marker-end="url(#${ marker })"/>`;
+      if (label) {
+        s += `<text x="${ mx.toFixed(1) }" y="${ (my - 3).toFixed(1) }" text-anchor="middle" font-family="var(--f-ui)" font-weight="800" font-size="10" fill="var(--ink)" stroke="var(--card)" stroke-width="3" paint-order="stroke" pointer-events="none">${ esc(label) }</text>`;
+      }
+      return s;
     };
-    for (const a of opts.allers || []) fl += fleche(a[0], a[1], 'aller' + (a[2] ? ' deux' : ''));
-    if (opts.trajet) fl += fleche(opts.trajet[0], opts.trajet[1], '');
+
+    // Flèches de trajectoires des Machines (uniquement au survol par défaut, ou si le bouton est activé)
+    let intHtml = '';
+    if (hoverM !== null || hoverS !== null || cfg.intentions) {
+      const ints = calculerIntentions(e, hoverM, hoverS);
+      for (const it of ints) {
+        const showLabel = (hoverM !== null || hoverS !== null);
+        const lbl = showLabel ? `${ ICO_T[it.tactique] } ${ it.chances }/36` : '';
+        intHtml += fleche(it.de, it.cible, 'intent ' + it.tactique, 'tete-' + it.tactique, lbl, it.offset);
+      }
+    }
+    $('gIntentions').innerHTML = intHtml;
+
+    let fl = '';
+    for (const a of opts.allers || []) fl += fleche(a[0], a[1], 'aller' + (a[2] ? ' deux' : ''), 'teteV');
+    if (opts.trajet) fl += fleche(opts.trajet[0], opts.trajet[1], '', 'tete');
     $('gFleches').innerHTML = fl;
+
+    // Pions fantômes (positions prévues après Étape 1)
+    const fantomes = opts.fantomes || [];
+    const pos = positions(e, fantomes);
+
+    let ghHtml = '';
+    for (const f of fantomes) {
+      const [gx, gy] = pos['g' + f.i] || [UI.geo.cells[f.c].cx, UI.geo.cells[f.c].cy];
+      const pj = K.proprietaire(P, f.i);
+      const lettr = String.fromCharCode(97 + (f.i % P.ipj));
+      ghHtml += `<g class="ind-ghost" transform="translate(${ gx.toFixed(1) },${ gy.toFixed(1) })">`
+        + `<circle r="9.5" fill="${ COUL(pj) }"/>`
+        + `<text text-anchor="middle" dominant-baseline="central" font-family="var(--f-ui)" font-weight="800" font-size="8.5" fill="#fff">${ lettr }1</text>`
+        + `</g>`;
+    }
+    $('gGhosts').innerHTML = ghHtml;
+
+    // Construction initiale des pions SVG (Machines + Individus)
     const tk = $('gToks');
     if (!UI.tokBuilt) {
       let h = '';
-      e.machines.forEach((_, j) => { h += `<g id="m${j}" class="tok mach"><rect x="-12" y="-9" width="24" height="18" rx="4"/><text text-anchor="middle" dominant-baseline="central">${K.MACHINES[j].court}</text></g>`; });
-      e.individus.forEach((_, i) => { const pj = K.proprietaire(P, i); h += `<g id="i${i}" class="tok ind" data-i="${i}"><circle r="8.5" fill="${COUL(pj)}"/><text text-anchor="middle" dominant-baseline="central">${String.fromCharCode(97 + (i % P.ipj))}</text></g>`; });
-      tk.innerHTML = h; UI.tokBuilt = true; UI.vus = {};
+      e.machines.forEach((_, j) => {
+        h += `<g id="m${ j }" class="tok mach" data-m="${ j }">`
+          + `<title>${ esc(MN(j)) } (cliquez ou survolez pour voir ses cibles)</title>`
+          + `<rect class="m-tread" x="-14" y="-11" width="28" height="3.2" rx="1.2"/>`
+          + `<rect class="m-tread" x="-14" y="7.8" width="28" height="3.2" rx="1.2"/>`
+          + `<rect class="m-body" x="-13" y="-8.5" width="26" height="17" rx="4"/>`
+          + `<path d="M13,-6 L16.5,-3.5 L14,0 L16.5,3.5 L13,6 Z" fill="var(--danger)" opacity=".85"/>`
+          + `<text text-anchor="middle" dominant-baseline="central">${ K.MACHINES[j].court }</text>`
+          + `</g>`;
+      });
+      e.individus.forEach((_, i) => {
+        const pj = K.proprietaire(P, i);
+        const lettr = String.fromCharCode(97 + (i % P.ipj));
+        h += `<g id="i${ i }" class="tok ind" data-i="${ i }">`
+          + `<title>Individu ${ nomI(i) } (Joueur ${ pj + 1 })</title>`
+          + `<circle class="i-halo" r="12.5"/>`
+          + `<circle class="i-body" r="9.5" fill="${ COUL(pj) }"/>`
+          + `<text text-anchor="middle" dominant-baseline="central">${ lettr }</text>`
+          + `</g>`;
+      });
+      tk.innerHTML = h;
+      UI.tokBuilt = true;
     }
-    const pos = positions(e);
+
     e.machines.forEach((c, j) => {
       const g = $('m' + j);
-      if (c < 0) { g.style.display = 'none'; UI.vus[j] = false; return; }
       const [x, y] = pos['m' + j];
-      if (!UI.vus[j]) { g.style.transition = 'none'; g.style.display = ''; g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`); void g.getBBox; requestAnimationFrame(() => { g.style.transition = ''; }); UI.vus[j] = true; }
-      else g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`);
-      g.setAttribute('class', 'tok mach' + (opts.actif === j ? ' actif' : ''));
+      g.style.display = '';
+      g.setAttribute('transform', `translate(${ x.toFixed(1) },${ y.toFixed(1) })`);
+      const isHl = (hoverM === j);
+      g.setAttribute('class', 'tok mach' + (opts.actif === j ? ' actif' : '') + (isHl ? ' hl' : ''));
     });
+
     e.individus.forEach((_, i) => {
-      const g = $('i' + i); const [x, y] = pos['i' + i]; g.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`);
+      const g = $('i' + i);
+      const [x, y] = pos['i' + i];
+      g.setAttribute('transform', `translate(${ x.toFixed(1) },${ y.toFixed(1) })`);
       g.setAttribute('class', 'tok ind' + (UI.sel === i ? ' sel' : '') + (opts.cliquables && opts.cliquables.has(i) ? ' cliquable' : ''));
     });
-    $('legend').innerHTML = '<span><i style="background:var(--f3)"></i>case boisée (le chiffre : ses arbres)</span><span><i style="background:var(--f0)"></i>case rasée</span>'
-      + '<span><i style="background:var(--machine)"></i>Machine sur le plateau</span>'
-      + (opts.menace ? `<span><i style="background:var(--danger);opacity:.55"></i>chance qu'au moins une menace de la vague frappe la case (pourcentage dès 10 %)</span>` : '')
-      + '<span><i style="background:var(--accent)"></i>déplacement programmé</span>';
+
+    // Badges de Garde et Sabotage (programmés ou actifs pendant la vague)
+    let bHtml = '';
+    if (opts.gardesCase) {
+      for (const [cStr, label] of Object.entries(opts.gardesCase)) {
+        const g = UI.geo.cells[+cStr];
+        if (g) bHtml += svgBadgeGarde(g.cx + g.tan[0] * 14 - g.rad[0] * 10, g.cy + g.tan[1] * 14 - g.rad[1] * 10, label, opts.vagueActive);
+      }
+    }
+    if (opts.sabotsMach) {
+      for (const [mStr, label] of Object.entries(opts.sabotsMach)) {
+        const [mx, my] = pos['m' + mStr] || [0, 0];
+        if (mx) bHtml += svgBadgeSabot(mx + 12, my - 10, label);
+      }
+    }
+    $('gBadges').innerHTML = bHtml;
+
+    $('legend').innerHTML = '<span>🌲 Arbres debout / 🪵 Souches</span>'
+      + '<span><i style="background:var(--machine)"></i>Machine (bulldozer)</span>'
+      + '<span>🛡️ Case gardée</span>'
+      + '<span>🔧 Machine sabotée</span>'
+      + '<span><i style="background:var(--accent)"></i>Déplacement prévu</span>';
   }
 
-  // ------------------------------------------------------------------ la tête du Méchant : les deux pistes
+  // ------------------------------------------------------------------ Bandeau d'inspection (Survol Pistes <-> Plateau)
+  function setHover(h) {
+    UI.hover = h;
+    majInspectBar();
+    if (!P || !PL) return;
+    const e = S ? S.e : UI.apercuEtat;
+    if (!e) return;
+    if (S) {
+      dessinerPlateau(S.e, UI.lastBoardOpts || {});
+    } else {
+      dessinerPlateau(e, { menace: cfg.aide ? menaceVague(e) : null });
+    }
+    // Mettre en évidence sur les pistes sans tout reconstruire pour garder le survol fluide
+    document.querySelectorAll('#mech [data-somme]').forEach((el) => {
+      const s = +el.getAttribute('data-somme');
+      let hl = false, dim = false;
+      if (h && h.type === 'somme') { hl = (s === h.id); dim = !hl; }
+      else if (h && h.type === 'machine') {
+        const posM = e.pisteM.indexOf(h.id);
+        const ec = K.ECARTS[posM];
+        const okS = sommesPourEcart(ec);
+        hl = okS.has(s); dim = !hl;
+      }
+      el.classList.toggle('hl', hl);
+      el.classList.toggle('dim', dim);
+    });
+    document.querySelectorAll('#mech [data-machine]').forEach((el) => {
+      const m = +el.getAttribute('data-machine');
+      const posM = e.pisteM.indexOf(m);
+      const ec = K.ECARTS[posM];
+      let hl = false, dim = false;
+      if (h && h.type === 'machine') { hl = (m === h.id); dim = !hl; }
+      else if (h && h.type === 'somme') {
+        const okE = ecartsPourSomme(h.id);
+        hl = okE.has(ec); dim = !hl;
+      }
+      el.classList.toggle('hl', hl);
+      el.classList.toggle('dim', dim);
+    });
+  }
+
+  function majInspectBar() {
+    const bar = $('inspectBar'); if (!bar) return;
+    const e = S ? S.e : UI.apercuEtat;
+    if (!UI.hover || !e) {
+      bar.className = 'inspect-bar';
+      bar.innerHTML = '💡 <span>Survole une <b>Machine</b> (sur le plateau ou sur sa piste), une <b>Pensée</b> ou une <b>case</b> pour voir ses cibles et probabilités.</span>';
+      return;
+    }
+    bar.className = 'inspect-bar active';
+    if (UI.hover.type === 'machine') {
+      const m = UI.hover.id;
+      const posM = e.pisteM.indexOf(m);
+      const ec = K.ECARTS[posM];
+      const ch = K.CHANCES_ECART[ec];
+      const pVague = pct(K.auMoinsUneFois(ch, P.L));
+      if (e.machines[m] < 0) {
+        bar.innerHTML = `🏗️ <b>${ esc(MN(m)) } (${ K.MACHINES[m].court })</b> · Écart <b>${ ec }</b> (${ ch }/36 par lancer, <b>${ pVague }</b> sur la vague) — <b>Au chantier</b> : si appelée, elle entrera sur une case de lisière tirée au dé.`;
+      } else {
+        const ints = calculerIntentions(e, m, null);
+        const det = ints.map((it) => {
+          const tList = Array.from(it.tactiques).map((t) => `${ ICO_T[t] } ${ NT[t] }`).join(' / ');
+          return `<b>${ nomC(it.cible) }</b> (${ it.chances }/36 via ${ tList })`;
+        }).join(' · ');
+        bar.innerHTML = `🚜 <b>${ esc(MN(m)) } (${ K.MACHINES[m].court })</b> en <b>${ nomC(e.machines[m]) }</b> · Écart <b>${ ec }</b> (${ ch }/36, <b>${ pVague }</b> dans la vague) → Cible : ${ det }`;
+      }
+    } else if (UI.hover.type === 'somme') {
+      const s = UI.hover.id;
+      const t = K.tactiqueEn(e, s);
+      const ch = K.CHANCES_SOMME(s);
+      const ecSet = ecartsPourSomme(s);
+      const machs = Array.from(ecSet).map((ec) => MN(e.pisteM[K.ECARTS.indexOf(ec)])).join(', ');
+      bar.innerHTML = `🎲 <b>Somme ${ s }</b> (${ ch }/36) → Tactique <b>${ ICO_T[t] } ${ NT[t] }</b>. Compatible avec les Machines : <b>${ esc(machs) }</b>.`;
+    } else if (UI.hover.type === 'case') {
+      const c = UI.hover.id;
+      const mp = K.menaceParCase(P, PL, e);
+      const pVague = pct(1 - Math.pow(1 - mp[c], P.L));
+      const nbI = e.individus.filter((x) => x === c).length;
+      bar.innerHTML = `🌲 <b>Case ${ nomCaseHumain(c) }</b> : <b>${ e.arbres[c] }</b> arbre(s) debout, <b>${ nbI }</b> individu(s) présent(s) · Risque d'être frappée dans la vague : <b>${ pVague }</b> (${ pct(mp[c]) } par lancer).`;
+    }
+  }
+
+  // ------------------------------------------------------------------ la tête du Méchant : les deux pistes + pyramide
   function rendreMechant(opts) {
     opts = opts || {};
     const e = S ? S.e : opts.e; if (!e) return;
-    const ev = opts.ev; const ap = ev && ev.appris ? ev.appris : null; const apV = opts.appVague || [];
+    UI.apercuEtat = e;
+    const ev = opts.ev;
+    const ap = ev && ev.appris ? ev.appris : null;
+    const apV = opts.appVague || [];
     const bougeP = new Set(), bougeM = new Set();
-    for (const a of (ap ? [ap] : []).concat(apV)) { if (a.pensees[1] !== null) { bougeP.add(a.pensees[0]); bougeP.add(a.pensees[1]); } if (a.machines[1] !== null) { bougeM.add(a.machines[0]); bougeM.add(a.machines[1]); } }
-    let h = '<div class="trk-h"><span class="eyebrow">Piste des pensées</span><span class="small">la <b>somme</b> des deux dés désigne la tactique</span></div><div class="track trk-p">';
-    for (let s = 2; s <= 12; s++) {
-      const t = K.tactiqueEn(e, s); const ch = K.CHANCES_SOMME(s);
-      h += `<div class="tc ${ev && ev.somme === s ? 'vise' : ''} ${bougeP.has(s) ? 'bouge' : ''} ${s === 7 ? 'sept' : ''}"><span class="n">${s}</span><span class="dots" aria-label="${ch} chances sur 36">${'<i></i>'.repeat(ch)}</span><span class="tile ${t}" title="${NT[t]}">${COURT[t]}</span></div>`;
+    for (const a of (ap ? [ap] : []).concat(apV)) {
+      if (a.pensees[1] !== null) { bougeP.add(a.pensees[0]); bougeP.add(a.pensees[1]); }
+      if (a.machines[1] !== null) { bougeM.add(a.machines[0]); bougeM.add(a.machines[1]); }
     }
-    h += '</div><p class="small sens">Réussite : vers le 7. Échec : vers le bord (au 7, vers le 8).</p>';
+
+    let h = '<div class="trk-sec">';
+    h += '<div class="trk-h"><span class="eyebrow">1. Piste des pensées (Somme des 2 dés → Tactique)</span><span class="small">Survole une case pour voir qui l\'exécute</span></div>';
+    h += '<div class="trk-sens-bar"><span class="s-par">⟵ Échec (parée) : recule vers 2</span><span class="s-ok">🎯 Réussite (arbre coupé) : converge vers le 7 (max 6/36)</span><span class="s-par">Échec (parée) : recule vers 12 ⟶</span></div>';
+    h += '<div class="track trk-p">';
+    for (let s = 2; s <= 12; s++) {
+      const t = K.tactiqueEn(e, s);
+      const ch = K.CHANCES_SOMME(s);
+      const isSwapped = bougeP.has(s);
+      h += `<div class="tc ${ ev && ev.somme === s ? 'vise' : '' } ${ isSwapped ? 'bouge' : '' } ${ s === 7 ? 'sept' : '' }" data-somme="${ s }">`
+        + `<span class="n">${ s }</span>`
+        + `<span class="dots" title="${ ch } chances sur 36">${ '<i></i>'.repeat(ch) }</span>`
+        + `<span class="tile ${ t }" title="${ NT[t] }"><span class="t-ico">${ ICO_T[t] }</span><span>${ COURT[t] }</span></span>`
+        + (isSwapped ? '<span class="swap-arrow">⇄ appris</span>' : '')
+        + `</div>`;
+    }
+    h += '</div></div>';
+
     const prof = K.profils(e);
-    h += '<div class="trk-h"><span class="eyebrow">Piste des Machines</span><span class="small">l\'<b>écart</b> des deux dés désigne la Machine</span></div><div class="track trk-m">';
+    h += '<div class="trk-sec">';
+    h += '<div class="trk-h"><span class="eyebrow">2. Piste des Machines (Écart des 2 dés → Machine active)</span><span class="small">Classées de la plus probable (10/36) à la plus rare (2/36)</span></div>';
+    h += '<div class="trk-sens-bar"><span class="s-ok">🔥 Côté probable · ⟵ Réussite avance à gauche</span><span class="s-par">Échec (parée) recule à droite ⟶ · Côté rare ❄️</span></div>';
+    h += '<div class="track trk-m">';
     K.ECARTS.forEach((d, pos) => {
-      const m = e.pisteM[pos]; const pr = prof[m]; const lieu = e.machines[m] < 0 ? 'au chantier' : 'en ' + nomC(e.machines[m]);
-      const bar = K.TACTIQUES.filter((t) => pr.tactiques[t]).map((t) => `<span class="${t}" style="flex:${pr.tactiques[t]}" title="${NT[t]} ${pr.tactiques[t]}/36"></span>`).join('');
-      const agit = opts.L ? `<span class="agit">${pct(K.auMoinsUneFois(K.CHANCES_ECART[d], opts.L))} dans la vague</span>` : '';
-      h += `<div class="tc mc ${ev && ev.ecart === d ? 'vise' : ''} ${bougeM.has(pos) ? 'bouge' : ''}"><span class="n">écart ${d}</span><span class="ch num">${K.CHANCES_ECART[d]}/36</span><span class="mtag ${e.machines[m] < 0 ? 'off' : ''}">${K.MACHINES[m].court}</span><span class="mn">${esc(MN(m))}</span><span class="lieu">${esc(lieu)}</span><span class="pbar" aria-label="tactiques possibles">${bar}</span>${agit}</div>`;
+      const m = e.pisteM[pos];
+      const pr = prof[m];
+      const surPlat = e.machines[m] >= 0;
+      const lieu = surPlat ? 'en ' + nomC(e.machines[m]) : '🏗️ au chantier';
+      const bar = K.TACTIQUES.filter((t) => pr.tactiques[t]).map((t) => `<span class="${ t }" style="flex:${ pr.tactiques[t] }" title="${ NT[t] } : ${ pr.tactiques[t] }/36"></span>`).join('');
+      const agit = opts.L ? `<span class="agit">${ pct(K.auMoinsUneFois(K.CHANCES_ECART[d], opts.L)) } / vague</span>` : '';
+      const isSwapped = bougeM.has(pos);
+      h += `<div class="tc mc ${ ev && ev.ecart === d ? 'vise' : '' } ${ isSwapped ? 'bouge' : '' }" data-machine="${ m }">`
+        + `<span class="n">${ d === 0 ? 'double 0' : 'écart ' + d }</span>`
+        + `<span class="ch num">${ K.CHANCES_ECART[d] }/36</span>`
+        + `<span class="mtag ${ surPlat ? '' : 'off' }">${ K.MACHINES[m].court }</span>`
+        + `<span class="mn">${ esc(MN(m)) }</span>`
+        + `<span class="lieu ${ surPlat ? 'on-board' : '' }">${ esc(lieu) }</span>`
+        + `<span class="pbar" title="Tactiques compatibles avec cet écart">${ bar }</span>`
+        + agit
+        + (isSwapped ? '<span class="swap-arrow">⇄ appris</span>' : '')
+        + `</div>`;
     });
-    h += '</div><p class="small sens">← côté probable · réussite vers la gauche, échec vers la droite · côté rare →</p>';
-    h += '<div class="tleg">' + K.TACTIQUES.map((t) => `<span><span class="tile ${t}">${COURT[t]}</span> ${NT[t]}</span>`).join('') + '<span class="small">La barre sous chaque Machine : les tactiques qu\'elle peut recevoir.</span></div>';
-    if (opts.presage) h += `<div class="presage"><span class="eyebrow">Présage · les dés de la vague 1</span><div class="dl">${opts.presage.map((d) => { const L = K.lire(e, d); return `<span class="dp">${des(d)}<span class="small">${COURT[L.tactique]} · ${K.MACHINES[L.machine].court}</span></span>`; }).join('')}</div><p class="small">Lus sur les pistes actuelles. ${P.rythme === 'lancer' ? 'Les pistes bougent après chaque lancer : la lecture des derniers dés peut changer.' : 'Les pistes ne bougent qu\'à la fin de la vague : cette lecture tiendra.'}</p></div>`;
-    if (ev) h += `<div class="dernier"><span class="dl">${des(ev.d)}</span><span>somme <b>${ev.somme}</b> : ${NT[ev.tactique]} · écart <b>${ev.ecart}</b> : ${esc(MN(ev.machine))}</span></div>`;
+    h += '</div></div>';
+
+    // Matrice croisée Somme × Écart (dépliable via le bouton togPyr)
+    if (cfg.pyramide) {
+      h += '<div class="pyr-box"><div class="small" style="margin-bottom:4px"><b>Grille croisée des 21 plans (Somme × Écart)</b> : chaque case montre la tactique exécutée par la Machine de cette ligne si cette somme sort aux dés (et le nombre de combinaisons sur 36).</div>';
+      h += '<div class="pyr-grid"><div class="ph">Machine \\ Somme</div>';
+      for (let s = 2; s <= 12; s++) h += `<div class="ph">${ s }</div>`;
+      K.ECARTS.forEach((d, pos) => {
+        const m = e.pisteM[pos];
+        h += `<div class="pm" data-machine="${ m }"><span class="mtag ${ e.machines[m] < 0 ? 'off' : '' }" style="min-width:24px;height:18px;font-size:10px">${ K.MACHINES[m].court }</span><span>Éc.${ d }</span></div>`;
+        for (let s = 2; s <= 12; s++) {
+          let nb = 0;
+          for (const [a, b] of K.ISSUES) if (a + b === s && Math.abs(a - b) === d) nb++;
+          if (nb > 0) {
+            const t = K.tactiqueEn(e, s);
+            h += `<div class="pyr-c ${ t }" title="${ MN(m) } + Somme ${ s } (${ NT[t] }) : ${ nb }/36">${ ICO_T[t] }${ nb }</div>`;
+          } else {
+            h += `<div class="pyr-empty"></div>`;
+          }
+        }
+      });
+      h += '</div></div>';
+    }
+
+    h += '<div class="tleg">' + K.TACTIQUES.map((t) => `<span><span class="tile ${ t }">${ ICO_T[t] } ${ COURT[t] }</span> <b>${ NT[t] }</b> (${ t === 'cupidite' ? '+ boisée' : t === 'percee' ? 'vers Cœur' : t === 'opportunisme' ? '− défendue' : '+ défendue' })</span>`).join('') + '</div>';
+
+    if (opts.presage) {
+      h += `<div class="presage"><span class="eyebrow">🔮 Présage · Dés connus de la vague 1</span><div class="dl">${ opts.presage.map((d) => {
+        const L = K.lire(e, d);
+        return `<span class="dp">${ des(d) }<span class="small"><b>${ ICO_T[L.tactique] } ${ COURT[L.tactique] }</b> · <b>${ K.MACHINES[L.machine].court }</b></span></span>`;
+      }).join('') }</div></div>`;
+    }
+    if (ev) {
+      h += `<div class="dernier"><span class="dl">${ des(ev.d, true) }</span><span>Somme <b>${ ev.somme }</b> → <span class="tac ${ ev.tactique }">${ ICO_T[ev.tactique] } ${ NT[ev.tactique] }</span> · Écart <b>${ ev.ecart }</b> → <b>${ esc(MN(ev.machine)) }</b></span></div>`;
+    }
     $('mech').innerHTML = h;
+
+    // Événements de survol sur les pistes
+    $('mech').querySelectorAll('[data-somme]').forEach((el) => {
+      el.addEventListener('mouseenter', () => setHover({ type: 'somme', id: +el.getAttribute('data-somme') }));
+      el.addEventListener('mouseleave', () => setHover(null));
+    });
+    $('mech').querySelectorAll('[data-machine]').forEach((el) => {
+      el.addEventListener('mouseenter', () => setHover({ type: 'machine', id: +el.getAttribute('data-machine') }));
+      el.addEventListener('mouseleave', () => setHover(null));
+    });
   }
 
   // ------------------------------------------------------------------ préparation
@@ -188,37 +707,41 @@
     P = K.params(cfg.reglages); PL = K.plateau(P);
     construirePlateau(P, PL);
     const rng = K.generateur(cfg.reglages.graine);
-    const e = K.miseEnPlace(P, PL, rng); e.individus = K.placementHeuristique(P, PL, e);
-    dessinerPlateau(e, { menace: cfg.aide ? menaceVague(e) : null });
+    const e = K.miseEnPlace(P, PL, rng);
+    e.individus = K.placementHeuristique(P, PL, e);
+    UI.apercuEtat = e;
+    dessinerPlateau(e, { menace: menaceVague(e) });
     rendreMechant({ e, L: P.L });
   }
   const menaceVague = (e) => K.menaceParCase(P, PL, e).map((x) => 1 - Math.pow(1 - x, P.L));
 
   function rendrePreparation() {
+    stopAnimVague();
+    fermerPopMenu();
     const r = cfg.reglages; const J = r.joueurs; const p = K.params(r);
     let h = '<div class="eyebrow">Nouvelle partie</div><h2>Préparer la table</h2>';
-    h += '<p class="ctx">Chaque siège est un joueur humain ou un bot. Un humain peut tenir plusieurs sièges : il pose alors les cartes de chacun, à tour de rôle.</p>';
-    h += `<div class="params"><label for="pJ">Joueurs<select id="pJ">${[2, 3, 4, 5, 6].map((x) => `<option ${x === J ? 'selected' : ''}>${x}</option>`).join('')}</select></label></div>`;
+    h += '<p class="ctx">Chaque siège est tenu par un joueur humain ou par un bot. Tu peux déjà survoler le plateau et les pistes à gauche pour inspecter la mise en place de cette graine !</p>';
+    h += `<div class="params"><label for="pJ">Nombre de joueurs<select id="pJ">${ [2, 3, 4, 5, 6].map((x) => `<option value="${ x }" ${ x === J ? 'selected' : '' }>${ x } joueurs</option>`).join('') }</select></label></div>`;
     h += '<div class="setup" id="seats">';
     for (let j = 0; j < J; j++) {
-      h += `<div class="seat"><span class="dot" style="background:${COUL(j)}"></span><span>Joueur ${j + 1}</span><select id="s${j}" aria-label="Joueur ${j + 1}">`
-        + Object.entries(SIEGES).map(([k, v]) => `<option value="${k}" ${cfg.sieges[j] === k ? 'selected' : ''}>${v}</option>`).join('') + '</select></div>';
+      h += `<div class="seat"><span class="dot" style="background:${ COUL(j) }"></span><span>Joueur ${ j + 1 } (Tuile ${ 'ABCDEF'[j] })</span><select id="s${ j }" aria-label="Joueur ${ j + 1 }">`
+        + Object.entries(SIEGES).map(([k, v]) => `<option value="${ k }" ${ cfg.sieges[j] === k ? 'selected' : '' }>${ v }</option>`).join('') + '</select></div>';
     }
-    h += '</div><details><summary class="small" style="cursor:pointer;color:var(--accent);font-weight:800">Réglages</summary><div class="params" style="margin-top:8px">';
-    const sel = (id, lab, val, opts) => `<label for="${id}">${lab}<select id="${id}">${opts.map(([v, t]) => `<option value="${v}" ${String(v) === String(val) ? 'selected' : ''}>${t}</option>`).join('')}</select></label>`;
+    h += '</div><details><summary class="small" style="cursor:pointer;color:var(--accent);font-weight:800">⚙️ Réglages de la variante (étapes, rythme d\'apprentissage, présage…)</summary><div class="params" style="margin-top:8px">';
+    const sel = (id, lab, val, opts) => `<label for="${ id }">${ lab }<select id="${ id }">${ opts.map(([v, t]) => `<option value="${ v }" ${ String(v) === String(val) ? 'selected' : '' }>${ t }</option>`).join('') }</select></label>`;
     h += sel('pE', 'Cartes par joueur et par tour', r.etapes, [[2, 'deux (deux étapes)'], [1, 'une (témoin)']]);
-    h += sel('pL', 'Lancers par vague', r.lancersEnPlus, [[1, 'un de plus que de joueurs'], [2, 'deux de plus que de joueurs']]);
+    h += sel('pL', 'Lancers par vague', r.lancersEnPlus, [[1, 'J + 1 lancers'], [2, 'J + 2 lancers']]);
     h += sel('pY', 'Les pistes apprennent', r.rythme, [['lancer', 'après chaque lancer'], ['vague', 'à la fin de chaque vague']]);
-    h += sel('pP', 'Présage', r.presage ? 1 : 0, [[0, 'non'], [1, 'les dés de la vague 1 sont montrés']]);
-    h += sel('pT', 'Tuile', r.tuileL + 'x' + r.tuileP, [['3x3', '3 × 3 cases'], ['3x4', '3 × 4 cases'], ['4x4', '4 × 4 cases']]);
+    h += sel('pP', 'Présage', r.presage ? 1 : 0, [[0, 'non'], [1, 'oui (dés de la vague 1 montrés)']]);
+    h += sel('pT', 'Taille de tuile', r.tuileL + 'x' + r.tuileP, [['3x3', '3 × 3 cases'], ['3x4', '3 × 4 cases'], ['4x4', '4 × 4 cases']]);
     h += sel('pI', 'Individus par joueur', r.individusParJoueur, [[2, '2'], [3, '3']]);
     h += sel('pA', 'Arbres par case', r.arbres, [[2, '2'], [3, '3'], [4, '4']]);
     h += sel('pR', 'Tours', r.tours, (r.etapes === 2 ? [3, 4, 5] : [6, 8, 10]).map((x) => [x, String(x)]));
-    h += `<label for="pG">Graine (même graine, mêmes dés)<input type="number" id="pG" min="1" value="${r.graine}"></label>`;
-    h += '</div><p class="small">Par défaut : deux cartes, un lancer de plus que de joueurs par vague, les pistes apprennent après chaque lancer, pas de présage, 4 tours. Avec une carte, la partie passe à 8 tours : même nombre d\'ordres et de lancers.</p></details>';
-    h += `<div class="resume num"><span><b>${1 + J * r.tuileL * r.tuileP}</b> cases</span><span><b>${p.I}</b> individus</span><span><b>${p.ordresParTour}</b> ordres par tour</span><span><b>${p.lancersParTour}</b> lancers par tour</span><span><b>${p.surPlateau}</b> Machines sur le plateau, ${6 - p.surPlateau} au chantier</span><span><b>${p.c0}</b> arbres</span></div>`;
-    if (p.erreurs.length) h += `<div class="hint warn">${esc(p.erreurs.join(' ; '))}.</div>`;
-    h += `<div class="btn-row"><button class="btn" id="go" ${p.erreurs.length ? 'disabled' : ''}>Commencer la partie</button><button class="btn sec" id="newSeed">Autre graine</button></div>`;
+    h += `<label for="pG">Graine (aléatoire reproductible)<input type="number" id="pG" min="1" value="${ r.graine }"></label>`;
+    h += '</div></details>';
+    h += `<div class="resume num"><span>🌲 <b>${ p.c0 }</b> arbres sur <b>${ 1 + J * r.tuileL * r.tuileP }</b> cases</span><span>👥 <b>${ p.I }</b> individus</span><span>🃏 <b>${ p.ordresParTour }</b> ordres / tour</span><span>🎲 <b>${ p.lancersParTour }</b> lancers / tour</span><span>🚜 <b>${ p.surPlateau }</b> Machines en lisière + <b>${ 6 - p.surPlateau }</b> au chantier</span></div>`;
+    if (p.erreurs.length) h += `<div class="hint warn">${ esc(p.erreurs.join(' ; ')) }.</div>`;
+    h += `<div class="btn-row"><button class="btn" id="go" ${ p.erreurs.length ? 'disabled' : '' }>▶️ Commencer la partie</button><button class="btn sec" id="newSeed">🎲 Autre graine</button></div>`;
     $('ask').innerHTML = h;
     ['plBox', 'jBox'].forEach((id) => { $(id).hidden = true; });
     $('status').innerHTML = '';
@@ -227,38 +750,53 @@
       const E = +$('pE').value;
       let tours = +$('pR').value;
       if (ev && ev.target.id === 'pE') tours = E === 2 ? 4 : 8;
-      cfg.reglages = Object.assign({}, cfg.reglages, { joueurs: +$('pJ').value, etapes: E, lancersEnPlus: +$('pL').value, rythme: $('pY').value, presage: $('pP').value === '1',
-        tuileL: l, tuileP: q, individusParJoueur: +$('pI').value, arbres: +$('pA').value, tours, graine: Math.max(1, +$('pG').value || 1) });
+      cfg.reglages = Object.assign({}, cfg.reglages, {
+        joueurs: +$('pJ').value, etapes: E, lancersEnPlus: +$('pL').value, rythme: $('pY').value, presage: $('pP').value === '1',
+        tuileL: l, tuileP: q, individusParJoueur: +$('pI').value, arbres: +$('pA').value, tours, graine: Math.max(1, +$('pG').value || 1)
+      });
       for (let j = 0; j < 6; j++) if ($('s' + j)) cfg.sieges[j] = $('s' + j).value;
       garderCfg(); rendrePreparation(); apercu();
     };
     $('ask').querySelectorAll('select,input').forEach((x) => x.addEventListener('change', maj));
     $('go').addEventListener('click', demarrer);
-    $('newSeed').addEventListener('click', () => { cfg.reglages.graine = 1 + Math.floor(Math.random() * 99999); garderCfg(); rendrePreparation(); apercu(); });
+    $('newSeed').addEventListener('click', () => {
+      cfg.reglages.graine = 1 + Math.floor(Math.random() * 99999);
+      garderCfg(); rendrePreparation(); apercu();
+    });
   }
 
-  // ------------------------------------------------------------------ partie
+  // ------------------------------------------------------------------ déroulement d'une partie
   function demarrer() {
+    stopAnimVague();
+    fermerPopMenu();
     const reg = Object.assign({}, cfg.reglages);
     const np = K.nouvellePartie(reg);
     P = np.p; PL = np.pl;
     if (P.erreurs.length) { toast(P.erreurs.join(' ; ')); return; }
-    S = { id: 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36), date: new Date().toISOString(), reglages: reg,
-      sieges: cfg.sieges.slice(0, P.J), e: np.e, depart: K.copie(np.e), tirages: np.tirages, phase: 'cartes', v: 0, pas: 0,
-      cartes: null, raisons: {}, par: {}, fait: [], courant: null, slot: 0, brouillon: null, pose: null, attente: [], vague: [],
-      etapesTour: [], dernier: null, appVague: [], historique: [], journal: [], parJoueur: new Array(P.J).fill(0), hors: 0, S: 0, perdus: 0, enregistre: false };
+    S = {
+      id: 'p' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36),
+      date: new Date().toISOString(), reglages: reg,
+      sieges: cfg.sieges.slice(0, P.J), e: np.e, depart: K.copie(np.e), tirages: np.tirages,
+      phase: 'cartes', v: 0, pas: 0,
+      cartes: null, raisons: {}, par: {}, fait: [], courant: null, slot: 0, brouillon: null,
+      pose: null, attente: [], vague: [],
+      etapesTour: [], dernier: null, appVague: [], historique: [], journal: [],
+      parJoueur: new Array(P.J).fill(0), hors: 0, S: 0, perdus: 0, enregistre: false
+    };
     UI.sel = null;
     construirePlateau(P, PL);
     debutTour();
   }
 
   function debutTour() {
+    stopAnimVague();
+    fermerPopMenu();
     const t = tour();
     S.cartes = K.cartesVides(P);
     S.raisons = {}; S.par = {}; S.fait = []; S.pose = null; S.v = 0; S.pas = 0; S.vague = []; S.etapesTour = []; S.dernier = null; S.appVague = [];
     S.phase = 'cartes'; UI.sel = null;
-    log('tour', `Tour ${t + 1} sur ${P.tours}`);
-    if (P.presage) log('ann', 'Présage : les dés de la vague 1 sont ' + S.tirages[t][0].map((l) => `${l.d[0]}-${l.d[1]}`).join(', ') + '.');
+    log('tour', `Tour ${ t + 1 } sur ${ P.tours }`);
+    if (P.presage) log('ann', 'Présage : les dés de la vague 1 sont ' + S.tirages[t][0].map((l) => `${ l.d[0] }-${ l.d[1] }`).join(', ') + '.');
     suiteCartes();
   }
 
@@ -266,7 +804,14 @@
 
   function suiteCartes() {
     const j = humainSuivant();
-    if (j !== null) { S.courant = j; S.slot = 0; S.brouillon = S.cartes[j].slice(); rendre(); return; }
+    if (j !== null) {
+      S.courant = j; S.slot = 0; S.brouillon = S.cartes[j].slice();
+      // Sélectionner par défaut le premier individu du joueur pour faciliter le clic direct sur le plateau
+      const inds = B.individusDe(P, j);
+      UI.sel = inds.length ? inds[0] : null;
+      rendre();
+      return;
+    }
     const t = tour();
     Object.keys(B.BOTS).forEach((type, n) => {
       const qui = []; for (let k = 0; k < P.J; k++) if (S.sieges[k] === type) qui.push(k);
@@ -276,52 +821,77 @@
       for (const k of qui) { S.raisons[k] = raisons[k] || ''; S.par[k] = type; }
     });
     for (let k = 0; k < P.J; k++) {
-      log('ordre', `Joueur ${k + 1} : ` + S.cartes[k].map((c, v) => (P.E > 1 ? `carte ${v + 1} ` : '') + carteTexte(c)).join(' · '), S.par[k] !== 'humain' ? S.raisons[k] : '', SIEGES[S.sieges[k]]);
+      log('ordre', `Joueur ${ k + 1 } : ` + S.cartes[k].map((c, v) => (P.E > 1 ? `carte ${ v + 1 } ` : '') + carteTexte(c)).join(' · '), S.par[k] !== 'humain' ? S.raisons[k] : '', SIEGES[S.sieges[k]]);
     }
     S.courant = null;
     revelerEtape(0);
   }
 
   function revelerEtape(v) {
+    stopAnimVague();
+    fermerPopMenu();
     S.v = v; S.pas = 0; S.vague = []; S.attente = []; S.dernier = null; S.appVague = [];
     const prog = K.programmeEtape(P, S.cartes, v);
     S.pose = K.reveler(P, PL, S.e, prog);
     const vus = S.cartes.map((cs) => cs[v]).filter((c) => c);
-    log('etape', `${P.E > 1 ? `Étape ${v + 1} : on révèle les cartes ${v + 1}` : 'On révèle les cartes'}${vus.length ? ' (' + vus.map(carteTexte).join(', ') + ')' : ''}.`);
-    for (const x of S.pose.perdus) { log('perdu', `Ordre perdu : ${nomI(x.i)} ${ordreTexte(x.o)} (${x.pourquoi}).`); S.perdus++; }
+    log('etape', `${ P.E > 1 ? `Étape ${ v + 1 } : on révèle les cartes ${ v + 1 }` : 'On révèle les cartes' }${ vus.length ? ' (' + vus.map(carteTexte).join(', ') + ')' : '' }.`);
+    for (const x of S.pose.perdus) { log('perdu', `Ordre perdu : ${ nomI(x.i) } ${ ordreTexte(x.o) } (${ x.pourquoi }).`); S.perdus++; }
     S.phase = 'vague';
     rendre();
   }
 
   function texteLancer(ev) {
     const m = MN(ev.machine); const rep = ev.repli ? ' (repli : plus d\'arbre autour d\'elle)' : '';
-    let s = `Dés ${ev.d[0]} et ${ev.d[1]} : somme ${ev.somme}, ${NT[ev.tactique]} ; écart ${ev.ecart}, ${m}. `;
+    let s = `Dés ${ ev.d[0] } et ${ ev.d[1] } : somme ${ ev.somme } (${ NT[ev.tactique] }), écart ${ ev.ecart } (${ m }). `;
     if (ev.entree !== undefined) {
-      s += `${m} sort du chantier et entre en ${nomC(ev.entree)}`;
-      if (ev.issue === 'abattu') s += ev.cible !== ev.entree ? `, puis abat en ${nomC(ev.cible)}${rep}.` : ' et y abat un arbre.';
-      else s += `, gardée par ${nomI(ev.qui)} : parée.`;
-    } else if (ev.issue === 'abattu') s += `${m} entre en ${nomC(ev.cible)} et abat un arbre${rep}.`;
-    else if (ev.issue === 'gardee') s += `${m} vise ${nomC(ev.cible)}, gardée par ${nomI(ev.qui)} : parée.`;
-    else s += `${m} est sabotée par ${nomI(ev.qui)} : elle va en ${nomC(ev.cible)} sans abattre.`;
+      s += `${ m } sort du chantier et entre en ${ nomC(ev.entree) }`;
+      if (ev.issue === 'abattu') s += ev.cible !== ev.entree ? `, puis abat un arbre en ${ nomC(ev.cible) }${ rep }.` : ' et y abat un arbre.';
+      else s += `, gardée par ${ nomI(ev.qui) } : menace parée !`;
+    } else if (ev.issue === 'abattu') s += `${ m } entre en ${ nomC(ev.cible) } et abat un arbre${ rep }.`;
+    else if (ev.issue === 'gardee') s += `${ m } vise ${ nomC(ev.cible) }, gardée par ${ nomI(ev.qui) } : menace parée !`;
+    else s += `${ m } est sabotée par ${ nomI(ev.qui) } : elle avance en ${ nomC(ev.cible) } sans abattre.`;
     return s;
   }
   function texteAppris(a, tactique, machine) {
-    const p = a.pensees[1] === null ? `${NT[tactique]} reste en ${a.pensees[0]}` : `${NT[tactique]} ${a.pensees[0]} → ${a.pensees[1]}`;
-    const m = a.machines[1] === null ? `${MN(machine)} reste sur l'écart ${K.ECARTS[a.machines[0]]}` : `${MN(machine)} écart ${K.ECARTS[a.machines[0]]} → ${K.ECARTS[a.machines[1]]}`;
-    return `${p} ; ${m}.`;
+    const p = a.pensees[1] === null ? `${ NT[tactique] } reste en ${ a.pensees[0] }` : `${ NT[tactique] } ${ a.pensees[0] } → ${ a.pensees[1] }`;
+    const m = a.machines[1] === null ? `${ MN(machine) } reste sur l'écart ${ K.ECARTS[a.machines[0]] }` : `${ MN(machine) } écart ${ K.ECARTS[a.machines[0]] } → ${ K.ECARTS[a.machines[1]] }`;
+    return `${ p } ; ${ m }.`;
   }
 
   function lancerSuivant() {
+    if (!S || S.phase !== 'vague') return;
     const t = tour(); const l = S.tirages[t][S.v][S.pas];
     const ev = K.executerLancer(P, PL, S.e, S.pose, l, S.attente);
     S.vague.push(ev); S.pas++; S.dernier = ev;
     if (ev.issue === 'abattu') log('abattu', texteLancer(ev));
-    else { const j = K.proprietaire(P, ev.qui); S.parJoueur[j]++; S.S++; if (PL.tuile[ev.lieu] !== j) S.hors++; log('pare', texteLancer(ev)); }
+    else {
+      const j = K.proprietaire(P, ev.qui); S.parJoueur[j]++; S.S++;
+      if (PL.tuile[ev.lieu] !== j) S.hors++;
+      log('pare', texteLancer(ev));
+    }
     if (ev.appris) log('appris', (ev.issue === 'abattu' ? 'Réussite, il apprend : ' : 'Échec, il apprend : ') + texteAppris(ev.appris, ev.tactique, ev.machine));
-    if (S.pas === P.L) finVague(); else rendre();
+    if (S.pas === P.L) { stopAnimVague(); finVague(); } else rendre();
+  }
+
+  function toggleAnimVague() {
+    if (UI.animTimer) {
+      stopAnimVague();
+      rendreAsk();
+      return;
+    }
+    const step = () => {
+      if (!S || S.phase !== 'vague') { stopAnimVague(); return; }
+      lancerSuivant();
+      if (S && S.phase === 'vague') {
+        UI.animTimer = setTimeout(step, 1250);
+        rendreAsk();
+      }
+    };
+    step();
   }
 
   function finVague() {
+    stopAnimVague();
     const appris = K.finVague(P, S.e, S.attente);
     if (appris.length) {
       log('appris', 'Fin de la vague, il apprend : ' + appris.map((a, k) => texteAppris(a, S.vague[k].tactique, S.vague[k].machine)).join(' '));
@@ -329,112 +899,293 @@
     }
     S.etapesTour.push({ etape: S.v + 1, perdus: S.pose.perdus, evenements: S.vague, appris });
     const par = S.vague.filter((x) => x.issue !== 'abattu').length;
-    log('bilan', `Vague ${S.v + 1} : ${par} parade(s), ${P.L - par} arbre(s) abattu(s).`);
+    log('bilan', `Vague ${ S.v + 1 } : ${ par } parade(s), ${ P.L - par } arbre(s) abattu(s).`);
     if (S.v + 1 < P.E) { S.phase = 'inter'; rendre(); } else finTour();
   }
 
   function finTour() {
+    stopAnimVague();
     const t = tour(); S.e.tour++;
     const par = S.etapesTour.reduce((s, x) => s + x.evenements.filter((v) => v.issue !== 'abattu').length, 0);
-    S.historique.push({ tour: t + 1, des: S.tirages[t].map((w) => w.map((l) => l.d)),
+    S.historique.push({
+      tour: t + 1, des: S.tirages[t].map((w) => w.map((l) => l.d)),
       cartes: Array.from({ length: P.J }, (_, j) => ({ joueur: j + 1, siege: S.sieges[j], cartes: S.cartes[j], raison: S.raisons[j] || '' })),
-      etapes: S.etapesTour, parades: par, foret: K.foret(S.e), pensees: S.e.pensees.slice(2).map((x) => K.TUILES[x]), pisteMachines: S.e.pisteM.map(MN) });
-    log('bilan', `Fin du tour ${t + 1} : ${par} parade(s), ${P.lancersParTour - par} arbre(s) abattu(s). Forêt : ${K.foret(S.e)} arbres.`);
-    if (S.e.tour >= P.tours) { S.phase = 'fin'; log('fin', `Fin de la partie : ${K.foret(S.e)} arbres sur ${P.c0} (${pct(K.foret(S.e) / P.c0)}), ${S.S} parades pour ${P.ordresParTour * P.tours} ordres.`); enregistrer(); }
-    else S.phase = 'entre';
+      etapes: S.etapesTour, parades: par, foret: K.foret(S.e),
+      pensees: S.e.pensees.slice(2).map((x) => K.TUILES[x]), pisteMachines: S.e.pisteM.map(MN)
+    });
+    log('bilan', `Fin du tour ${ t + 1 } : ${ par } parade(s), ${ P.lancersParTour - par } arbre(s) abattu(s). Forêt : ${ K.foret(S.e) } arbres.`);
+    if (S.e.tour >= P.tours) {
+      S.phase = 'fin';
+      log('fin', `Fin de la partie : ${ K.foret(S.e) } arbres sur ${ P.c0 } (${ pct(K.foret(S.e) / P.c0) }), ${ S.S } parades pour ${ P.ordresParTour * P.tours } ordres.`);
+      enregistrer();
+    } else S.phase = 'entre';
     rendre();
   }
 
-  function toutLaVague() { const v = S.v; while (S.phase === 'vague' && S.v === v) lancerSuivant(); }
-  function toutLeTour() { let g = 50; while ((S.phase === 'vague' || S.phase === 'inter') && g--) { if (S.phase === 'inter') revelerEtape(S.v + 1); else toutLaVague(); } }
-  function jusquAuBout() { let g = 200; while (S.phase !== 'fin' && g--) { if (S.phase === 'entre') debutTour(); else if (S.phase === 'vague' || S.phase === 'inter') toutLeTour(); else break; } }
+  function toutLaVague() { stopAnimVague(); const v = S.v; while (S.phase === 'vague' && S.v === v) lancerSuivant(); }
+  function toutLeTour() { stopAnimVague(); let g = 50; while ((S.phase === 'vague' || S.phase === 'inter') && g--) { if (S.phase === 'inter') revelerEtape(S.v + 1); else toutLaVague(); } }
+  function jusquAuBout() { stopAnimVague(); let g = 200; while (S.phase !== 'fin' && g--) { if (S.phase === 'entre') debutTour(); else if (S.phase === 'vague' || S.phase === 'inter') toutLeTour(); else break; } }
 
-  // ------------------------------------------------------------------ cartes des humains
+  // ------------------------------------------------------------------ programmation des cartes humaines & menu sur plateau
   function cartesAvecBrouillon() { const cs = S.cartes.map((x) => x.slice()); cs[S.courant] = S.brouillon.slice(); return cs; }
   function posPrevues(v) { return K.positionsPrevues(P, S.e, cartesAvecBrouillon(), v); }
   function optionsSlot(i, v) { return K.ordresPossibles(P, PL, S.e, i, posPrevues(v)[i]); }
-  // une carte qui ne tient plus après un changement d'une carte précédente est retirée
+
   function verifierSuite(depuis) {
     for (let v = depuis + 1; v < P.E; v++) {
       const c = S.brouillon[v]; if (!c) continue;
-      if (!optionsSlot(c.i, v).some((o) => o[0] === c.o[0] && o[1] === c.o[1])) { S.brouillon[v] = null; toast(`La carte ${v + 1} ne tenait plus : retirée.`); }
+      if (!optionsSlot(c.i, v).some((o) => o[0] === c.o[0] && o[1] === c.o[1])) {
+        S.brouillon[v] = null;
+        toast(`La carte ${ v + 1 } ne tenait plus : retirée.`);
+      }
     }
   }
+
   function choisir(i, o) {
-    S.brouillon[S.slot] = { i, o }; verifierSuite(S.slot);
-    if (S.slot < P.E - 1) S.slot++;
-    UI.sel = i; rendre();
+    fermerPopMenu();
+    S.brouillon[S.slot] = { i, o };
+    verifierSuite(S.slot);
+    if (S.slot < P.E - 1 && !S.brouillon[S.slot + 1]) S.slot++;
+    UI.sel = i;
+    rendre();
   }
+
+  function suggererBot() {
+    if (!S || S.phase !== 'cartes' || S.courant === null) return;
+    const j = S.courant;
+    const cs = S.cartes.map((x) => x.slice());
+    const rb = K.generateur(S.reglages.graine * 997 + tour() * 53 + j + 1);
+    const raisons = B.BOTS.prevoyant.jouer(P, PL, S.e, cs, [j], rb, ctxBots());
+    S.brouillon = cs[j].slice();
+    toast('Suggestion du Bot prévoyant appliquée (' + (raisons[j] || '').split('[')[0].trim() + ')');
+    rendre();
+  }
+
   function validerCartes() {
+    fermerPopMenu();
     const j = S.courant;
     S.cartes[j] = S.brouillon.slice();
     S.par[j] = 'humain'; S.fait.push(j); UI.sel = null; S.brouillon = null;
     suiteCartes();
   }
-  function clicIndividu(i) {
-    if (!S || S.phase !== 'cartes' || S.courant === null) return;
-    if (K.proprietaire(P, i) !== S.courant) return;
-    UI.sel = UI.sel === i ? null : i; rendre();
-  }
-  function clicCase(c) {
-    if (!S || S.phase !== 'cartes' || S.courant === null || UI.sel === null) return;
-    const i = UI.sel; const pos = posPrevues(S.slot)[i];
-    if (c === pos) choisir(i, [K.GARDER, pos]);
-    else if (PL.dist[pos][c] === 1) choisir(i, [K.ALLER, c]);
+
+  function fermerPopMenu() {
+    UI.popCell = null;
+    const pm = $('popMenu');
+    if (pm) pm.hidden = true;
   }
 
-  // ------------------------------------------------------------------ rendu de la partie
+  function ouvrirPopMenuCase(c, actions, titre) {
+    const pm = $('popMenu'); if (!pm) return;
+    const g = UI.geo.cells[c];
+    const stage = $('boardStage');
+    const rect = stage.getBoundingClientRect();
+    const px = Math.min(rect.width - 220, Math.max(10, (g.cx / 680) * rect.width - 95));
+    const py = Math.min(rect.height - 140, Math.max(10, (g.cy / 650) * rect.height + 14));
+    pm.style.left = px + 'px';
+    pm.style.top = py + 'px';
+    let h = `<div class="pm-head"><span>${ esc(titre) }</span><button type="button" class="pm-close" id="pmClose">✕</button></div>`;
+    actions.forEach((act, idx) => {
+      h += `<button type="button" class="pm-act" data-idx="${ idx }"><span>${ esc(act.label) }</span>${ act.aide ? `<span class="val">${ esc(act.aide) }</span>` : '' }</button>`;
+    });
+    pm.innerHTML = h;
+    pm.hidden = false;
+    $('pmClose').addEventListener('click', fermerPopMenu);
+    pm.querySelectorAll('button.pm-act').forEach((b) => {
+      b.addEventListener('click', () => {
+        const a = actions[+b.getAttribute('data-idx')];
+        if (a) choisir(a.i, a.o);
+      });
+    });
+  }
+
+  function clicIndividu(i) {
+    if (!S || S.phase !== 'cartes' || S.courant === null) return;
+    if (K.proprietaire(P, i) !== S.courant) {
+      toast(`Ce pion appartient au Joueur ${ K.proprietaire(P, i) + 1 }.`);
+      return;
+    }
+    fermerPopMenu();
+    UI.sel = i;
+    rendre();
+  }
+
+  function clicMachinePlateau(m) {
+    if (!S || S.phase !== 'cartes' || S.courant === null) return;
+    const cm = S.e.machines[m];
+    if (cm < 0) return;
+    // Si un individu du joueur courant est sur la case de cette Machine à l'étape courante, proposer de la saboter !
+    const pos = posPrevues(S.slot);
+    const indsIci = B.individusDe(P, S.courant).filter((i) => pos[i] === cm);
+    if (indsIci.length) {
+      const i = indsIci.includes(UI.sel) ? UI.sel : indsIci[0];
+      choisir(i, [K.SABOTER, m]);
+    } else {
+      toast(`${ MN(m) } est en ${ nomC(cm) } : aucun de tes individus n'est sur sa case pour la saboter.`);
+    }
+  }
+
+  function clicCase(c) {
+    if (!S || S.phase !== 'cartes' || S.courant === null) return;
+    const j = S.courant, v = S.slot;
+    const pos = posPrevues(v);
+    const mesInds = B.individusDe(P, j);
+    if (UI.sel === null || K.proprietaire(P, UI.sel) !== j) UI.sel = mesInds[0];
+    const i = UI.sel;
+    const posI = pos[i];
+
+    // Si on clique sur la case où se trouve le pion sélectionné : Garder ou Saboter (si Machine présente)
+    if (c === posI) {
+      const ops = optionsSlot(i, v).filter((o) => o[0] === K.GARDER || o[0] === K.SABOTER);
+      if (ops.length === 1) {
+        choisir(i, ops[0]);
+      } else if (ops.length > 1) {
+        const lu = cfg.aide ? B.lectureEtape(P, PL, S.e, pos, v, ctxBots()) : null;
+        const actions = ops.map((o) => ({
+          i, o,
+          label: `${ nomI(i) } : ${ ordreRiche(o) }`,
+          aide: lu ? (o[0] === K.GARDER ? pct(lu.garde(o[1], 0)) : pct(lu.sabot(o[1], 0))) : ''
+        }));
+        ouvrirPopMenuCase(c, actions, `Carte ${ v + 1 } · Action en ${ nomC(c) }`);
+      }
+      return;
+    }
+
+    // Si on clique sur une case voisine du pion sélectionné : Aller
+    if (PL.dist[posI][c] === 1) {
+      choisir(i, [K.ALLER, c]);
+      return;
+    }
+
+    // Sinon, regarder si un autre de nos individus est sur cette case c !
+    const autreSurCase = mesInds.find((k) => pos[k] === c);
+    if (autreSurCase !== undefined) {
+      UI.sel = autreSurCase;
+      rendre();
+      return;
+    }
+  }
+
+  // ------------------------------------------------------------------ rendu global de la partie
   function rendre() {
     if (!S) { rendrePreparation(); apercu(); return; }
     const opts = {};
     let mopts = { ev: null };
+
     if (S.phase === 'cartes' && S.courant !== null) {
       const cs = cartesAvecBrouillon();
       const pos = K.positionsPrevues(P, S.e, cs, S.slot);
-      if (cfg.aide) { const f = K.copie(S.e); f.individus = pos; opts.menace = S.slot === 0 && P.presage ? null : menaceVague(f); }
+      const f = K.copie(S.e); f.individus = pos;
+      opts.menace = S.slot === 0 && P.presage ? null : menaceVague(f);
+
       const allers = [];
-      cs.forEach((x) => x.forEach((c, v) => { if (c && c.o[0] === K.ALLER) allers.push([K.positionsPrevues(P, S.e, cs, v)[c.i], c.o[1], v > 0]); }));
+      const fantomes = [];
+      const gardesCase = {};
+      const sabotsMach = {};
+      cs.forEach((x) => x.forEach((c, v) => {
+        if (!c) return;
+        const pAvant = K.positionsPrevues(P, S.e, cs, v)[c.i];
+        if (c.o[0] === K.ALLER) {
+          allers.push([pAvant, c.o[1], v > 0]);
+          if (v === 0 && S.slot === 1) fantomes.push({ i: c.i, c: c.o[1] });
+        } else if (c.o[0] === K.GARDER) {
+          gardesCase[c.o[1]] = (gardesCase[c.o[1]] ? gardesCase[c.o[1]] + '+' : '') + '🛡️' + (v + 1);
+        } else if (c.o[0] === K.SABOTER) {
+          sabotsMach[c.o[1]] = (sabotsMach[c.o[1]] ? sabotsMach[c.o[1]] + '+' : '') + '🔧' + (v + 1);
+        }
+      }));
       opts.allers = allers;
+      opts.fantomes = fantomes;
+      opts.gardesCase = gardesCase;
+      opts.sabotsMach = sabotsMach;
       opts.cliquables = new Set(B.individusDe(P, S.courant));
-      if (UI.sel !== null) opts.cand = new Set([pos[UI.sel]].concat(PL.voisins[pos[UI.sel]]));
+      if (UI.sel !== null) {
+        opts.candOrigin = pos[UI.sel];
+        opts.cand = new Set([pos[UI.sel]].concat(PL.voisins[pos[UI.sel]]));
+      }
       mopts = { L: P.L, presage: P.presage ? S.tirages[tour()][0].map((l) => l.d) : null };
     } else if (S.phase === 'vague') {
       const ev = S.dernier;
-      if (ev) { opts.actif = ev.machine; if (ev.issue === 'abattu') opts.cible = ev.cible; else opts.pare = ev.lieu; if (ev.de >= 0 && ev.de !== ev.cible && ev.issue !== 'gardee') opts.trajet = [ev.de, ev.cible]; }
+      if (ev) {
+        opts.actif = ev.machine;
+        if (ev.issue === 'abattu') opts.cible = ev.cible;
+        else opts.pare = ev.lieu;
+        if (ev.de >= 0 && ev.de !== ev.cible && ev.issue !== 'gardee') opts.trajet = [ev.de, ev.cible];
+      }
+      // Afficher les gardes et sabotages encore actifs dans la vague !
+      const gardesCase = {}, sabotsMach = {};
+      if (S.pose) {
+        for (const [cStr, nb] of Object.entries(S.pose.gardes)) if (nb > 0) gardesCase[cStr] = nb > 1 ? `🛡️×${ nb }` : '🛡️';
+        for (const [mStr, nb] of Object.entries(S.pose.sab)) if (nb > 0) sabotsMach[mStr] = nb > 1 ? `🔧×${ nb }` : '🔧';
+      }
+      opts.gardesCase = gardesCase;
+      opts.sabotsMach = sabotsMach;
+      opts.vagueActive = true;
       mopts = { ev };
     } else if (S.phase === 'inter') {
-      if (cfg.aide) opts.menace = menaceVague(S.e);
-      const allers = []; S.cartes.forEach((cs) => { const c = cs[S.v + 1]; if (c && c.o[0] === K.ALLER) allers.push([S.e.individus[c.i], c.o[1], true]); });
+      opts.menace = menaceVague(S.e);
+      const allers = [], gardesCase = {}, sabotsMach = {};
+      S.cartes.forEach((cs) => {
+        const c = cs[S.v + 1];
+        if (!c) return;
+        if (c.o[0] === K.ALLER) allers.push([S.e.individus[c.i], c.o[1], true]);
+        else if (c.o[0] === K.GARDER) gardesCase[c.o[1]] = '🛡️2';
+        else if (c.o[0] === K.SABOTER) sabotsMach[c.o[1]] = '🔧2';
+      });
       opts.allers = allers;
+      opts.gardesCase = gardesCase;
+      opts.sabotsMach = sabotsMach;
       mopts = { L: P.L, appVague: S.appVague, ev: P.rythme === 'vague' ? null : S.dernier };
     } else if (S.phase === 'entre' || S.phase === 'fin') {
       mopts = { appVague: S.appVague, ev: P.rythme === 'vague' ? null : S.dernier };
     }
+
+    UI.lastBoardOpts = opts;
     dessinerPlateau(S.e, opts);
     rendreMechant(mopts);
-    rendreStatus(); rendreAsk(); rendreJoueurs(); rendreJournal();
+    rendreStatus();
+    rendreAsk();
+    rendreJoueurs();
+    rendreJournal();
   }
 
   function rendreStatus() {
     const tt = Math.min(tour() + (S.phase === 'entre' || S.phase === 'fin' ? 0 : 1), P.tours);
-    $('status').innerHTML = `<span>Tour <b>${tt}</b>/${P.tours}</span><span>Forêt <b>${K.foret(S.e)}</b>/${P.c0}</span><span>Parades <b>${S.S}</b></span><button class="opt" id="quit">Nouvelle partie</button>`;
-    $('quit').addEventListener('click', () => { S = null; UI.sel = null; rendre(); });
+    $('status').innerHTML = `<span class="pill-stat">⏳ Tour <b>${ tt }</b>/${ P.tours }</span>`
+      + `<span class="pill-stat">🌲 Forêt <b>${ K.foret(S.e) }</b>/${ P.c0 }</span>`
+      + `<span class="pill-stat">🛡️ Parades <b>${ S.S }</b></span>`
+      + `<button class="opt" id="quit">🔄 Nouvelle partie</button>`;
+    $('quit').addEventListener('click', () => { stopAnimVague(); S = null; UI.sel = null; rendre(); });
   }
 
   function rendreAsk() {
     let h = '';
     if (S.phase === 'cartes' && S.courant !== null) {
       const j = S.courant; const v = S.slot;
-      h += `<div class="eyebrow" style="color:${COUL(j)}">Joueur ${j + 1} · à toi</div><h2>${P.E > 1 ? 'Tes deux cartes du tour' : 'Ta carte du tour'}</h2>`;
-      h += `<p class="ctx">${P.E > 1 ? 'La carte 1 est révélée avant la première vague de lancers, la carte 2 avant la seconde. Entre les deux, les Machines bougent et les pistes apprennent. ' : ''}Clique un de tes pions puis sa case pour <b>garder</b>, ou une case voisine pour y <b>aller</b> ; ou choisis ci-dessous.</p>`;
+      h += `<div class="btn-row" style="justify-content:space-between">`
+        + `<div class="eyebrow" style="color:${ COUL(j) }">● Joueur ${ j + 1 } (Tuile ${ 'ABCDEF'[j] }) · À toi de programmer</div>`
+        + `<button type="button" class="tbtn" id="btnSuggest" title="Remplir tes deux cartes avec la recommandation du Bot prévoyant">💡 Suggérer (Bot)</button>`
+        + `</div>`;
+      h += `<h2>${ P.E > 1 ? 'Programme tes 2 cartes du tour' : 'Programme ta carte du tour' }</h2>`;
+      h += `<p class="ctx">👆 <b>Sur le plateau</b> : clique un de tes pions, puis clique sa case pour <b>🛡️ Garder</b>, une case voisine entourée en vert pour <b>🥾 Aller</b>, ou une Machine sur sa case pour <b>🔧 Saboter</b>.</p>`;
+
       if (P.E > 1) {
-        h += '<div class="slots">' + S.brouillon.map((c, k) => `<button class="slot ${k === v ? 'on' : ''}" aria-pressed="${k === v}" data-slot="${k}"><span class="eyebrow">Carte ${k + 1} · étape ${k + 1}</span><span>${esc(carteTexte(c))}</span></button>`).join('') + '</div>';
+        h += '<div class="slots">' + S.brouillon.map((c, k) => {
+          return `<button type="button" class="slot ${ k === v ? 'on' : '' }" aria-pressed="${ k === v }" data-slot="${ k }">`
+            + `<span class="eyebrow"><span class="sl-badge">${ k + 1 }</span>Carte ${ k + 1 } · avant Vague ${ k + 1 }</span>`
+            + `<span class="sl-ord">${ esc(carteRiche(c)) }</span>`
+            + `<span class="sl-sub">${ k === 0 ? 'Jouée sur les positions actuelles' : 'Jouée après les mouvements de la Carte 1 et la Vague 1' }</span>`
+            + `</button>`;
+        }).join('') + '</div>';
       }
+
       const pos = posPrevues(v);
       const lu = cfg.aide ? B.lectureEtape(P, PL, S.e, pos, v, ctxBots()) : null;
       const autres = S.cartes.map((cs, k) => (k === j ? null : cs[v])).filter((c) => c);
       const dejaG = (c) => autres.filter((x) => x.o[0] === K.GARDER && x.o[1] === c).length;
       const dejaS = (m) => autres.filter((x) => x.o[0] === K.SABOTER && x.o[1] === m).length;
+
+      h += '<div class="ind-cards">';
       for (const i of B.individusDe(P, j)) {
         const ops = optionsSlot(i, v);
         const btn = (o) => {
@@ -443,66 +1194,118 @@
           if (lu) {
             if (o[0] === K.GARDER) aide = pct(lu.garde(o[1], dejaG(o[1])));
             else if (o[0] === K.SABOTER) aide = pct(lu.sabot(o[1], dejaS(o[1])));
-            else aide = 'menace ' + pct(1 - Math.pow(1 - lu.pr[o[1]], P.L));
+            else aide = pct(1 - Math.pow(1 - lu.pr[o[1]], P.L));
           }
-          return `<button class="opt k-${o[0]}" aria-pressed="${!!on}" data-i="${i}" data-o="${o[0]}" data-a="${o[1]}">${esc(ordreTexte(o))}${aide ? `<span class="val">${aide}</span>` : ''}</button>`;
+          return `<button type="button" class="opt k-${ o[0] }" aria-pressed="${ !!on }" data-i="${ i }" data-o="${ o[0] }" data-a="${ o[1] }">${ esc(ordreRiche(o)) }${ aide ? `<span class="val" title="Probabilité sur la vague">${ aide }</span>` : '' }</button>`;
         };
         const moved = pos[i] !== S.e.individus[i];
-        h += `<div class="indrow"><span class="pion" style="background:${COUL(j)}">${String.fromCharCode(97 + (i % P.ipj))}</span><div><div class="small"><b>${nomI(i)}</b> ${moved ? `sera en ${nomC(pos[i])} (après sa carte ${v})` : `en ${nomC(pos[i])}`}, ${S.e.arbres[pos[i]]} arbres</div><div class="btn-row" style="margin-top:4px">${ops.map(btn).join('')}</div></div></div>`;
+        const isSel = UI.sel === i;
+        h += `<div class="indrow ${ isSel ? 'sel' : '' }" data-row-i="${ i }">`
+          + `<span class="pion" style="background:${ COUL(j) }" data-sel-i="${ i }">${ String.fromCharCode(97 + (i % P.ipj)) }</span>`
+          + `<div><div class="small"><b>Pion ${ nomI(i) }</b> ${ moved ? `→ sera en <b>${ nomC(pos[i]) }</b> (après Carte 1)` : `en <b>${ nomC(pos[i]) }</b>` } · ${ S.e.arbres[pos[i]] }🌲</div>`
+          + `<div class="btn-row" style="margin-top:5px">${ ops.map(btn).join('') }</div></div></div>`;
       }
-      if (lu) h += `<p class="small">${lu.certain ? 'Présage : 100 % veut dire qu\'un des dés montrés désigne cette Machine ou cette case (lus sur les pistes actuelles).' : `Garder : chance qu'au moins une menace de la vague frappe la case. Saboter : chance que la Machine agisse dans la vague (${P.L} lancers). Estimations sur les pistes et positions ${v ? 'prévues, sans ce que la vague 1 changera' : 'actuelles'}.`}</p>`;
-      h += `<label class="small"><input type="checkbox" id="aide" ${cfg.aide ? 'checked' : ''}> afficher les chances (aide à la lecture des pistes)</label>`;
+      h += '</div>';
+
+      h += `<div class="btn-row" style="justify-content:space-between">`
+        + `<label class="small"><input type="checkbox" id="aide" ${ cfg.aide ? 'checked' : '' }> afficher les % d'aide à la décision</label>`
+        + `${ S.brouillon[v] ? '<button type="button" class="tbtn" id="retirer">✕ Effacer cette carte</button>' : '' }`
+        + `</div>`;
       const nb = S.brouillon.filter((c) => c).length;
-      h += `<div class="btn-row"><button class="btn" id="valider">${nb ? `Valider ${P.E > 1 ? 'mes cartes' : 'ma carte'}` : 'Ne rien faire ce tour'}</button>${S.brouillon[v] ? '<button class="btn sec" id="retirer">Retirer cette carte</button>' : ''}</div>`;
+      h += `<div class="btn-row"><button type="button" class="btn" id="valider">✅ ${ nb ? `Valider ${ P.E > 1 ? 'mes 2 cartes' : 'ma carte' }` : 'Passer sans jouer' }</button></div>`;
       $('ask').innerHTML = h;
+
+      $('btnSuggest').addEventListener('click', suggererBot);
+      $('ask').querySelectorAll('[data-sel-i]').forEach((el) => el.addEventListener('click', () => { UI.sel = +el.getAttribute('data-sel-i'); rendre(); }));
       $('ask').querySelectorAll('button[data-o]').forEach((b) => b.addEventListener('click', () => {
-        const a = b.dataset.a === 'null' ? null : +b.dataset.a; choisir(+b.dataset.i, [b.dataset.o, a]); }));
-      $('ask').querySelectorAll('button[data-slot]').forEach((b) => b.addEventListener('click', () => { S.slot = +b.dataset.slot; rendre(); }));
+        const a = b.dataset.a === 'null' ? null : +b.dataset.a;
+        choisir(+b.dataset.i, [b.dataset.o, a]);
+      }));
+      $('ask').querySelectorAll('button[data-slot]').forEach((b) => b.addEventListener('click', () => { S.slot = +b.dataset.slot; fermerPopMenu(); rendre(); }));
       $('aide').addEventListener('change', () => { cfg.aide = $('aide').checked; garderCfg(); rendre(); });
       $('valider').addEventListener('click', validerCartes);
       if ($('retirer')) $('retirer').addEventListener('click', () => { S.brouillon[v] = null; verifierSuite(v); rendre(); });
       return;
     }
+
     const auto = !S.sieges.includes('humain');
     if (S.phase === 'vague') {
       const ev = S.dernier;
-      h += `<div class="eyebrow">${P.E > 1 ? `Vague ${S.v + 1} · ` : ''}lancer ${Math.min(S.pas + 1, P.L)} sur ${P.L}</div>`;
-      if (ev) h += `<h2>${ev.issue === 'abattu' ? 'Un arbre tombe' : 'Menace parée'}</h2><p class="ctx">${esc(texteLancer(ev))}</p>${ev.appris ? `<p class="ctx">${ev.issue === 'abattu' ? 'Réussite' : 'Échec'} : ${esc(texteAppris(ev.appris, ev.tactique, ev.machine))}</p>` : ''}`;
-      else h += `<h2>Cartes ${P.E > 1 ? S.v + 1 + ' ' : ''}révélées</h2><p class="ctx">Les déplacements ont eu lieu, les gardes et les sabotages sont posés pour cette vague. Le Méchant lance les dés ${P.L} fois : la somme désigne une tactique, l'écart une Machine.</p>`;
-      if (S.pose.perdus.length && !ev) h += `<div class="hint warn">${S.pose.perdus.map((x) => esc(`${nomI(x.i)} : ${ordreTexte(x.o)} perdu (${x.pourquoi}).`)).join('<br>')}</div>`;
-      h += `<div class="btn-row"><button class="btn" id="suiv">Lancer les dés</button><button class="btn sec" id="vg">Toute la vague</button>${auto ? '<button class="btn sec" id="bout">Jouer jusqu\'au bout</button>' : ''}</div>`;
+      h += `<div class="eyebrow">${ P.E > 1 ? `Vague ${ S.v + 1 } sur ${ P.E } · ` : '' }Résolution des menaces du Méchant</div>`;
+      // Pips de progression des lancers de la vague
+      h += '<div class="vague-stage"><div class="vague-pips">';
+      for (let k = 0; k < P.L; k++) {
+        if (k < S.vague.length) {
+          const eV = S.vague[k];
+          const ok = eV.issue !== 'abattu';
+          h += `<span class="v-pip ${ ok ? 'pare' : 'abattu' }">${ ok ? '🛡️' : '🪵' } Lancer ${ k + 1 } (${ eV.d[0] }+${ eV.d[1] })</span>`;
+        } else if (k === S.pas) {
+          h += `<span class="v-pip cur">🎲 Lancer ${ k + 1 } / ${ P.L }</span>`;
+        } else {
+          h += `<span class="v-pip">Lancer ${ k + 1 }</span>`;
+        }
+      }
+      h += '</div>';
+
+      if (ev) {
+        h += `<h2>${ ev.issue === 'abattu' ? '🪵 Un arbre tombe !' : (ev.issue === 'gardee' ? '🛡️ Menace parée par une Garde !' : '🔧 Machine sabotée !') }</h2>`;
+        h += `<p class="ctx">${ esc(texteLancer(ev)) }</p>`;
+        if (ev.appris) h += `<p class="small">🧠 <b>Apprentissage (${ ev.issue === 'abattu' ? 'Réussite' : 'Échec' })</b> : ${ esc(texteAppris(ev.appris, ev.tactique, ev.machine)) }</p>`;
+      } else {
+        h += `<h2>🃏 Cartes ${ P.E > 1 ? S.v + 1 + ' ' : '' }révélées sur le plateau</h2>`;
+        h += `<p class="ctx">Les déplacements ont eu lieu et les boucliers <b>🛡️ Gardes</b> et <b>🔧 Sabotages</b> sont posés sur le plateau. Le Méchant va lancer les dés <b>${ P.L } fois</b>.</p>`;
+      }
+      h += '</div>';
+
+      if (S.pose.perdus.length && !ev) {
+        h += `<div class="hint warn">⚠️ ${ S.pose.perdus.map((x) => esc(`${ nomI(x.i) } : ${ ordreTexte(x.o) } perdu (${ x.pourquoi }).`)).join('<br>') }</div>`;
+      }
+      h += `<div class="btn-row">`
+        + `<button class="btn" id="suiv">🎲 Lancer les dés (${ S.pas + 1 }/${ P.L })</button>`
+        + `<button class="btn sec" id="animV">${ UI.animTimer ? '⏸️ Pause' : '▶️ Vague animée' }</button>`
+        + `<button class="btn sec" id="vg">⏩ Toute la vague</button>`
+        + `${ auto ? '<button class="btn sec" id="bout">⏩ Jusqu\'au bout</button>' : '' }`
+        + `</div>`;
       $('ask').innerHTML = h;
-      $('suiv').addEventListener('click', lancerSuivant); $('vg').addEventListener('click', () => { toutLaVague(); });
+      $('suiv').addEventListener('click', () => { stopAnimVague(); lancerSuivant(); });
+      $('animV').addEventListener('click', toggleAnimVague);
+      $('vg').addEventListener('click', () => { toutLaVague(); });
       if (auto) $('bout').addEventListener('click', () => { jusquAuBout(); rendre(); });
       return;
     }
+
     if (S.phase === 'inter') {
-      const last = S.etapesTour[S.etapesTour.length - 1]; const par = last.evenements.filter((x) => x.issue !== 'abattu').length;
-      h += `<div class="eyebrow">Vague ${S.v + 1} terminée</div><h2>${par} parade${par > 1 ? 's' : ''}, ${P.L - par} arbre${P.L - par > 1 ? 's' : ''} abattu${P.L - par > 1 ? 's' : ''}</h2>`;
-      h += `<p class="ctx">Les gardes et les sabotages de l'étape ${S.v + 1} tombent. Les Machines ont bougé et les pistes ont appris : regarde ce qui a changé avant de révéler les cartes ${S.v + 2}. Un sabotage dont la Machine a quitté la case sera perdu.</p>`;
-      h += `<div class="btn-row"><button class="btn" id="rev">Révéler les cartes ${S.v + 2}</button>${auto ? '<button class="btn sec" id="bout">Jouer jusqu\'au bout</button>' : ''}</div>`;
+      const last = S.etapesTour[S.etapesTour.length - 1];
+      const par = last.evenements.filter((x) => x.issue !== 'abattu').length;
+      h += `<div class="eyebrow">Fin de la Vague ${ S.v + 1 }</div>`;
+      h += `<h2>🛡️ ${ par } parade${ par > 1 ? 's' : '' } · 🪵 ${ P.L - par } arbre${ P.L - par > 1 ? 's' : '' } abattu${ P.L - par > 1 ? 's' : '' }</h2>`;
+      h += `<p class="ctx">Les gardes et sabotages de l'étape 1 tombent. Les Machines ont bougé et les pistes du Méchant ont appris : observe le nouvel état du plateau avant de révéler les <b>Cartes 2</b>.</p>`;
+      h += `<div class="btn-row"><button class="btn" id="rev">🃏 Révéler les Cartes ${ S.v + 2 } (Étape 2)</button>${ auto ? '<button class="btn sec" id="bout">⏩ Jusqu\'au bout</button>' : '' }</div>`;
       $('ask').innerHTML = h;
       $('rev').addEventListener('click', () => revelerEtape(S.v + 1));
       if (auto) $('bout').addEventListener('click', () => { jusquAuBout(); rendre(); });
       return;
     }
+
     if (S.phase === 'entre') {
       const last = S.historique[S.historique.length - 1];
-      h += `<div class="eyebrow">Tour ${last.tour} terminé</div><h2>${last.parades} parade${last.parades > 1 ? 's' : ''}, ${P.lancersParTour - last.parades} arbre${P.lancersParTour - last.parades > 1 ? 's' : ''} abattu${P.lancersParTour - last.parades > 1 ? 's' : ''}</h2>`;
-      h += `<div class="btn-row"><button class="btn" id="next">Tour suivant</button>${auto ? '<button class="btn sec" id="auto">Jouer jusqu\'au bout</button>' : ''}</div>`;
+      h += `<div class="eyebrow">Tour ${ last.tour } sur ${ P.tours } terminé</div>`;
+      h += `<h2>🛡️ ${ last.parades } parade${ last.parades > 1 ? 's' : '' } · 🪵 ${ P.lancersParTour - last.parades } arbre${ P.lancersParTour - last.parades > 1 ? 's' : '' } abattu${ P.lancersParTour - last.parades > 1 ? 's' : '' } ce tour</h2>`;
+      h += `<p class="ctx">Il reste <b>${ K.foret(S.e) } arbres</b> sur ${ P.c0 }. Préparez le tour suivant !</p>`;
+      h += `<div class="btn-row"><button class="btn" id="next">▶️ Passer au Tour ${ last.tour + 1 }</button>${ auto ? '<button class="btn sec" id="auto">⏩ Jusqu\'au bout</button>' : '' }</div>`;
       $('ask').innerHTML = h;
       $('next').addEventListener('click', () => { debutTour(); });
       if (auto) $('auto').addEventListener('click', () => { jusquAuBout(); rendre(); });
       return;
     }
+
     if (S.phase === 'fin') {
       const r = K.foret(S.e);
-      h += `<div class="eyebrow">Partie terminée</div><h2>${r} arbres sur ${P.c0} (${pct(r / P.c0)})</h2>`;
-      h += `<p class="ctx">${S.S} parades pour ${P.ordresParTour * P.tours} ordres, soit <b>${pct(S.S / (P.ordresParTour * P.tours))}</b> des ordres qui ont sauvé un arbre. ${S.perdus} ordre${S.perdus > 1 ? 's' : ''} perdu${S.perdus > 1 ? 's' : ''}. ${S.S ? `${pct(S.hors / S.S)} des parades faites hors de sa propre tuile.` : ''}</p>`;
+      h += `<div class="eyebrow">Partie terminée</div><h2>🌲 ${ r } arbres sauvés sur ${ P.c0 } (${ pct(r / P.c0) })</h2>`;
+      h += `<p class="ctx"><b>${ S.S } parades</b> réussies sur ${ P.ordresParTour * P.tours } ordres programmés, soit un taux de parade de <b>${ pct(S.S / (P.ordresParTour * P.tours)) }</b>. ${ S.perdus } ordre${ S.perdus > 1 ? 's' : '' } perdu${ S.perdus > 1 ? 's' : '' }. ${ S.S ? `${ pct(S.hors / S.S) } des parades faites hors de sa propre tuile (entraide).` : '' }</p>`;
       const mx = Math.max(1, ...S.parJoueur);
-      h += '<div class="bars">' + S.parJoueur.map((x, j) => `<div class="barl"><span>Joueur ${j + 1}</span><span class="bart"><span style="width:${(100 * x / mx).toFixed(0)}%;background:${COUL(j)}"></span></span><span class="num">${x}</span></div>`).join('') + '</div>';
-      h += `<p class="small">${S.enregistre ? 'Partie enregistrée.' : (UI.db ? 'Enregistrement…' : 'Enregistrement indisponible dans cette vue : exportez la partie depuis l\'onglet « Parties enregistrées ».')}</p>`;
-      h += '<div class="btn-row"><button class="btn" id="again">Nouvelle partie</button><button class="btn sec" id="same">Rejouer la même graine</button></div>';
+      h += '<div class="bars">' + S.parJoueur.map((x, j) => `<div class="barl"><span>Joueur ${ j + 1 }</span><span class="bart"><span style="width:${ (100 * x / mx).toFixed(0) }%;background:${ COUL(j) }"></span></span><span class="num">${ x } 🛡️</span></div>`).join('') + '</div>';
+      h += '<div class="btn-row"><button class="btn" id="again">🎲 Nouvelle partie (autre graine)</button><button class="btn sec" id="same">🔄 Rejouer la même graine</button></div>';
       $('ask').innerHTML = h;
       $('again').addEventListener('click', () => { cfg.reglages.graine = 1 + Math.floor(Math.random() * 99999); garderCfg(); S = null; rendre(); });
       $('same').addEventListener('click', () => { demarrer(); });
@@ -511,45 +1314,83 @@
 
   function rendreJoueurs() {
     $('plBox').hidden = false;
-    const revele = (v) => S.phase !== 'cartes' && (v < S.v || (v === S.v));
+    const revele = (v) => S.phase !== 'cartes' && (v <= S.v);
     $('players').innerHTML = S.sieges.map((s, j) => {
-      let cartes;
-      if (S.phase === 'cartes' && !S.fait.includes(j)) cartes = S.courant === j ? 'pose ses cartes…' : 'attend';
-      else cartes = S.cartes[j].map((c, v) => `<span class="${S.phase !== 'cartes' && !revele(v) ? 'cache' : ''}">${P.E > 1 ? `${v + 1}. ` : ''}${esc(carteTexte(c))}</span>`).join(' ');
-      return `<div class="pl ${S.courant === j ? 'actif' : ''}"><span class="dot" style="background:${COUL(j)}"></span><span>Joueur ${j + 1} <span class="who">${SIEGES[s]}</span><br><span class="ord">${cartes}</span></span><span class="num small">${S.parJoueur[j]} parade${S.parJoueur[j] > 1 ? 's' : ''}</span></div>`;
+      let cartesHtml;
+      if (S.phase === 'cartes' && !S.fait.includes(j)) {
+        cartesHtml = `<span class="c-pill ${ S.courant === j ? 'active-step' : 'cache' }">${ S.courant === j ? '✍️ programme ses cartes…' : '⏳ en attente' }</span>`;
+      } else {
+        cartesHtml = S.cartes[j].map((c, v) => {
+          const isRev = revele(v) || S.phase === 'cartes';
+          const isCur = S.phase !== 'cartes' && v === S.v && (S.phase === 'vague');
+          return `<span class="c-pill ${ !isRev ? 'cache' : '' } ${ isCur ? 'active-step' : '' }">${ P.E > 1 ? `<b>C${ v + 1 }</b> ` : '' }${ esc( c ? `${ nomI(c.i) } ${ ordreRiche(c.o) }` : 'rien') }</span>`;
+        }).join('');
+      }
+      return `<div class="pl ${ S.courant === j ? 'actif' : '' }"><span class="dot" style="background:${ COUL(j) }"></span><div><div><b>Joueur ${ j + 1 }</b> <span class="who">(${ SIEGES[s] })</span></div><div class="ord">${ cartesHtml }</div></div><span class="num small"><b>${ S.parJoueur[j] }</b> 🛡️</span></div>`;
     }).join('');
   }
 
   function rendreJournal() {
     $('jBox').hidden = false;
     const why = $('showWhy').checked;
-    $('journal').innerHTML = S.journal.map((l) => `<div class="jl k-${l.k}">${l.tag ? `<span class="tag">${esc(l.tag)}</span>` : ''}${esc(l.txt)}${why && l.why ? `<span class="why">${esc(l.why)}</span>` : ''}</div>`).join('');
+    $('journal').innerHTML = S.journal.map((l) => `<div class="jl k-${ l.k }">${ l.tag ? `<span class="tag">${ esc(l.tag) }</span>` : '' }${ esc(l.txt) }${ why && l.why ? `<span class="why">${ esc(l.why) }</span>` : '' }</div>`).join('');
     $('journal').scrollTop = $('journal').scrollHeight;
   }
   $('showWhy').addEventListener('change', () => { if (S) rendreJournal(); });
 
-  // ------------------------------------------------------------------ enregistrement
+  // ------------------------------------------------------------------ boutons de la barre du plateau
+  function syncToggles() {
+    $('togIntent').setAttribute('aria-pressed', String(!!cfg.intentions));
+    $('togHeat').setAttribute('aria-pressed', String(!!cfg.heatmap));
+    $('togCodes').setAttribute('aria-pressed', String(!!cfg.codes));
+    $('togPyr').setAttribute('aria-pressed', String(!!cfg.pyramide));
+  }
+  $('togIntent').addEventListener('click', () => { cfg.intentions = !cfg.intentions; garderCfg(); syncToggles(); rendre(); });
+  $('togHeat').addEventListener('click', () => { cfg.heatmap = !cfg.heatmap; garderCfg(); syncToggles(); rendre(); });
+  $('togCodes').addEventListener('click', () => { cfg.codes = !cfg.codes; garderCfg(); syncToggles(); rendre(); });
+  $('togPyr').addEventListener('click', () => { cfg.pyramide = !cfg.pyramide; garderCfg(); syncToggles(); rendre(); });
+  syncToggles();
+
+  // ------------------------------------------------------------------ enregistrement & téléchargement local
   function resume(rec) {
-    if (rec.type === 'serie') return { id: rec.id, type: 'serie', date: rec.date, titre: `Série : ${rec.lignes.length} lignes, ${rec.parties} parties par bot et par taille` };
-    return { id: rec.id, type: 'partie', date: rec.date, titre: `${rec.reglages.joueurs} joueurs (${rec.sieges.map((s) => SIEGES[s]).join(', ')}) : ${rec.resultat.foret}/${rec.resultat.c0} arbres, ${pct(rec.resultat.taux)} de parades` };
+    if (rec.type === 'serie') return { id: rec.id, type: 'serie', date: rec.date, titre: `Série : ${ rec.lignes.length } lignes, ${ rec.parties } parties par bot et par taille` };
+    return { id: rec.id, type: 'partie', date: rec.date, titre: `${ rec.reglages.joueurs } joueurs (${ rec.sieges.map((s) => SIEGES[s]).join(', ') }) : ${ rec.resultat.foret }/${ rec.resultat.c0 } arbres, ${ pct(rec.resultat.taux) } de parades` };
   }
   function recordPartie() {
-    return { id: S.id, type: 'partie', modele: 'pistes', date: S.date, version: 1, reglages: S.reglages, sieges: S.sieges, depart: S.depart, tours: S.historique,
-      resultat: { foret: K.foret(S.e), c0: P.c0, parades: S.S, taux: S.S / (P.ordresParTour * P.tours), perdus: S.perdus, parJoueur: S.parJoueur, horsTuile: S.hors } };
+    return {
+      id: S.id, type: 'partie', modele: 'pistes', date: S.date, version: 1, reglages: S.reglages, sieges: S.sieges, depart: S.depart, tours: S.historique,
+      resultat: { foret: K.foret(S.e), c0: P.c0, parades: S.S, taux: S.S / (P.ordresParTour * P.tours), perdus: S.perdus, parJoueur: S.parJoueur, horsTuile: S.hors }
+    };
   }
   async function enregistrer() {
     const rec = recordPartie(); UI.local = UI.local || []; UI.local.unshift(rec);
-    if (!UI.db) { rendreArchives(); return; }
-    try { await UI.db.collection('parties').doc(rec.id).set(rec); await UI.db.collection('index').doc(rec.id).set(resume(rec)); S.enregistre = true; toast('Partie enregistrée.'); }
-    catch (e) { toast('La partie n\'a pas pu être enregistrée : ' + (e && e.message ? e.message : 'erreur')); }
+    try { localStorage.setItem('pistes-saved-local', JSON.stringify(UI.local.slice(0, 50))); } catch (e) { /* rien */ }
+    if (!UI.db) {
+      rendreArchives();
+      sauver(`couronne-pistes-${ rec.id }.json`, rec);
+      toast('Partie terminée et exportée automatiquement dans Téléchargements.');
+      return;
+    }
+    try {
+      await UI.db.collection('parties').doc(rec.id).set(rec);
+      await UI.db.collection('index').doc(rec.id).set(resume(rec));
+      S.enregistre = true; toast('Partie enregistrée.');
+    } catch (e) { toast('Enregistrée localement.'); }
     if (S && S.phase === 'fin') rendreAsk();
   }
 
+  try {
+    const savedLoc = JSON.parse(localStorage.getItem('pistes-saved-local') || 'null');
+    if (Array.isArray(savedLoc)) UI.local = savedLoc;
+  } catch (e) { /* rien */ }
+
   function rendreArchives() {
     const lignes = UI.index.length ? UI.index : (UI.local || []).map(resume);
-    $('dbState').textContent = UI.db ? 'Chaque partie terminée et chaque série sont enregistrées avec leur journal : réglages, graine, dés, cartes, raisons des bots, lancers, parades et échanges sur les pistes. Claude peut les relire pour les analyser.'
-      : 'L\'enregistrement partagé n\'est pas disponible dans cette vue. Les parties de cette session restent listées ici et peuvent être exportées.';
-    $('saved').innerHTML = lignes.length ? lignes.map((x) => `<div class="sv"><span>${esc(x.titre)}<br><span class="m">${new Date(x.date).toLocaleString('fr-FR')} · ${x.type === 'serie' ? 'série' : 'partie'}</span></span><button class="opt" data-id="${esc(x.id)}" data-c="${x.type === 'serie' ? 'series' : 'parties'}">Exporter</button></div>`).join('')
+    $('dbState').textContent = UI.db
+      ? 'Chaque partie terminée et chaque série sont enregistrées avec leur journal.'
+      : 'Les parties jouées dans ce navigateur sont mémorisées localement et peuvent être exportées en JSON.';
+    $('saved').innerHTML = lignes.length
+      ? lignes.map((x) => `<div class="sv"><span>${ esc(x.titre) }<br><span class="m">${ new Date(x.date).toLocaleString('fr-FR') } · ${ x.type === 'serie' ? 'série' : 'partie' }</span></span><button class="opt" data-id="${ esc(x.id) }" data-c="${ x.type === 'serie' ? 'series' : 'parties' }">📥 Exporter JSON</button></div>`).join('')
       : '<div class="empty">Aucune partie enregistrée pour l\'instant. Les parties terminées et les séries de bots apparaîtront ici.</div>';
     $('saved').querySelectorAll('button[data-id]').forEach((b) => b.addEventListener('click', () => exporter(b.dataset.c, b.dataset.id)));
   }
@@ -559,10 +1400,19 @@
     try { const s = await UI.db.collection(coll).doc(id).get(); return s.exists ? s.data() : null; } catch (e) { return null; }
   }
   async function sauver(nom, obj) {
-    if (!UI.dl) { toast('Le téléchargement n\'est pas disponible dans cette vue.'); return; }
-    try { await UI.dl.save({ filename: nom, data: JSON.stringify(obj, null, 1) }); } catch (e) { /* refusé par le lecteur */ }
+    const dataStr = JSON.stringify(obj, null, 2);
+    if (UI.dl) {
+      try { await UI.dl.save({ filename: nom, data: dataStr }); return; } catch (e) { /* fallback navigateur */ }
+    }
+    try {
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = nom; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    } catch (e) { toast('Le téléchargement a échoué.'); }
   }
-  async function exporter(coll, id) { const r = await lire(coll, id); if (r) sauver(`couronne-pistes-${id}.json`, r); else toast('Introuvable.'); }
+  async function exporter(coll, id) { const r = await lire(coll, id); if (r) sauver(`couronne-pistes-${ id }.json`, r); else toast('Introuvable.'); }
   $('expAll').addEventListener('click', async () => {
     const tout = [];
     for (const x of (UI.index.length ? UI.index : (UI.local || []).map(resume))) { const r = await lire(x.type === 'serie' ? 'series' : 'parties', x.id); if (r) tout.push(r); }
@@ -586,7 +1436,7 @@
         const a = acc[J + '|' + b] = acc[J + '|' + b] || { J, b, n: 0, taux: 0, foret: 0, agence: 0, couplage: 0, perdus: 0 };
         a.n++; a.taux += r.taux; a.foret += r.foret; a.agence += r.agence; a.couplage += r.couplage; a.perdus += r.perdus;
       }
-      $('serieProg').textContent = `${Math.floor(k / bots.length)} / ${taches.length / bots.length} tables`;
+      $('serieProg').textContent = `${ Math.floor(k / bots.length) } / ${ taches.length / bots.length } tables`;
       if (k < taches.length) { setTimeout(pas, 0); return; }
       UI.serie = null; $('runSerie').disabled = false;
       const lignes = Object.values(acc).map((a) => ({ joueurs: a.J, bot: a.b, parties: a.n, taux: a.taux / a.n, foret: a.foret / a.n, agence: a.agence / a.n, couplage: a.couplage / a.n, perdus: a.perdus / a.n }));
@@ -601,15 +1451,15 @@
   function afficherSerie(lignes, Js) {
     const NB = { hasard: 'Hasard', reflexe: 'Réflexe', stratege: 'Glouton', prevoyant: 'Prévoyant' };
     let h = '<div class="eyebrow">Résultats</div><h2>Ordres qui ont paré une menace</h2><div class="tw"><table class="res num"><thead><tr><th>Joueurs</th>'
-      + Object.values(NB).map((n) => `<th>${n}</th>`).join('') + '<th>Forêt*</th><th>Perdus*</th><th>Agence*</th><th>Couplage*</th></tr></thead><tbody>';
+      + Object.values(NB).map((n) => `<th>${ n }</th>`).join('') + '<th>Forêt*</th><th>Perdus*</th><th>Agence*</th><th>Couplage*</th></tr></thead><tbody>';
     for (const J of Js) {
       const L = (b) => lignes.find((x) => x.joueurs === J && x.bot === b);
       const pv = L('prevoyant');
-      h += `<tr><td>${J}</td>` + Object.keys(NB).map((b) => `<td>${pct(L(b).taux)}</td>`).join('') + `<td>${pct(pv.foret)}</td><td>${f1(pv.perdus)}</td><td>${pct(pv.agence)}</td><td>${pct(pv.couplage)}</td></tr>`;
+      h += `<tr><td>${ J }</td>` + Object.keys(NB).map((b) => `<td>${ pct(L(b).taux) }</td>`).join('') + `<td>${ pct(pv.foret) }</td><td>${ f1(pv.perdus) }</td><td>${ pct(pv.agence) }</td><td>${ pct(pv.couplage) }</td></tr>`;
     }
-    h += '</tbody></table></div><p class="small">* pour le bot prévoyant. Forêt : arbres restants en fin de partie. Perdus : ordres perdus par partie (un sabotage dont la Machine est partie). Agence : part des joueurs qui ont paré au moins une menace. Couplage : part des parades faites hors de sa tuile.</p>';
+    h += '</tbody></table></div><p class="small">* pour le bot prévoyant. Forêt : arbres restants en fin de partie. Perdus : ordres perdus par partie. Agence : part des joueurs qui ont paré au moins une menace. Couplage : part des parades faites hors de sa tuile.</p>';
     const ecarts = Js.map((J) => { const a = lignes.find((x) => x.joueurs === J && x.bot === 'prevoyant'), b = lignes.find((x) => x.joueurs === J && x.bot === 'reflexe'); return 100 * (a.taux - b.taux); });
-    h += `<div class="verdict">Prévoyant moins Réflexe : ${ecarts.map((x, n) => `${Js[n]} joueurs ${x >= 0 ? '+' : ''}${f1(x)} pt`).join(' · ')}. C'est ce que rapporte de prévoir la vague suivante et le tour suivant.</div>`;
+    h += `<div class="verdict">Prévoyant moins Réflexe : ${ ecarts.map((x, n) => `${ Js[n] } joueurs ${ x >= 0 ? '+' : '' }${ f1(x) } pt`).join(' · ') }. C'est ce que rapporte de prévoir la vague suivante et le tour suivant.</div>`;
     $('serieRes').innerHTML = h;
   }
   $('runSerie').addEventListener('click', lancerSerie);
@@ -622,7 +1472,25 @@
   }));
 
   function demarrerPage(data) {
-    if (data && data.S && data.S.tirages) { S = data.S; cfg = data.cfg || cfg; P = K.params(S.reglages); PL = K.plateau(P); construirePlateau(P, PL); }
+    if (data && data.S && data.S.tirages) {
+      S = data.S; cfg = data.cfg || cfg; P = K.params(S.reglages); PL = K.plateau(P);
+      syncToggles();
+      construirePlateau(P, PL);
+    } else if (window.location && window.location.search) {
+      const qs = new URLSearchParams(window.location.search);
+      let mod = false;
+      for (const k of ['joueurs', 'etapes', 'tours', 'lancersEnPlus']) {
+        if (qs.has(k)) { cfg.reglages[k] = +qs.get(k); mod = true; }
+      }
+      if (qs.has('rythme')) { cfg.reglages.rythme = qs.get('rythme'); mod = true; }
+      if (qs.has('presage')) { cfg.reglages.presage = qs.get('presage') === '1' || qs.get('presage') === 'true'; mod = true; }
+      if (mod) {
+        if (cfg.reglages.etapes === 1 && !qs.has('tours')) cfg.reglages.tours = 8;
+        syncToggles();
+        nouvelle();
+        return;
+      }
+    }
     rendre();
     rendreArchives();
   }

@@ -109,8 +109,21 @@
           const gain = lu.pr[c] - lu.pr[pos[i]];
           if (gain > 0.02 && (!mv || gain > mv.g)) mv = { g: gain, i, c };
         }
-        if (mv) { cartes[j][v] = { i: mv.i, o: [ALLER, mv.c] }; morceaux.push(`${etq}${nomInd(p, mv.i)} va en ${nomCase(p, pl, mv.c)}, plus menacée (${pc(lu.pr[mv.c])} par lancer) : il s'y place.`); }
-        else morceaux.push(`${etq}aucun ordre utile.`);
+        if (mv) { cartes[j][v] = { i: mv.i, o: [ALLER, mv.c] }; morceaux.push(`${etq}${nomInd(p, mv.i)} va en ${nomCase(p, pl, mv.c)}, plus menacée (${pc(lu.pr[mv.c])} par lancer) : il s'y place.`); continue; }
+        // sinon se rapprocher du Cœur ou garder sa case plutôt que de passer
+        let rap = null;
+        for (const i of individusDe(p, j)) for (const c of pl.voisins[pos[i]]) {
+          if (tenues.has(c)) continue;
+          const d0 = pl.dist[0][pos[i]] - pl.dist[0][c];
+          if (d0 > 0 && (!rap || lu.pr[c] > rap.p)) rap = { p: lu.pr[c], i, c };
+        }
+        if (rap && (!best || best.v < 0.05)) {
+          cartes[j][v] = { i: rap.i, o: [ALLER, rap.c] };
+          morceaux.push(`${etq}${nomInd(p, rap.i)} va en ${nomCase(p, pl, rap.c)} (se rapproche du Cœur).`);
+        } else if (best) {
+          cartes[j][v] = { i: best.i, o: best.o };
+          morceaux.push(`${etq}${nomInd(p, best.i)} ${ordreTexte(p, pl, best.o)} (garde préventive, ${pc(best.v)}).`);
+        } else morceaux.push(`${etq}aucun ordre utile.`);
       }
       raisons[j] = morceaux.join(' ');
     }
@@ -120,8 +133,9 @@
   // ------------------------------------------------------------ Glouton
   function optionsCartes(p, pl, e, cartes, j, v) {
     const pos = K.positionsPrevues(p, e, cartes, v);
-    const out = [null];
+    const out = [];
     for (const i of individusDe(p, j)) for (const o of K.ordresPossibles(p, pl, e, i, pos[i])) out.push({ i, o });
+    if (!out.length) out.push(null);
     return out;
   }
   function decrireCartes(p, pl, cs) {
@@ -132,13 +146,25 @@
     S = S || 10;
     const raisons = {};
     const echant = echantillons(p, rng, S, ctx);
+    const pr0 = K.menaceParCase(p, pl, e), prof0 = K.profils(e);
     for (const j of joueurs) {
       let best = null;
       const essai = copieCartes(cartes);
+      const bonusTie = (cs) => {
+        let b = 0;
+        for (let v = 0; v < cs.length; v++) {
+          const c = cs[v]; if (!c) continue;
+          if (c.o[0] === GARDER) b += 0.001 * (1 + pr0[c.o[1]]);
+          else if (c.o[0] === SABOTER) b += 0.001 * (1 + (prof0[c.o[1]].chances / 36));
+          else if (c.o[0] === ALLER) b += 0.0005 * (1 + pr0[c.o[1]] + 0.1 / (1 + pl.dist[0][c.o[1]]));
+        }
+        return b;
+      };
       const parcourir = (v) => {
         if (v === p.E) {
-          const val = valeur(p, pl, e, essai, echant) - 0.001 * essai[j].filter((c) => c).length;
-          if (!best || val > best.v + 1e-9) best = { v: val, cs: essai[j].slice() };
+          const raw = valeur(p, pl, e, essai, echant);
+          const val = raw + bonusTie(essai[j]);
+          if (!best || val > best.v + 1e-9) best = { v: val, raw, cs: essai[j].slice() };
           return;
         }
         for (const c of optionsCartes(p, pl, e, essai, j, v)) { essai[j][v] = c; parcourir(v + 1); }
@@ -146,7 +172,7 @@
       };
       parcourir(0);
       cartes[j] = best.cs;
-      raisons[j] = `${decrireCartes(p, pl, best.cs)} : la meilleure paire de cartes de ce joueur, ${f2(best.v + 0.001 * best.cs.filter((c) => c).length)} parade(s) attendue(s) sur ${S} tirages des pistes, ses partenaires étant fixés.`;
+      raisons[j] = `${decrireCartes(p, pl, best.cs)} : la meilleure paire de cartes de ce joueur, ${f2(best.raw)} parade(s) attendue(s) sur ${S} tirages des pistes, ses partenaires étant fixés.`;
     }
     return raisons;
   }

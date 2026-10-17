@@ -258,6 +258,7 @@ Chaque Machine est une carte, avec son nom et son caractère (galerie façon *Ca
 
 #### ✦ Les cartes personnages à deux moitiés : 6 (8)
 Chaque peuple a un petit paquet de personnages (6 à 8). Chaque carte porte une moitié haute et une moitié basse, une par compartiment du peuple ; on choisit en orientant la carte à la programmation.
+*Ajout du 16 oct. 2026 (23 h 12, différé au Palier 5)* : **Cartes d'aide (« événements ») liées au peuple** — donner de nouvelles possibilités aux joueurs via des cartes en main propres à leur peuple qui peuvent les aider ponctuellement en cours de partie.
 
 #### Le piège comme action commune : 6 (6)
 Première revue : réserve sur le piège comme mode d'action unique (6-7). Forme proposée : tous les peuples peuvent piéger (lianes, troncs, boue) et neutraliser un organe au choix, mais seulement en alliance, et bruyamment. Les peuples spécialistes ont leurs propres manières.
