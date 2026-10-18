@@ -49,6 +49,12 @@ Documents à lire avant de travailler : `README.md` (carte du dépôt), `docs/re
     -H "Accept: application/vnd.github.raw" > synthese.json
   ```
 - **Limites GitHub** : 20 tâches à la fois ; 6 h au plus par lot. Les campagnes « placement » sont courtes (1 à 15 min sur 20 lots).
+- **Campagnes intensives sur VM Cloud OCI** : pour les campagnes de grande échelle sans contrainte de quota GitHub, une VM haute performance est disponible sur Oracle Cloud (`141.145.218.127`, guide complet : [docs/infrastructure_calcul.md](docs/infrastructure_calcul.md)).
+  ```bash
+  ssh -i "C:\Users\antoi\Documents\Projet Jeu\ssh-key-2026-10-18.key" opc@141.145.218.127
+  tmux new -s calcul
+  python3 -m placement.campagne campagnes/<plan>.json --sortie res_vm/ --processus $(nproc)
+  ```
 - **Maquettes jouables** : modifier les sources de `maquettes-numeriques/<kit|pistes>/`, lancer leur test, reconstruire (`python3 maquettes-numeriques/<…>/construire.py`), puis republier le fichier HTML à la même adresse d'artefact. Les parties jouées par l'auteur sont enregistrées dans la base de l'artefact (`parties`, `series`, `index`).
 
 ## 4. Étape suivante

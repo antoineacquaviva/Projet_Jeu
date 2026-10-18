@@ -15,6 +15,7 @@ projet/                  Documents de conception (à lire en premier)
   4-bilans/                Les études du modèle « placement »
   5-visuels/               Méthode de production des visuels
 docs/regles_placement.md Les règles du modèle « placement » (P1 à P6, et la couronne)
+docs/infrastructure_calcul.md Guide et accès à la VM de calcul Oracle Cloud (OCI)
 placement/               Le moteur Python du modèle « placement » : règles, bots, campagnes, analyse
 maquettes-numeriques/    Les maquettes jouables en JavaScript
   kit/                     « Forêt en couronne » : le kit par joueur, de 2 à 6 joueurs
@@ -38,6 +39,7 @@ archive/                 Le jeu complet V0.1 à V0.4 (moteur foret, plans, bilan
 | [Étude 1 du modèle « placement »](projet/4-bilans/placement-etude-1.md) | Viable par construction ; intéressant dans une zone étroite ; m = n le plus profond |
 | [Étude 2 : le kit par joueur](projet/4-bilans/placement-etude-2-kit.md) | La couronne règle le placement ; le réglage robuste de 2 à 6 joueurs |
 | [Diviser le Gentil : 1 à 6 joueurs](projet/3-pilotage/nombre-de-joueurs-pistes.md) | Pistes structurelles pour le nombre de joueurs, et sondes chiffrées |
+| [Infrastructure de calcul VM Cloud](docs/infrastructure_calcul.md) | Fiche technique, accès SSH et commandes d'exécution sur la VM OCI |
 | **Le jeu visé et ses principes** | |
 | [Synthèse des idées](projet/1-idees/synthese-des-idees.md) | Toutes les idées du jeu, notées par l'auteur (11 oct.) |
 | [Mécanique du Méchant](projet/1-idees/mecanique-du-mechant.md) et [Dynamique d'ensemble](projet/1-idees/dynamique-d-ensemble.md) | La machine qui apprend ; le rythme de la bataille, le Méchant qui rêve (10 oct.) |
