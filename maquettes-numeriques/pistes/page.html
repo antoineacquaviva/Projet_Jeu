@@ -3,16 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Couronne aux deux pistes — La Forêt qui rêve</title>
+<title>La Forêt qui rêve — Couronne aux deux pistes &amp; Attaques Croisées (1B)</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;1,400&family=Alegreya+Sans:wght@500;600;700;800&family=Young+Serif&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;0,700;1,400&family=Alegreya+Sans:wght@500;600;700;800&family=Young+Serif&display=swap">
 <style>
 :root{
-  --bg:#E6ECE2; --panel:#F4F7F0; --card:#FFFFFF; --ink:#162019; --muted:#526056; --line:#C5D0C1;
-  --felt:#243D2D; --felt-ink:#EAF2EC; --accent:#286640; --accent-bg:#D6E8DA;
-  --machine:#E5AB12; --machine-ink:#261F04; --danger:#B83326; --danger-bg:#F8DFDA; --ok:#267845; --ok-bg:#D6EFE0; --warn-bg:#F6E7C8;
+  --bg:#DCE4D8; --panel:#EFF4EC; --card:#FFFFFF; --ink:#152018; --muted:#4E5E52; --line:#BDD0B8;
+  --felt:#1E3626; --felt-deep:#15281B; --felt-line:#2F523B; --felt-ink:#EAF2EC;
+  --wood:#4A321F; --wood-light:#6E4B30; --parchment:#FBF7EC; --parchment-line:#D8C9A3;
+  --hud-bg:#F4F7F9; --hud-card:#FFFFFF; --hud-line:#CBD5E1; --hud-accent:#1D4ED8; --hud-accent-bg:#DBEAFE;
+  --accent:#24633D; --accent-bg:#D3E8D8;
+  --machine:#E5AB12; --machine-ink:#241D03; --danger:#B83225; --danger-bg:#F9DFDA; --ok:#237542; --ok-bg:#D4EFE0; --warn-bg:#F8E7C2;
+  --phys-bg:#FEF6E4; --phys-line:#E2B96B; --phys-ink:#5C3D08;
   --f0:#DFD3C0; --f1:#CBE0C4; --f2:#B0CFA7; --f3:#8EBC84; --f4:#6AA361; --f5:#4B8945; --heart:#376B3F; --cell-line:#6D8C68;
   --t-cup:#E5BF42; --t-opp:#78C2B7; --t-rep:#E48873; --t-per:#EE9F4E;
   --j1:#2874B2; --j2:#B83E35; --j3:#754EA8; --j4:#C4840E; --j5:#268872; --j6:#85542E;
@@ -22,59 +26,119 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0F1511; --panel:#161F19; --card:#1C271F; --ink:#E3ECE4; --muted:#98A89B; --line:#2E3E33;
-    --felt:#192A1E; --felt-ink:#DCE8DE; --accent:#76C292; --accent-bg:#1C3224;
+    --bg:#0D130F; --panel:#141E17; --card:#1B261E; --ink:#E4EDE5; --muted:#97A89A; --line:#2B3C30;
+    --felt:#132418; --felt-deep:#0C1810; --felt-line:#284632; --felt-ink:#DCE8DE;
+    --wood:#3A2617; --wood-light:#593C25; --parchment:#25221B; --parchment-line:#4A4232;
+    --hud-bg:#111822; --hud-card:#182230; --hud-line:#2B3B4E; --hud-accent:#60A5FA; --hud-accent-bg:#1E3A5F;
+    --accent:#72C490; --accent-bg:#193122;
     --machine:#EAB825; --machine-ink:#221B04; --danger:#F08878; --danger-bg:#3D201B; --ok:#74C690; --ok-bg:#1B3525; --warn-bg:#382A10;
+    --phys-bg:#2A2111; --phys-line:#78581E; --phys-ink:#F5D896;
     --f0:#3A3228; --f1:#233528; --f2:#2A4431; --f3:#32553A; --f4:#3B6944; --f5:#457C4F; --heart:#589660; --cell-line:#4C6852;
     --j1:#68ACE4; --j2:#EE8878; --j3:#B298E8; --j4:#EAB64B; --j5:#68CCB2; --j6:#CA9A72;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0F1511; --panel:#161F19; --card:#1C271F; --ink:#E3ECE4; --muted:#98A89B; --line:#2E3E33;
-  --felt:#192A1E; --felt-ink:#DCE8DE; --accent:#76C292; --accent-bg:#1C3224;
+  --bg:#0D130F; --panel:#141E17; --card:#1B261E; --ink:#E4EDE5; --muted:#97A89A; --line:#2B3C30;
+  --felt:#132418; --felt-deep:#0C1810; --felt-line:#284632; --felt-ink:#DCE8DE;
+  --wood:#3A2617; --wood-light:#593C25; --parchment:#25221B; --parchment-line:#4A4232;
+  --hud-bg:#111822; --hud-card:#182230; --hud-line:#2B3B4E; --hud-accent:#60A5FA; --hud-accent-bg:#1E3A5F;
+  --accent:#72C490; --accent-bg:#193122;
   --machine:#EAB825; --machine-ink:#221B04; --danger:#F08878; --danger-bg:#3D201B; --ok:#74C690; --ok-bg:#1B3525; --warn-bg:#382A10;
+  --phys-bg:#2A2111; --phys-line:#78581E; --phys-ink:#F5D896;
   --f0:#3A3228; --f1:#233528; --f2:#2A4431; --f3:#32553A; --f4:#3B6944; --f5:#457C4F; --heart:#589660; --cell-line:#4C6852;
   --j1:#68ACE4; --j2:#EE8878; --j3:#B298E8; --j4:#EAB64B; --j5:#68CCB2; --j6:#CA9A72;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font:16px/1.48 var(--f-body);margin:0;padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body{background:var(--bg);color:var(--ink);font:16px/1.48 var(--f-body);margin:0;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));padding-block:0 48px}
 button,select,input{font:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:1440px;margin:0 auto}
+.wrap{max-width:1520px;margin:0 auto}
 h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;line-height:1.15;text-wrap:balance}
 .num{font-variant-numeric:tabular-nums}
 
-/* En-tête et navigation */
-.head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 18px;padding-block:14px 8px}
-.head-title{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
-.head h1{font-size:clamp(22px,2.6vw,31px)}
-.head .sub{font:600 13.5px/1.35 var(--f-ui);color:var(--muted);margin:0}
-.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:12;background:var(--bg);display:flex;flex-wrap:wrap;gap:4px;border-bottom:1.5px solid var(--line);padding-block:5px;align-items:center}
-.tabs button[role="tab"]{font:800 13.5px var(--f-ui);letter-spacing:.03em;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:6px 11px;cursor:pointer;border-radius:6px 6px 0 0}
-.tabs button[role="tab"][aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);background:var(--panel)}
-.status{margin-left:auto;font:700 13.5px var(--f-ui);color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+/* ============================================================================
+   BARRE SUPÉRIEURE FAÇON BGA (Navigation + Statut + Outils Didactiques)
+   ============================================================================ */
+.bga-topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:25;background:var(--card);border-bottom:2px solid var(--line);box-shadow:0 3px 14px rgba(0,0,0,.08);margin-inline:calc(-1 * max(12px,env(safe-area-inset-left,0px)));padding:6px max(14px,env(safe-area-inset-left,0px))}
+.bga-topbar-inner{max-width:1520px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{width:34px;height:34px;border-radius:9px;background:var(--felt);color:#fff;display:grid;place-items:center;font-size:19px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.2)}
+.brand h1{font-size:clamp(17px,1.8vw,22px)}
+.brand .sub{font:600 12px/1.2 var(--f-ui);color:var(--muted);margin:0}
+
+.tabs{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.tabs button[role="tab"]{font:800 13px var(--f-ui);letter-spacing:.02em;background:none;border:1.5px solid transparent;color:var(--muted);padding:5px 11px;cursor:pointer;border-radius:8px;transition:all .15s}
+.tabs button[role="tab"]:hover{color:var(--ink);background:var(--panel)}
+.tabs button[role="tab"][aria-selected="true"]{color:var(--accent);border-color:var(--accent);background:var(--accent-bg)}
+
+.top-tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tool-btn{font:800 12px var(--f-ui);background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:4px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.tool-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.tool-btn.phys-toggle[aria-pressed="true"]{background:var(--phys-bg);border-color:var(--phys-line);color:var(--phys-ink)}
+.tool-btn.demo-btn{background:var(--hud-accent-bg);border-color:var(--hud-accent);color:var(--hud-accent)}
+
+.status{font:700 12.5px var(--f-ui);color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .status b{color:var(--ink)}
-.pill-stat{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;display:inline-flex;align-items:center;gap:5px}
-section[role="tabpanel"]{padding-top:12px}
+.pill-stat{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 9px;display:inline-block}
 
-/* Grille principale : Plateau + Pistes à gauche, Contrôles + Joueurs + Journal à droite */
-.table{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(360px,.95fr);gap:16px;align-items:start}
-@media (max-width:1040px){.table{grid-template-columns:minmax(0,1fr)}}
+/* ============================================================================
+   BANDEAU D'ÉTAT BGA & FIL D'ARIANE DES PHASES DU TOUR
+   ============================================================================ */
+.bga-phasebar{margin-top:10px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:8px 14px;display:grid;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.phase-steps{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;font:800 11.5px var(--f-ui)}
+.ph-step{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;color:var(--muted);background:var(--panel);border:1px solid transparent}
+.ph-step.done{color:var(--ok);background:var(--ok-bg);border-color:var(--ok)}
+.ph-step.active{color:#fff;background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-bg)}
+.ph-arrow{color:var(--muted);font-size:11px;opacity:.6}
 
-/* Barre d'outils visuelle du plateau */
-.board{background:var(--panel);border:1.5px solid var(--line);border-radius:16px;padding:10px 12px;display:grid;gap:8px;min-width:0;position:relative;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.bga-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;padding-top:4px;border-top:1px dashed var(--line)}
+.bga-banner-msg{font:700 14.5px/1.38 var(--f-ui);color:var(--ink);display:block}
+
+/* Encart discret « Matérialisation sur le jeu physique » */
+.phys-note{background:var(--phys-bg);border:1.5px solid var(--phys-line);color:var(--phys-ink);border-radius:10px;padding:6px 11px;font:600 12.5px/1.4 var(--f-ui);display:block}
+.phys-note > div{display:inline}
+.phys-note[hidden]{display:none!important}
+.phys-note b{font-weight:800}
+.phys-badge{display:inline-flex;align-items:center;gap:4px;font:800 10px var(--f-ui);letter-spacing:.06em;text-transform:uppercase;background:var(--phys-bg);color:var(--phys-ink);border:1px solid var(--phys-line);border-radius:999px;padding:2px 7px;white-space:nowrap}
+
+/* ============================================================================
+   BANNIÈRE DU MODE « PARTIE EXEMPLE DÉROULÉE PAS-À-PAS »
+   ============================================================================ */
+.walkthrough-bar{margin-top:10px;background:linear-gradient(135deg,var(--hud-accent-bg),var(--card));border:2px solid var(--hud-accent);border-radius:14px;padding:10px 14px;display:grid;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.walkthrough-bar[hidden]{display:none!important}
+.wt-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.wt-title{font:800 14.5px var(--f-ui);color:var(--hud-accent);display:flex;align-items:center;gap:8px}
+.wt-body{font:500 14px/1.45 var(--f-ui);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+
+/* ============================================================================
+   GRILLE PRINCIPALE : MONDE 1 (TABLE PHYSIQUE) vs MONDE 2 (HUD NUMÉRIQUE BGA)
+   ============================================================================ */
+section[role="tabpanel"]{padding-top:10px}
+.table{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(380px,.95fr);gap:16px;align-items:start}
+@media (max-width:1080px){.table{grid-template-columns:minmax(0,1fr)}}
+
+/* MONDE 1 : LE TAPIS DE TABLE PHYSIQUE (Ce qui est dans la boîte de jeu) */
+.physical-table{background:radial-gradient(circle at 50% 35%, var(--felt) 0%, var(--felt-deep) 100%);border:4px solid var(--wood);outline:1.5px solid var(--wood-light);border-radius:20px;padding:12px 14px;display:grid;gap:12px;color:var(--felt-ink);box-shadow:0 8px 28px rgba(0,0,0,.18), inset 0 0 24px rgba(0,0,0,.28);min-width:0}
+.world-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--felt-line);padding-bottom:6px}
+.world-badge{display:inline-flex;align-items:center;gap:6px;font:800 11px var(--f-ui);letter-spacing:.09em;text-transform:uppercase;padding:3px 10px;border-radius:999px}
+.world-badge.table-tag{background:var(--wood);color:#FDE68A;border:1px solid var(--wood-light)}
+.world-badge.hud-tag{background:var(--hud-accent-bg);color:var(--hud-accent);border:1px solid var(--hud-accent)}
+.world-sub{font:600 12px var(--f-ui);opacity:.85}
+
+/* Composant Physique 1 : Le Plateau en Couronne */
+.board{background:var(--panel);color:var(--ink);border:2px solid var(--parchment-line);border-radius:15px;padding:10px 12px;display:grid;gap:8px;min-width:0;position:relative;box-shadow:0 4px 14px rgba(0,0,0,.2)}
 .board-bar{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;justify-content:space-between;font:700 12.5px var(--f-ui)}
 .board-toggles{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .tbtn{font:700 12px var(--f-ui);background:var(--card);color:var(--muted);border:1.5px solid var(--line);border-radius:999px;padding:4px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
 .tbtn:hover{border-color:var(--accent);color:var(--ink)}
 .tbtn[aria-pressed="true"]{background:var(--accent-bg);color:var(--accent);border-color:var(--accent);font-weight:800}
 .board-stage{position:relative;display:grid;place-items:center}
-.board svg#plateau{width:100%;height:auto;display:block;max-height:58vh;user-select:none}
+.board svg#plateau{width:100%;height:auto;display:block;max-height:48vh;user-select:none}
 
-/* Menu flottant sur case (quand on clique un pion ou une case sur le plateau) */
-.pop-menu{position:absolute;z-index:15;background:var(--card);border:2px solid var(--accent);border-radius:12px;padding:8px 10px;box-shadow:0 8px 24px rgba(0,0,0,.22);display:grid;gap:6px;min-width:190px;max-width:260px;font:700 13px var(--f-ui);pointer-events:auto}
+/* Menu flottant sur case */
+.pop-menu{position:absolute;z-index:20;background:var(--card);border:2px solid var(--accent);border-radius:12px;padding:8px 10px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:grid;gap:6px;min-width:195px;max-width:270px;font:700 13px var(--f-ui);pointer-events:auto}
 .pop-menu[hidden]{display:none!important}
 .pop-menu .pm-head{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding-bottom:4px;font-size:12px;color:var(--muted)}
 .pop-menu .pm-close{background:none;border:0;font-size:15px;cursor:pointer;color:var(--muted);padding:0 4px}
@@ -82,12 +146,10 @@ section[role="tabpanel"]{padding-top:12px}
 .pop-menu button.pm-act:hover{border-color:var(--accent);background:var(--accent-bg)}
 .pop-menu button.pm-act .val{font-weight:800;color:var(--danger);font-size:12px}
 
-/* Bandeau d'inspection au survol (Pistes <-> Plateau) */
-.inspect-bar{min-height:32px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:5px 10px;font:600 13px/1.35 var(--f-ui);color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inspect-bar{min-height:30px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font:600 12.5px/1.38 var(--f-ui);color:var(--muted);display:block}
 .inspect-bar b{color:var(--ink)}
 .inspect-bar.active{border-color:var(--accent);background:var(--accent-bg);color:var(--ink)}
 
-/* Légende sous le plateau */
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font:600 12px var(--f-ui);color:var(--muted);padding-inline:4px}
 .legend span{display:inline-flex;align-items:center;gap:5px}
 .legend i{display:inline-block;width:11px;height:11px;border-radius:3px}
@@ -98,11 +160,11 @@ section[role="tabpanel"]{padding-top:12px}
 .cell:hover{stroke:var(--ink);stroke-width:2}
 .cell.cand{stroke:var(--accent);stroke-width:3.2;stroke-dasharray:none;cursor:pointer}
 .cell.cand-move{stroke:var(--accent);stroke-width:2.8;stroke-dasharray:5 3;cursor:pointer}
-.cell.cible{stroke:var(--danger);stroke-width:4}
-.cell.pare{stroke:var(--ok);stroke-width:4}
-.cell.rayon-hl{stroke:var(--machine);stroke-width:2.6}
+.cell.cible{stroke:var(--danger);stroke-width:4.2}
+.cell.pare{stroke:var(--ok);stroke-width:4.2}
+.cell.rayon-hl{stroke:var(--machine);stroke-width:3;stroke-dasharray:4 2}
 .tile-sep{stroke:var(--ink);stroke-width:2.4;opacity:.5;pointer-events:none}
-.tile-arc{fill:none;stroke-width:6;opacity:.75; stroke-linecap:round;pointer-events:none}
+.tile-arc{fill:none;stroke-width:6;opacity:.78;stroke-linecap:round;pointer-events:none}
 .tile-name{font:800 12.5px var(--f-ui);letter-spacing:.05em;pointer-events:none}
 .ntree{font:800 11px var(--f-ui);fill:var(--ink);opacity:.92;pointer-events:none;paint-order:stroke;stroke:var(--panel);stroke-width:2.5px;stroke-linejoin:round}
 .cname{font:800 10.5px var(--f-ui);fill:var(--ink);opacity:.85;pointer-events:none;paint-order:stroke;stroke:var(--panel);stroke-width:2.5px;stroke-linejoin:round;transition:font-size .12s,opacity .12s}
@@ -117,7 +179,7 @@ section[role="tabpanel"]{padding-top:12px}
 .mach .m-tread{fill:var(--machine-ink);opacity:.82}
 .mach text{font:800 9.5px var(--f-ui);fill:var(--machine-ink);pointer-events:none}
 .mach:hover .m-body,.mach.hl .m-body{stroke:var(--danger);stroke-width:2.8;transform:scale(1.1)}
-.mach.actif .m-body{stroke:var(--danger);stroke-width:3.5;filter:drop-shadow(0 0 6px var(--danger))}
+.mach.actif .m-body{stroke:var(--danger);stroke-width:3.6;filter:drop-shadow(0 0 8px var(--danger));transform:scale(1.14)}
 .ind{cursor:pointer}
 .ind .i-halo{fill:none;stroke:transparent;stroke-width:3}
 .ind .i-body{stroke:var(--card);stroke-width:1.6;transition:transform .15s}
@@ -125,14 +187,15 @@ section[role="tabpanel"]{padding-top:12px}
 .ind.cliquable:hover .i-body{transform:scale(1.14)}
 .ind.sel .i-halo{stroke:var(--ink);stroke-dasharray:3 2}
 .ind.sel .i-body{stroke:var(--ink);stroke-width:2.5;transform:scale(1.14)}
-.ind-ghost{pointer-events:none;opacity:.55}
+.ind.focus-pion .i-halo{stroke:var(--machine);stroke-width:4}
+.ind.focus-pion .i-body{transform:scale(1.22)}
+.ind-ghost{pointer-events:none;opacity:.58}
 .ind-ghost circle{stroke-dasharray:3 2;stroke-width:1.5;stroke:var(--ink)}
 
-/* Badges de Garde et Sabotage sur le plateau */
 .badge-garde{pointer-events:none}
 .badge-sabot{pointer-events:none}
-.fleche{fill:none;stroke:var(--danger);stroke-width:2;stroke-dasharray:4 3;opacity:.85;pointer-events:none}
-.fleche.aller{stroke:var(--accent);stroke-width:2.4;stroke-dasharray:none;opacity:.92}
+.fleche{fill:none;stroke:var(--danger);stroke-width:2.4;stroke-dasharray:4 3;opacity:.9;pointer-events:none}
+.fleche.aller{stroke:var(--accent);stroke-width:2.6;stroke-dasharray:none;opacity:.94}
 .fleche.aller.deux{stroke-dasharray:5 3}
 #gIntentions{filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.45))}
 .fleche.intent{stroke-width:2.4;stroke-dasharray:4 2.5;opacity:.96}
@@ -140,154 +203,209 @@ section[role="tabpanel"]{padding-top:12px}
 .fleche.intent.percee{stroke:var(--t-per)}
 .fleche.intent.opportunisme{stroke:var(--t-opp)}
 .fleche.intent.represailles{stroke:var(--t-rep)}
-
-/* Encadré Chantier dans le SVG */
-.chantier-box{fill:var(--card);fill-opacity:.88;stroke:var(--line);stroke-width:1.5;rx:10}
+.chantier-box{fill:var(--card);fill-opacity:.9;stroke:var(--line);stroke-width:1.5;rx:10}
 .chantier-title{font:800 10px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;fill:var(--muted)}
 
-/* La tête du Méchant : Les deux pistes */
-.mech-box{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:10px;min-width:0}
+/* ============================================================================
+   COMPOSANT PHYSIQUE 2 : PIOCHES & TAPIS DES ATTAQUES CROISÉES 1B
+   ============================================================================ */
+.att1b-mat{background:rgba(0,0,0,.22);border:1.5px solid var(--felt-line);border-radius:14px;padding:10px 12px;display:grid;gap:8px}
+.att1b-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px}
+.att1b-title{font:800 12px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:#FDE68A;display:flex;align-items:center;gap:6px}
+.decks-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:rgba(0,0,0,.26);border:1px dashed var(--felt-line);border-radius:10px;padding:6px 10px;font:600 11.5px var(--f-ui);color:#DCE8DE}
+.deck-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:7px;font:800 11px var(--f-ui);border:1.5px solid rgba(255,255,255,.22);box-shadow:2px 2px 0 rgba(0,0,0,.35)}
+.deck-pill.d-mach{background:#5C4012;color:#FDE68A;border-color:#E5AB12}
+.deck-pill.d-tac{background:#1F3F2B;color:#BBF7D0;border-color:#4ADE80}
+.att1b-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.att-slot{background:rgba(255,255,255,.06);border:1.5px solid var(--felt-line);border-radius:12px;padding:8px 9px;display:grid;gap:6px;transition:all .2s}
+.att-slot.active-att{border-color:#FBBF24;background:rgba(251,191,36,.14);box-shadow:0 0 0 2px rgba(251,191,36,.35)}
+.att-slot.complete-att{border-color:#4ADE80}
+.att-slot-hdr{display:flex;justify-content:space-between;align-items:center;font:800 11.5px var(--f-ui);color:var(--felt-ink)}
+.att-cards-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+
+/* Vraies cartes physiques (Dos toilé vs Face Parchemin imprimée + Aide numérique) */
+.pcard{border-radius:9px;padding:6px 7px;min-height:70px;display:flex;flex-direction:column;justify-content:space-between;font:700 11px/1.2 var(--f-ui);position:relative;transition:transform .25s,box-shadow .2s;cursor:pointer;user-select:none}
+.pcard:hover{transform:translateY(-2px)}
+.pcard.face-up{background:var(--parchment);color:var(--ink);border:2px solid var(--parchment-line);box-shadow:0 3px 8px rgba(0,0,0,.25)}
+.pcard.face-secret{background:var(--parchment);color:var(--ink);border:2px dashed #F59E0B;box-shadow:0 3px 8px rgba(0,0,0,.25)}
+.pcard.face-down{background:repeating-linear-gradient(45deg,#243B2C,#243B2C 6px,#1B2E22 6px,#1B2E22 12px);color:#CBE3D2;border:2px solid #4A6B55;box-shadow:inset 0 0 0 2px rgba(255,255,255,.08)}
+.pcard.face-down.mach-back{background:repeating-linear-gradient(45deg,#3D2C10,#3D2C10 6px,#2B1E0A 6px,#2B1E0A 12px);border-color:#9A7025;color:#FDE68A}
+.pcard .pc-top{display:flex;justify-content:space-between;align-items:center;gap:4px;font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;opacity:.88}
+.pcard .pc-printed{font:800 13px/1.15 var(--f-ui);margin-top:3px;color:inherit}
+.pcard .pc-lookup{font:700 11px/1.2 var(--f-ui);margin-top:3px;padding:2px 5px;border-radius:5px;background:rgba(36,99,61,.11);color:var(--accent);border:1px solid rgba(36,99,61,.22)}
+.pcard .pc-main{font:800 12px/1.15 var(--f-ui);margin-block:3px}
+.pcard .pc-sub{font-size:10px;opacity:.82}
+.pcard-tag{display:inline-block;padding:1px 5px;border-radius:4px;font-size:9px;font-weight:800}
+.pcard-tag.pub{background:var(--ok-bg);color:var(--ok)}
+.pcard-tag.sec{background:#FEF3C7;color:#92400E}
+.pcard-tag.hid{background:rgba(0,0,0,.35);color:#DCE8DE}
+.att-deduction{font:600 11px/1.25 var(--f-ui);color:#DCE8DE;background:rgba(0,0,0,.28);border-radius:7px;padding:4px 7px}
+.att-deduction b{color:#FDE68A}
+
+/* ============================================================================
+   COMPOSANT PHYSIQUE 3 : PLATEAU DES 2 PISTES PUBLIQUES DU MÉCHANT
+   ============================================================================ */
+.mech-box{background:var(--parchment);color:var(--ink);border:2px solid var(--parchment-line);border-radius:15px;padding:10px 12px;display:grid;gap:9px;min-width:0;box-shadow:0 4px 12px rgba(0,0,0,.18)}
 .mech-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
-.mech{display:grid;gap:10px;min-width:0}
-.trk-sec{display:grid;gap:5px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.mech{display:grid;gap:9px;min-width:0}
+.trk-sec{display:grid;gap:5px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:7px 9px}
 .trk-h{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;justify-content:space-between}
-.trk-sens-bar{display:flex;justify-content:space-between;align-items:center;font:700 11px var(--f-ui);color:var(--muted);background:var(--card);border-radius:6px;padding:2px 8px;border:1px solid var(--line)}
+.trk-sens-bar{display:flex;justify-content:space-between;align-items:center;font:700 10.5px var(--f-ui);color:var(--muted);background:var(--card);border-radius:6px;padding:2px 8px;border:1px solid var(--line)}
 .trk-sens-bar .s-ok{color:var(--danger)}
 .trk-sens-bar .s-par{color:var(--ok)}
 .track{display:grid;gap:4px;min-width:0}
 .trk-p{grid-template-columns:repeat(11,minmax(0,1fr));align-items:end}
 .trk-m{grid-template-columns:repeat(6,minmax(0,1fr))}
 .tc{border:1.5px solid var(--line);border-radius:9px;background:var(--card);padding:5px 3px;display:grid;gap:3px;justify-items:center;align-content:start;text-align:center;min-width:0;transition:all .2s;cursor:pointer;position:relative}
-.tc:hover,.tc.hl{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,.1)}
+.tc:hover,.tc.hl{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,.12)}
 .tc.dim{opacity:.32;filter:grayscale(.4)}
 .tc.sept{border-color:var(--felt);border-width:2px;background:var(--accent-bg)}
-.tc .n{font:800 12.5px/1 var(--f-ui)}
-.tc .ch,.tc .lieu,.tc .agit{font:600 10.5px/1.15 var(--f-ui);color:var(--muted)}
+.tc .n{font:800 12px/1 var(--f-ui)}
+.tc .ch,.tc .lieu,.tc .agit{font:600 10px/1.15 var(--f-ui);color:var(--muted)}
 .tc .lieu.on-board{color:var(--ink);font-weight:700;background:var(--panel);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
 .tc .agit{color:var(--danger);font-weight:800}
-.tc .mn{font:800 11px/1.15 var(--f-ui);color:var(--ink);overflow-wrap:anywhere}
-.tc.vise{border-color:var(--danger);box-shadow:0 0 0 2.5px var(--danger);transform:translateY(-2px)}
-.tc.bouge{background:var(--warn-bg);border-color:var(--machine)}
-.tc .swap-arrow{font:800 10px var(--f-ui);color:var(--danger);background:var(--danger-bg);border-radius:4px;padding:0 4px}
+.tc .mn{font:800 10.5px/1.15 var(--f-ui);color:var(--ink);overflow-wrap:anywhere}
+.tc.vise{border-color:var(--danger);box-shadow:0 0 0 3px var(--danger);transform:translateY(-3px);z-index:2}
+.tc.bouge{background:var(--warn-bg);border-color:var(--machine);box-shadow:0 0 0 2.5px var(--machine)}
+.tc .swap-arrow{font:800 10px var(--f-ui);color:var(--danger);background:var(--danger-bg);border-radius:4px;padding:1px 4px}
 .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:32px;min-height:8px}
 .dots i{width:4px;height:4px;border-radius:50%;background:var(--ink);opacity:.72}
-.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;border-radius:6px;padding:4px 2px;font:800 10.5px/1.1 var(--f-ui);color:#1D231F;gap:1px;border:1px solid rgba(0,0,0,.12)}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;border-radius:6px;padding:4px 2px;font:800 10px/1.1 var(--f-ui);color:#1D231F;gap:1px;border:1px solid rgba(0,0,0,.15);box-shadow:0 1px 2px rgba(0,0,0,.1)}
 .tile .t-ico{font-size:12px;line-height:1}
 .tile.cupidite,.pbar .cupidite,.pyr-c.cupidite{background:var(--t-cup)}
 .tile.percee,.pbar .percee,.pyr-c.percee{background:var(--t-per)}
 .tile.opportunisme,.pbar .opportunisme,.pyr-c.opportunisme{background:var(--t-opp)}
 .tile.represailles,.pbar .represailles,.pyr-c.represailles{background:var(--t-rep)}
-.mtag{display:inline-flex;align-items:center;justify-content:center;gap:3px;min-width:34px;height:22px;border-radius:6px;background:var(--machine);color:var(--machine-ink);font:800 11.5px var(--f-ui);padding-inline:5px;border:1px solid rgba(0,0,0,.2)}
+.mtag{display:inline-flex;align-items:center;justify-content:center;gap:3px;min-width:34px;height:21px;border-radius:6px;background:var(--machine);color:var(--machine-ink);font:800 11px var(--f-ui);padding-inline:5px;border:1px solid rgba(0,0,0,.2)}
 .mtag.off{background:transparent;color:var(--muted);border:1.5px dashed var(--muted)}
-.pbar{display:flex;width:100%;height:8px;border-radius:4px;overflow:hidden;gap:1px;border:1px solid rgba(0,0,0,.1)}
-.tleg{display:flex;flex-wrap:wrap;gap:5px 12px;align-items:center;font:600 12px var(--f-ui);color:var(--muted)}
+.pbar{display:flex;width:100%;height:7px;border-radius:4px;overflow:hidden;gap:1px;border:1px solid rgba(0,0,0,.1)}
+.tleg{display:flex;flex-wrap:wrap;gap:5px 12px;align-items:center;font:600 11.5px var(--f-ui);color:var(--muted)}
 .tleg .tile{display:inline-flex;flex-direction:row;width:auto;padding:2px 7px;gap:4px}
 
-/* Matrice / Pyramide croisée Somme x Écart */
 .pyr-box{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px}
-.pyr-grid{display:grid;grid-template-columns:110px repeat(11,minmax(32px,1fr));gap:3px;font:700 11px var(--f-ui);min-width:520px;align-items:center}
+.pyr-grid{display:grid;grid-template-columns:110px repeat(11,minmax(30px,1fr));gap:3px;font:700 11px var(--f-ui);min-width:500px;align-items:center}
 .pyr-grid .ph{text-align:center;font-weight:800;padding:2px;color:var(--muted)}
 .pyr-grid .pm{display:flex;align-items:center;gap:5px;padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:5px;cursor:pointer}
 .pyr-grid .pm:hover{background:var(--accent-bg)}
 .pyr-c{height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font:800 10px var(--f-ui);color:#1D231F;border:1px solid rgba(0,0,0,.12)}
 .pyr-empty{height:22px;border-radius:4px;background:rgba(128,128,128,.07)}
 
-/* Présage et dernier lancer */
-.presage,.dernier{border-top:1px solid var(--line);padding-top:8px;display:grid;gap:6px}
-.dernier{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font:600 14px var(--f-ui);background:var(--warn-bg);padding:8px 10px;border-radius:10px;border:1px solid var(--machine)}
-.dl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
-.dp{display:inline-flex;gap:4px;align-items:center;background:var(--card);padding:3px 7px;border-radius:8px;border:1px solid var(--line)}
 .die{display:inline-grid;grid-template:repeat(3,1fr)/repeat(3,1fr);width:24px;height:24px;border:1.5px solid var(--ink);border-radius:5px;padding:2px;background:var(--card);vertical-align:middle;box-shadow:0 1px 2px rgba(0,0,0,.15)}
 .die i{width:4px;height:4px;border-radius:50%;background:var(--ink);place-self:center}
 .die.roll{animation:dieroll .35s ease}
 @keyframes dieroll{0%{transform:rotate(-18deg) scale(.85)}50%{transform:rotate(14deg) scale(1.12)}100%{transform:rotate(0) scale(1)}}
 
-/* Colonne de droite : Boîte de décision (Cartes, Vagues), Table, Journal */
-.side{display:grid;gap:12px;min-width:0}
-.box{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:10px;min-width:0;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+/* ============================================================================
+   MONDE 2 : COLONNE DROITE — L'ASSISTANT NUMÉRIQUE & CONTEXTE (Hors boîte, BGA)
+   ============================================================================ */
+.hud-side{background:var(--hud-bg);border:2px solid var(--hud-line);border-radius:20px;padding:12px 14px;display:grid;gap:12px;min-width:0;box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.box{background:var(--hud-card);border:1.5px solid var(--hud-line);border-radius:14px;padding:13px 15px;display:grid;gap:10px;min-width:0;box-shadow:0 2px 6px rgba(0,0,0,.03)}
 .box.ask{border-color:var(--accent);border-width:2px}
-.box h2{font-size:20px}
-.eyebrow{font:800 11.5px var(--f-ui);letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
-.ctx{font:500 14px/1.42 var(--f-ui);color:var(--muted);margin:0}
+.box h2{font-size:19px}
+.eyebrow{font:800 11px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ctx{font:500 13.5px/1.44 var(--f-ui);color:var(--muted);margin:0}
 .ctx b{color:var(--ink)}
-.btn{font:800 14px var(--f-ui);border-radius:9px;padding:8px 14px;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent);color:var(--card);transition:transform .1s,opacity .15s}
-.btn:hover:not(:disabled){filter:brightness(1.06)}
+.btn{font:800 13.5px var(--f-ui);border-radius:9px;padding:7px 13px;cursor:pointer;border:1.5px solid var(--accent);background:var(--accent);color:#fff;transition:transform .1s,opacity .15s}
+.btn:hover:not(:disabled){filter:brightness(1.07)}
 .btn.sec{background:transparent;color:var(--accent)}
 .btn.warn{border-color:var(--danger);background:var(--danger);color:#fff}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-.btn-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn-row{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+
+/* Cartes de choix d'indice 1B (Phase 1) */
+.clue-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.clue-card{background:var(--parchment);border:2px solid var(--parchment-line);border-radius:12px;padding:10px 12px;display:grid;gap:6px;text-align:left;cursor:pointer;transition:all .16s;position:relative}
+.clue-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.clue-card.selected{border-color:var(--accent);border-width:2.5px;box-shadow:0 0 0 3px var(--accent-bg)}
+.clue-card .cc-head{display:flex;justify-content:space-between;align-items:center;font:800 11px var(--f-ui);color:var(--muted)}
+.clue-card .cc-main{font:800 15px/1.2 var(--f-ui);color:var(--ink)}
+.clue-card .cc-why{font:500 12px/1.35 var(--f-ui);color:var(--muted);border-top:1px dashed var(--line);padding-top:5px}
 
 /* Vraies cartes de programmation Étape 1 & Étape 2 */
 .slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.slot{display:grid;gap:5px;text-align:left;font:700 13.5px var(--f-ui);background:var(--panel);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;position:relative;transition:all .15s}
+.slot{display:grid;gap:4px;text-align:left;font:700 13px var(--f-ui);background:var(--parchment);color:var(--ink);border:2px solid var(--parchment-line);border-radius:12px;padding:9px 11px;cursor:pointer;position:relative;transition:all .15s}
 .slot:hover{border-color:var(--accent)}
-.slot.on{border-color:var(--accent);background:var(--card);box-shadow:0 4px 12px rgba(0,0,0,.08)}
-.slot .sl-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--card);font:800 11px var(--f-ui);margin-right:5px}
-.slot .sl-ord{font:800 14.5px/1.25 var(--f-ui);color:var(--ink);display:flex;align-items:center;gap:6px;margin-top:2px}
-.slot .sl-sub{font:600 12px var(--f-ui);color:var(--muted)}
+.slot.on{border-color:var(--accent);border-width:2.5px;background:var(--card);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.slot .sl-badge{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--accent);color:#fff;font:800 11px var(--f-ui);margin-right:5px}
+.slot .sl-ord{font:800 14px/1.2 var(--f-ui);color:var(--ink);display:flex;align-items:center;gap:6px;margin-top:2px}
+.slot .sl-sub{font:600 11.5px var(--f-ui);color:var(--muted)}
 
 /* Lignes d'individus et boutons d'ordres */
 .ind-cards{display:grid;gap:7px}
 .indrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px;align-items:start;padding:8px 10px;border:1.5px solid var(--line);border-radius:11px;background:var(--panel);transition:border-color .15s}
 .indrow.sel{border-color:var(--ink);background:var(--card)}
-.pion{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font:800 12px var(--f-ui);color:var(--card);cursor:pointer;border:2px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.opt{font:700 13px var(--f-ui);background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:5px 9px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .12s}
+.pion{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font:800 12px var(--f-ui);color:#fff;cursor:pointer;border:2px solid var(--card);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.opt{font:700 12.5px var(--f-ui);background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .12s}
 .opt:hover{border-color:var(--accent);transform:translateY(-1px)}
 .opt[aria-pressed="true"]{background:var(--felt);color:var(--felt-ink);border-color:var(--felt)}
 .opt.k-garder{border-left:4px solid var(--ok)}
 .opt.k-saboter{border-left:4px solid var(--machine)}
 .opt.k-aller{border-left:4px solid var(--accent)}
-.opt .val{margin-left:4px;font-weight:800;color:var(--danger);font-size:12px}
+.opt .val{margin-left:3px;font-weight:800;color:var(--danger);font-size:11.5px}
 .opt[aria-pressed="true"] .val{color:#FFD1C9}
-.small{font:500 12.5px/1.4 var(--f-ui);color:var(--muted)}
-.hint{font:500 13.5px/1.42 var(--f-ui);background:var(--accent-bg);border-radius:9px;padding:8px 11px}
+.small{font:500 12px/1.38 var(--f-ui);color:var(--muted)}
+.hint{font:500 13px/1.4 var(--f-ui);background:var(--accent-bg);border-radius:9px;padding:8px 11px}
 .hint.warn{background:var(--warn-bg)}
 
-/* Résumé de vague animée */
-.vague-stage{background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:8px}
-.vague-pips{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.v-pip{padding:3px 9px;border-radius:999px;font:800 11.5px var(--f-ui);border:1.5px solid var(--line);background:var(--card);color:var(--muted)}
+/* ============================================================================
+   CONTRÔLEUR DIDACTIQUE DE RÉSOLUTION DÉCOMPOSÉE (4 TEMPS PAR ATTAQUE)
+   ============================================================================ */
+.didactic-box{background:var(--panel);border:2px solid var(--accent);border-radius:12px;padding:10px 12px;display:grid;gap:8px}
+.didactic-steps-bar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.d-substep{font:800 10.5px var(--f-ui);text-align:center;padding:4px 4px;border-radius:6px;background:var(--card);color:var(--muted);border:1px solid var(--line)}
+.d-substep.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.d-substep.done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+.didactic-focus-card{background:var(--card);border-left:4px solid var(--accent);border-radius:8px;padding:9px 11px;display:block;font:500 13.5px/1.45 var(--f-ui)}
+.didactic-focus-card.danger{border-left-color:var(--danger)}
+.didactic-focus-card.ok{border-left-color:var(--ok)}
+.didactic-why-table{width:100%;border-collapse:collapse;font:600 11.5px var(--f-ui);margin-top:4px}
+.didactic-why-table th,.didactic-why-table td{padding:3px 6px;border-bottom:1px solid var(--line);text-align:left}
+.didactic-why-table tr.winner{background:var(--warn-bg);font-weight:800}
+
+.vague-pips{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.v-pip{padding:3px 8px;border-radius:999px;font:800 11px var(--f-ui);border:1.5px solid var(--line);background:var(--card);color:var(--muted);cursor:pointer}
 .v-pip.cur{border-color:var(--danger);color:var(--ink);background:var(--warn-bg)}
 .v-pip.pare{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
 .v-pip.abattu{border-color:var(--danger);background:var(--danger-bg);color:var(--danger)}
 
-/* Joueurs autour de la table */
+/* Panneaux Joueurs façon BGA */
 .players{display:grid;gap:6px}
-.pl{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;font:600 13.5px var(--f-ui);padding:6px 8px;border-radius:9px;background:var(--panel);border:1px solid transparent}
+.pl{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;font:600 13px var(--f-ui);padding:7px 9px;border-radius:10px;background:var(--panel);border:1.5px solid var(--line)}
 .pl.actif{background:var(--accent-bg);border-color:var(--accent)}
 .pl .dot{width:14px;height:14px;border-radius:50%}
-.pl .who{color:var(--muted);font-weight:600;font-size:12px}
-.pl .ord{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}
-.pl .c-pill{font:700 12px var(--f-ui);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--ink)}
-.pl .c-pill.cache{opacity:.5;font-style:italic;border-style:dashed}
+.pl .who{color:var(--muted);font-weight:600;font-size:11.5px}
+.pl .ord{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.pl .c-pill{font:700 11.5px var(--f-ui);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--ink)}
+.pl .c-pill.cache{opacity:.55;font-style:italic;border-style:dashed}
 .pl .c-pill.active-step{border-color:var(--accent);background:var(--accent-bg)}
+.pl .c-pill.indice-pill{background:var(--parchment);border-color:var(--parchment-line)}
 
 /* Journal */
-.journal{max-height:380px;overflow:auto;display:grid;gap:3px;font:500 13.5px/1.4 var(--f-ui);padding-right:4px}
+.journal{max-height:320px;overflow:auto;display:grid;gap:3px;font:500 13px/1.38 var(--f-ui);padding-right:4px}
 .jl{padding:4px 8px;border-radius:7px;border-left:3px solid transparent}
 .jl.k-tour{font-weight:800;color:var(--ink);margin-top:6px;border-left-color:var(--felt);background:var(--panel)}
 .jl.k-ann{background:var(--panel);border-left-color:var(--machine)}
 .jl.k-abattu{color:var(--danger);border-left-color:var(--danger);background:color-mix(in srgb,var(--danger-bg) 45%,transparent)}
 .jl.k-pare{color:var(--ok);font-weight:700;border-left-color:var(--ok);background:color-mix(in srgb,var(--ok-bg) 45%,transparent)}
 .jl.k-fin{background:var(--accent-bg);font-weight:800;color:var(--ink)}
-.jl.k-appris{color:var(--muted);font-size:12.5px;padding-left:18px}
+.jl.k-appris{color:var(--muted);font-size:12px;padding-left:16px}
 .jl.k-etape{font-weight:700;border-left-color:var(--accent)}
 .jl.k-perdu{color:var(--danger);font-style:italic}
-.jl .why{display:block;font-size:12.5px;color:var(--muted);font-style:italic;margin-top:1px}
-.jl .tag{font:800 10px var(--f-ui);letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 5px;margin-right:5px;background:var(--card);color:var(--muted);border:1px solid var(--line)}
+.jl .why{display:block;font-size:12px;color:var(--muted);font-style:italic;margin-top:1px}
+.jl .tag{font:800 9.5px var(--f-ui);letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 5px;margin-right:5px;background:var(--card);color:var(--muted);border:1px solid var(--line)}
 
 /* Préparation, Séries, Règles, Archives */
-.setup{display:grid;gap:8px}
-.seat{display:grid;grid-template-columns:14px minmax(0,1fr) minmax(0,12em);gap:10px;align-items:center;font:700 14px var(--f-ui)}
+.setup{display:grid;gap:7px}
+.seat{display:grid;grid-template-columns:14px minmax(0,1fr) minmax(0,12em);gap:10px;align-items:center;font:700 13.5px var(--f-ui)}
 .seat .dot{width:14px;height:14px;border-radius:50%}
 select,input[type="number"]{background:var(--panel);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;min-width:0;max-width:100%}
 .params{display:grid;grid-template-columns:repeat(auto-fill,minmax(12.5em,1fr));gap:8px 12px}
-.params label{display:grid;gap:3px;font:700 12.5px var(--f-ui);color:var(--muted)}
-.resume{display:flex;flex-wrap:wrap;gap:6px 14px;font:600 13.5px var(--f-ui);color:var(--muted);background:var(--panel);padding:8px 10px;border-radius:9px}
+.params label{display:grid;gap:3px;font:700 12px var(--f-ui);color:var(--muted)}
+.resume{display:flex;flex-wrap:wrap;gap:6px 12px;font:600 13px var(--f-ui);color:var(--muted);background:var(--panel);padding:8px 10px;border-radius:9px}
 .resume b{color:var(--ink)}
 
 .tw{overflow-x:auto}
-table.res{border-collapse:collapse;width:100%;font:500 14px/1.35 var(--f-ui)}
+table.res{border-collapse:collapse;width:100%;font:500 13.5px/1.35 var(--f-ui)}
 .res th,.res td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:right;white-space:nowrap}
 .res th:first-child,.res td:first-child{text-align:left}
 .res th{font:800 11px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -295,172 +413,344 @@ table.res{border-collapse:collapse;width:100%;font:500 14px/1.35 var(--f-ui)}
 .barl{display:grid;grid-template-columns:5.5em minmax(0,1fr) 3em;gap:8px;align-items:center;font:700 13px var(--f-ui)}
 .bart{height:10px;border-radius:5px;background:var(--panel);overflow:hidden}
 .bart span{display:block;height:100%;border-radius:5px}
-.verdict{font:700 14.5px/1.45 var(--f-ui);padding:10px 12px;border-radius:9px;background:var(--accent-bg)}
+.verdict{font:700 14px/1.45 var(--f-ui);padding:10px 12px;border-radius:9px;background:var(--accent-bg)}
 
-.regles{max-width:78ch;display:grid;gap:10px;font:400 16.5px/1.6 var(--f-body)}
-.regles h2{font-size:25px;margin-top:14px}
-.regles h3{font-size:19px;margin-top:6px}
+/* ============================================================================
+   LIVRET DE RÈGLES MODERNE ILLUSTRÉ & SIMULATEUR DE GESTES PHYSIQUES
+   ============================================================================ */
+.regles{max-width:1040px;display:grid;gap:18px;font:400 16px/1.58 var(--f-body);margin:0 auto;background:var(--card);padding:24px 28px;border-radius:18px;border:1.5px solid var(--line)}
+.regles h2{font-size:23px;margin-top:8px;border-bottom:2px solid var(--line);padding-bottom:5px;color:var(--ink)}
+.regles h3{font-size:18px;margin-top:4px;font-family:var(--f-ui);font-weight:800}
 .regles p{margin:0}
-.regles ul,.regles ol{margin:0;padding-left:22px;display:grid;gap:3px}
-.regles table{border-collapse:collapse;font:500 14px/1.4 var(--f-ui)}
-.regles th,.regles td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
-.tac{border-radius:5px;padding:1px 7px;font:800 12px var(--f-ui);color:#1D231F}
+.regles ul,.regles ol{margin:0;padding-left:20px;display:grid;gap:5px}
+.regles table{border-collapse:collapse;font:500 14px/1.4 var(--f-ui);width:100%}
+.regles th,.regles td{border-bottom:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+.tac{border-radius:5px;padding:1px 7px;font:800 12px var(--f-ui);color:#1D231F;display:inline-block}
 .tac.cupidite{background:var(--t-cup)} .tac.percee{background:var(--t-per)} .tac.opportunisme{background:var(--t-opp)} .tac.represailles{background:var(--t-rep)}
+.regles-box{background:var(--panel);border-left:4px solid var(--accent);padding:11px 15px;border-radius:9px;font:500 14.5px/1.48 var(--f-ui)}
+.regles-lead{font:500 16px/1.5 var(--f-ui);color:var(--ink);background:var(--accent-bg);border:1.5px solid var(--accent);border-radius:12px;padding:12px 16px}
+
+/* Grille d'inventaire illustré du matériel de la boîte */
+.mat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:12px;font-family:var(--f-ui)}
+.mat-card{background:var(--panel);border:1.5px solid var(--line);border-radius:13px;padding:12px 14px;display:grid;gap:7px;align-content:start}
+.mat-card .mc-num{font:800 11px var(--f-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.mat-card h3{font:800 15.5px/1.2 var(--f-ui);margin:0;color:var(--ink)}
+.mat-card p{font:500 13px/1.42 var(--f-ui);color:var(--muted)}
+.mat-vis{background:var(--parchment);border:1.5px solid var(--parchment-line);border-radius:9px;padding:8px 10px;font:700 12px/1.35 var(--f-ui);color:var(--ink);display:grid;gap:4px}
+
+/* Simulateur interactif des 5 gestes physiques sur table */
+.geste-sim{background:radial-gradient(circle at 50% 35%, var(--felt) 0%, var(--felt-deep) 100%);border:3.5px solid var(--wood);border-radius:16px;padding:14px 16px;color:var(--felt-ink);font-family:var(--f-ui);display:grid;gap:12px}
+.geste-tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:6px}
+.g-tab{font:800 12px/1.25 var(--f-ui);text-align:left;background:rgba(255,255,255,.08);color:#DCE8DE;border:1.5px solid var(--felt-line);border-radius:9px;padding:7px 10px;cursor:pointer;transition:all .15s}
+.g-tab:hover{background:rgba(255,255,255,.15)}
+.g-tab.active{background:#FDE68A;color:#241D03;border-color:#F59E0B;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.geste-body{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.9fr);gap:14px;align-items:center;background:rgba(0,0,0,.25);border:1px solid var(--felt-line);border-radius:12px;padding:12px 14px}
+@media (max-width:860px){.geste-body{grid-template-columns:1fr}}
+.geste-visual{display:grid;gap:8px}
+.geste-explain{background:var(--parchment);color:var(--ink);border:2px solid var(--parchment-line);border-radius:11px;padding:11px 13px;display:grid;gap:7px;font:500 13.5px/1.42 var(--f-ui)}
+.geste-explain h4{margin:0;font:800 15px var(--f-ui);color:var(--accent)}
 
 .saved{display:grid;gap:8px}
 .sv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font:600 14px var(--f-ui)}
 .sv .m{color:var(--muted);font-weight:500;font-size:13px}
-.empty{font:500 14.5px/1.5 var(--f-ui);color:var(--muted);padding:18px;border:1.5px dashed var(--line);border-radius:12px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--felt);color:var(--felt-ink);font:700 14px var(--f-ui);padding:9px 16px;border-radius:999px;z-index:30;max-width:calc(100% - 32px);box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.empty{font:500 14px/1.5 var(--f-ui);color:var(--muted);padding:18px;border:1.5px dashed var(--line);border-radius:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--felt);color:var(--felt-ink);font:700 14px var(--f-ui);padding:9px 16px;border-radius:999px;z-index:40;max-width:calc(100% - 32px);box-shadow:0 4px 16px rgba(0,0,0,.25)}
 
-@media (max-width:600px){
-  .tc .mn,.tc .lieu{font-size:9.5px}
-  .tile{font-size:9.5px}
+/* ============================================================================
+   MODAL / SPOTLIGHT DU TOUR GUIDÉ DE L'INTERFACE (Exigence 8)
+   ============================================================================ */
+.tour-overlay{position:fixed;inset:0;background:transparent;z-index:200;pointer-events:auto}
+.tour-overlay[hidden]{display:none!important}
+.tour-spotlight{position:fixed;z-index:201;pointer-events:none;border:3.5px solid #FBBF24;border-radius:16px;box-shadow:0 0 0 9999px rgba(8,14,10,.66), 0 0 28px rgba(251,191,36,.85);transition:left .18s ease,top .18s ease,width .18s ease,height .18s ease}
+.tour-modal{position:fixed;z-index:205;background:var(--card);color:var(--ink);border:2.5px solid var(--accent);border-radius:16px;max-width:430px;width:calc(100vw - 32px);padding:16px 18px;box-shadow:0 18px 46px rgba(0,0,0,.5);display:grid;gap:10px;font-family:var(--f-ui)}
+.tour-highlight{outline:none}
+
+@media (max-width:640px){
+  .tc .mn,.tc .lieu{font-size:9px}
+  .tile{font-size:9px}
   .trk-p .dots{display:none}
-  .slots{grid-template-columns:1fr}
+  .slots,.clue-choice-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="head">
-    <div class="head-title">
-      <h1>Couronne aux deux pistes</h1>
-      <p class="sub">La Forêt qui rêve · Maquette d'étude (2 à 6 joueurs) — Deux pistes du Méchant, deux cartes par joueur en deux vagues</p>
+
+<!-- BARRE SUPÉRIEURE -->
+<header class="bga-topbar">
+  <div class="bga-topbar-inner">
+    <div class="brand">
+      <div class="brand-logo" aria-hidden="true">🌳</div>
+      <div>
+        <h1>La Forêt qui rêve</h1>
+        <p class="sub">Jeu de plateau coopératif · Pistes Publiques &amp; Attaques Croisées (1B)</p>
+      </div>
     </div>
-  </header>
 
-  <nav class="tabs" role="tablist" aria-label="Sections">
-    <button role="tab" id="tab-partie" aria-selected="true" aria-controls="pan-partie">🌲 Partie</button>
-    <button role="tab" id="tab-series" aria-selected="false" aria-controls="pan-series">📊 Séries de bots</button>
-    <button role="tab" id="tab-archives" aria-selected="false" aria-controls="pan-archives">💾 Parties enregistrées</button>
-    <button role="tab" id="tab-regles" aria-selected="false" aria-controls="pan-regles">📖 Règles</button>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" id="tab-partie" aria-selected="true" aria-controls="pan-partie">🎲 1. Jouer sur la Table</button>
+      <button role="tab" id="tab-regles" aria-selected="false" aria-controls="pan-regles">📖 2. Règle &amp; Matériel Physique</button>
+      <button role="tab" id="tab-series" aria-selected="false" aria-controls="pan-series">📊 Labo Bots</button>
+      <button role="tab" id="tab-archives" aria-selected="false" aria-controls="pan-archives">💾 Archives</button>
+    </nav>
+
+    <div class="top-tools">
+      <button type="button" class="tool-btn demo-btn" id="btnWalkthrough" title="Voir un tour complet déroulé pas-à-pas sur la table">🎬 Tour exemple pas-à-pas</button>
+      <button type="button" class="tool-btn" id="btnGuiTour" title="Repérer en 6 étapes les zones de la table">🎓 Repères écran</button>
+      <button type="button" class="tool-btn phys-toggle" id="btnPhysMode" aria-pressed="false" title="Afficher ou masquer sous le bandeau le geste physique correspondant sur une vraie table">📦 Geste physique</button>
+    </div>
+
     <div class="status num" id="status" aria-live="polite"></div>
-  </nav>
+  </div>
+</header>
 
+<div class="wrap">
+
+  <!-- BANDEAU D'ÉTAT COMPACT (Étapes du tour + Instruction courte + Note physique optionnelle) -->
+  <div class="bga-phasebar" id="bgaPhaseBar">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px">
+      <div class="phase-steps" id="phaseSteps"></div>
+      <div class="bga-banner-msg" id="bgaBannerMsg">🌲 Choisis tes partenaires à droite ou lance le <b>🎬 Tour exemple</b>.</div>
+    </div>
+    <div class="phys-note" id="physDynamicNote" hidden></div>
+  </div>
+
+  <!-- BANNIÈRE NARRATIVE DU TOUR EXEMPLE PAS-À-PAS -->
+  <div class="walkthrough-bar" id="walkthroughBar" hidden></div>
+
+  <!-- ONGLET 1 : LA TABLE DE JEU -->
   <section role="tabpanel" id="pan-partie" aria-labelledby="tab-partie">
     <div class="table">
-      <div class="side">
-        <div class="board">
+
+      <!-- ================================================================== -->
+      <!-- MONDE 1 : LE TAPIS DE TABLE PHYSIQUE (Matériel de la boîte)        -->
+      <!-- ================================================================== -->
+      <div class="physical-table" id="worldTable">
+        <div class="world-header">
+          <span class="world-badge table-tag">🎲 Matériel physique posé sur la table</span>
+          <span class="world-sub">Plateau Forêt · Cartes d'Assaut (Machine &amp; Tactique) · 2 Pistes à tuiles glissantes</span>
+        </div>
+
+        <!-- 1A. LE PLATEAU EN COURONNE & CHANTIER -->
+        <div class="board" id="tourStepBoard">
           <div class="board-bar">
-            <span class="eyebrow">Plateau en couronne &amp; Chantier</span>
+            <span class="eyebrow">1. Plateau de la Forêt (Couronne) &amp; Chantier</span>
             <div class="board-toggles">
-              <button type="button" class="tbtn" id="togIntent" aria-pressed="false" title="Afficher en permanence toutes les trajectoires possibles des Machines (sinon visibles au survol)">🎯 Toutes les trajectoires</button>
-              <button type="button" class="tbtn" id="togHeat" aria-pressed="false" title="Colorer les cases selon le risque d'être frappées pendant la vague">🔥 Carte des risques (%)</button>
-              <button type="button" class="tbtn" id="togCodes" aria-pressed="true" title="Afficher ou masquer les codes de cases (A1, B2…)">🏷️ Codes cases</button>
+              <button type="button" class="tbtn" id="togIntent" aria-pressed="false" title="Afficher toutes les trajectoires possibles des Machines">🎯 Trajectoires</button>
+              <button type="button" class="tbtn" id="togHeat" aria-pressed="false" title="Colorer les cases selon le risque d'être frappées">🔥 Risques (%)</button>
+              <button type="button" class="tbtn" id="togCodes" aria-pressed="true" title="Afficher les codes de cases (A1, B2…)">🏷️ Cases</button>
             </div>
           </div>
           <div class="board-stage" id="boardStage">
-            <svg id="plateau" viewBox="0 0 680 650" role="img" aria-label="La couronne : une tuile par joueur autour du Cœur, avec les arbres, les Machines, le Chantier et les individus"></svg>
+            <svg id="plateau" viewBox="0 0 680 650" role="img" aria-label="Plateau de la Forêt en couronne"></svg>
             <div class="pop-menu" id="popMenu" hidden></div>
           </div>
-          <div class="inspect-bar" id="inspectBar">💡 <span>Survole une <b>Machine</b> (sur le plateau ou sur sa piste) ou une <b>case</b> pour voir son rayon d'action et ses cibles selon chaque tactique.</span></div>
+          <div class="inspect-bar" id="inspectBar">💡 <span>Survole une <b>Machine</b>, une <b>Carte d'Assaut</b>, une <b>case</b> ou une <b>tuile de Piste</b> pour voir ses cibles.</span></div>
           <div class="legend" id="legend"></div>
         </div>
 
-        <div class="mech-box" aria-label="La tête du Méchant">
+        <!-- 1B. LES 2 PIOCHES & LE TAPIS DES ATTAQUES DE LA VAGUE 1 -->
+        <div class="att1b-mat" id="tourStepAtt1B">
+          <div class="att1b-head">
+            <div class="att1b-title">🃏 2. Cartes d'Assaut piochées pour la Vague 1 (Mécanique 1B)</div>
+            <span class="phys-badge" id="physBadge1B">📦 1 carte Machine (n° 1–6) + 1 carte Tactique (n° 2–12) par attaque</span>
+          </div>
+          <div id="att1BContainer"></div>
+        </div>
+
+        <!-- 1C. LE PLATEAU DU MÉCHANT : LES 2 PISTES PUBLIQUES -->
+        <div class="mech-box" id="tourStepTracks" aria-label="Plateau des 2 Pistes du Méchant">
           <div class="mech-header">
-            <div>
-              <div class="eyebrow">La tête du Méchant · Hasard contrôlé (2D6) &amp; Apprentissage</div>
-            </div>
-            <button type="button" class="tbtn" id="togPyr" aria-pressed="false">🎲 Croisement Somme × Écart (21 plans)</button>
+            <div class="eyebrow">3. Plateau du Méchant · Les 2 Pistes de Tuiles (toujours visibles)</div>
+            <button type="button" class="tbtn" id="togPyr" aria-pressed="false">🎲 Vue croisée</button>
           </div>
           <div class="mech" id="mech"></div>
         </div>
       </div>
 
-      <div class="side">
+      <!-- ================================================================== -->
+      <!-- MONDE 2 : VOS CHOIX & EXPLICATIONS PAS-À-PAS                       -->
+      <!-- ================================================================== -->
+      <div class="hud-side" id="worldHud">
+        <div class="world-header" style="border-bottom-color:var(--hud-line)">
+          <span class="world-badge hud-tag">💻 Vos Actions &amp; Explications</span>
+          <span class="small">Choix du joueur · Pas-à-pas · Journal</span>
+        </div>
+
         <div class="box ask" id="ask"></div>
+
         <div class="box" id="plBox" hidden>
-          <div class="eyebrow">Autour de la table · Programmation &amp; Parades</div>
+          <div class="eyebrow">Joueurs autour de la table · Indices &amp; Cartes posées</div>
           <div class="players" id="players"></div>
         </div>
+
         <div class="box" id="jBox" hidden>
           <div class="btn-row" style="justify-content:space-between">
-            <div class="eyebrow">Journal de la partie</div>
-            <label class="small"><input type="checkbox" id="showWhy" checked> afficher le raisonnement des bots</label>
+            <div class="eyebrow">Journal du tour</div>
+            <label class="small"><input type="checkbox" id="showWhy" checked> raisonnement des bots</label>
           </div>
           <div class="journal" id="journal" aria-live="polite"></div>
         </div>
       </div>
+
     </div>
   </section>
 
+  <!-- ====================================================================== -->
+  <!-- ONGLET 2 : LIVRET DE RÈGLES PAPIER & SIMULATEUR DE GESTES PHYSIQUES    -->
+  <!-- ====================================================================== -->
+  <section role="tabpanel" id="pan-regles" aria-labelledby="tab-regles" hidden>
+    <div class="regles">
+      <div class="regles-lead">
+        🌲 <b>But du jeu :</b> Dans <i>La Forêt qui rêve</i> (coopératif, 2 à 6 joueurs, 4 tours), vous incarnez les Gardiens d'une forêt attaquée par 6 Machines de déforestation. À chaque tour, vous éclairez une partie des cartes d'assaut du Méchant, programmez secrètement 2 actions par joueur, et repoussez les Machines dont les habitudes évoluent sur 2 pistes publiques.
+      </div>
+
+      <h2>1. Le Matériel dans la Boîte (Inventaire Physique)</h2>
+      <p>Tout le jeu repose sur <b>4 éléments matériels</b> posés sur la table (aucun dé n'est nécessaire) :</p>
+
+      <div class="mat-grid">
+        <div class="mat-card">
+          <span class="mc-num">Matériel A · Plateau central</span>
+          <h3>🌲 Le Plateau Forêt &amp; les Pions</h3>
+          <p>Assemblé au centre de la table :</p>
+          <div class="mat-vis">
+            <div>• <b>1 tuile Cœur</b> (au centre, 4 arbres)</div>
+            <div>• <b>1 tuile Secteur par joueur</b> (3×3 cases, 3 arbres par case)</div>
+            <div>• <b>3 pions Gardiens</b> en bois par joueur (<code>a, b, c</code>)</div>
+            <div>• <b>6 pions Machines</b> (bulldozers)</div>
+            <div>• <b>Jetons Arbre 🌲 / Souche 🪵</b> (double-face) + jetons <b>🛡️ Garde</b> et <b>🔧 Sabotage</b></div>
+          </div>
+        </div>
+
+        <div class="mat-card">
+          <span class="mc-num">Matériel B · Mémoire du Méchant</span>
+          <h3>🎚️ Le Plateau des 2 Pistes &amp; 17 Tuiles</h3>
+          <p>Posé face visible toute la partie. Les tuiles y <b>glissent d'une case</b> après chaque attaque :</p>
+          <div class="mat-vis">
+            <div>• <b>Piste des Machines (Cases n° 1 à 6) :</b> accueille les <b>6 tuiles Machine</b> (<i>Bulldozer, Rapiat, Tire-Dru, Grosse Gueule, Mâchoire, Zizanie</i>).</div>
+            <div>• <b>Piste des Tactiques (Cases n° 2 à 12) :</b> accueille les <b>11 tuiles Tactique</b> (3× <span class="tac cupidite">Cupidité</span>, 3× <span class="tac percee">Percée</span>, 3× <span class="tac opportunisme">Opportunisme</span>, 2× <span class="tac represailles">Représailles</span>).</div>
+          </div>
+        </div>
+
+        <div class="mat-card">
+          <span class="mc-num">Matériel C · Que pioche-t-on ?</span>
+          <h3>🃏 Les 2 Paquets de Cartes d'Assaut</h3>
+          <p>Ces cartes ne portent <b>pas</b> le nom d'une Machine ou d'une Tactique : elles indiquent <b>le numéro d'une case</b> sur les pistes !</p>
+          <div class="mat-vis">
+            <div>• <b>🂠 Paquet « Machine » (18 cartes, dos jaune ⚙️) :</b> numérotées de <b>Case n° 1</b> à <b>Case n° 6</b><br><span class="small">(5× n°1 · 4× n°2 · 3× n°3 · 3× n°4 · 2× n°5 · 1× n°6)</span></div>
+            <div>• <b>🂠 Paquet « Tactique » (36 cartes, dos vert 🧭) :</b> numérotées de <b>Case n° 2</b> à <b>Case n° 12</b><br><span class="small">(répartition en cloche : 6× n°7 au centre, jusqu'à 1× n°2 et n°12 aux bords)</span></div>
+          </div>
+        </div>
+
+        <div class="mat-card">
+          <span class="mc-num">Matériel D · Main des joueurs</span>
+          <h3>✍️ Les Cartes d'Ordres (Étape 1 &amp; 2)</h3>
+          <p>Devant chaque joueur pour programmer ses 2 actions du tour en silence :</p>
+          <div class="mat-vis">
+            <div>• <b>Carte 1 (Étape 1) :</b> jouée juste avant la Vague 1.</div>
+            <div>• <b>Carte 2 (Étape 2) :</b> jouée juste avant la Vague 2.</div>
+            <div>• <b>3 actions au choix</b> pour l'un de vos 3 Gardiens : <b>🛡️ Garder</b> sa case, <b>🔧 Saboter</b> une Machine sur sa case, ou <b>🥾 Aller</b> sur une case voisine.</div>
+          </div>
+        </div>
+      </div>
+
+      <h2>2. Manipulation Physique : Que fait-on concrètement à chaque étape ?</h2>
+      <p>Clique sur les <b>5 gestes du tour</b> ci-dessous pour voir exactement comment on manipule les cartes et les tuiles sur une vraie table :</p>
+
+      <!-- SIMULATEUR INTERACTIF DES 5 GESTES PHYSIQUES SUR TABLE -->
+      <div class="geste-sim" id="gesteSim">
+        <div class="geste-tabs" id="gesteTabs">
+          <button type="button" class="g-tab active" data-gstep="0">1. Piocher les cartes d'Assaut</button>
+          <button type="button" class="g-tab" data-gstep="1">2. Regarder 2 cartes en quinconce</button>
+          <button type="button" class="g-tab" data-gstep="2">3. Retourner 1 carte sur 2 (1B)</button>
+          <button type="button" class="g-tab" data-gstep="3">4. Lire les Pistes &amp; Agir</button>
+          <button type="button" class="g-tab" data-gstep="4">5. Glisser les tuiles (Apprentissage)</button>
+        </div>
+        <div class="geste-body" id="gesteBody"></div>
+      </div>
+
+      <h2>3. Comment lire une Attaque &amp; Résoudre les 4 Tactiques</h2>
+      <p>Lorsqu'on résout une Attaque, on retourne sa <b>Carte Machine</b> (ex. <code>Case n° 2</code>) et sa <b>Carte Tactique</b> (ex. <code>Case n° 7</code>) :</p>
+      <ol>
+        <li><b>Qui agit ?</b> Regardez quelle tuile Machine se trouve actuellement sur la <b>Case n° 2 de la Piste des Machines</b> (ex. <i>🚜 Rapiat</i>).</li>
+        <li><b>Comment cible-t-elle ?</b> Regardez quelle tuile Tactique se trouve actuellement sur la <b>Case n° 7 de la Piste des Tactiques</b> (ex. <span class="tac percee">🎯 Percée</span>).</li>
+        <li><b>Quelle case vise-t-elle ?</b> Sur le plateau Forêt, la Machine regarde <b>son rayon d'action</b> (sa case actuelle + les cases adjacentes ayant au moins 1 arbre debout) et choisit sa cible selon la Tactique :</li>
+      </ol>
+
+      <table>
+        <thead><tr><th>Tuile Tactique</th><th>Case choisie par la Machine parmi sa case et ses voisines boisées</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tac cupidite">🌳 Cupidité</span></td><td>Vise la case ayant <b>le plus d'arbres debout</b>.</td></tr>
+          <tr><td><span class="tac percee">🎯 Percée</span></td><td>Vise la case <b>la plus proche du Cœur</b>.</td></tr>
+          <tr><td><span class="tac opportunisme">👁️ Opportunisme</span></td><td>Vise la case <b>la moins défendue</b> (ayant le moins de pions Gardiens présents).</td></tr>
+          <tr><td><span class="tac represailles">⚔️ Représailles</span></td><td>Vise la case <b>la plus défendue</b> (ayant le plus de pions Gardiens présents).</td></tr>
+        </tbody>
+      </table>
+      <p class="small"><i>En cas d'égalité entre plusieurs cases du rayon :</i> la Machine préfère 1° la case la plus boisée, 2° la plus proche du Cœur, 3° sa case actuelle. (Si la Machine était au <b>Chantier</b>, elle entre sur une case de lisière).</p>
+
+      <h2>4. Effet des 3 Ordres des Joueurs &amp; Apprentissage</h2>
+      <ul>
+        <li><b>🥾 Aller (case voisine) :</b> résolu dès la révélation des cartes d'ordres. Déplacez votre pion Gardien d'une case.</li>
+        <li><b>🔧 Saboter (Machine sur votre case) :</b> posez un jeton 🔧 sur la Machine. Quand elle s'active, elle se déplace vers sa case cible mais <b>ne coupe aucun arbre</b> (retirez le jeton 🔧).</li>
+        <li><b>🛡️ Garder (votre case) :</b> posez un jeton 🛡️ sur la case. La première Machine qui vise cette case est <b>bloquée</b> : elle reste sur sa case de départ et <b>ne coupe aucun arbre</b> (retirez le jeton 🛡️).</li>
+        <li><b>🪓 Si l'attaque n'est ni sabotée ni gardée :</b> déplacez le pion Machine sur la case cible et retournez <b>1 jeton Arbre 🌲 sur sa face Souche 🪵</b>.</li>
+        <li><b>🧠 Glissement des tuiles (Apprentissage immédiat) :</b>
+          <ul>
+            <li><b>Arbre coupé (Succès du Méchant) :</b> sur la Piste des Machines, échangez la tuile Machine utilisée avec sa voisine de <b>gauche</b> (vers la Case n° 1, plus fréquente). Sur la Piste des Tactiques, échangez la tuile Tactique utilisée d'une case <b>vers le 7 central</b>.</li>
+            <li><b>Attaque parée par 🛡️ ou 🔧 (Échec du Méchant) :</b> échangez la tuile Machine avec sa voisine de <b>droite</b> (vers la Case n° 6, plus rare) et éloignez la tuile Tactique d'une case <b>vers le bord (2 ou 12)</b>.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ONGLET 3 : SÉRIES DE BOTS -->
   <section role="tabpanel" id="pan-series" aria-labelledby="tab-series" hidden>
     <div class="table">
       <div class="box setup">
-        <h2>Comparer les bots</h2>
-        <p class="ctx">Les bots jouent beaucoup de parties sans animation, sur les mêmes dés pour chaque bot (comparaisons appariées). Les réglages sont ceux de la préparation de partie.</p>
+        <h2>Comparer les bots (avec ou sans Indices Croisés 1B)</h2>
+        <p class="ctx">Les bots jouent des séries de parties sur les mêmes graines (comparaisons appariées).</p>
         <div class="params">
-          <label for="serN">Parties par bot et par taille<select id="serN"><option selected>6</option><option>12</option><option>24</option></select></label>
+          <label for="serN">Parties par bot<select id="serN"><option selected>6</option><option>12</option><option>24</option></select></label>
           <label for="serJ">Tailles de table<select id="serJ"><option value="cur">celle de la préparation</option><option value="all" selected>de 2 à 6 joueurs</option></select></label>
         </div>
-        <div class="btn-row"><button class="btn" id="runSerie">Lancer la série</button><span class="small num" id="serieProg"></span></div>
+        <div class="btn-row"><button class="btn" id="runSerie">▶️ Lancer la série</button><span class="small num" id="serieProg"></span></div>
       </div>
-      <div class="side"><div class="box" id="serieRes"><div class="empty">Les résultats s'afficheront ici : pour chaque bot et chaque taille de table, la part des ordres qui ont paré une menace, la forêt restante, les ordres perdus, l'agence et le couplage.</div></div></div>
+      <div class="hud-side"><div class="box" id="serieRes"><div class="empty">Les résultats s'afficheront ici : taux de parade, forêt sauvée, ordres perdus, agence et couplage.</div></div></div>
     </div>
   </section>
 
+  <!-- ONGLET 4 : ARCHIVES -->
   <section role="tabpanel" id="pan-archives" aria-labelledby="tab-archives" hidden>
     <div class="box">
       <div class="btn-row" style="justify-content:space-between">
         <h2>Parties enregistrées</h2>
-        <div class="btn-row"><button class="btn sec" id="expAll">Exporter tout (JSON)</button></div>
+        <div class="btn-row"><button class="btn sec" id="expAll">📥 Exporter tout (JSON)</button></div>
       </div>
       <p class="ctx" id="dbState">Chaque partie terminée et chaque série sont enregistrées avec leur journal.</p>
       <div class="saved" id="saved"></div>
     </div>
   </section>
 
-  <section role="tabpanel" id="pan-regles" aria-labelledby="tab-regles" hidden>
-    <div class="regles">
-      <h2>Le but</h2>
-      <p>Une partie dure 4 tours. À chaque tour, les Machines du Méchant abattent des arbres et les joueurs, ensemble, en sauvent le plus possible. On compte à la fin les arbres restants. Il en tombe au moins un à chaque vague, et il en reste toujours.</p>
-      <h2>La mise en place</h2>
-      <ul>
-        <li><b>Chaque joueur pose sa tuile</b> contre le Cœur (3 × 3 cases, 3 arbres par case). Les tuiles forment une couronne : la rangée intérieure touche le Cœur, la rangée extérieure est la lisière, chaque tuile touche ses deux voisines.</li>
-        <li><b>Chaque joueur pose ses individus</b> (3) sur sa tuile. Ensuite, ils vont où ils veulent.</li>
-        <li><b>Les six Machines</b> sont rangées sur la piste des Machines. Il y en a une de plus que de joueurs sur le plateau (au plus six), posées dans l'ordre Grosse Gueule, Rapiat, Mâchoire, Tonton Débard, Ripaille, Zizanie : la Machine du joueur j sur la lisière de sa tuile, une de plus sur une lisière tirée au dé. Les autres attendent au chantier.</li>
-      </ul>
-      <h2>La tête du Méchant : deux pistes</h2>
-      <p>Le Méchant ne dit pas ce qu'il va faire. Il lance deux dés, et ses deux pistes, publiques, disent ce que chaque lancer donnera. La position d'une tuile sur une piste est sa probabilité.</p>
-      <ul>
-        <li><b>La piste des pensées</b>, cases 2 à 12 : la <b>somme</b> des dés désigne une case, et la tuile qui s'y trouve donne la tactique. Le 7 sort 6 fois sur 36, le 2 et le 12 une fois.</li>
-        <li><b>La piste des Machines</b>, six cases imprimées dans l'ordre des probabilités : l'<b>écart</b> des dés désigne la Machine qui obéit. Écart 1 : 10 chances sur 36 ; écart 2 : 8 ; écart 0 (un double) : 6 ; écart 3 : 6 ; écart 4 : 4 ; écart 5 : 2.</li>
-        <li>Somme et écart viennent des mêmes dés : une Machine ne reçoit pas toutes les tactiques. La Machine de l'écart 5 joue toujours la case 7, celle de l'écart 4 les cases 6 ou 8, celle de l'écart 1 les cases impaires de 3 à 11, le double les cases paires.</li>
-      </ul>
-      <h3>Un lancer</h3>
-      <ul>
-        <li>La Machine désignée applique la tactique dans son rayon (sa case et les cases voisines qui ont encore des arbres), sur la forêt du moment. Si sa cible est gardée, la menace est parée et la Machine reste. Sinon elle y entre et abat un arbre.</li>
-        <li>Si la Machine désignée est au chantier, elle entre sur une case de lisière tirée au dé et y abat un arbre (ou, sans arbre là, sur la case boisée la plus proche). Une garde sur cette case la pare.</li>
-        <li><b>Il apprend</b>, après chaque lancer : la tuile de tactique et la Machine désignées s'échangent avec une voisine. Si un arbre est tombé (réussite), la tactique va vers le 7 et la Machine vers le côté probable (gauche). Si la menace a été parée (échec), la tactique va vers le bord (au 7, vers le 8) et la Machine vers le côté rare (droite). Au bord, rien ne bouge.</li>
-      </ul>
-      <h2>Un tour</h2>
-      <ol>
-        <li><b>Les cartes.</b> Chaque joueur pose deux cartes d'ordre, numérotées 1 et 2, chacune pour l'un de ses individus (le même peut recevoir les deux), en même temps que les autres.</li>
-        <li><b>Étape 1.</b> On révèle les cartes 1 : déplacements d'abord, puis gardes et sabotages posés.</li>
-        <li><b>Vague 1.</b> Le Méchant lance les dés autant de fois qu'il y a de joueurs, plus une.</li>
-        <li><b>Étape 2.</b> Les gardes et sabotages de l'étape 1 tombent ; on révèle les cartes 2.</li>
-        <li><b>Vague 2.</b> Autant de lancers.</li>
-      </ol>
-      <h3>Les ordres</h3>
-      <ul>
-        <li><b>🛡️ Garder</b> : l'individu garde sa case. La première menace qui la vise pendant la vague est parée.</li>
-        <li><b>🥾 Aller</b> : l'individu va sur une case voisine. Il ne pare rien, mais sa présence compte aussitôt pour les tactiques.</li>
-        <li><b>🔧 Saboter</b> : l'individu est sur la case d'une Machine. La première menace de cette Machine pendant la vague est parée ; la Machine va quand même où elle voulait, sans abattre.</li>
-        <li><b>Un ordre devenu impossible est perdu</b> : saboter une Machine qui a quitté la case pendant la vague 1, par exemple.</li>
-      </ul>
-      <h3>Les tactiques</h3>
-      <table><thead><tr><th>Tactique</th><th>Case visée dans le rayon</th></tr></thead><tbody>
-        <tr><td><span class="tac cupidite">🌳 Cupidité</span></td><td>la plus boisée</td></tr>
-        <tr><td><span class="tac percee">🎯 Percée</span></td><td>la plus proche du Cœur</td></tr>
-        <tr><td><span class="tac opportunisme">👁️ Opportunisme</span></td><td>la moins défendue (le moins d'individus)</td></tr>
-        <tr><td><span class="tac represailles">⚔️ Représailles</span></td><td>la plus défendue</td></tr>
-      </tbody></table>
-      <p class="small">Égalités : la plus boisée, puis la plus proche du Cœur, puis la case de la Machine, puis le plus petit numéro. Sans arbre dans son rayon, une Machine va vers la case boisée la plus proche.</p>
-    </div>
-  </section>
 </div>
+
+<!-- MODAL DU TOUR GUIDÉ DE L'INTERFACE (Exigence 8) -->
+<div class="tour-overlay" id="guiTourOverlay" hidden>
+  <div class="tour-spotlight" id="guiTourSpotlight"></div>
+  <div class="tour-modal" id="guiTourModal" role="dialog" aria-modal="true" aria-labelledby="guiTourTitle">
+    <div class="eyebrow" id="guiTourStep">Visite guidée de l'interface · Étape 1 / 6</div>
+    <h2 id="guiTourTitle">Bienvenue sur la table de jeu</h2>
+    <div class="ctx" id="guiTourBody" style="color:var(--ink)"></div>
+    <div class="phys-note" id="guiTourPhys"></div>
+    <div class="btn-row" style="justify-content:space-between;margin-top:4px">
+      <button type="button" class="btn sec" id="guiTourClose">✕ Fermer</button>
+      <div class="btn-row">
+        <button type="button" class="btn sec" id="guiTourPrev">◀ Précédent</button>
+        <button type="button" class="btn" id="guiTourNext">Suivant ▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
 <script>/*MOTEUR*/</script>

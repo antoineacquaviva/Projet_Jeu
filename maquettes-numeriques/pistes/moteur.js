@@ -325,6 +325,181 @@
     return pris;
   }
 
+  // Explication détaillée du ciblage d'une Machine (pour le mode didactique et l'inspection)
+  function detailDestination(p, pl, e, machine, tactique) {
+    const pos = e.machines[machine];
+    if (pos < 0) return { depart: -1, cible: -1, repli: false, candidats: [] };
+    const A = e.arbres;
+    const pres = presence(e);
+    const voisins = [pos].concat(pl.voisins[pos]);
+    const rayon = voisins.filter((c) => A[c] > 0);
+    const [cible, repli] = destination(p, pl, e, machine, tactique);
+    const candidats = rayon.map((c) => ({
+      c,
+      arbres: A[c],
+      distCoeur: pl.dist[0][c],
+      individus: pres[c] || 0,
+      surPlace: c === pos,
+      choisi: c === cible
+    }));
+    return { depart: pos, cible, repli, rayon, tousVoisins: voisins, candidats };
+  }
+
+  // ------------------------------------------------------------ Mécanique 1B : Pistes publiques & Attaques Croisées
+  // Au début du tour, les L attaques de la Vague 1 sont posées face cachée sous forme de paires (Carte Machine, Carte Tactique).
+  // Pour k < J :
+  //   - Le Joueur k regarde secrètement la Carte Machine de l'Attaque k (Indice 0) ;
+  //   - Le Joueur k regarde secrètement la Carte Tactique de l'Attaque (k + 1) % J (Indice 1) ;
+  //   - Chaque joueur retourne 1 de ses 2 cartes face visible (reveles[k] = 0 pour Machine_k, 1 pour Tactique_{(k+1)%J}).
+  // S'il y a L > J attaques (ex. L = J + 1), l'Attaque J est une « Attaque d'Embuscade » non inspectée par les éclaireurs.
+  function indicesTour1B(p, e, vague0) {
+    const ROMAINS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+    const attaques = vague0.map((l, k) => {
+      const L = lire(e, l.d);
+      const embuscade = k >= p.J;
+      const joueurM = embuscade ? null : k;
+      const joueurT = embuscade ? null : (k - 1 + p.J) % p.J;
+      return {
+        k,
+        code: ROMAINS[k] || String(k + 1),
+        d: l.d.slice(),
+        t: l.t,
+        c: l.c,
+        somme: L.somme,
+        ecart: L.ecart,
+        pos: L.pos,
+        rangM: L.pos + 1,
+        tuile: L.tuile,
+        tactique: L.tactique,
+        machine: L.machine,
+        chancesM: CHANCES_ECART[L.ecart],
+        chancesT: CHANCES_SOMME(L.somme),
+        embuscade,
+        joueurM,
+        joueurT
+      };
+    });
+
+    const mains = [];
+    for (let j = 0; j < p.J; j++) {
+      const attM = attaques[j];
+      const attT = attaques[(j + 1) % p.J];
+      mains.push([
+        {
+          slot: 0,
+          type: 'machine',
+          attIdx: attM.k,
+          attCode: attM.code,
+          machine: attM.machine,
+          pos: attM.pos,
+          rangM: attM.rangM,
+          ecart: attM.ecart,
+          chances: attM.chancesM
+        },
+        {
+          slot: 1,
+          type: 'tactique',
+          attIdx: attT.k,
+          attCode: attT.code,
+          tactique: attT.tactique,
+          somme: attT.somme,
+          tuile: attT.tuile,
+          chances: attT.chancesT
+        }
+      ]);
+    }
+    return { attaques, mains };
+  }
+
+  // État de connaissance de chaque attaque de la Vague 1 du point de vue de `jObservateur`
+  // (`jObservateur` = 0..J-1 pour un joueur, -1 pour la vue strictement publique, 'omniscient' pour tout voir)
+  function etatAttaques1B(p, pl, e, vague0, reveles, jObservateur) {
+    const info = indicesTour1B(p, e, vague0);
+    const rev = reveles || [];
+    return info.attaques.map((att) => {
+      const mPub = !att.embuscade && rev[att.joueurM] === 0;
+      const mSec = !att.embuscade && !mPub && (jObservateur === att.joueurM || jObservateur === 'omniscient');
+      const statutM = mPub ? 'public' : (mSec ? 'secret' : 'cache');
+
+      const tPub = !att.embuscade && rev[att.joueurT] === 1;
+      const tSec = !att.embuscade && !tPub && (jObservateur === att.joueurT || jObservateur === 'omniscient');
+      const statutT = tPub ? 'public' : (tSec ? 'secret' : 'cache');
+
+      const connaisM = statutM !== 'cache';
+      const connaisT = statutT !== 'cache';
+
+      // Calcul de la distribution des cases cibles et des Machines possibles pour cette attaque selon ce que sait jObservateur
+      const probCibles = new Array(pl.N).fill(0);
+      const probMachines = new Array(NM).fill(0);
+      const nl = p.J * p.l;
+
+      const ajouterCouple = (m, tac, poids) => {
+        probMachines[m] += poids;
+        if (e.machines[m] >= 0) {
+          const c = destination(p, pl, e, m, tac)[0];
+          probCibles[c] += poids;
+        } else {
+          for (let t = 0; t < p.J; t++) for (let c = 0; c < p.l; c++) probCibles[entree(p, pl, e, { t, c })[1]] += poids / nl;
+        }
+      };
+
+      if (connaisM && connaisT) {
+        ajouterCouple(att.machine, att.tactique, 1);
+      } else if (connaisM && !connaisT) {
+        for (let s = 2; s <= 12; s++) {
+          ajouterCouple(att.machine, tactiqueEn(e, s), CHANCES_SOMME(s) / 36);
+        }
+      } else if (!connaisM && connaisT) {
+        ECARTS.forEach((ec, pos) => {
+          ajouterCouple(e.pisteM[pos], att.tactique, CHANCES_ECART[ec] / 36);
+        });
+      } else {
+        for (const d of ISSUES) {
+          const L = lire(e, d);
+          ajouterCouple(L.machine, L.tactique, 1 / 36);
+        }
+      }
+
+      return Object.assign({}, att, {
+        statutM,
+        statutT,
+        connaisM,
+        connaisT,
+        complet: connaisM && connaisT,
+        completPublic: mPub && tPub,
+        probCibles,
+        probMachines
+      });
+    });
+  }
+
+  // Probabilité qu'au moins une attaque de la Vague 1 frappe chaque case (et chaque Machine), compte tenu des indices 1B connus par jObservateur
+  function menaceVague1B(p, pl, e, vague0, reveles, jObservateur) {
+    const etats = etatAttaques1B(p, pl, e, vague0, reveles, jObservateur);
+    const nonFrappeCase = new Array(pl.N).fill(1);
+    const nonAgitMachine = new Array(NM).fill(1);
+    const espCase = new Array(pl.N).fill(0);
+    const espMachine = new Array(NM).fill(0);
+
+    for (const att of etats) {
+      for (let c = 0; c < pl.N; c++) {
+        nonFrappeCase[c] *= (1 - att.probCibles[c]);
+        espCase[c] += att.probCibles[c];
+      }
+      for (let m = 0; m < NM; m++) {
+        nonAgitMachine[m] *= (1 - att.probMachines[m]);
+        espMachine[m] += att.probMachines[m];
+      }
+    }
+    return {
+      etats,
+      probCaseAuMoins1: nonFrappeCase.map((x) => 1 - x),
+      probMachineAuMoins1: nonAgitMachine.map((x) => 1 - x),
+      espCase,
+      espMachine
+    };
+  }
+
   // Une partie entière avec ses tirages (faits d'avance à partir de la graine)
   function nouvellePartie(reglages) {
     const p = params(reglages); const pl = plateau(p);
@@ -337,8 +512,9 @@
 
   const API = { TACTIQUES, NOMS_TACTIQUES, RIEN, GARDER, ALLER, SABOTER, DEFAUTS, PENSEES_DEPART, CHANCES_SOMME, ECARTS, CHANCES_ECART,
     MACHINES, ECART_DEPART, TUILES, generateur, params, plateau, proprietaire, miseEnPlace, copie, foret, tactiqueEn,
-    tirerLancer, tirerTour, lire, destination, entree, apprendre, ordresPossibles, cartesVides, positionsPrevues, programmeEtape,
+    tirerLancer, tirerTour, lire, destination, detailDestination, entree, apprendre, ordresPossibles, cartesVides, positionsPrevues, programmeEtape,
     reveler, executerLancer, finVague, jouerTour, paradesEtapes, ISSUES, profils, menaceParCase, auMoinsUneFois,
+    indicesTour1B, etatAttaques1B, menaceVague1B,
     casesDepart: CASES_DEPART, placementHeuristique, presence, nouvellePartie };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else G.PISTES = API;
 })(typeof window !== 'undefined' ? window : globalThis);

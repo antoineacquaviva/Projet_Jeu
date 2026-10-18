@@ -53,21 +53,22 @@ Documents à lire avant de travailler : `README.md` (carte du dépôt), `docs/re
 
 ## 4. Étape suivante
 
-**Ligne active : Campagne 3 (« Couronne aux deux pistes ») terminée en local ; implémentation du mode didactique décomposé sur la maquette et attente des décisions de l'auteur sur les propositions.**
+**Ligne active : Mécanique d'indices 1B intégrée dans la maquette ; clarification de la séparation entre l'incarnation physique concrète et le jeu numérique ; exploration en cours sur le matériel physique exact de tirage des attaques.**
 
-1. **Nouveau besoin prioritaire sur la maquette (exprimé par l'auteur le 17 oct., 11 h 31)** :
-   - Ajouter dans `maquettes-numeriques/pistes/` un **mode didactique très décomposé** qui montre et explique pas à pas chaque micro-action, en particulier pendant la **phase de résolution** avec des **focus visuels sur les éléments qui s'activent et bougent** :
-     1. Révélation et exécution détaillée des cartes des joueurs (déplacements `Aller`, pose des `Garder` / `Saboter`, explication des éventuels ordres perdus) ;
-     2. Pour chaque lancer de dé d'une vague, décomposition en 4 focus successifs : (a) lancer des 2 dés (`Somme` et `Écart`), (b) focus sur la tuile de la *Piste des pensées* et la tuile de la *Piste des Machines* désignées, (c) focus sur le plateau (rayon de la Machine, choix de la case cible selon la tactique, mouvement ou entrée du Chantier, parade ou coupe d'arbre), (d) focus animé sur l'apprentissage (échange des tuiles sur les deux pistes selon réussite/échec).
-   - Cahier des charges détaillé consigné dans [`projet/4-bilans/placement-etude-3-pistes.md`](projet/4-bilans/placement-etude-3-pistes.md).
-2. **Résultats de la Campagne 3 (16 oct. soir, `projet/4-bilans/placement-etude-3-pistes.md`)** :
-   - Outil d'évaluation multi-cœurs construit dans `maquettes-numeriques/pistes/campagne.js`, plan `campagnes/pistes_campagne3.json` (21 variantes × 24 parties appariées × 11 bots, tests $T_1$ et $T_4$), rapport `resultats/pistes/pistes_campagne3_rapport.md` et tableau de bord interactif `maquettes-numeriques/pistes/laboratoire.html`.
-   - **Constats mesurés :**
-     - Sans présage (`J3_base`), programmer 2 étapes à l'aveugle sur les seules pistes donne peu de prise au second ordre (taux fort 29,3 %, 10,4 % d'ordres perdus, Profondeur −1,0 🔴, Plan 2 étapes +1,6 pt).
-     - Avec le **Présage sur la Vague 1 (`J3_presage`)**, le score passe en tête (**0,77** : taux fort **42,2 % 🟢**, Lecture **16,8 pts 🟢**, Profondeur **+8,0 pts 🟢**, Info **14,6 pts 🟢**, Plan 2 étapes **+9,7 pts**, ordres perdus **2,8 %**). Sans présage, le rythme `vague` (`J3_rythme_vague`) améliore la Maîtrise (5,0 pts 🟢) et le Plan 2 étapes (+6,1 pts).
-     - La programmation en 2 étapes est indispensable au déplacement (`Placement` = 0,0 🔴 en 1 ordre/tour `J3_1ordre_8tours`, contre 3,3 à 7,3 pts en 2 étapes avec présage).
-     - L'apprentissage des deux pistes pèse **−9,2 pts** de taux de parade (`J3_base` 29,3 % contre `J3_sans_apprentissage` 38,5 %, ~51 échanges/partie).
-     - Le témoin `J3_sabotage_fige` fait bondir la boucle aveugle `marquage` à 38,4 % (Lecture 1,6 🔴), prouvant qu'un joueur **seul** ne doit pas pouvoir figer une Machine en boucle, mais que cet effet fort doit exiger d'**être à deux (Synergie, Palier 1)**, ce qui forcera aussi le **Couplage** inter-tuiles (actuellement bas : 2,8 % à 14,3 %) à monter.
+1. **Focus en cours : Compréhension physique concrète & Démonstration du tour de jeu (exprimé par l'auteur les 17–18 oct.)** :
+   - L'auteur a clarifié ses deux besoins distincts :
+     - **Besoin 1 (prioritaire)** : Comprendre le jeu, sa mécanique, se projeter sur l'incarnation physique sur table et les manipulations concrètes exactes du matériel à chaque étape (règle type livret de jeu moderne, table de jeu matérielle avec animation cohérente de la mise en place et d'un tour pas-à-pas avec focus sur la règle correspondante).
+     - **Besoin 2** : Jouer, comprendre les choix offerts et identifier ce qui se passe.
+   - Question centrale en cours de réflexion : **Quel matériel physique exact pour tirer les attaques en préservant le secret partiel de la 1B ?**
+     - Les 2 dés initiaux lient somme (tactique) et écart (machine). L'auteur apprécie l'élégance et les probabilités inégales des 2 dés, mais est moins convaincu par la liaison somme/écart.
+     - L'option de 2 paquets indépendants de cartes de « Rang » (18 cartes Machine numérotées Case 1..6 et 36 cartes Tactique numérotées Case 2..12) délie les deux composantes tout en conservant les mêmes probabilités marginales sur les pistes.
+
+2. **Réalisations récentes sur la maquette (`maquettes-numeriques/pistes/`)** :
+   - Intégration de la mécanique 1B d'Attaques Croisées (consultation secrète en quinconce, révélation d'1 indice sur 2).
+   - Mode didactique pas-à-pas en 4 temps par attaque (Cartes d'assaut → Lecture pistes → Rayon/Impact plateau → Glissement d'apprentissage).
+   - Tapis physique distingué du pupitre numérique BGA ; simulateur interactif des 5 gestes physiques sur table ; visite guidée interactive de l'interface (6 étapes) et partie exemple déroulée pas-à-pas (9 scènes).
+   - Validation automatisée complète (`node test_moteur.js` : 5146/5146 contrôles ; `node test_ui.js` avec Chrome CDP : 0 anomalie UI).
+
 3. **Feuille de route en 6 paliers convenue avec l'auteur (16 oct., 23 h 12)** :
    - **Palier 0 (Fait)** : Outil de campagne automatisé + Campagne 3 sur le modèle `pistes`.
    - **Palier 1** : Synergie (être à deux sur une Machine) & revalorisation du Sabotage.
@@ -75,12 +76,6 @@ Documents à lire avant de travailler : `README.md` (carte du dépôt), `docs/re
    - **Palier 3** : Phase de communication entre joueurs (Conseil de la calebasse, `projet/2-maquettes/proposition-conseil-calebasse.md`).
    - **Palier 4** : Mécanisme du Rêve disputé et fins de jeu provoquées.
    - **Palier 5** : Spécialisation des peuples (exceptions aux règles communes, identité des individus, cartes d'aide en main liées au peuple).
-
-**Décisions et propositions en attente de l'auteur (aucune décision prise au 17 oct., 11 h 31)**
-- **Socle Campagne 3** : Activer par défaut le Présage (`presage=true`) et/ou le rythme `vague` dans la maquette ?
-- **Palier 1 (Synergie à deux sur une Machine)** : Choisir les pistes à tester en simulation (Piste A : Saboter seul = échappe, Saboter à deux = remorquage au Chantier / HS + recul doublé ; Piste B : Garder seul, Saboter exige 2 individus sur la case et fige/détruit un organe ; ou autre piste).
-- **Exécution Hybride Local / Cloud (GitHub Actions)** : Ajouter `--lot i/N` et `--fusionner` à `maquettes-numeriques/pistes/campagne.js` et brancher `.github/workflows/placement.yml` pour lancer les petites sondes en local (< 5 min) et les gros criblages sur 20 machines GitHub Actions en parallèle (PC éteint).
-- Deux choix initiaux de la maquette des pistes à confirmer : une Machine qui sort du chantier sur une case gardée entre quand même, sans abattre ; sur le lancer qui la fait entrer, sa tuile tactique apprend du verdict comme l'autre (`maquettes-numeriques/pistes/LISEZMOI.md`).
 
 ## 5. Tâches planifiées
 
@@ -96,6 +91,8 @@ Documents à lire avant de travailler : `README.md` (carte du dépôt), `docs/re
 
 *L'auteur écrit ici ses réponses aux décisions attendues, avec la date. Les réponses antérieures au 15 oct., 16 h sont dans le journal des décisions et l'`ETAT.md` archivé.*
 
+- **18 oct. 2026 (matériel de tirage et priorité d'apprentissage)** : l'auteur confirme que la question du matériel de tirage est centrale ; il appréciait l'élégance et les probabilités inégales des 2 dés, mais était moins convaincu par la liaison somme/écart. Il demande de se concentrer en priorité sur le **premier besoin** : comprendre le jeu et son incarnation physique via une table de jeu avec matériel concret, une animation pas-à-pas cohérente de la mise en place et d'un tour de jeu, synchronisée avec la règle du jeu papier.
+- **17 oct. 2026, après-midi et soir (choix de la 1B et clarification des besoins)** : après comparaison de 3 pistes de communication (1A râtelier, 1B attaques croisées, 1C déduction pure), l'auteur retient la mécanique **1B (Attaques Croisées)** pour sa fluidité physique (évite la manipulation lourde d'un sac/creuset de jetons). Puis il clarifie la séparation nécessaire entre : 1) comprendre l'incarnation physique et les gestes réels sur table, 2) jouer sur l'interface avec facilités numériques.
 - **17 oct. 2026, 11 h 31 (clôture de session & nouveau besoin)** : l'auteur ne prend pas de décision sur les règles pour l'instant (il étudiera les résultats de la Campagne 3 et les propositions à part) ; il demande de tout consigner (résultats, propositions sur le jeu et sur l'exécution hybride local/cloud) et exprime un **nouveau besoin pour la maquette : un mode beaucoup plus didactique** montrant et expliquant en détail toutes les actions, en particulier une phase de résolution très décomposée avec des focus sur les éléments qui s'activent et bougent.
 - **16 oct. 2026, 19 h 30 à 23 h 30 (ergonomie de la maquette, analyse de partie, feuille de route et Campagne 3)** : validation des améliorations visuelles de `maquettes-numeriques/pistes/pistes.html` (arbres/souches SVG, réserve du Chantier, noms des cases agrandis au survol, flèches d'intention colorées par tactique d'épaisseur constante affichées au survol uniquement, croisement 21 plans masquable, menu radial, export JSON automatique) ; analyse de la partie humaine (`couronne-pistes-pmvbfmu561ss.json`) et accord pour corriger le biais de passivité des bots dans `bots.js` ; accord sur l'ordre des 6 paliers du plan d'action et sur le lancement immédiat de l'outil d'évaluation et de la Campagne 3 ; précision consignée sur les « cartes événements » (= cartes d'aide en main propres au peuple, Palier 5).
 - **16 oct. 2026, 16 h 51 (rangement)** : l'auteur demande de ranger les documents du projet et le dépôt : garder ce qui correspond à l'exploration actuelle et les pistes encore pertinentes, restructurer ce qui reste, archiver ce qui n'est plus sur la trajectoire, supprimer le reste. Fait le 16 oct. (section 9) ; suppressions soumises en lot.
@@ -135,6 +132,7 @@ Les sessions antérieures au 15 oct., 16 h sont dans l'`ETAT.md` archivé.
 | 16 oct. 2026 | 09:27 | 5 h (avec pauses) | Retour de partie de l'auteur ; proposition « pistes et deux étapes » ; décisions sur la piste des Machines ; maquette « Couronne aux deux pistes » écrite, testée et publiée. |
 | 16 oct. 2026 | 16:51 | 1 h 30 | **Rangement du dépôt et des documents du projet**, à la demande de l'auteur : jeu complet V0.x, moteur `foret`, plans et bilans V0.x, noyau N1 et quatre workflows déplacés dans `archive/` ; `ETAT.md`, `README.md`, registre des parties différées et journal des décisions réécrits pour la ligne active. |
 | 16–17 oct. 2026 | 19:30 | 4 h (avec pause nuit) | **Refonte ergonomique de `pistes.html`, analyse de partie humaine, outil d'évaluation automatisé et Campagne 3** : amélioration visuelle et interactive de `maquettes-numeriques/pistes/` ; export JSON automatique ; analyse de la partie `couronne-pistes-pmvbfmu561ss.json` et correction de la passivité des bots dans `bots.js` ; plan d'action en 6 paliers ; création de `maquettes-numeriques/pistes/campagne.js` et `laboratoire.html` ; exécution et bilan de la Campagne 3 (`projet/4-bilans/placement-etude-3-pistes.md`) ; consignation des propositions et du nouveau besoin de mode didactique décomposé. |
+| 17–18 oct. 2026 | 11:35 | – | **Exploration de la communication (1A, 1B, 1C), choix de la 1B, refonte didactique de `pistes.html` et réflexion sur le matériel physique** : étude des 3 options de communication ; choix de la mécanique 1B (Attaques Croisées) par l'auteur pour son ergonomie sur table ; refonte complète de la maquette avec séparation tapis physique / pupitre BGA, résolution en 4 micro-temps, simulateur des 5 gestes physiques, visite guidée interactive, partie exemple animée ; test suite UI automatisée (Chrome CDP) ; clarification des deux besoins (comprendre l'incarnation physique concrète vs jouer) et échanges sur le tirage physique des attaques (dés vs cartes déliées). |
 
 ## 10. Reprendre la main
 

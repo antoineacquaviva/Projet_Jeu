@@ -37,12 +37,33 @@
     return s;
   }
 
-  // tirages des pistes pour évaluer un programme ; avec le présage, les dés de la vague 1 sont connus
+  // tirages des pistes pour évaluer un programme ; avec le présage ou les indices croisés 1B, la vague 1 est contrainte
   function echantillons(p, rng, S, ctx) {
     const out = [];
     for (let s = 0; s < S; s++) {
       const t = K.tirerTour(p, rng);
-      if (ctx && ctx.connus) t[0].forEach((l, k) => { l.d = ctx.connus[k].slice(); });
+      if (ctx && ctx.connus) {
+        t[0].forEach((l, k) => { l.d = ctx.connus[k].slice(); });
+      } else if (ctx && ctx.indices1B && ctx.e) {
+        const { vague0, reveles, jObs } = ctx.indices1B;
+        const etats = K.etatAttaques1B(p, ctx.pl, ctx.e, vague0, reveles, jObs);
+        t[0].forEach((l, k) => {
+          const st = etats[k];
+          if (!st) return;
+          if (st.connaisM && st.connaisT) {
+            l.d = st.d.slice();
+            l.t = st.t; l.c = st.c;
+          } else if (st.connaisM) {
+            // Tirer un dé compatible avec l'écart connu de la Machine
+            const cands = K.ISSUES.filter((d) => Math.abs(d[0] - d[1]) === st.ecart);
+            if (cands.length) l.d = rng.choix(cands).slice();
+          } else if (st.connaisT) {
+            // Tirer un dé compatible avec la tactique connue
+            const cands = K.ISSUES.filter((d) => K.tactiqueEn(ctx.e, d[0] + d[1]) === st.tactique);
+            if (cands.length) l.d = rng.choix(cands).slice();
+          }
+        });
+      }
       out.push(t);
     }
     return out;
@@ -67,6 +88,17 @@
       }
       return { garde: (c, deja) => ((hc[c] || 0) > deja ? 1 : 0), sabot: (m, deja) => ((hm[m] || 0) > deja ? 1 : 0),
         pr: K.menaceParCase(p, pl, f), certain: true };
+    }
+    if (v === 0 && ctx && ctx.indices1B) {        // Mécanique 1B : indices croisés publics + secret du joueur jObs
+      const mv = K.menaceVague1B(p, pl, f, ctx.indices1B.vague0, ctx.indices1B.reveles, ctx.indices1B.jObs);
+      return {
+        garde: (c, deja) => (deja === 0 ? mv.probCaseAuMoins1[c] : Math.max(0, mv.espCase[c] - deja)),
+        sabot: (m, deja) => (deja === 0 ? mv.probMachineAuMoins1[m] : Math.max(0, mv.espMachine[m] - deja)),
+        pr: mv.espCase.map((x) => x / p.L),
+        probVagueCase: mv.probCaseAuMoins1,
+        certain: false,
+        indices1B: true
+      };
     }
     const pr = K.menaceParCase(p, pl, f); const prof = K.profils(f);
     return { garde: (c, deja) => queueBinomiale(p.L, pr[c], deja + 1), sabot: (m, deja) => queueBinomiale(p.L, prof[m].chances / 36, deja + 1),
@@ -246,6 +278,71 @@
     hasard: { nom: 'Hasard', decrit: 'des cartes permises au hasard (témoin)', jouer: hasard },
   };
 
+  // ------------------------------------------------------------ Choix de l'indice à révéler en Mécanique 1B
+  // Le joueur j détient :
+  //   - Indice 0 : la Machine de l'Attaque j (sur la piste des Machines)
+  //   - Indice 1 : la Tactique de l'Attaque (j + 1) % J (sur la piste des Pensées)
+  function choisirRevelation1B(p, pl, e, vague0, j, botType, rng) {
+    const info = K.indicesTour1B(p, e, vague0);
+    const indM = info.mains[j][0];
+    const indT = info.mains[j][1];
+    if (botType === 'hasard' && rng) {
+      const ch = rng.entier(2);
+      return {
+        choix: ch,
+        raison: ch === 0
+          ? `Révèle au hasard la Machine de l'Attaque ${indM.attCode} (${nomM(indM.machine)}).`
+          : `Révèle au hasard la Tactique de l'Attaque ${indT.attCode} (${NOMS_TACTIQUES[indT.tactique]}).`,
+        conseil0: '',
+        conseil1: ''
+      };
+    }
+
+    const mesInds = individusDe(p, j);
+    const mesCases = new Set(mesInds.map((i) => e.individus[i]));
+    const posM = e.machines[indM.machine];
+    const mSurMonPion = posM >= 0 && mesCases.has(posM);
+    const mSurMaTuile = posM >= 0 && pl.tuile[posM] === j;
+    const mChezAllie = posM >= 0 && pl.tuile[posM] !== j;
+
+    // Probabilité a priori de cette Machine et de cette Tactique sur les pistes publiques
+    const probM = indM.chances / 36;
+    let chancesTacTot = 0;
+    for (let s = 2; s <= 12; s++) if (K.tactiqueEn(e, s) === indT.tactique) chancesTacTot += K.CHANCES_SOMME(s);
+    const probT = chancesTacTot / 36;
+
+    // Score d'intérêt coopératif pour révéler la Machine (0) vs la Tactique (1)
+    const surpriseM = 1 - probM;
+    const surpriseT = 1 - probT;
+    let scoreM = surpriseM + (mChezAllie ? 0.55 : 0) - (mSurMonPion ? 0.65 : 0);
+    let scoreT = surpriseT + 0.25 + (mSurMonPion ? 0.45 : 0);
+
+    const voisinT = ((j + 1) % p.J) + 1;
+    const lieuM = posM >= 0 ? `en ${nomCase(p, pl, posM)} (Tuile J${pl.tuile[posM] + 1})` : 'au Chantier';
+
+    const conseil0 = mSurMonPion
+      ? `Tu as déjà un pion sur la case de ${nomM(indM.machine)} (${lieuM}) : tu peux la gérer toi-même en la gardant secrète.`
+      : (mChezAllie
+        ? `${nomM(indM.machine)} est chez un coéquipier (${lieuM}) : la révéler l'alerte directement !`
+        : `${nomM(indM.machine)} est sur ta tuile (${lieuM}, probabilité piste ${indM.chances}/36).`);
+
+    const conseil1 = `Révéler ${NOMS_TACTIQUES[indT.tactique]} sur l'Attaque ${indT.attCode} permet au Joueur ${voisinT} (qui connaît la Machine ${indT.attCode}) de connaître à 100 % la cible exacte de l'Attaque ${indT.attCode} !`;
+
+    const choix = scoreM >= scoreT ? 0 : 1;
+    let raison;
+    if (choix === 0) {
+      raison = `Révèle la Machine de l'Attaque ${indM.attCode} (${nomM(indM.machine)}, ${lieuM}) : `
+        + (mChezAllie ? `elle menace directement la tuile d'un allié` : `indice plus rare sur la piste (${indM.chances}/36)`)
+        + ` — et garde en secret la Tactique de l'Attaque ${indT.attCode} (${NOMS_TACTIQUES[indT.tactique]}).`;
+    } else {
+      raison = `Révèle la Tactique de l'Attaque ${indT.attCode} (${NOMS_TACTIQUES[indT.tactique]}) pour compléter le puzzle du Joueur ${voisinT}`
+        + (mSurMonPion ? ` (car J${j + 1} a déjà un pion sur ${nomM(indM.machine)} pour la gérer en secret)` : ` (${NOMS_TACTIQUES[indT.tactique]} vaut ${chancesTacTot}/36 sur la piste)`)
+        + ` — et garde en secret la Machine de l'Attaque ${indM.attCode} (${nomM(indM.machine)}).`;
+    }
+
+    return { choix, raison, scoreM, scoreT, conseil0, conseil1 };
+  }
+
   // une partie entière jouée par un bot à tous les sièges (séries de la page) ; mêmes tirages du jeu pour tous les bots
   // à graine égale (comparaisons appariées)
   function partieAuto(reglages, bot) {
@@ -255,8 +352,16 @@
     const tous = Array.from({ length: p.J }, (_, j) => j);
     for (let t = 0; t < p.tours; t++) {
       const cartes = K.cartesVides(p);
-      const ctx = p.presage ? { connus: tirages[t][0].map((l) => l.d.slice()) } : null;
-      BOTS[bot].jouer(p, pl, e, cartes, tous, rb, ctx);
+      let ctx = p.presage ? { connus: tirages[t][0].map((l) => l.d.slice()) } : null;
+      if (reglages && reglages.comm1B && !p.presage) {
+        const reveles = tous.map((j) => choisirRevelation1B(p, pl, e, tirages[t][0], j, bot, rb).choix);
+        for (const j of tous) {
+          const ctxJ = { e, pl, indices1B: { vague0: tirages[t][0], reveles, jObs: j } };
+          BOTS[bot].jouer(p, pl, e, cartes, [j], rb, ctxJ);
+        }
+      } else {
+        BOTS[bot].jouer(p, pl, e, cartes, tous, rb, ctx);
+      }
       for (const et of K.jouerTour(p, pl, e, cartes, tirages[t])) {
         perdus += et.perdus.length;
         for (const v of et.evts) {
@@ -270,6 +375,6 @@
       couplage: S ? hors / S : 0, parades: S, perdus };
   }
 
-  const API = { BOTS, nomCase, nomInd, nomM, ordreTexte, individusDe, valeur, echantillons, lectureEtape, queueBinomiale, partieAuto };
+  const API = { BOTS, nomCase, nomInd, nomM, ordreTexte, individusDe, valeur, echantillons, lectureEtape, queueBinomiale, choisirRevelation1B, partieAuto };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else G.PISTESBOTS = API;
 })(typeof window !== 'undefined' ? window : globalThis);

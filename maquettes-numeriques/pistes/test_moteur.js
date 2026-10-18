@@ -88,6 +88,39 @@ for (const J of [2, 3, 4, 5, 6]) for (const bot of Object.keys(B.BOTS)) for (con
   const a = B.partieAuto({ joueurs: 3, graine: 42 }, 'prevoyant'), b = B.partieAuto({ joueurs: 3, graine: 42 }, 'prevoyant');
   ok(egal(a, b), 'même graine, même partie (prévoyant)');
 }
+
+// 5. mécanique 1B (Pistes publiques & Attaques croisées) et détail didactique
+{
+  const { p, pl, e, tirages } = K.nouvellePartie({ joueurs: 3, graine: 77 });
+  const vague0 = tirages[0][0];
+  const indices = K.indicesTour1B(p, e, vague0);
+  ok(indices.mains.length === 3 && indices.attaques.length === p.L, '1B : 3 joueurs => 3 paires d\'indices croisés');
+  for (let j = 0; j < 3; j++) {
+    ok(indices.mains[j][0].attIdx === j && indices.mains[j][0].type === 'machine', `1B J${j} indice 0 = Machine de l'attaque ${j}`);
+    ok(indices.mains[j][1].attIdx === (j + 1) % 3 && indices.mains[j][1].type === 'tactique', `1B J${j} indice 1 = Tactique de l'attaque ${(j + 1) % 3}`);
+  }
+  const reveles = [null, null, null];
+  for (let j = 0; j < 3; j++) {
+    const ch = B.choisirRevelation1B(p, pl, e, vague0, j, 'prevoyant', K.generateur(10 + j));
+    ok(ch.choix === 0 || ch.choix === 1, `1B choix valide pour J${j}`);
+    ok(typeof ch.raison === 'string' && ch.raison.length > 10, `1B explication fournie pour J${j}`);
+    reveles[j] = ch.choix;
+  }
+  const attJ0 = K.etatAttaques1B(p, pl, e, vague0, reveles, 0);
+  ok(attJ0.length === p.L, '1B : etatAttaques1B couvre les L attaques');
+  ok(attJ0[3].embuscade === true && !attJ0[3].connaisM && !attJ0[3].connaisT, '1B : la (J+1)-ième attaque est une embuscade cachée');
+  const men = K.menaceVague1B(p, pl, e, vague0, reveles, 0);
+  ok(Math.abs(men.espMachine.reduce((a, b) => a + b, 0) - p.L) < 1e-6, '1B : somme des espérances de machines = L');
+  const det = K.detailDestination(p, pl, e, 0, 'cupidite');
+  ok(det.candidats.length > 0 && det.cible === K.destination(p, pl, e, 0, 'cupidite')[0], 'detailDestination cohérent avec destination()');
+  const cartes = K.cartesVides(p);
+  const raisons1B = B.BOTS.prevoyant.jouer(p, pl, e, cartes, [0, 1, 2], K.generateur(99), {
+    indices1B: { vague0, reveles }
+  });
+  ok(Object.keys(raisons1B).length === 3, 'Bot prévoyant joue avec contexte 1B');
+}
 console.log(`${controles - echecs} / ${controles} contrôles réussis`);
 console.log('Temps de décision par partie (ms) :', Object.entries(temps).map(([k, v]) => `${k} ${v}`).join(' · '));
 process.exit(echecs ? 1 : 0);
+
+
