@@ -1,6 +1,54 @@
 {
-  "derniereSauvegarde": "2026-10-19T20:34:12.850Z",
+  "derniereSauvegarde": "2026-10-19T20:57:44.579Z",
   "variantes": [
+    {
+      "id": "v01_exp_mvfqk35p_0",
+      "nom": "V0.1 Exploratoire #12 (sequentielle / coupe / 3J)",
+      "version": "0.1",
+      "description": "Exploration automatique : Programmation sequentielle_2_ordres, Résolution deux_vagues_completes, Protéger=coupe_seule, Saboter=individuel_chantier, +Replanter.",
+      "origine": "exploration",
+      "statutViabilite": "eliminee",
+      "modeProgrammation": "sequentielle_2_ordres",
+      "modeResolution": "deux_vagues_completes",
+      "effetProteger": "coupe_seule",
+      "effetSaboter": "individuel_chantier",
+      "actionReplanterActive": true,
+      "deplacementDoubleActif": false,
+      "rythmeApprentissage": "chaque_machine",
+      "porteeTactiques": "voisinage",
+      "nbJoueurs": 3,
+      "defenseursParJoueur": 2,
+      "foretsParCaseSecteur": 4,
+      "foretsCoeur": 6,
+      "nbTours": 4,
+      "machinesInitiales": 3,
+      "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
+      "bandeSante": "rouge"
+    },
+    {
+      "id": "v01_exp_mvfqk35p_1",
+      "nom": "V0.1 Exploratoire #13 (alternee / coupe / 4J)",
+      "version": "0.1",
+      "description": "Exploration automatique : Programmation alternee_1_par_1, Résolution entrelacee_coupe_fin, Protéger=coupe_seule, Saboter=immobiliser_sur_place.",
+      "origine": "exploration",
+      "statutViabilite": "viable",
+      "modeProgrammation": "alternee_1_par_1",
+      "modeResolution": "entrelacee_coupe_fin",
+      "effetProteger": "coupe_seule",
+      "effetSaboter": "immobiliser_sur_place",
+      "actionReplanterActive": false,
+      "deplacementDoubleActif": false,
+      "rythmeApprentissage": "fin_de_tour",
+      "porteeTactiques": "voisinage",
+      "nbJoueurs": 4,
+      "defenseursParJoueur": 2,
+      "foretsParCaseSecteur": 4,
+      "foretsCoeur": 6,
+      "nbTours": 4,
+      "machinesInitiales": 4,
+      "scoreInteretDernierTest": 83,
+      "bandeSante": "vert"
+    },
     {
       "id": "v01_exp_mvfppt0c_0",
       "nom": "V0.1 Exploratoire #8 (sequentielle / coupe / 3J)",
@@ -22,8 +70,8 @@
       "foretsCoeur": 6,
       "nbTours": 4,
       "machinesInitiales": 3,
-      "scoreInteretDernierTest": 57,
-      "bandeSante": "orange"
+      "scoreInteretDernierTest": 23,
+      "bandeSante": "rouge"
     },
     {
       "id": "v01_exp_mvfppt0c_1",
@@ -55,7 +103,7 @@
       "version": "0.1",
       "description": "Exploration automatique : Programmation 2e_apres_ciblage, Résolution entrelacee_coupe_fin, Protéger=coupe_seule, Saboter=immobiliser_sur_place.",
       "origine": "exploration",
-      "statutViabilite": "eliminee",
+      "statutViabilite": "viable",
       "modeProgrammation": "2e_apres_ciblage",
       "modeResolution": "entrelacee_coupe_fin",
       "effetProteger": "coupe_seule",
@@ -70,8 +118,8 @@
       "foretsCoeur": 6,
       "nbTours": 4,
       "machinesInitiales": 5,
-      "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
-      "bandeSante": "rouge"
+      "bandeSante": "vert",
+      "scoreInteretDernierTest": 89
     },
     {
       "id": "v01_exp_mvfppt0c_3",
@@ -104,7 +152,7 @@
       "description": "Séquencement confirmé : programmation séquentielle de 2 actions après tirage 2D6 secret ; 1res actions -> ciblage Machines au milieu -> 2es actions -> coupe des Forêts en fin de tour et apprentissage.",
       "origine": "socle",
       "statutViabilite": "viable",
-      "scoreInteretDernierTest": 81,
+      "scoreInteretDernierTest": 84,
       "bandeSante": "vert",
       "modeProgrammation": "sequentielle_2_ordres",
       "modeResolution": "entrelacee_coupe_fin",
@@ -176,8 +224,8 @@
       "version": "0.1",
       "description": "Saboter exige 2 Défenseurs sur la même tuile pour renvoyer une Machine au chantier, mais les Défenseurs disposent d’une 4e carte « Replanter » permettant de régénérer une Forêt.",
       "origine": "exploration",
-      "statutViabilite": "eliminee",
-      "scoreInteretDernierTest": 81,
+      "statutViabilite": "viable",
+      "scoreInteretDernierTest": 28,
       "bandeSante": "rouge",
       "modeProgrammation": "sequentielle_2_ordres",
       "modeResolution": "entrelacee_coupe_fin",
@@ -192,8 +240,7 @@
       "foretsParCaseSecteur": 4,
       "foretsCoeur": 6,
       "nbTours": 4,
-      "machinesInitiales": 4,
-      "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+      "machinesInitiales": 4
     },
     {
       "id": "v01_deux_vagues_completes",
@@ -201,8 +248,8 @@
       "version": "0.1",
       "description": "Au lieu de regrouper les coupes en fin de tour, la moitié des lancers de Machines cible et coupe dès la fin de la Vague I, et la seconde moitié après la Vague II.",
       "origine": "exploration",
-      "statutViabilite": "eliminee",
-      "scoreInteretDernierTest": 67,
+      "statutViabilite": "viable",
+      "scoreInteretDernierTest": 32,
       "bandeSante": "rouge",
       "modeProgrammation": "sequentielle_2_ordres",
       "modeResolution": "deux_vagues_completes",
@@ -217,8 +264,7 @@
       "foretsParCaseSecteur": 4,
       "foretsCoeur": 6,
       "nbTours": 4,
-      "machinesInitiales": 4,
-      "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+      "machinesInitiales": 4
     },
     {
       "id": "v01_temoin_boucle_gagnante",
@@ -273,18 +319,19 @@
   ],
   "rapportsViabilite": [
     {
-      "varianteId": "v01_exp_mvfppt0c_0",
-      "varianteNom": "V0.1 Exploratoire #8 (sequentielle / coupe / 3J)",
-      "dateExecution": "2026-10-19T20:34:09.716Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 151,
-      "viable": true,
+      "varianteId": "v01_exp_mvfqk35p_0",
+      "varianteNom": "V0.1 Exploratoire #12 (sequentielle / coupe / 3J)",
+      "dateExecution": "2026-10-19T20:57:42.485Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 87,
+      "viable": false,
+      "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
       "criteres": [
         {
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 4 tours",
+          "valeurObservee": "5/5 parties terminées en 4 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -292,7 +339,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 84.8 % (Pire décile 76.7 %)",
+          "valeurObservee": "Moyenne 74.7 % (Pire décile 70 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -300,7 +347,57 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": true,
-          "valeurObservee": "+24.6 pts de forêt sauvée sur Inerte (60.2 %)",
+          "valeurObservee": "+14.7 pts de forêt sauvée sur Inerte (60 %)",
+          "seuilAttendu": "Écart ≥ +12 pts",
+          "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+        },
+        {
+          "code": "V4_GARDE_FOU_BOUCLE",
+          "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+          "valide": false,
+          "valeurObservee": "Déductif 74.7 % vs Boucle 74 % (écart +0.7 pts)",
+          "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+          "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+        },
+        {
+          "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+          "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+          "valide": true,
+          "valeurObservee": "Dépl. 44% · Prot. 37% · Sabotages/partie: 7.8",
+          "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+          "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+        }
+      ]
+    },
+    {
+      "varianteId": "v01_exp_mvfqk35p_1",
+      "varianteNom": "V0.1 Exploratoire #13 (alternee / coupe / 4J)",
+      "dateExecution": "2026-10-19T20:57:42.577Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 92,
+      "viable": true,
+      "criteres": [
+        {
+          "code": "V1_TERMINAISON",
+          "intitule": "Terminaison & Intégrité du Moteur",
+          "valide": true,
+          "valeurObservee": "5/5 parties terminées en 4 tours",
+          "seuilAttendu": "100 % sans blocage ni état invalide",
+          "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+        },
+        {
+          "code": "V2_BANDE_SURVIE",
+          "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+          "valide": true,
+          "valeurObservee": "Moyenne 82.6 % (Pire décile 73.7 %)",
+          "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+          "detail": "La pression exercée par les Machines est bien calibrée."
+        },
+        {
+          "code": "V3_IMPACT_JOUEURS",
+          "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+          "valide": true,
+          "valeurObservee": "+23.1 pts de forêt sauvée sur Inerte (59.5 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
         },
@@ -308,7 +405,7 @@
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
           "valide": true,
-          "valeurObservee": "Déductif 84.8 % vs Boucle 74.8 % (écart +10 pts)",
+          "valeurObservee": "Déductif 82.6 % vs Boucle 76.3 % (écart +6.3 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
           "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
         },
@@ -316,7 +413,57 @@
           "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": true,
-          "valeurObservee": "Dépl. 48% · Prot. 39% · Sabotages/partie: 5.3",
+          "valeurObservee": "Dépl. 49% · Prot. 38% · Sabotages/partie: 7.2",
+          "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+          "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+        }
+      ]
+    },
+    {
+      "varianteId": "v01_exp_mvfppt0c_0",
+      "varianteNom": "V0.1 Exploratoire #8 (sequentielle / coupe / 3J)",
+      "dateExecution": "2026-10-19T20:57:42.874Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 47,
+      "viable": true,
+      "criteres": [
+        {
+          "code": "V1_TERMINAISON",
+          "intitule": "Terminaison & Intégrité du Moteur",
+          "valide": true,
+          "valeurObservee": "5/5 parties terminées en 4 tours",
+          "seuilAttendu": "100 % sans blocage ni état invalide",
+          "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+        },
+        {
+          "code": "V2_BANDE_SURVIE",
+          "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+          "valide": true,
+          "valeurObservee": "Moyenne 88.7 % (Pire décile 83.3 %)",
+          "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+          "detail": "La pression exercée par les Machines est bien calibrée."
+        },
+        {
+          "code": "V3_IMPACT_JOUEURS",
+          "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+          "valide": true,
+          "valeurObservee": "+28 pts de forêt sauvée sur Inerte (60.7 %)",
+          "seuilAttendu": "Écart ≥ +12 pts",
+          "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+        },
+        {
+          "code": "V4_GARDE_FOU_BOUCLE",
+          "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+          "valide": true,
+          "valeurObservee": "Déductif 88.7 % vs Boucle 72.7 % (écart +16 pts)",
+          "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+          "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
+        },
+        {
+          "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+          "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+          "valide": true,
+          "valeurObservee": "Dépl. 45% · Prot. 40% · Sabotages/partie: 6.2",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -325,9 +472,9 @@
     {
       "varianteId": "v01_exp_mvfppt0c_1",
       "varianteNom": "V0.1 Exploratoire #9 (alternee / coupe / 4J)",
-      "dateExecution": "2026-10-19T20:34:10.315Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 304,
+      "dateExecution": "2026-10-19T20:57:43.047Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 102,
       "viable": false,
       "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
       "criteres": [
@@ -335,7 +482,7 @@
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 4 tours",
+          "valeurObservee": "5/5 parties terminées en 4 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -343,7 +490,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 71.2 % (Pire décile 65.8 %)",
+          "valeurObservee": "Moyenne 72.1 % (Pire décile 63.2 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -351,7 +498,7 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": true,
-          "valeurObservee": "+13.3 pts de forêt sauvée sur Inerte (57.9 %)",
+          "valeurObservee": "+14.2 pts de forêt sauvée sur Inerte (57.9 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
         },
@@ -359,7 +506,7 @@
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
           "valide": false,
-          "valeurObservee": "Déductif 71.2 % vs Boucle 74.8 % (écart -3.6 pts)",
+          "valeurObservee": "Déductif 72.1 % vs Boucle 76.8 % (écart -4.7 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
           "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
         },
@@ -367,7 +514,7 @@
           "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": true,
-          "valeurObservee": "Dépl. 49% · Prot. 39% · Sabotages/partie: 6.7",
+          "valeurObservee": "Dépl. 48% · Prot. 39% · Sabotages/partie: 6.6",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -376,17 +523,16 @@
     {
       "varianteId": "v01_exp_mvfppt0c_2",
       "varianteNom": "V0.1 Exploratoire #10 (2e / coupe / 5J)",
-      "dateExecution": "2026-10-19T20:34:10.685Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 370,
-      "viable": false,
-      "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
+      "dateExecution": "2026-10-19T20:57:43.165Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 118,
+      "viable": true,
       "criteres": [
         {
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 4 tours",
+          "valeurObservee": "5/5 parties terminées en 4 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -394,7 +540,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 83 % (Pire décile 73.9 %)",
+          "valeurObservee": "Moyenne 84.4 % (Pire décile 78.3 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -402,23 +548,23 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": true,
-          "valeurObservee": "+24.9 pts de forêt sauvée sur Inerte (58.1 %)",
+          "valeurObservee": "+25.7 pts de forêt sauvée sur Inerte (58.7 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
         },
         {
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
-          "valide": false,
-          "valeurObservee": "Déductif 83 % vs Boucle 78.7 % (écart +4.3 pts)",
+          "valide": true,
+          "valeurObservee": "Déductif 84.4 % vs Boucle 78.7 % (écart +5.7 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
-          "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+          "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
         },
         {
           "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": true,
-          "valeurObservee": "Dépl. 46% · Prot. 40% · Sabotages/partie: 10.9",
+          "valeurObservee": "Dépl. 45% · Prot. 40% · Sabotages/partie: 11.2",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -427,9 +573,9 @@
     {
       "varianteId": "v01_exp_mvfppt0c_3",
       "varianteNom": "V0.1 Exploratoire #11 (un / coupe / 6J)",
-      "dateExecution": "2026-10-19T20:34:10.702Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 17,
+      "dateExecution": "2026-10-19T20:57:43.515Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 6,
       "viable": false,
       "motifElimination": "Éliminée (V3_IMPACT_JOUEURS, V4_GARDE_FOU_BOUCLE, V5_USAGE_SABOTAGE_ET_MOUVEMENT) : Les actions des joueurs pèsent trop peu sur l’issue de la partie.",
       "criteres": [
@@ -437,7 +583,7 @@
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 4 tours",
+          "valeurObservee": "5/5 parties terminées en 4 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -445,7 +591,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 60.6 % (Pire décile 57.4 %)",
+          "valeurObservee": "Moyenne 60.8 % (Pire décile 59.3 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -453,7 +599,7 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": false,
-          "valeurObservee": "+0 pts de forêt sauvée sur Inerte (60.6 %)",
+          "valeurObservee": "+0 pts de forêt sauvée sur Inerte (60.8 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les actions des joueurs pèsent trop peu sur l’issue de la partie."
         },
@@ -461,7 +607,7 @@
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
           "valide": false,
-          "valeurObservee": "Déductif 60.6 % vs Boucle 60.6 % (écart +0 pts)",
+          "valeurObservee": "Déductif 60.8 % vs Boucle 60.8 % (écart +0 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
           "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
         },
@@ -478,16 +624,16 @@
     {
       "varianteId": "v01_socle_reference",
       "varianteNom": "V0.1 Socle — Séquencement Entrelacé (Référence)",
-      "dateExecution": "2026-10-19T20:34:10.859Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 157,
+      "dateExecution": "2026-10-19T20:57:43.572Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 57,
       "viable": true,
       "criteres": [
         {
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 4 tours",
+          "valeurObservee": "5/5 parties terminées en 4 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -495,7 +641,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 86.7 % (Pire décile 76.3 %)",
+          "valeurObservee": "Moyenne 89.5 % (Pire décile 81.6 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -503,7 +649,7 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": true,
-          "valeurObservee": "+28.5 pts de forêt sauvée sur Inerte (58.2 %)",
+          "valeurObservee": "+31.1 pts de forêt sauvée sur Inerte (58.4 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
         },
@@ -511,7 +657,7 @@
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
           "valide": true,
-          "valeurObservee": "Déductif 86.7 % vs Boucle 78.4 % (écart +8.3 pts)",
+          "valeurObservee": "Déductif 89.5 % vs Boucle 76.8 % (écart +12.7 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
           "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
         },
@@ -519,7 +665,7 @@
           "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": true,
-          "valeurObservee": "Dépl. 48% · Prot. 41% · Sabotages/partie: 6.8",
+          "valeurObservee": "Dépl. 49% · Prot. 40% · Sabotages/partie: 6.8",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -528,16 +674,16 @@
     {
       "varianteId": "v01_alternee_barrage",
       "varianteNom": "V0.1 Pose Alternée (I puis II) & Barrage Complet",
-      "dateExecution": "2026-10-19T20:34:11.525Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 251,
+      "dateExecution": "2026-10-19T20:57:43.797Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 101,
       "viable": true,
       "criteres": [
         {
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 4 tours",
+          "valeurObservee": "5/5 parties terminées en 4 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -545,7 +691,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 79.3 % (Pire décile 73.7 %)",
+          "valeurObservee": "Moyenne 78.4 % (Pire décile 76.3 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -553,7 +699,7 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": true,
-          "valeurObservee": "+20.4 pts de forêt sauvée sur Inerte (58.9 %)",
+          "valeurObservee": "+18.9 pts de forêt sauvée sur Inerte (59.5 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
         },
@@ -561,7 +707,7 @@
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
           "valide": true,
-          "valeurObservee": "Déductif 79.3 % vs Boucle 62.7 % (écart +16.6 pts)",
+          "valeurObservee": "Déductif 78.4 % vs Boucle 64.2 % (écart +14.2 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
           "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
         },
@@ -569,7 +715,7 @@
           "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": true,
-          "valeurObservee": "Dépl. 48% · Prot. 42% · Sabotages/partie: 6",
+          "valeurObservee": "Dépl. 50% · Prot. 41% · Sabotages/partie: 5.6",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -578,9 +724,9 @@
     {
       "varianteId": "v01_reaction_intermediaire",
       "varianteNom": "V0.1 Programmation de la 2e Action après Ciblage Machine",
-      "dateExecution": "2026-10-19T20:34:12.464Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 247,
+      "dateExecution": "2026-10-19T20:57:44.159Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 133,
       "viable": false,
       "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
       "criteres": [
@@ -588,7 +734,7 @@
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 4 tours",
+          "valeurObservee": "5/5 parties terminées en 4 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -596,7 +742,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 82.1 % (Pire décile 76.3 %)",
+          "valeurObservee": "Moyenne 80 % (Pire décile 76.3 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -604,7 +750,7 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": true,
-          "valeurObservee": "+23.2 pts de forêt sauvée sur Inerte (58.9 %)",
+          "valeurObservee": "+20.5 pts de forêt sauvée sur Inerte (59.5 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
         },
@@ -612,7 +758,7 @@
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
           "valide": false,
-          "valeurObservee": "Déductif 82.1 % vs Boucle 78 % (écart +4.1 pts)",
+          "valeurObservee": "Déductif 80 % vs Boucle 76.3 % (écart +3.7 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
           "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
         },
@@ -620,7 +766,7 @@
           "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": true,
-          "valeurObservee": "Dépl. 44% · Prot. 46% · Sabotages/partie: 6.6",
+          "valeurObservee": "Dépl. 45% · Prot. 46% · Sabotages/partie: 5.6",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -629,17 +775,16 @@
     {
       "varianteId": "v01_alliance_replanter",
       "varianteNom": "V0.1 Sabotage en Alliance & Action Replanter",
-      "dateExecution": "2026-10-19T20:34:12.595Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 131,
-      "viable": false,
-      "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
+      "dateExecution": "2026-10-19T20:57:44.212Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 53,
+      "viable": true,
       "criteres": [
         {
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 4 tours",
+          "valeurObservee": "5/5 parties terminées en 4 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -647,7 +792,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 82.7 % (Pire décile 76.3 %)",
+          "valeurObservee": "Moyenne 88.4 % (Pire décile 78.9 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -655,23 +800,23 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": true,
-          "valeurObservee": "+24.5 pts de forêt sauvée sur Inerte (58.2 %)",
+          "valeurObservee": "+30 pts de forêt sauvée sur Inerte (58.4 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
         },
         {
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
-          "valide": false,
-          "valeurObservee": "Déductif 82.7 % vs Boucle 78.4 % (écart +4.3 pts)",
+          "valide": true,
+          "valeurObservee": "Déductif 88.4 % vs Boucle 76.8 % (écart +11.6 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
-          "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+          "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
         },
         {
           "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": true,
-          "valeurObservee": "Dépl. 48% · Prot. 39% · Sabotages/partie: 7.1",
+          "valeurObservee": "Dépl. 50% · Prot. 35% · Sabotages/partie: 8",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -680,17 +825,16 @@
     {
       "varianteId": "v01_deux_vagues_completes",
       "varianteNom": "V0.1 Résolution en Deux Vagues de Coupe Successives",
-      "dateExecution": "2026-10-19T20:34:12.745Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 150,
-      "viable": false,
-      "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
+      "dateExecution": "2026-10-19T20:57:44.397Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 47,
+      "viable": true,
       "criteres": [
         {
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 4 tours",
+          "valeurObservee": "5/5 parties terminées en 4 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -698,7 +842,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 79.8 % (Pire décile 71.1 %)",
+          "valeurObservee": "Moyenne 83.2 % (Pire décile 81.6 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -706,23 +850,23 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": true,
-          "valeurObservee": "+21.9 pts de forêt sauvée sur Inerte (57.9 %)",
+          "valeurObservee": "+25.3 pts de forêt sauvée sur Inerte (57.9 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
         },
         {
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
-          "valide": false,
-          "valeurObservee": "Déductif 79.8 % vs Boucle 78.8 % (écart +1 pts)",
+          "valide": true,
+          "valeurObservee": "Déductif 83.2 % vs Boucle 78.4 % (écart +4.8 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
-          "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+          "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
         },
         {
           "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": true,
-          "valeurObservee": "Dépl. 45% · Prot. 34% · Sabotages/partie: 11.4",
+          "valeurObservee": "Dépl. 44% · Prot. 34% · Sabotages/partie: 12.2",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -731,9 +875,9 @@
     {
       "varianteId": "v01_temoin_boucle_gagnante",
       "varianteNom": "V0.1 Variante Éliminée — Boucle de Replantation Infinie",
-      "dateExecution": "2026-10-19T20:34:12.838Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 92,
+      "dateExecution": "2026-10-19T20:57:44.573Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 26,
       "viable": false,
       "motifElimination": "Éliminée (V3_IMPACT_JOUEURS, V4_GARDE_FOU_BOUCLE, V5_USAGE_SABOTAGE_ET_MOUVEMENT) : Les actions des joueurs pèsent trop peu sur l’issue de la partie.",
       "criteres": [
@@ -741,7 +885,7 @@
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 3 tours",
+          "valeurObservee": "5/5 parties terminées en 3 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -749,7 +893,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": true,
-          "valeurObservee": "Moyenne 76.7 % (Pire décile 75.7 %)",
+          "valeurObservee": "Moyenne 77.3 % (Pire décile 75.7 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "La pression exercée par les Machines est bien calibrée."
         },
@@ -757,7 +901,7 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": false,
-          "valeurObservee": "+1 pts de forêt sauvée sur Inerte (75.7 %)",
+          "valeurObservee": "+1.6 pts de forêt sauvée sur Inerte (75.7 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les actions des joueurs pèsent trop peu sur l’issue de la partie."
         },
@@ -765,7 +909,7 @@
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
           "valide": false,
-          "valeurObservee": "Déductif 76.7 % vs Boucle 93.4 % (écart -16.7 pts)",
+          "valeurObservee": "Déductif 77.3 % vs Boucle 93.5 % (écart -16.2 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
           "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
         },
@@ -773,7 +917,7 @@
           "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": false,
-          "valeurObservee": "Dépl. 93% · Prot. 1% · Sabotages/partie: 1.1",
+          "valeurObservee": "Dépl. 89% · Prot. 2% · Sabotages/partie: 1.8",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -782,9 +926,9 @@
     {
       "varianteId": "v01_temoin_ecrasement",
       "varianteNom": "V0.1 Variante Éliminée — Submersion Globale à 1 Ordre",
-      "dateExecution": "2026-10-19T20:34:12.849Z",
-      "nbPartiesTestees": 48,
-      "dureeMs": 11,
+      "dateExecution": "2026-10-19T20:57:44.578Z",
+      "nbPartiesTestees": 15,
+      "dureeMs": 5,
       "viable": false,
       "motifElimination": "Éliminée (V2_BANDE_SURVIE, V3_IMPACT_JOUEURS, V4_GARDE_FOU_BOUCLE, V5_USAGE_SABOTAGE_ET_MOUVEMENT) : Submersion excessive : même le meilleur bot perd plus de la moitié de la forêt.",
       "criteres": [
@@ -792,7 +936,7 @@
           "code": "V1_TERMINAISON",
           "intitule": "Terminaison & Intégrité du Moteur",
           "valide": true,
-          "valeurObservee": "16/16 parties terminées en 5 tours",
+          "valeurObservee": "5/5 parties terminées en 5 tours",
           "seuilAttendu": "100 % sans blocage ni état invalide",
           "detail": "Toutes les parties se résolvent jusqu’au décompte final."
         },
@@ -800,7 +944,7 @@
           "code": "V2_BANDE_SURVIE",
           "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
           "valide": false,
-          "valeurObservee": "Moyenne 27.6 % (Pire décile 15.8 %)",
+          "valeurObservee": "Moyenne 28.4 % (Pire décile 21.1 %)",
           "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
           "detail": "Submersion excessive : même le meilleur bot perd plus de la moitié de la forêt."
         },
@@ -808,7 +952,7 @@
           "code": "V3_IMPACT_JOUEURS",
           "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
           "valide": false,
-          "valeurObservee": "+0 pts de forêt sauvée sur Inerte (27.6 %)",
+          "valeurObservee": "+0 pts de forêt sauvée sur Inerte (28.4 %)",
           "seuilAttendu": "Écart ≥ +12 pts",
           "detail": "Les actions des joueurs pèsent trop peu sur l’issue de la partie."
         },
@@ -816,7 +960,7 @@
           "code": "V4_GARDE_FOU_BOUCLE",
           "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
           "valide": false,
-          "valeurObservee": "Déductif 27.6 % vs Boucle 27.6 % (écart +0 pts)",
+          "valeurObservee": "Déductif 28.4 % vs Boucle 28.4 % (écart +0 pts)",
           "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
           "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
         },
@@ -833,17 +977,139 @@
   ],
   "rapportsInteret": [
     {
-      "varianteId": "v01_socle_reference",
-      "varianteNom": "V0.1 Socle — Séquencement Entrelacé (Référence)",
-      "dateExecution": "2026-10-19T20:34:11.274Z",
-      "nbPartiesParBot": 20,
-      "dureeMs": 415,
+      "varianteId": "v01_exp_mvfppt0c_2",
+      "varianteNom": "V0.1 Exploratoire #10 (2e / coupe / 5J)",
+      "dateExecution": "2026-10-19T20:57:43.509Z",
+      "nbPartiesParBot": 5,
+      "dureeMs": 344,
       "echelleBots": [
         {
           "botId": "inerte",
           "botNom": "Bot Inerte (Plancher)",
-          "foretSauveeMoyennePct": 58.6,
-          "ecartTypePct": 1.1,
+          "foretSauveeMoyennePct": 58.3,
+          "ecartTypePct": 1.6,
+          "pireDecilePct": 56.5,
+          "arbresCoupesMoyen": 19.2,
+          "paradesMoyennes": 0,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 0,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "hasard",
+          "botNom": "Bot Hasard (Bruité)",
+          "foretSauveeMoyennePct": 80,
+          "ecartTypePct": 4.4,
+          "pireDecilePct": 73.9,
+          "arbresCoupesMoyen": 9.2,
+          "paradesMoyennes": 2.6,
+          "sabotagesMoyens": 8.8,
+          "tauxUsageActions": {
+            "deplacer": 45,
+            "proteger": 42,
+            "saboter": 14,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "boucle",
+          "botNom": "Bot Boucle Fixe (Garde-fou)",
+          "foretSauveeMoyennePct": 78.7,
+          "ecartTypePct": 0.8,
+          "pireDecilePct": 78.3,
+          "arbresCoupesMoyen": 9.8,
+          "paradesMoyennes": 9.2,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 100,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "reflexe",
+          "botNom": "Bot Réflexe (Tape-taupe)",
+          "foretSauveeMoyennePct": 78.7,
+          "ecartTypePct": 6.5,
+          "pireDecilePct": 69.6,
+          "arbresCoupesMoyen": 9.8,
+          "paradesMoyennes": 10,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 27,
+            "proteger": 74,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "glouton",
+          "botNom": "Bot Glouton (Pistes + Dés personnels)",
+          "foretSauveeMoyennePct": 87.4,
+          "ecartTypePct": 7.6,
+          "pireDecilePct": 73.9,
+          "arbresCoupesMoyen": 5.8,
+          "paradesMoyennes": 1.8,
+          "sabotagesMoyens": 11.2,
+          "tauxUsageActions": {
+            "deplacer": 45,
+            "proteger": 39,
+            "saboter": 16,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "deductif",
+          "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+          "foretSauveeMoyennePct": 90.5,
+          "ecartTypePct": 4,
+          "pireDecilePct": 84.8,
+          "arbresCoupesMoyen": 4.4,
+          "paradesMoyennes": 2,
+          "sabotagesMoyens": 11.8,
+          "tauxUsageActions": {
+            "deplacer": 44,
+            "proteger": 40,
+            "saboter": 16,
+            "replanter": 0
+          }
+        }
+      ],
+      "indicateurs": {
+        "progressionEchelleValide": true,
+        "ecartDeductifSurInerte": 32.2,
+        "margeGardeFouBoucle": 11.8,
+        "gainDeductionSequentielle": 3.1,
+        "gainLecturePistes": 8.7,
+        "impactApprentissageMechant": 3.2,
+        "equilibreActionsPct": 90
+      },
+      "scoreInteretGlobal": 89,
+      "bandeSante": "vert",
+      "syntheseAnalytique": [
+        "Échelle des Bots : Inerte 58.3% → Hasard 80% → Réflexe 78.7% → Glouton 87.4% → Déductif 90.5%.",
+        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +8.7 pts de forêt sauvée.",
+        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +3.1 pts.",
+        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +11.8 pts (Sain)."
+      ]
+    },
+    {
+      "varianteId": "v01_socle_reference",
+      "varianteNom": "V0.1 Socle — Séquencement Entrelacé (Référence)",
+      "dateExecution": "2026-10-19T20:57:43.696Z",
+      "nbPartiesParBot": 5,
+      "dureeMs": 124,
+      "echelleBots": [
+        {
+          "botId": "inerte",
+          "botNom": "Bot Inerte (Plancher)",
+          "foretSauveeMoyennePct": 58.4,
+          "ecartTypePct": 1,
           "pireDecilePct": 57.9,
           "arbresCoupesMoyen": 15.8,
           "paradesMoyennes": 0,
@@ -858,27 +1124,27 @@
         {
           "botId": "hasard",
           "botNom": "Bot Hasard (Bruité)",
-          "foretSauveeMoyennePct": 79.2,
-          "ecartTypePct": 7,
-          "pireDecilePct": 71.1,
-          "arbresCoupesMoyen": 7.9,
-          "paradesMoyennes": 3.8,
-          "sabotagesMoyens": 4.7,
+          "foretSauveeMoyennePct": 78.9,
+          "ecartTypePct": 5,
+          "pireDecilePct": 73.7,
+          "arbresCoupesMoyen": 8,
+          "paradesMoyennes": 2.6,
+          "sabotagesMoyens": 4.6,
           "tauxUsageActions": {
-            "deplacer": 45,
-            "proteger": 46,
-            "saboter": 10,
+            "deplacer": 44,
+            "proteger": 47,
+            "saboter": 9,
             "replanter": 0
           }
         },
         {
           "botId": "boucle",
           "botNom": "Bot Boucle Fixe (Garde-fou)",
-          "foretSauveeMoyennePct": 78.6,
-          "ecartTypePct": 4.3,
+          "foretSauveeMoyennePct": 77.9,
+          "ecartTypePct": 3.2,
           "pireDecilePct": 73.7,
-          "arbresCoupesMoyen": 8.2,
-          "paradesMoyennes": 7.4,
+          "arbresCoupesMoyen": 8.4,
+          "paradesMoyennes": 7.2,
           "sabotagesMoyens": 0,
           "tauxUsageActions": {
             "deplacer": 0,
@@ -890,84 +1156,84 @@
         {
           "botId": "reflexe",
           "botNom": "Bot Réflexe (Tape-taupe)",
-          "foretSauveeMoyennePct": 75.7,
-          "ecartTypePct": 6.7,
-          "pireDecilePct": 68.4,
-          "arbresCoupesMoyen": 9.3,
-          "paradesMoyennes": 6.4,
-          "sabotagesMoyens": 5.7,
+          "foretSauveeMoyennePct": 78.4,
+          "ecartTypePct": 6.5,
+          "pireDecilePct": 71.1,
+          "arbresCoupesMoyen": 8.2,
+          "paradesMoyennes": 7.6,
+          "sabotagesMoyens": 6.4,
           "tauxUsageActions": {
             "deplacer": 32,
-            "proteger": 58,
-            "saboter": 10,
+            "proteger": 57,
+            "saboter": 11,
             "replanter": 0
           }
         },
         {
           "botId": "glouton",
           "botNom": "Bot Glouton (Pistes + Dés personnels)",
-          "foretSauveeMoyennePct": 85.3,
+          "foretSauveeMoyennePct": 86.3,
           "ecartTypePct": 4.5,
-          "pireDecilePct": 81.6,
-          "arbresCoupesMoyen": 5.6,
-          "paradesMoyennes": 5.8,
-          "sabotagesMoyens": 7,
+          "pireDecilePct": 78.9,
+          "arbresCoupesMoyen": 5.2,
+          "paradesMoyennes": 5.6,
+          "sabotagesMoyens": 6.6,
           "tauxUsageActions": {
             "deplacer": 46,
             "proteger": 42,
-            "saboter": 12,
+            "saboter": 11,
             "replanter": 0
           }
         },
         {
           "botId": "deductif",
           "botNom": "Bot Déductif & Coordonné (Référence Forte)",
-          "foretSauveeMoyennePct": 86.8,
-          "ecartTypePct": 5.3,
+          "foretSauveeMoyennePct": 88.4,
+          "ecartTypePct": 4.9,
           "pireDecilePct": 81.6,
-          "arbresCoupesMoyen": 5,
-          "paradesMoyennes": 6.5,
+          "arbresCoupesMoyen": 4.4,
+          "paradesMoyennes": 6.8,
           "sabotagesMoyens": 7.4,
           "tauxUsageActions": {
-            "deplacer": 46,
-            "proteger": 41,
-            "saboter": 12,
+            "deplacer": 47,
+            "proteger": 40,
+            "saboter": 13,
             "replanter": 0
           }
         }
       ],
       "indicateurs": {
         "progressionEchelleValide": true,
-        "ecartDeductifSurInerte": 28.2,
-        "margeGardeFouBoucle": 8.2,
-        "gainDeductionSequentielle": 1.5,
-        "gainLecturePistes": 9.6,
-        "impactApprentissageMechant": 2.2,
-        "equilibreActionsPct": 90
+        "ecartDeductifSurInerte": 30,
+        "margeGardeFouBoucle": 10.5,
+        "gainDeductionSequentielle": 2.1,
+        "gainLecturePistes": 7.9,
+        "impactApprentissageMechant": 3.2,
+        "equilibreActionsPct": 88
       },
-      "scoreInteretGlobal": 81,
+      "scoreInteretGlobal": 84,
       "bandeSante": "vert",
       "syntheseAnalytique": [
-        "Échelle des Bots : Inerte 58.6% → Hasard 79.2% → Réflexe 75.7% → Glouton 85.3% → Déductif 86.8%.",
-        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +9.6 pts de forêt sauvée.",
-        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +1.5 pts.",
-        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +8.2 pts (Sain)."
+        "Échelle des Bots : Inerte 58.4% → Hasard 78.9% → Réflexe 78.4% → Glouton 86.3% → Déductif 88.4%.",
+        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +7.9 pts de forêt sauvée.",
+        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +2.1 pts.",
+        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +10.5 pts (Sain)."
       ]
     },
     {
-      "varianteId": "v01_alternee_barrage",
-      "varianteNom": "V0.1 Pose Alternée (I puis II) & Barrage Complet",
-      "dateExecution": "2026-10-19T20:34:12.217Z",
-      "nbPartiesParBot": 20,
-      "dureeMs": 692,
+      "varianteId": "v01_exp_mvfqk35p_1",
+      "varianteNom": "V0.1 Exploratoire #13 (alternee / coupe / 4J)",
+      "dateExecution": "2026-10-19T20:57:42.827Z",
+      "nbPartiesParBot": 5,
+      "dureeMs": 249,
       "echelleBots": [
         {
           "botId": "inerte",
           "botNom": "Bot Inerte (Plancher)",
-          "foretSauveeMoyennePct": 59.2,
-          "ecartTypePct": 2,
+          "foretSauveeMoyennePct": 59.5,
+          "ecartTypePct": 2.1,
           "pireDecilePct": 57.9,
-          "arbresCoupesMoyen": 15.5,
+          "arbresCoupesMoyen": 15.4,
           "paradesMoyennes": 0,
           "sabotagesMoyens": 0,
           "tauxUsageActions": {
@@ -980,15 +1246,137 @@
         {
           "botId": "hasard",
           "botNom": "Bot Hasard (Bruité)",
-          "foretSauveeMoyennePct": 71.3,
-          "ecartTypePct": 5.4,
-          "pireDecilePct": 65.8,
-          "arbresCoupesMoyen": 10.9,
-          "paradesMoyennes": 2.6,
-          "sabotagesMoyens": 4.1,
+          "foretSauveeMoyennePct": 79.5,
+          "ecartTypePct": 4.8,
+          "pireDecilePct": 71.1,
+          "arbresCoupesMoyen": 7.8,
+          "paradesMoyennes": 3,
+          "sabotagesMoyens": 6.8,
           "tauxUsageActions": {
-            "deplacer": 48,
-            "proteger": 44,
+            "deplacer": 46,
+            "proteger": 40,
+            "saboter": 14,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "boucle",
+          "botNom": "Bot Boucle Fixe (Garde-fou)",
+          "foretSauveeMoyennePct": 76.3,
+          "ecartTypePct": 3.7,
+          "pireDecilePct": 71.1,
+          "arbresCoupesMoyen": 9,
+          "paradesMoyennes": 6,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 100,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "reflexe",
+          "botNom": "Bot Réflexe (Tape-taupe)",
+          "foretSauveeMoyennePct": 75.8,
+          "ecartTypePct": 4.2,
+          "pireDecilePct": 68.4,
+          "arbresCoupesMoyen": 9.2,
+          "paradesMoyennes": 6.8,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 23,
+            "proteger": 78,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "glouton",
+          "botNom": "Bot Glouton (Pistes + Dés personnels)",
+          "foretSauveeMoyennePct": 82.1,
+          "ecartTypePct": 4.2,
+          "pireDecilePct": 78.9,
+          "arbresCoupesMoyen": 6.8,
+          "paradesMoyennes": 3.4,
+          "sabotagesMoyens": 8.2,
+          "tauxUsageActions": {
+            "deplacer": 45,
+            "proteger": 41,
+            "saboter": 14,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "deductif",
+          "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+          "foretSauveeMoyennePct": 85.2,
+          "ecartTypePct": 5.4,
+          "pireDecilePct": 78.9,
+          "arbresCoupesMoyen": 5.6,
+          "paradesMoyennes": 4.8,
+          "sabotagesMoyens": 8.8,
+          "tauxUsageActions": {
+            "deplacer": 47,
+            "proteger": 38,
+            "saboter": 15,
+            "replanter": 0
+          }
+        }
+      ],
+      "indicateurs": {
+        "progressionEchelleValide": true,
+        "ecartDeductifSurInerte": 25.7,
+        "margeGardeFouBoucle": 8.9,
+        "gainDeductionSequentielle": 3.1,
+        "gainLecturePistes": 6.3,
+        "impactApprentissageMechant": 4.5,
+        "equilibreActionsPct": 87
+      },
+      "scoreInteretGlobal": 83,
+      "bandeSante": "vert",
+      "syntheseAnalytique": [
+        "Échelle des Bots : Inerte 59.5% → Hasard 79.5% → Réflexe 75.8% → Glouton 82.1% → Déductif 85.2%.",
+        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +6.3 pts de forêt sauvée.",
+        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +3.1 pts.",
+        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +8.9 pts (Sain)."
+      ]
+    },
+    {
+      "varianteId": "v01_alternee_barrage",
+      "varianteNom": "V0.1 Pose Alternée (I puis II) & Barrage Complet",
+      "dateExecution": "2026-10-19T20:57:44.026Z",
+      "nbPartiesParBot": 5,
+      "dureeMs": 229,
+      "echelleBots": [
+        {
+          "botId": "inerte",
+          "botNom": "Bot Inerte (Plancher)",
+          "foretSauveeMoyennePct": 59.5,
+          "ecartTypePct": 2.1,
+          "pireDecilePct": 57.9,
+          "arbresCoupesMoyen": 15.4,
+          "paradesMoyennes": 0,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 0,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "hasard",
+          "botNom": "Bot Hasard (Bruité)",
+          "foretSauveeMoyennePct": 73.7,
+          "ecartTypePct": 5.5,
+          "pireDecilePct": 68.4,
+          "arbresCoupesMoyen": 10,
+          "paradesMoyennes": 3.4,
+          "sabotagesMoyens": 4.4,
+          "tauxUsageActions": {
+            "deplacer": 49,
+            "proteger": 42,
             "saboter": 9,
             "replanter": 0
           }
@@ -996,10 +1384,10 @@
         {
           "botId": "boucle",
           "botNom": "Bot Boucle Fixe (Garde-fou)",
-          "foretSauveeMoyennePct": 61.6,
-          "ecartTypePct": 1.6,
+          "foretSauveeMoyennePct": 62.1,
+          "ecartTypePct": 2.1,
           "pireDecilePct": 60.5,
-          "arbresCoupesMoyen": 14.6,
+          "arbresCoupesMoyen": 14.4,
           "paradesMoyennes": 0,
           "sabotagesMoyens": 0,
           "tauxUsageActions": {
@@ -1012,76 +1400,320 @@
         {
           "botId": "reflexe",
           "botNom": "Bot Réflexe (Tape-taupe)",
-          "foretSauveeMoyennePct": 76.3,
-          "ecartTypePct": 9.2,
+          "foretSauveeMoyennePct": 78.4,
+          "ecartTypePct": 11.6,
           "pireDecilePct": 65.8,
-          "arbresCoupesMoyen": 9,
-          "paradesMoyennes": 5.6,
-          "sabotagesMoyens": 5.8,
+          "arbresCoupesMoyen": 8.2,
+          "paradesMoyennes": 5.8,
+          "sabotagesMoyens": 6.4,
           "tauxUsageActions": {
-            "deplacer": 31,
+            "deplacer": 30,
             "proteger": 59,
-            "saboter": 10,
+            "saboter": 11,
             "replanter": 0
           }
         },
         {
           "botId": "glouton",
           "botNom": "Bot Glouton (Pistes + Dés personnels)",
-          "foretSauveeMoyennePct": 78.9,
-          "ecartTypePct": 8.2,
-          "pireDecilePct": 71.1,
-          "arbresCoupesMoyen": 8,
-          "paradesMoyennes": 2.4,
-          "sabotagesMoyens": 5.6,
+          "foretSauveeMoyennePct": 78.4,
+          "ecartTypePct": 6.7,
+          "pireDecilePct": 65.8,
+          "arbresCoupesMoyen": 8.2,
+          "paradesMoyennes": 2.2,
+          "sabotagesMoyens": 6.4,
           "tauxUsageActions": {
-            "deplacer": 48,
+            "deplacer": 46,
             "proteger": 43,
-            "saboter": 10,
+            "saboter": 11,
             "replanter": 0
           }
         },
         {
           "botId": "deductif",
           "botNom": "Bot Déductif & Coordonné (Référence Forte)",
-          "foretSauveeMoyennePct": 78.9,
-          "ecartTypePct": 8.1,
-          "pireDecilePct": 68.4,
-          "arbresCoupesMoyen": 8,
-          "paradesMoyennes": 2.6,
-          "sabotagesMoyens": 5.7,
+          "foretSauveeMoyennePct": 80,
+          "ecartTypePct": 7.2,
+          "pireDecilePct": 65.8,
+          "arbresCoupesMoyen": 7.6,
+          "paradesMoyennes": 3.4,
+          "sabotagesMoyens": 6.4,
           "tauxUsageActions": {
-            "deplacer": 47,
-            "proteger": 43,
-            "saboter": 10,
+            "deplacer": 44,
+            "proteger": 45,
+            "saboter": 11,
             "replanter": 0
           }
         }
       ],
       "indicateurs": {
         "progressionEchelleValide": true,
-        "ecartDeductifSurInerte": 19.7,
-        "margeGardeFouBoucle": 17.3,
-        "gainDeductionSequentielle": 0,
-        "gainLecturePistes": 2.6,
-        "impactApprentissageMechant": 0.4,
-        "equilibreActionsPct": 86
+        "ecartDeductifSurInerte": 20.5,
+        "margeGardeFouBoucle": 17.9,
+        "gainDeductionSequentielle": 1.6,
+        "gainLecturePistes": 0,
+        "impactApprentissageMechant": 0.1,
+        "equilibreActionsPct": 92
       },
       "scoreInteretGlobal": 74,
       "bandeSante": "orange",
       "syntheseAnalytique": [
-        "Échelle des Bots : Inerte 59.2% → Hasard 71.3% → Réflexe 76.3% → Glouton 78.9% → Déductif 78.9%.",
-        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +2.6 pts de forêt sauvée.",
-        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +0 pts.",
-        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +17.3 pts (Sain)."
+        "Échelle des Bots : Inerte 59.5% → Hasard 73.7% → Réflexe 78.4% → Glouton 78.4% → Déductif 80%.",
+        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +0 pts de forêt sauvée.",
+        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +1.6 pts.",
+        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +17.9 pts (Sain)."
+      ]
+    },
+    {
+      "varianteId": "v01_deux_vagues_completes",
+      "varianteNom": "V0.1 Résolution en Deux Vagues de Coupe Successives",
+      "dateExecution": "2026-10-19T20:57:44.547Z",
+      "nbPartiesParBot": 5,
+      "dureeMs": 150,
+      "echelleBots": [
+        {
+          "botId": "inerte",
+          "botNom": "Bot Inerte (Plancher)",
+          "foretSauveeMoyennePct": 57.9,
+          "ecartTypePct": 0,
+          "pireDecilePct": 57.9,
+          "arbresCoupesMoyen": 16,
+          "paradesMoyennes": 0,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 0,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "hasard",
+          "botNom": "Bot Hasard (Bruité)",
+          "foretSauveeMoyennePct": 83.7,
+          "ecartTypePct": 5.1,
+          "pireDecilePct": 76.3,
+          "arbresCoupesMoyen": 6.2,
+          "paradesMoyennes": 6.2,
+          "sabotagesMoyens": 7.4,
+          "tauxUsageActions": {
+            "deplacer": 42,
+            "proteger": 44,
+            "saboter": 14,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "boucle",
+          "botNom": "Bot Boucle Fixe (Garde-fou)",
+          "foretSauveeMoyennePct": 82.6,
+          "ecartTypePct": 3.6,
+          "pireDecilePct": 76.3,
+          "arbresCoupesMoyen": 6.6,
+          "paradesMoyennes": 9.4,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 100,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "reflexe",
+          "botNom": "Bot Réflexe (Tape-taupe)",
+          "foretSauveeMoyennePct": 68.4,
+          "ecartTypePct": 5.5,
+          "pireDecilePct": 63.2,
+          "arbresCoupesMoyen": 12,
+          "paradesMoyennes": 4,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 24,
+            "proteger": 76,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "glouton",
+          "botNom": "Bot Glouton (Pistes + Dés personnels)",
+          "foretSauveeMoyennePct": 81.5,
+          "ecartTypePct": 3.3,
+          "pireDecilePct": 78.9,
+          "arbresCoupesMoyen": 7,
+          "paradesMoyennes": 3.2,
+          "sabotagesMoyens": 7.4,
+          "tauxUsageActions": {
+            "deplacer": 44,
+            "proteger": 43,
+            "saboter": 13,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "deductif",
+          "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+          "foretSauveeMoyennePct": 80.5,
+          "ecartTypePct": 2.7,
+          "pireDecilePct": 76.3,
+          "arbresCoupesMoyen": 7.4,
+          "paradesMoyennes": 2.4,
+          "sabotagesMoyens": 12,
+          "tauxUsageActions": {
+            "deplacer": 45,
+            "proteger": 34,
+            "saboter": 21,
+            "replanter": 0
+          }
+        }
+      ],
+      "indicateurs": {
+        "progressionEchelleValide": false,
+        "ecartDeductifSurInerte": 22.6,
+        "margeGardeFouBoucle": -2.1,
+        "gainDeductionSequentielle": -1,
+        "gainLecturePistes": 13.1,
+        "impactApprentissageMechant": 1.7,
+        "equilibreActionsPct": 85
+      },
+      "scoreInteretGlobal": 32,
+      "bandeSante": "rouge",
+      "syntheseAnalytique": [
+        "Échelle des Bots : Inerte 57.9% → Hasard 83.7% → Réflexe 68.4% → Glouton 81.5% → Déductif 80.5%.",
+        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +13.1 pts de forêt sauvée.",
+        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : -1 pts.",
+        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : -2.1 pts (Alerte boucle gagnante)."
+      ]
+    },
+    {
+      "varianteId": "v01_alliance_replanter",
+      "varianteNom": "V0.1 Sabotage en Alliance & Action Replanter",
+      "dateExecution": "2026-10-19T20:57:44.350Z",
+      "nbPartiesParBot": 5,
+      "dureeMs": 138,
+      "echelleBots": [
+        {
+          "botId": "inerte",
+          "botNom": "Bot Inerte (Plancher)",
+          "foretSauveeMoyennePct": 58.4,
+          "ecartTypePct": 1,
+          "pireDecilePct": 57.9,
+          "arbresCoupesMoyen": 15.8,
+          "paradesMoyennes": 0,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 0,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "hasard",
+          "botNom": "Bot Hasard (Bruité)",
+          "foretSauveeMoyennePct": 78.4,
+          "ecartTypePct": 3.9,
+          "pireDecilePct": 73.7,
+          "arbresCoupesMoyen": 9.4,
+          "paradesMoyennes": 3.6,
+          "sabotagesMoyens": 2.8,
+          "tauxUsageActions": {
+            "deplacer": 48,
+            "proteger": 42,
+            "saboter": 7,
+            "replanter": 3
+          }
+        },
+        {
+          "botId": "boucle",
+          "botNom": "Bot Boucle Fixe (Garde-fou)",
+          "foretSauveeMoyennePct": 77.9,
+          "ecartTypePct": 3.2,
+          "pireDecilePct": 73.7,
+          "arbresCoupesMoyen": 8.4,
+          "paradesMoyennes": 7.2,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 100,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "reflexe",
+          "botNom": "Bot Réflexe (Tape-taupe)",
+          "foretSauveeMoyennePct": 75.8,
+          "ecartTypePct": 4.5,
+          "pireDecilePct": 71.1,
+          "arbresCoupesMoyen": 9.2,
+          "paradesMoyennes": 6.8,
+          "sabotagesMoyens": 0,
+          "tauxUsageActions": {
+            "deplacer": 26,
+            "proteger": 74,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "glouton",
+          "botNom": "Bot Glouton (Pistes + Dés personnels)",
+          "foretSauveeMoyennePct": 82.1,
+          "ecartTypePct": 4.5,
+          "pireDecilePct": 76.3,
+          "arbresCoupesMoyen": 7.2,
+          "paradesMoyennes": 2.4,
+          "sabotagesMoyens": 7,
+          "tauxUsageActions": {
+            "deplacer": 44,
+            "proteger": 44,
+            "saboter": 12,
+            "replanter": 1
+          }
+        },
+        {
+          "botId": "deductif",
+          "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+          "foretSauveeMoyennePct": 80,
+          "ecartTypePct": 5.4,
+          "pireDecilePct": 73.7,
+          "arbresCoupesMoyen": 8,
+          "paradesMoyennes": 1,
+          "sabotagesMoyens": 7.8,
+          "tauxUsageActions": {
+            "deplacer": 45,
+            "proteger": 42,
+            "saboter": 13,
+            "replanter": 1
+          }
+        }
+      ],
+      "indicateurs": {
+        "progressionEchelleValide": false,
+        "ecartDeductifSurInerte": 21.6,
+        "margeGardeFouBoucle": 2.1,
+        "gainDeductionSequentielle": -2.1,
+        "gainLecturePistes": 6.3,
+        "impactApprentissageMechant": 1.4,
+        "equilibreActionsPct": 91
+      },
+      "scoreInteretGlobal": 28,
+      "bandeSante": "rouge",
+      "syntheseAnalytique": [
+        "Échelle des Bots : Inerte 58.4% → Hasard 78.4% → Réflexe 75.8% → Glouton 82.1% → Déductif 80%.",
+        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +6.3 pts de forêt sauvée.",
+        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : -2.1 pts.",
+        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +2.1 pts (Alerte boucle gagnante)."
       ]
     },
     {
       "varianteId": "v01_exp_mvfppt0c_0",
       "varianteNom": "V0.1 Exploratoire #8 (sequentielle / coupe / 3J)",
-      "dateExecution": "2026-10-19T20:34:10.010Z",
-      "nbPartiesParBot": 20,
-      "dureeMs": 295,
+      "dateExecution": "2026-10-19T20:57:42.945Z",
+      "nbPartiesParBot": 5,
+      "dureeMs": 71,
       "echelleBots": [
         {
           "botId": "inerte",
@@ -1102,15 +1734,15 @@
         {
           "botId": "hasard",
           "botNom": "Bot Hasard (Bruité)",
-          "foretSauveeMoyennePct": 78.2,
-          "ecartTypePct": 6.7,
-          "pireDecilePct": 70,
-          "arbresCoupesMoyen": 6.6,
-          "paradesMoyennes": 3.3,
-          "sabotagesMoyens": 2.3,
+          "foretSauveeMoyennePct": 80.7,
+          "ecartTypePct": 2.5,
+          "pireDecilePct": 76.7,
+          "arbresCoupesMoyen": 5.8,
+          "paradesMoyennes": 3.8,
+          "sabotagesMoyens": 2.6,
           "tauxUsageActions": {
             "deplacer": 48,
-            "proteger": 46,
+            "proteger": 45,
             "saboter": 7,
             "replanter": 0
           }
@@ -1118,11 +1750,11 @@
         {
           "botId": "boucle",
           "botNom": "Bot Boucle Fixe (Garde-fou)",
-          "foretSauveeMoyennePct": 75.8,
-          "ecartTypePct": 4.9,
-          "pireDecilePct": 70,
-          "arbresCoupesMoyen": 7.3,
-          "paradesMoyennes": 4.7,
+          "foretSauveeMoyennePct": 79.3,
+          "ecartTypePct": 4.4,
+          "pireDecilePct": 73.3,
+          "arbresCoupesMoyen": 6.2,
+          "paradesMoyennes": 5.8,
           "sabotagesMoyens": 0,
           "tauxUsageActions": {
             "deplacer": 0,
@@ -1134,15 +1766,15 @@
         {
           "botId": "reflexe",
           "botNom": "Bot Réflexe (Tape-taupe)",
-          "foretSauveeMoyennePct": 87.2,
-          "ecartTypePct": 5.9,
+          "foretSauveeMoyennePct": 88.7,
+          "ecartTypePct": 6.2,
           "pireDecilePct": 80,
-          "arbresCoupesMoyen": 3.9,
-          "paradesMoyennes": 8.2,
+          "arbresCoupesMoyen": 3.4,
+          "paradesMoyennes": 8.6,
           "sabotagesMoyens": 0,
           "tauxUsageActions": {
-            "deplacer": 14,
-            "proteger": 86,
+            "deplacer": 13,
+            "proteger": 87,
             "saboter": 0,
             "replanter": 0
           }
@@ -1150,15 +1782,15 @@
         {
           "botId": "glouton",
           "botNom": "Bot Glouton (Pistes + Dés personnels)",
-          "foretSauveeMoyennePct": 80.3,
-          "ecartTypePct": 7.8,
-          "pireDecilePct": 70,
-          "arbresCoupesMoyen": 5.9,
-          "paradesMoyennes": 1.1,
+          "foretSauveeMoyennePct": 76.7,
+          "ecartTypePct": 5.6,
+          "pireDecilePct": 66.7,
+          "arbresCoupesMoyen": 7,
+          "paradesMoyennes": 0.8,
           "sabotagesMoyens": 5,
           "tauxUsageActions": {
-            "deplacer": 47,
-            "proteger": 40,
+            "deplacer": 46,
+            "proteger": 41,
             "saboter": 12,
             "replanter": 0
           }
@@ -1166,40 +1798,1563 @@
         {
           "botId": "deductif",
           "botNom": "Bot Déductif & Coordonné (Référence Forte)",
-          "foretSauveeMoyennePct": 83.7,
-          "ecartTypePct": 8.7,
-          "pireDecilePct": 70,
-          "arbresCoupesMoyen": 4.9,
-          "paradesMoyennes": 1.4,
-          "sabotagesMoyens": 5.4,
+          "foretSauveeMoyennePct": 80,
+          "ecartTypePct": 9.9,
+          "pireDecilePct": 66.7,
+          "arbresCoupesMoyen": 6,
+          "paradesMoyennes": 1,
+          "sabotagesMoyens": 5,
           "tauxUsageActions": {
-            "deplacer": 47,
-            "proteger": 40,
-            "saboter": 13,
+            "deplacer": 46,
+            "proteger": 42,
+            "saboter": 12,
             "replanter": 0
           }
         }
       ],
       "indicateurs": {
         "progressionEchelleValide": false,
-        "ecartDeductifSurInerte": 23.7,
-        "margeGardeFouBoucle": 7.9,
-        "gainDeductionSequentielle": 3.4,
-        "gainLecturePistes": -6.9,
+        "ecartDeductifSurInerte": 20,
+        "margeGardeFouBoucle": 0.7,
+        "gainDeductionSequentielle": 3.3,
+        "gainLecturePistes": -12,
         "impactApprentissageMechant": 0,
-        "equilibreActionsPct": 88
+        "equilibreActionsPct": 90
       },
-      "scoreInteretGlobal": 57,
-      "bandeSante": "orange",
+      "scoreInteretGlobal": 23,
+      "bandeSante": "rouge",
       "syntheseAnalytique": [
-        "Échelle des Bots : Inerte 60% → Hasard 78.2% → Réflexe 87.2% → Glouton 80.3% → Déductif 83.7%.",
-        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : -6.9 pts de forêt sauvée.",
-        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +3.4 pts.",
-        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +7.9 pts (Acceptable)."
+        "Échelle des Bots : Inerte 60% → Hasard 80.7% → Réflexe 88.7% → Glouton 76.7% → Déductif 80%.",
+        "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : -12 pts de forêt sauvée.",
+        "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +3.3 pts.",
+        "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +0.7 pts (Alerte boucle gagnante)."
       ]
     }
   ],
   "campagnesSelection": [
+    {
+      "id": "camp_mvfqk4ua",
+      "nom": "Campagne VM Oracle Cloud (2026-10-19T20:57)",
+      "dateExecution": "2026-10-19T20:57:44.578Z",
+      "nbVariantesEntree": 13,
+      "nbVariantesViables": 7,
+      "nbVariantesEliminees": 6,
+      "rapportsViabilite": [
+        {
+          "varianteId": "v01_exp_mvfqk35p_0",
+          "varianteNom": "V0.1 Exploratoire #12 (sequentielle / coupe / 3J)",
+          "dateExecution": "2026-10-19T20:57:42.485Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 87,
+          "viable": false,
+          "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 74.7 % (Pire décile 70 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+14.7 pts de forêt sauvée sur Inerte (60 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": false,
+              "valeurObservee": "Déductif 74.7 % vs Boucle 74 % (écart +0.7 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 44% · Prot. 37% · Sabotages/partie: 7.8",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_exp_mvfqk35p_1",
+          "varianteNom": "V0.1 Exploratoire #13 (alternee / coupe / 4J)",
+          "dateExecution": "2026-10-19T20:57:42.577Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 92,
+          "viable": true,
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 82.6 % (Pire décile 73.7 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+23.1 pts de forêt sauvée sur Inerte (59.5 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": true,
+              "valeurObservee": "Déductif 82.6 % vs Boucle 76.3 % (écart +6.3 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 49% · Prot. 38% · Sabotages/partie: 7.2",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_exp_mvfppt0c_0",
+          "varianteNom": "V0.1 Exploratoire #8 (sequentielle / coupe / 3J)",
+          "dateExecution": "2026-10-19T20:57:42.874Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 47,
+          "viable": true,
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 88.7 % (Pire décile 83.3 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+28 pts de forêt sauvée sur Inerte (60.7 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": true,
+              "valeurObservee": "Déductif 88.7 % vs Boucle 72.7 % (écart +16 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 45% · Prot. 40% · Sabotages/partie: 6.2",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_exp_mvfppt0c_1",
+          "varianteNom": "V0.1 Exploratoire #9 (alternee / coupe / 4J)",
+          "dateExecution": "2026-10-19T20:57:43.047Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 102,
+          "viable": false,
+          "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 72.1 % (Pire décile 63.2 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+14.2 pts de forêt sauvée sur Inerte (57.9 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": false,
+              "valeurObservee": "Déductif 72.1 % vs Boucle 76.8 % (écart -4.7 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 48% · Prot. 39% · Sabotages/partie: 6.6",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_exp_mvfppt0c_2",
+          "varianteNom": "V0.1 Exploratoire #10 (2e / coupe / 5J)",
+          "dateExecution": "2026-10-19T20:57:43.165Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 118,
+          "viable": true,
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 84.4 % (Pire décile 78.3 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+25.7 pts de forêt sauvée sur Inerte (58.7 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": true,
+              "valeurObservee": "Déductif 84.4 % vs Boucle 78.7 % (écart +5.7 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 45% · Prot. 40% · Sabotages/partie: 11.2",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_exp_mvfppt0c_3",
+          "varianteNom": "V0.1 Exploratoire #11 (un / coupe / 6J)",
+          "dateExecution": "2026-10-19T20:57:43.515Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 6,
+          "viable": false,
+          "motifElimination": "Éliminée (V3_IMPACT_JOUEURS, V4_GARDE_FOU_BOUCLE, V5_USAGE_SABOTAGE_ET_MOUVEMENT) : Les actions des joueurs pèsent trop peu sur l’issue de la partie.",
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 60.8 % (Pire décile 59.3 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": false,
+              "valeurObservee": "+0 pts de forêt sauvée sur Inerte (60.8 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les actions des joueurs pèsent trop peu sur l’issue de la partie."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": false,
+              "valeurObservee": "Déductif 60.8 % vs Boucle 60.8 % (écart +0 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": false,
+              "valeurObservee": "Dépl. 0% · Prot. 0% · Sabotages/partie: 0",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "L’action Saboter est quasi morte ou inatteignable dans cette configuration."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_socle_reference",
+          "varianteNom": "V0.1 Socle — Séquencement Entrelacé (Référence)",
+          "dateExecution": "2026-10-19T20:57:43.572Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 57,
+          "viable": true,
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 89.5 % (Pire décile 81.6 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+31.1 pts de forêt sauvée sur Inerte (58.4 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": true,
+              "valeurObservee": "Déductif 89.5 % vs Boucle 76.8 % (écart +12.7 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 49% · Prot. 40% · Sabotages/partie: 6.8",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_alternee_barrage",
+          "varianteNom": "V0.1 Pose Alternée (I puis II) & Barrage Complet",
+          "dateExecution": "2026-10-19T20:57:43.797Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 101,
+          "viable": true,
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 78.4 % (Pire décile 76.3 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+18.9 pts de forêt sauvée sur Inerte (59.5 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": true,
+              "valeurObservee": "Déductif 78.4 % vs Boucle 64.2 % (écart +14.2 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 50% · Prot. 41% · Sabotages/partie: 5.6",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_reaction_intermediaire",
+          "varianteNom": "V0.1 Programmation de la 2e Action après Ciblage Machine",
+          "dateExecution": "2026-10-19T20:57:44.159Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 133,
+          "viable": false,
+          "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 80 % (Pire décile 76.3 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+20.5 pts de forêt sauvée sur Inerte (59.5 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": false,
+              "valeurObservee": "Déductif 80 % vs Boucle 76.3 % (écart +3.7 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 45% · Prot. 46% · Sabotages/partie: 5.6",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_alliance_replanter",
+          "varianteNom": "V0.1 Sabotage en Alliance & Action Replanter",
+          "dateExecution": "2026-10-19T20:57:44.212Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 53,
+          "viable": true,
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 88.4 % (Pire décile 78.9 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+30 pts de forêt sauvée sur Inerte (58.4 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": true,
+              "valeurObservee": "Déductif 88.4 % vs Boucle 76.8 % (écart +11.6 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 50% · Prot. 35% · Sabotages/partie: 8",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_deux_vagues_completes",
+          "varianteNom": "V0.1 Résolution en Deux Vagues de Coupe Successives",
+          "dateExecution": "2026-10-19T20:57:44.397Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 47,
+          "viable": true,
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 4 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 83.2 % (Pire décile 81.6 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": true,
+              "valeurObservee": "+25.3 pts de forêt sauvée sur Inerte (57.9 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": true,
+              "valeurObservee": "Déductif 83.2 % vs Boucle 78.4 % (écart +4.8 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": true,
+              "valeurObservee": "Dépl. 44% · Prot. 34% · Sabotages/partie: 12.2",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_temoin_boucle_gagnante",
+          "varianteNom": "V0.1 Variante Éliminée — Boucle de Replantation Infinie",
+          "dateExecution": "2026-10-19T20:57:44.573Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 26,
+          "viable": false,
+          "motifElimination": "Éliminée (V3_IMPACT_JOUEURS, V4_GARDE_FOU_BOUCLE, V5_USAGE_SABOTAGE_ET_MOUVEMENT) : Les actions des joueurs pèsent trop peu sur l’issue de la partie.",
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 3 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": true,
+              "valeurObservee": "Moyenne 77.3 % (Pire décile 75.7 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "La pression exercée par les Machines est bien calibrée."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": false,
+              "valeurObservee": "+1.6 pts de forêt sauvée sur Inerte (75.7 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les actions des joueurs pèsent trop peu sur l’issue de la partie."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": false,
+              "valeurObservee": "Déductif 77.3 % vs Boucle 93.5 % (écart -16.2 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": false,
+              "valeurObservee": "Dépl. 89% · Prot. 2% · Sabotages/partie: 1.8",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+            }
+          ]
+        },
+        {
+          "varianteId": "v01_temoin_ecrasement",
+          "varianteNom": "V0.1 Variante Éliminée — Submersion Globale à 1 Ordre",
+          "dateExecution": "2026-10-19T20:57:44.578Z",
+          "nbPartiesTestees": 15,
+          "dureeMs": 5,
+          "viable": false,
+          "motifElimination": "Éliminée (V2_BANDE_SURVIE, V3_IMPACT_JOUEURS, V4_GARDE_FOU_BOUCLE, V5_USAGE_SABOTAGE_ET_MOUVEMENT) : Submersion excessive : même le meilleur bot perd plus de la moitié de la forêt.",
+          "criteres": [
+            {
+              "code": "V1_TERMINAISON",
+              "intitule": "Terminaison & Intégrité du Moteur",
+              "valide": true,
+              "valeurObservee": "5/5 parties terminées en 5 tours",
+              "seuilAttendu": "100 % sans blocage ni état invalide",
+              "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+            },
+            {
+              "code": "V2_BANDE_SURVIE",
+              "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+              "valide": false,
+              "valeurObservee": "Moyenne 28.4 % (Pire décile 21.1 %)",
+              "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+              "detail": "Submersion excessive : même le meilleur bot perd plus de la moitié de la forêt."
+            },
+            {
+              "code": "V3_IMPACT_JOUEURS",
+              "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+              "valide": false,
+              "valeurObservee": "+0 pts de forêt sauvée sur Inerte (28.4 %)",
+              "seuilAttendu": "Écart ≥ +12 pts",
+              "detail": "Les actions des joueurs pèsent trop peu sur l’issue de la partie."
+            },
+            {
+              "code": "V4_GARDE_FOU_BOUCLE",
+              "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+              "valide": false,
+              "valeurObservee": "Déductif 28.4 % vs Boucle 28.4 % (écart +0 pts)",
+              "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+              "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
+            },
+            {
+              "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+              "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+              "valide": false,
+              "valeurObservee": "Dépl. 0% · Prot. 0% · Sabotages/partie: 0",
+              "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+              "detail": "L’action Saboter est quasi morte ou inatteignable dans cette configuration."
+            }
+          ]
+        }
+      ],
+      "rapportsInteret": [
+        {
+          "varianteId": "v01_exp_mvfppt0c_2",
+          "varianteNom": "V0.1 Exploratoire #10 (2e / coupe / 5J)",
+          "dateExecution": "2026-10-19T20:57:43.509Z",
+          "nbPartiesParBot": 5,
+          "dureeMs": 344,
+          "echelleBots": [
+            {
+              "botId": "inerte",
+              "botNom": "Bot Inerte (Plancher)",
+              "foretSauveeMoyennePct": 58.3,
+              "ecartTypePct": 1.6,
+              "pireDecilePct": 56.5,
+              "arbresCoupesMoyen": 19.2,
+              "paradesMoyennes": 0,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 0,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "hasard",
+              "botNom": "Bot Hasard (Bruité)",
+              "foretSauveeMoyennePct": 80,
+              "ecartTypePct": 4.4,
+              "pireDecilePct": 73.9,
+              "arbresCoupesMoyen": 9.2,
+              "paradesMoyennes": 2.6,
+              "sabotagesMoyens": 8.8,
+              "tauxUsageActions": {
+                "deplacer": 45,
+                "proteger": 42,
+                "saboter": 14,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "boucle",
+              "botNom": "Bot Boucle Fixe (Garde-fou)",
+              "foretSauveeMoyennePct": 78.7,
+              "ecartTypePct": 0.8,
+              "pireDecilePct": 78.3,
+              "arbresCoupesMoyen": 9.8,
+              "paradesMoyennes": 9.2,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 100,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "reflexe",
+              "botNom": "Bot Réflexe (Tape-taupe)",
+              "foretSauveeMoyennePct": 78.7,
+              "ecartTypePct": 6.5,
+              "pireDecilePct": 69.6,
+              "arbresCoupesMoyen": 9.8,
+              "paradesMoyennes": 10,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 27,
+                "proteger": 74,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "glouton",
+              "botNom": "Bot Glouton (Pistes + Dés personnels)",
+              "foretSauveeMoyennePct": 87.4,
+              "ecartTypePct": 7.6,
+              "pireDecilePct": 73.9,
+              "arbresCoupesMoyen": 5.8,
+              "paradesMoyennes": 1.8,
+              "sabotagesMoyens": 11.2,
+              "tauxUsageActions": {
+                "deplacer": 45,
+                "proteger": 39,
+                "saboter": 16,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "deductif",
+              "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+              "foretSauveeMoyennePct": 90.5,
+              "ecartTypePct": 4,
+              "pireDecilePct": 84.8,
+              "arbresCoupesMoyen": 4.4,
+              "paradesMoyennes": 2,
+              "sabotagesMoyens": 11.8,
+              "tauxUsageActions": {
+                "deplacer": 44,
+                "proteger": 40,
+                "saboter": 16,
+                "replanter": 0
+              }
+            }
+          ],
+          "indicateurs": {
+            "progressionEchelleValide": true,
+            "ecartDeductifSurInerte": 32.2,
+            "margeGardeFouBoucle": 11.8,
+            "gainDeductionSequentielle": 3.1,
+            "gainLecturePistes": 8.7,
+            "impactApprentissageMechant": 3.2,
+            "equilibreActionsPct": 90
+          },
+          "scoreInteretGlobal": 89,
+          "bandeSante": "vert",
+          "syntheseAnalytique": [
+            "Échelle des Bots : Inerte 58.3% → Hasard 80% → Réflexe 78.7% → Glouton 87.4% → Déductif 90.5%.",
+            "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +8.7 pts de forêt sauvée.",
+            "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +3.1 pts.",
+            "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +11.8 pts (Sain)."
+          ]
+        },
+        {
+          "varianteId": "v01_socle_reference",
+          "varianteNom": "V0.1 Socle — Séquencement Entrelacé (Référence)",
+          "dateExecution": "2026-10-19T20:57:43.696Z",
+          "nbPartiesParBot": 5,
+          "dureeMs": 124,
+          "echelleBots": [
+            {
+              "botId": "inerte",
+              "botNom": "Bot Inerte (Plancher)",
+              "foretSauveeMoyennePct": 58.4,
+              "ecartTypePct": 1,
+              "pireDecilePct": 57.9,
+              "arbresCoupesMoyen": 15.8,
+              "paradesMoyennes": 0,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 0,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "hasard",
+              "botNom": "Bot Hasard (Bruité)",
+              "foretSauveeMoyennePct": 78.9,
+              "ecartTypePct": 5,
+              "pireDecilePct": 73.7,
+              "arbresCoupesMoyen": 8,
+              "paradesMoyennes": 2.6,
+              "sabotagesMoyens": 4.6,
+              "tauxUsageActions": {
+                "deplacer": 44,
+                "proteger": 47,
+                "saboter": 9,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "boucle",
+              "botNom": "Bot Boucle Fixe (Garde-fou)",
+              "foretSauveeMoyennePct": 77.9,
+              "ecartTypePct": 3.2,
+              "pireDecilePct": 73.7,
+              "arbresCoupesMoyen": 8.4,
+              "paradesMoyennes": 7.2,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 100,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "reflexe",
+              "botNom": "Bot Réflexe (Tape-taupe)",
+              "foretSauveeMoyennePct": 78.4,
+              "ecartTypePct": 6.5,
+              "pireDecilePct": 71.1,
+              "arbresCoupesMoyen": 8.2,
+              "paradesMoyennes": 7.6,
+              "sabotagesMoyens": 6.4,
+              "tauxUsageActions": {
+                "deplacer": 32,
+                "proteger": 57,
+                "saboter": 11,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "glouton",
+              "botNom": "Bot Glouton (Pistes + Dés personnels)",
+              "foretSauveeMoyennePct": 86.3,
+              "ecartTypePct": 4.5,
+              "pireDecilePct": 78.9,
+              "arbresCoupesMoyen": 5.2,
+              "paradesMoyennes": 5.6,
+              "sabotagesMoyens": 6.6,
+              "tauxUsageActions": {
+                "deplacer": 46,
+                "proteger": 42,
+                "saboter": 11,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "deductif",
+              "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+              "foretSauveeMoyennePct": 88.4,
+              "ecartTypePct": 4.9,
+              "pireDecilePct": 81.6,
+              "arbresCoupesMoyen": 4.4,
+              "paradesMoyennes": 6.8,
+              "sabotagesMoyens": 7.4,
+              "tauxUsageActions": {
+                "deplacer": 47,
+                "proteger": 40,
+                "saboter": 13,
+                "replanter": 0
+              }
+            }
+          ],
+          "indicateurs": {
+            "progressionEchelleValide": true,
+            "ecartDeductifSurInerte": 30,
+            "margeGardeFouBoucle": 10.5,
+            "gainDeductionSequentielle": 2.1,
+            "gainLecturePistes": 7.9,
+            "impactApprentissageMechant": 3.2,
+            "equilibreActionsPct": 88
+          },
+          "scoreInteretGlobal": 84,
+          "bandeSante": "vert",
+          "syntheseAnalytique": [
+            "Échelle des Bots : Inerte 58.4% → Hasard 78.9% → Réflexe 78.4% → Glouton 86.3% → Déductif 88.4%.",
+            "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +7.9 pts de forêt sauvée.",
+            "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +2.1 pts.",
+            "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +10.5 pts (Sain)."
+          ]
+        },
+        {
+          "varianteId": "v01_exp_mvfqk35p_1",
+          "varianteNom": "V0.1 Exploratoire #13 (alternee / coupe / 4J)",
+          "dateExecution": "2026-10-19T20:57:42.827Z",
+          "nbPartiesParBot": 5,
+          "dureeMs": 249,
+          "echelleBots": [
+            {
+              "botId": "inerte",
+              "botNom": "Bot Inerte (Plancher)",
+              "foretSauveeMoyennePct": 59.5,
+              "ecartTypePct": 2.1,
+              "pireDecilePct": 57.9,
+              "arbresCoupesMoyen": 15.4,
+              "paradesMoyennes": 0,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 0,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "hasard",
+              "botNom": "Bot Hasard (Bruité)",
+              "foretSauveeMoyennePct": 79.5,
+              "ecartTypePct": 4.8,
+              "pireDecilePct": 71.1,
+              "arbresCoupesMoyen": 7.8,
+              "paradesMoyennes": 3,
+              "sabotagesMoyens": 6.8,
+              "tauxUsageActions": {
+                "deplacer": 46,
+                "proteger": 40,
+                "saboter": 14,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "boucle",
+              "botNom": "Bot Boucle Fixe (Garde-fou)",
+              "foretSauveeMoyennePct": 76.3,
+              "ecartTypePct": 3.7,
+              "pireDecilePct": 71.1,
+              "arbresCoupesMoyen": 9,
+              "paradesMoyennes": 6,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 100,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "reflexe",
+              "botNom": "Bot Réflexe (Tape-taupe)",
+              "foretSauveeMoyennePct": 75.8,
+              "ecartTypePct": 4.2,
+              "pireDecilePct": 68.4,
+              "arbresCoupesMoyen": 9.2,
+              "paradesMoyennes": 6.8,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 23,
+                "proteger": 78,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "glouton",
+              "botNom": "Bot Glouton (Pistes + Dés personnels)",
+              "foretSauveeMoyennePct": 82.1,
+              "ecartTypePct": 4.2,
+              "pireDecilePct": 78.9,
+              "arbresCoupesMoyen": 6.8,
+              "paradesMoyennes": 3.4,
+              "sabotagesMoyens": 8.2,
+              "tauxUsageActions": {
+                "deplacer": 45,
+                "proteger": 41,
+                "saboter": 14,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "deductif",
+              "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+              "foretSauveeMoyennePct": 85.2,
+              "ecartTypePct": 5.4,
+              "pireDecilePct": 78.9,
+              "arbresCoupesMoyen": 5.6,
+              "paradesMoyennes": 4.8,
+              "sabotagesMoyens": 8.8,
+              "tauxUsageActions": {
+                "deplacer": 47,
+                "proteger": 38,
+                "saboter": 15,
+                "replanter": 0
+              }
+            }
+          ],
+          "indicateurs": {
+            "progressionEchelleValide": true,
+            "ecartDeductifSurInerte": 25.7,
+            "margeGardeFouBoucle": 8.9,
+            "gainDeductionSequentielle": 3.1,
+            "gainLecturePistes": 6.3,
+            "impactApprentissageMechant": 4.5,
+            "equilibreActionsPct": 87
+          },
+          "scoreInteretGlobal": 83,
+          "bandeSante": "vert",
+          "syntheseAnalytique": [
+            "Échelle des Bots : Inerte 59.5% → Hasard 79.5% → Réflexe 75.8% → Glouton 82.1% → Déductif 85.2%.",
+            "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +6.3 pts de forêt sauvée.",
+            "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +3.1 pts.",
+            "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +8.9 pts (Sain)."
+          ]
+        },
+        {
+          "varianteId": "v01_alternee_barrage",
+          "varianteNom": "V0.1 Pose Alternée (I puis II) & Barrage Complet",
+          "dateExecution": "2026-10-19T20:57:44.026Z",
+          "nbPartiesParBot": 5,
+          "dureeMs": 229,
+          "echelleBots": [
+            {
+              "botId": "inerte",
+              "botNom": "Bot Inerte (Plancher)",
+              "foretSauveeMoyennePct": 59.5,
+              "ecartTypePct": 2.1,
+              "pireDecilePct": 57.9,
+              "arbresCoupesMoyen": 15.4,
+              "paradesMoyennes": 0,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 0,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "hasard",
+              "botNom": "Bot Hasard (Bruité)",
+              "foretSauveeMoyennePct": 73.7,
+              "ecartTypePct": 5.5,
+              "pireDecilePct": 68.4,
+              "arbresCoupesMoyen": 10,
+              "paradesMoyennes": 3.4,
+              "sabotagesMoyens": 4.4,
+              "tauxUsageActions": {
+                "deplacer": 49,
+                "proteger": 42,
+                "saboter": 9,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "boucle",
+              "botNom": "Bot Boucle Fixe (Garde-fou)",
+              "foretSauveeMoyennePct": 62.1,
+              "ecartTypePct": 2.1,
+              "pireDecilePct": 60.5,
+              "arbresCoupesMoyen": 14.4,
+              "paradesMoyennes": 0,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 100,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "reflexe",
+              "botNom": "Bot Réflexe (Tape-taupe)",
+              "foretSauveeMoyennePct": 78.4,
+              "ecartTypePct": 11.6,
+              "pireDecilePct": 65.8,
+              "arbresCoupesMoyen": 8.2,
+              "paradesMoyennes": 5.8,
+              "sabotagesMoyens": 6.4,
+              "tauxUsageActions": {
+                "deplacer": 30,
+                "proteger": 59,
+                "saboter": 11,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "glouton",
+              "botNom": "Bot Glouton (Pistes + Dés personnels)",
+              "foretSauveeMoyennePct": 78.4,
+              "ecartTypePct": 6.7,
+              "pireDecilePct": 65.8,
+              "arbresCoupesMoyen": 8.2,
+              "paradesMoyennes": 2.2,
+              "sabotagesMoyens": 6.4,
+              "tauxUsageActions": {
+                "deplacer": 46,
+                "proteger": 43,
+                "saboter": 11,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "deductif",
+              "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+              "foretSauveeMoyennePct": 80,
+              "ecartTypePct": 7.2,
+              "pireDecilePct": 65.8,
+              "arbresCoupesMoyen": 7.6,
+              "paradesMoyennes": 3.4,
+              "sabotagesMoyens": 6.4,
+              "tauxUsageActions": {
+                "deplacer": 44,
+                "proteger": 45,
+                "saboter": 11,
+                "replanter": 0
+              }
+            }
+          ],
+          "indicateurs": {
+            "progressionEchelleValide": true,
+            "ecartDeductifSurInerte": 20.5,
+            "margeGardeFouBoucle": 17.9,
+            "gainDeductionSequentielle": 1.6,
+            "gainLecturePistes": 0,
+            "impactApprentissageMechant": 0.1,
+            "equilibreActionsPct": 92
+          },
+          "scoreInteretGlobal": 74,
+          "bandeSante": "orange",
+          "syntheseAnalytique": [
+            "Échelle des Bots : Inerte 59.5% → Hasard 73.7% → Réflexe 78.4% → Glouton 78.4% → Déductif 80%.",
+            "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +0 pts de forêt sauvée.",
+            "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +1.6 pts.",
+            "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +17.9 pts (Sain)."
+          ]
+        },
+        {
+          "varianteId": "v01_deux_vagues_completes",
+          "varianteNom": "V0.1 Résolution en Deux Vagues de Coupe Successives",
+          "dateExecution": "2026-10-19T20:57:44.547Z",
+          "nbPartiesParBot": 5,
+          "dureeMs": 150,
+          "echelleBots": [
+            {
+              "botId": "inerte",
+              "botNom": "Bot Inerte (Plancher)",
+              "foretSauveeMoyennePct": 57.9,
+              "ecartTypePct": 0,
+              "pireDecilePct": 57.9,
+              "arbresCoupesMoyen": 16,
+              "paradesMoyennes": 0,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 0,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "hasard",
+              "botNom": "Bot Hasard (Bruité)",
+              "foretSauveeMoyennePct": 83.7,
+              "ecartTypePct": 5.1,
+              "pireDecilePct": 76.3,
+              "arbresCoupesMoyen": 6.2,
+              "paradesMoyennes": 6.2,
+              "sabotagesMoyens": 7.4,
+              "tauxUsageActions": {
+                "deplacer": 42,
+                "proteger": 44,
+                "saboter": 14,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "boucle",
+              "botNom": "Bot Boucle Fixe (Garde-fou)",
+              "foretSauveeMoyennePct": 82.6,
+              "ecartTypePct": 3.6,
+              "pireDecilePct": 76.3,
+              "arbresCoupesMoyen": 6.6,
+              "paradesMoyennes": 9.4,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 100,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "reflexe",
+              "botNom": "Bot Réflexe (Tape-taupe)",
+              "foretSauveeMoyennePct": 68.4,
+              "ecartTypePct": 5.5,
+              "pireDecilePct": 63.2,
+              "arbresCoupesMoyen": 12,
+              "paradesMoyennes": 4,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 24,
+                "proteger": 76,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "glouton",
+              "botNom": "Bot Glouton (Pistes + Dés personnels)",
+              "foretSauveeMoyennePct": 81.5,
+              "ecartTypePct": 3.3,
+              "pireDecilePct": 78.9,
+              "arbresCoupesMoyen": 7,
+              "paradesMoyennes": 3.2,
+              "sabotagesMoyens": 7.4,
+              "tauxUsageActions": {
+                "deplacer": 44,
+                "proteger": 43,
+                "saboter": 13,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "deductif",
+              "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+              "foretSauveeMoyennePct": 80.5,
+              "ecartTypePct": 2.7,
+              "pireDecilePct": 76.3,
+              "arbresCoupesMoyen": 7.4,
+              "paradesMoyennes": 2.4,
+              "sabotagesMoyens": 12,
+              "tauxUsageActions": {
+                "deplacer": 45,
+                "proteger": 34,
+                "saboter": 21,
+                "replanter": 0
+              }
+            }
+          ],
+          "indicateurs": {
+            "progressionEchelleValide": false,
+            "ecartDeductifSurInerte": 22.6,
+            "margeGardeFouBoucle": -2.1,
+            "gainDeductionSequentielle": -1,
+            "gainLecturePistes": 13.1,
+            "impactApprentissageMechant": 1.7,
+            "equilibreActionsPct": 85
+          },
+          "scoreInteretGlobal": 32,
+          "bandeSante": "rouge",
+          "syntheseAnalytique": [
+            "Échelle des Bots : Inerte 57.9% → Hasard 83.7% → Réflexe 68.4% → Glouton 81.5% → Déductif 80.5%.",
+            "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +13.1 pts de forêt sauvée.",
+            "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : -1 pts.",
+            "Garde-fou anti-boucle (Déductif vs Boucle fixe) : -2.1 pts (Alerte boucle gagnante)."
+          ]
+        },
+        {
+          "varianteId": "v01_alliance_replanter",
+          "varianteNom": "V0.1 Sabotage en Alliance & Action Replanter",
+          "dateExecution": "2026-10-19T20:57:44.350Z",
+          "nbPartiesParBot": 5,
+          "dureeMs": 138,
+          "echelleBots": [
+            {
+              "botId": "inerte",
+              "botNom": "Bot Inerte (Plancher)",
+              "foretSauveeMoyennePct": 58.4,
+              "ecartTypePct": 1,
+              "pireDecilePct": 57.9,
+              "arbresCoupesMoyen": 15.8,
+              "paradesMoyennes": 0,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 0,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "hasard",
+              "botNom": "Bot Hasard (Bruité)",
+              "foretSauveeMoyennePct": 78.4,
+              "ecartTypePct": 3.9,
+              "pireDecilePct": 73.7,
+              "arbresCoupesMoyen": 9.4,
+              "paradesMoyennes": 3.6,
+              "sabotagesMoyens": 2.8,
+              "tauxUsageActions": {
+                "deplacer": 48,
+                "proteger": 42,
+                "saboter": 7,
+                "replanter": 3
+              }
+            },
+            {
+              "botId": "boucle",
+              "botNom": "Bot Boucle Fixe (Garde-fou)",
+              "foretSauveeMoyennePct": 77.9,
+              "ecartTypePct": 3.2,
+              "pireDecilePct": 73.7,
+              "arbresCoupesMoyen": 8.4,
+              "paradesMoyennes": 7.2,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 100,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "reflexe",
+              "botNom": "Bot Réflexe (Tape-taupe)",
+              "foretSauveeMoyennePct": 75.8,
+              "ecartTypePct": 4.5,
+              "pireDecilePct": 71.1,
+              "arbresCoupesMoyen": 9.2,
+              "paradesMoyennes": 6.8,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 26,
+                "proteger": 74,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "glouton",
+              "botNom": "Bot Glouton (Pistes + Dés personnels)",
+              "foretSauveeMoyennePct": 82.1,
+              "ecartTypePct": 4.5,
+              "pireDecilePct": 76.3,
+              "arbresCoupesMoyen": 7.2,
+              "paradesMoyennes": 2.4,
+              "sabotagesMoyens": 7,
+              "tauxUsageActions": {
+                "deplacer": 44,
+                "proteger": 44,
+                "saboter": 12,
+                "replanter": 1
+              }
+            },
+            {
+              "botId": "deductif",
+              "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+              "foretSauveeMoyennePct": 80,
+              "ecartTypePct": 5.4,
+              "pireDecilePct": 73.7,
+              "arbresCoupesMoyen": 8,
+              "paradesMoyennes": 1,
+              "sabotagesMoyens": 7.8,
+              "tauxUsageActions": {
+                "deplacer": 45,
+                "proteger": 42,
+                "saboter": 13,
+                "replanter": 1
+              }
+            }
+          ],
+          "indicateurs": {
+            "progressionEchelleValide": false,
+            "ecartDeductifSurInerte": 21.6,
+            "margeGardeFouBoucle": 2.1,
+            "gainDeductionSequentielle": -2.1,
+            "gainLecturePistes": 6.3,
+            "impactApprentissageMechant": 1.4,
+            "equilibreActionsPct": 91
+          },
+          "scoreInteretGlobal": 28,
+          "bandeSante": "rouge",
+          "syntheseAnalytique": [
+            "Échelle des Bots : Inerte 58.4% → Hasard 78.4% → Réflexe 75.8% → Glouton 82.1% → Déductif 80%.",
+            "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : +6.3 pts de forêt sauvée.",
+            "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : -2.1 pts.",
+            "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +2.1 pts (Alerte boucle gagnante)."
+          ]
+        },
+        {
+          "varianteId": "v01_exp_mvfppt0c_0",
+          "varianteNom": "V0.1 Exploratoire #8 (sequentielle / coupe / 3J)",
+          "dateExecution": "2026-10-19T20:57:42.945Z",
+          "nbPartiesParBot": 5,
+          "dureeMs": 71,
+          "echelleBots": [
+            {
+              "botId": "inerte",
+              "botNom": "Bot Inerte (Plancher)",
+              "foretSauveeMoyennePct": 60,
+              "ecartTypePct": 0,
+              "pireDecilePct": 60,
+              "arbresCoupesMoyen": 12,
+              "paradesMoyennes": 0,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 0,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "hasard",
+              "botNom": "Bot Hasard (Bruité)",
+              "foretSauveeMoyennePct": 80.7,
+              "ecartTypePct": 2.5,
+              "pireDecilePct": 76.7,
+              "arbresCoupesMoyen": 5.8,
+              "paradesMoyennes": 3.8,
+              "sabotagesMoyens": 2.6,
+              "tauxUsageActions": {
+                "deplacer": 48,
+                "proteger": 45,
+                "saboter": 7,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "boucle",
+              "botNom": "Bot Boucle Fixe (Garde-fou)",
+              "foretSauveeMoyennePct": 79.3,
+              "ecartTypePct": 4.4,
+              "pireDecilePct": 73.3,
+              "arbresCoupesMoyen": 6.2,
+              "paradesMoyennes": 5.8,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 0,
+                "proteger": 100,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "reflexe",
+              "botNom": "Bot Réflexe (Tape-taupe)",
+              "foretSauveeMoyennePct": 88.7,
+              "ecartTypePct": 6.2,
+              "pireDecilePct": 80,
+              "arbresCoupesMoyen": 3.4,
+              "paradesMoyennes": 8.6,
+              "sabotagesMoyens": 0,
+              "tauxUsageActions": {
+                "deplacer": 13,
+                "proteger": 87,
+                "saboter": 0,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "glouton",
+              "botNom": "Bot Glouton (Pistes + Dés personnels)",
+              "foretSauveeMoyennePct": 76.7,
+              "ecartTypePct": 5.6,
+              "pireDecilePct": 66.7,
+              "arbresCoupesMoyen": 7,
+              "paradesMoyennes": 0.8,
+              "sabotagesMoyens": 5,
+              "tauxUsageActions": {
+                "deplacer": 46,
+                "proteger": 41,
+                "saboter": 12,
+                "replanter": 0
+              }
+            },
+            {
+              "botId": "deductif",
+              "botNom": "Bot Déductif & Coordonné (Référence Forte)",
+              "foretSauveeMoyennePct": 80,
+              "ecartTypePct": 9.9,
+              "pireDecilePct": 66.7,
+              "arbresCoupesMoyen": 6,
+              "paradesMoyennes": 1,
+              "sabotagesMoyens": 5,
+              "tauxUsageActions": {
+                "deplacer": 46,
+                "proteger": 42,
+                "saboter": 12,
+                "replanter": 0
+              }
+            }
+          ],
+          "indicateurs": {
+            "progressionEchelleValide": false,
+            "ecartDeductifSurInerte": 20,
+            "margeGardeFouBoucle": 0.7,
+            "gainDeductionSequentielle": 3.3,
+            "gainLecturePistes": -12,
+            "impactApprentissageMechant": 0,
+            "equilibreActionsPct": 90
+          },
+          "scoreInteretGlobal": 23,
+          "bandeSante": "rouge",
+          "syntheseAnalytique": [
+            "Échelle des Bots : Inerte 60% → Hasard 80.7% → Réflexe 88.7% → Glouton 76.7% → Déductif 80%.",
+            "Valeur de la lecture des 2 pistes (Glouton vs Réflexe) : -12 pts de forêt sauvée.",
+            "Valeur de la déduction séquentielle autour de la table (Déductif vs Glouton) : +3.3 pts.",
+            "Garde-fou anti-boucle (Déductif vs Boucle fixe) : +0.7 pts (Alerte boucle gagnante)."
+          ]
+        }
+      ],
+      "meilleureVarianteId": "v01_exp_mvfppt0c_2"
+    },
     {
       "id": "camp_mvfppvjm",
       "nom": "Campagne VM Oracle Cloud (2026-10-19T20:34)",
