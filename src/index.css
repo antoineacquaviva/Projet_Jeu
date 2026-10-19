@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #F4F5F0;
+  --panel: #FFFFFF;
+  --ink: #16211B;
+  --muted: #55645B;
+  --line: #D8DFD5;
+  --felt: #1E3528;
+  --felt-light: #274434;
+  --accent: #256B45;
+  --machine: #D99B16;
+  --danger: #C2412D;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+.font-sans {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-mono-tabular {
+  font-family: 'IBM Plex Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

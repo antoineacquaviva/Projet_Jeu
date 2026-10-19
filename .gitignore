@@ -5,5 +5,6 @@ lots/
 resultats/essai*/
 resultats/batterie/
 resultats/fusion/
-.ui_screenshots/
-**/.ui_screenshots/
+node_modules/
+dist/
+.aistudio/

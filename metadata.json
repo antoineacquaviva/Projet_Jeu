@@ -1,0 +1,8 @@
+{
+  "name": "La Forêt qui rêve",
+  "description": "Atelier de conception V1 (Moteur, Bots, Tests, Démo, Proto, Labo) pour le jeu coopératif Défenseurs de la forêt V0.1.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
