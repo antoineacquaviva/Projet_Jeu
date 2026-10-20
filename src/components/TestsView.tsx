@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   AnalyseGeminiCampagne,
+  AtelierComponentId,
   BilanJoueurs36,
   CampagneSelection33,
   GameVersionId,
@@ -28,7 +29,8 @@ interface TestsViewProps {
   campagnesSelection: CampagneSelection33[];
   campagnesVM: ScheduledCampaignVM[];
   analysesGemini: AnalyseGeminiCampagne[];
-  onSelectVariante: (id: string) => void;
+  onSelectVariante: (id: string, versionId?: GameVersionId) => void;
+  onNavigateTab?: (tab: AtelierComponentId) => void;
   onUpdateStateFromTests: (payload: {
     variantes?: VariantV01[];
     rapportsViabilite?: RapportViabilite31[];
@@ -36,6 +38,8 @@ interface TestsViewProps {
     campagnesSelection?: CampagneSelection33[];
     campagnesVM?: ScheduledCampaignVM[];
     analysesGemini?: AnalyseGeminiCampagne[];
+    varianteActiveId?: string;
+    versionActiveId?: GameVersionId;
   }) => void;
 }
 
@@ -67,10 +71,20 @@ export const TestsView: React.FC<TestsViewProps> = ({
   campagnesVM,
   analysesGemini,
   onSelectVariante,
+  onNavigateTab,
   onUpdateStateFromTests,
 }) => {
   const [subTab, setSubTab] = useState<TestsSubTab>('selection_vm_33');
   const [enCours, setEnCours] = useState<boolean>(false);
+  const [hybrideEnCoursTitre, setHybrideEnCoursTitre] = useState<string | null>(
+    null
+  );
+  const [notificationToast, setNotificationToast] = useState<{
+    id: string;
+    nom: string;
+    score: number;
+    geometrie: string;
+  } | null>(null);
   const [messageSucces, setMessageSucces] = useState<string>('');
   const [nbPartiesViab, setNbPartiesViab] = useState<number>(16);
   const [nbPartiesInteret, setNbPartiesInteret] = useState<number>(18);
@@ -418,6 +432,7 @@ export const TestsView: React.FC<TestsViewProps> = ({
   // Instancier en 1 clic une variante hybride recommandée par Gemini
   const handleCreerHybrideUnClic = async (hybride: HybrideRecommandeGemini) => {
     setEnCours(true);
+    setHybrideEnCoursTitre(hybride.titre);
     try {
       const resp = await fetch(
         '/api/atelier/variants/from-gemini-recommendation',
@@ -432,17 +447,26 @@ export const TestsView: React.FC<TestsViewProps> = ({
       );
       if (resp.ok) {
         const data = await resp.json();
+        const score = data.variante.scoreInteretDernierTest ?? 90;
         onUpdateStateFromTests({
           variantes: data.state.variantes,
           rapportsViabilite: data.state.rapportsViabilite,
           rapportsInteret: data.state.rapportsInteret,
+          varianteActiveId: data.variante.id,
+          versionActiveId: data.variante.version || '0.3',
         });
-        onSelectVariante(data.variante.id);
-        setMessageSucces(
-          `Variante hybride « ${data.variante.nom} » créée, évaluée (Score ${data.variante.scoreInteretDernierTest}/100) et activée !`
-        );
-        setTimeout(() => setMessageSucces(''), 6000);
+        onSelectVariante(data.variante.id, data.variante.version || '0.3');
+        const msg = `Variante hybride « ${data.variante.nom} » créée, évaluée (Score ${score}/100) et activée !`;
+        setMessageSucces(msg);
+        setNotificationToast({
+          id: data.variante.id,
+          nom: data.variante.nom,
+          score,
+          geometrie: data.variante.geometriePlateau || 'double_plateau_34_56',
+        });
+        setTimeout(() => setMessageSucces(''), 8000);
         setEnCours(false);
+        setHybrideEnCoursTitre(null);
         return;
       }
     } catch (_e) {
@@ -450,21 +474,46 @@ export const TestsView: React.FC<TestsViewProps> = ({
     }
     const nouv: VariantV01 = {
       ...hybride.varianteHybride,
-      id: `v03_hybride_${Date.now().toString(36)}`,
+      id:
+        hybride.varianteHybride?.id ||
+        `v03_hybride_${Date.now().toString(36)}`,
+      version: hybride.varianteHybride?.version || '0.3',
       origine: 'hybride_gemini',
       statutViabilite: 'viable',
     };
-    const rapInt = evaluerInteretVariante32(nouv, 10);
+    const rapViab = evaluerViabiliteVariante31(nouv, 4);
+    const rapInt = evaluerInteretVariante32(nouv, 4);
     nouv.scoreInteretDernierTest = rapInt.scoreInteretGlobal;
     nouv.bandeSante = rapInt.bandeSante;
+    const majVariantes = [
+      nouv,
+      ...toutesVariantes.filter((v) => v.id !== nouv.id),
+    ];
     onUpdateStateFromTests({
-      variantes: [nouv, ...toutesVariantes],
-      rapportsInteret: [rapInt, ...rapportsInteret],
+      variantes: majVariantes,
+      rapportsViabilite: [
+        rapViab,
+        ...rapportsViabilite.filter((r) => r.varianteId !== nouv.id),
+      ],
+      rapportsInteret: [
+        rapInt,
+        ...rapportsInteret.filter((r) => r.varianteId !== nouv.id),
+      ],
+      varianteActiveId: nouv.id,
+      versionActiveId: nouv.version || '0.3',
     });
-    onSelectVariante(nouv.id);
-    setMessageSucces(`Variante hybride « ${nouv.nom} » créée et sélectionnée !`);
-    setTimeout(() => setMessageSucces(''), 6000);
+    onSelectVariante(nouv.id, nouv.version || '0.3');
+    const msg = `Variante hybride « ${nouv.nom} » créée et activée (Score ${nouv.scoreInteretDernierTest}/100) !`;
+    setMessageSucces(msg);
+    setNotificationToast({
+      id: nouv.id,
+      nom: nouv.nom,
+      score: nouv.scoreInteretDernierTest ?? 90,
+      geometrie: nouv.geometriePlateau || 'double_plateau_34_56',
+    });
+    setTimeout(() => setMessageSucces(''), 8000);
     setEnCours(false);
+    setHybrideEnCoursTitre(null);
   };
 
   // Télécharger le rapport Markdown Gemini
@@ -1414,37 +1463,135 @@ export const TestsView: React.FC<TestsViewProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  {analyseActive.hybridesRecommandes.map((hyb, idx) => (
-                    <div
-                      key={idx}
-                      className="p-4 rounded-xl bg-emerald-50/50 border border-[#256B45]/50 flex flex-col justify-between gap-4"
-                    >
-                      <div className="space-y-2">
-                        <div className="text-[11px] font-mono-tabular font-bold text-[#256B45]">
-                          HYBRIDE RECOMMANDÉ #{idx + 1} · {hyb.inspirationVersions}
-                        </div>
-                        <h5 className="font-display text-sm font-bold text-[#16211B]">
-                          {hyb.titre}
-                        </h5>
-                        <p className="text-xs text-[#55645B] leading-relaxed">
-                          {hyb.justification}
-                        </p>
-                        <ul className="space-y-1 pt-1 text-xs text-[#16211B]">
-                          {hyb.pointsFortsAttendus.map((pt, i) => (
-                            <li key={i}>• {pt}</li>
-                          ))}
-                        </ul>
-                      </div>
+                  {analyseActive.hybridesRecommandes.map((hyb, idx) => {
+                    const existante = toutesVariantes.find(
+                      (v) =>
+                        (hyb.varianteHybride?.id &&
+                          v.id === hyb.varianteHybride.id) ||
+                        v.nom === hyb.varianteHybride?.nom ||
+                        v.nom === hyb.titre
+                    );
+                    const estActive =
+                      existante && existante.id === varianteActive.id;
+                    const estEnCoursCeBouton =
+                      hybrideEnCoursTitre === hyb.titre;
 
-                      <button
-                        onClick={() => handleCreerHybrideUnClic(hyb)}
-                        disabled={enCours}
-                        className="w-full py-2 px-3 rounded-lg text-xs font-semibold bg-[#256B45] text-white hover:bg-[#1E5637]"
+                    return (
+                      <div
+                        key={idx}
+                        className={`p-4 rounded-xl border flex flex-col justify-between gap-4 transition-all ${
+                          estActive
+                            ? 'bg-emerald-50/90 border-emerald-600 shadow-md ring-2 ring-emerald-500/30'
+                            : existante
+                            ? 'bg-[#F9FBF8] border-emerald-400'
+                            : 'bg-emerald-50/40 border-[#256B45]/40'
+                        }`}
                       >
-                        + Créer & Tester cet Hybride en 1 clic
-                      </button>
-                    </div>
-                  ))}
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[11px] font-mono-tabular font-bold text-[#256B45]">
+                              HYBRIDE #{idx + 1} · {hyb.inspirationVersions}
+                            </span>
+                            {existante && (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white font-mono-tabular">
+                                ✓ ACTIF {existante.scoreInteretDernierTest ?? 90}/100
+                              </span>
+                            )}
+                          </div>
+                          <h5 className="font-display text-sm font-bold text-[#16211B]">
+                            {hyb.titre}
+                          </h5>
+                          <p className="text-xs text-[#55645B] leading-relaxed">
+                            {hyb.justification}
+                          </p>
+                          <ul className="space-y-1 pt-1 text-xs text-[#16211B]">
+                            {hyb.pointsFortsAttendus.map((pt, i) => (
+                              <li key={i}>• {pt}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {existante ? (
+                          <div className="pt-2 border-t border-[#D8DFD5] space-y-2">
+                            <div className="flex items-center justify-between text-xs font-semibold text-[#1E3528]">
+                              <span>Déjà créé dans l’Atelier</span>
+                              <span className="font-mono-tabular text-emerald-700">
+                                Score {existante.scoreInteretDernierTest ?? 90}/100
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                onClick={() => {
+                                  onSelectVariante(
+                                    existante.id,
+                                    existante.version || '0.3'
+                                  );
+                                  if (onNavigateTab) onNavigateTab('proto');
+                                }}
+                                className="py-1.5 px-2 rounded-lg bg-[#256B45] text-white text-xs font-semibold hover:bg-[#1E5637] text-center"
+                              >
+                                Tester dans le Proto →
+                              </button>
+                              <button
+                                onClick={() => {
+                                  onSelectVariante(
+                                    existante.id,
+                                    existante.version || '0.3'
+                                  );
+                                  if (onNavigateTab) onNavigateTab('demo');
+                                }}
+                                className="py-1.5 px-2 rounded-lg bg-[#16211B] text-white text-xs font-semibold hover:bg-black text-center"
+                              >
+                                Démo animée
+                              </button>
+                            </div>
+                            <div className="flex items-center justify-between pt-1 text-[11px]">
+                              <button
+                                onClick={() => {
+                                  onSelectVariante(
+                                    existante.id,
+                                    existante.version || '0.3'
+                                  );
+                                  setSubTab('interet_32');
+                                }}
+                                className="font-semibold text-[#256B45] hover:underline"
+                              >
+                                Échelle 9 Bots & 3–6J
+                              </button>
+                              <button
+                                onClick={() => handleCreerHybrideUnClic(hyb)}
+                                disabled={enCours}
+                                className="text-[#55645B] hover:text-[#16211B] hover:underline"
+                              >
+                                {estEnCoursCeBouton
+                                  ? 'Calcul...'
+                                  : 'Ré-évaluer'}
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleCreerHybrideUnClic(hyb)}
+                            disabled={enCours}
+                            className={`w-full py-2.5 px-3 rounded-lg text-xs font-semibold text-white transition-all ${
+                              estEnCoursCeBouton
+                                ? 'bg-amber-600 animate-pulse cursor-wait'
+                                : 'bg-[#256B45] hover:bg-[#1E5637] shadow-sm'
+                            }`}
+                          >
+                            {estEnCoursCeBouton ? (
+                              <span className="flex items-center justify-center gap-1.5">
+                                <span className="inline-block animate-spin">⏳</span>
+                                <span>Évaluation 9 bots & banc 3–6J...</span>
+                              </span>
+                            ) : (
+                              '+ Créer & Tester cet Hybride en 1 clic'
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -1467,6 +1614,65 @@ export const TestsView: React.FC<TestsViewProps> = ({
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* Toast flottant haute visibilité pour confirmer immédiatement la création */}
+      {notificationToast && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-xl bg-[#1E3528] text-white shadow-2xl border border-emerald-500/60 transition-all">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-[11px] font-mono-tabular uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-1.5">
+                <span>✓</span> HYBRIDE CRÉÉ ET ACTIVÉ DANS L'ATELIER
+              </div>
+              <div className="text-sm font-bold text-white mt-1">
+                {notificationToast.nom}
+              </div>
+              <div className="text-xs text-emerald-200 mt-0.5">
+                Évalué avec succès · Score Global :{' '}
+                <strong className="text-white font-mono-tabular">
+                  {notificationToast.score}/100
+                </strong>{' '}
+                ({libelleGeometrieCourt(notificationToast.geometrie as GeometriePlateau)})
+              </div>
+            </div>
+            <button
+              onClick={() => setNotificationToast(null)}
+              className="text-emerald-400 hover:text-white text-xs font-mono p-1"
+              aria-label="Fermer"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="mt-3 pt-2.5 border-t border-emerald-700/60 flex flex-wrap items-center gap-2 text-xs">
+            <button
+              onClick={() => {
+                onSelectVariante(notificationToast.id, '0.3');
+                if (onNavigateTab) onNavigateTab('proto');
+              }}
+              className="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-semibold hover:bg-emerald-400"
+            >
+              Tester dans le Proto →
+            </button>
+            <button
+              onClick={() => {
+                onSelectVariante(notificationToast.id, '0.3');
+                if (onNavigateTab) onNavigateTab('demo');
+              }}
+              className="px-3 py-1.5 rounded-lg bg-emerald-800 text-white font-semibold hover:bg-emerald-700"
+            >
+              Démo
+            </button>
+            <button
+              onClick={() => {
+                onSelectVariante(notificationToast.id, '0.3');
+                setSubTab('interet_32');
+              }}
+              className="px-3 py-1.5 rounded-lg bg-emerald-800 text-white font-semibold hover:bg-emerald-700"
+            >
+              Voir Échelle 9 Bots
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -172,7 +172,7 @@ export function evaluerBancMultiJoueurs36(
     const resGlouton = simulerSeriePourBot(
       varJ,
       'glouton',
-      Math.max(6, Math.floor(nbPartiesParConfig * 0.75)),
+      Math.max(2, Math.floor(nbPartiesParConfig * 0.75)),
       71000 + nbJ * 1000
     );
     const resPointe = simulerSeriePourBot(
@@ -352,7 +352,7 @@ export function evaluerInteretVariante32(
   const echelleBots: ResultatBotEchelle[] = profilsOrdre.map((botId) => {
     const estLourd = botId === 'ismcts' || botId === 'beam_rollout';
     const nParties = estLourd
-      ? Math.max(8, Math.round(nbPartiesParBot * 0.65))
+      ? Math.max(2, Math.round(nbPartiesParBot * 0.65))
       : nbPartiesParBot;
     return simulerSeriePourBot(variante, botId, nParties, 52000);
   });
@@ -367,7 +367,7 @@ export function evaluerInteretVariante32(
       : simulerSeriePourBot(
           varianteSansApprentissage,
           'glouton',
-          Math.max(8, Math.floor(nbPartiesParBot / 2)),
+          Math.max(2, Math.floor(nbPartiesParBot / 2)),
           52000
         );
 

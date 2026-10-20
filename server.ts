@@ -599,19 +599,21 @@ async function startServer() {
       id:
         hybride.varianteHybride.id ||
         `v03_hybride_${Date.now().toString(36)}`,
+      version: hybride.varianteHybride.version || '0.3',
       origine: 'hybride_gemini',
       statutViabilite: 'viable',
     };
 
     if (evaluerImmediatement) {
-      const rapViab = evaluerViabiliteVariante31(nouvelleVariante, 10);
+      // Évaluation réactive et rapide (4 parties/bot) pour instanciation 1-clic fluide
+      const rapViab = evaluerViabiliteVariante31(nouvelleVariante, 4);
       state.rapportsViabilite = [
         rapViab,
         ...state.rapportsViabilite.filter(
           (r) => r.varianteId !== nouvelleVariante.id
         ),
       ];
-      const rapInt = evaluerInteretVariante32(nouvelleVariante, 10);
+      const rapInt = evaluerInteretVariante32(nouvelleVariante, 4);
       nouvelleVariante.scoreInteretDernierTest = rapInt.scoreInteretGlobal;
       nouvelleVariante.bandeSante = rapInt.bandeSante;
       state.rapportsInteret = [

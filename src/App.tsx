@@ -172,10 +172,14 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleSelectVarianteGlobale = (id: string) => {
-    const cible = variantes.find((v) => v.id === id);
-    if (cible && cible.version && cible.version !== versionActiveId) {
-      setVersionActiveId(cible.version);
+  const handleSelectVarianteGlobale = (
+    id: string,
+    versionId?: GameVersionId
+  ) => {
+    const ver =
+      versionId || variantes.find((v) => v.id === id)?.version || '0.3';
+    if (ver !== versionActiveId) {
+      setVersionActiveId(ver);
     }
     setVarianteActiveId(id);
   };
@@ -477,9 +481,10 @@ export const App: React.FC = () => {
             campagnesSelection={campagnesSelection}
             campagnesVM={campagnesVM}
             analysesGemini={analysesGemini}
-            onSelectVariante={(id) => {
-              handleSelectVarianteGlobale(id);
+            onSelectVariante={(id, ver) => {
+              handleSelectVarianteGlobale(id, ver);
             }}
+            onNavigateTab={(tab) => setOngletActif(tab)}
             onUpdateStateFromTests={(payload) => {
               if (payload.variantes) setVariantes(payload.variantes);
               if (payload.rapportsViabilite)
@@ -491,6 +496,10 @@ export const App: React.FC = () => {
               if (payload.campagnesVM) setCampagnesVM(payload.campagnesVM);
               if (payload.analysesGemini)
                 setAnalysesGemini(payload.analysesGemini);
+              if (payload.versionActiveId)
+                setVersionActiveId(payload.versionActiveId);
+              if (payload.varianteActiveId)
+                setVarianteActiveId(payload.varianteActiveId);
             }}
           />
         )}
