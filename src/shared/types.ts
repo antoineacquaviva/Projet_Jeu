@@ -6,11 +6,18 @@ export type AtelierComponentId =
   | 'tests'
   | 'labo';
 
-export type GameVersionId = string; // ex. '0.1', '0.2'
+export type GameVersionId = string; // ex. '0.1', '0.2', '0.3'
 
 export type TactiqueType = 'cupidite' | 'percee' | 'opportunisme' | 'represailles';
 
 export type ActionDefenseurType = 'deplacer' | 'proteger' | 'saboter' | 'replanter' | 'attendre';
+
+// Nouvelles architectures géométriques de plateau (introduites en V0.3, rétrocompatibles V0.1/V0.2)
+export type GeometriePlateau =
+  | 'modulaire_secteurs'   // Socle V0.1/V0.2 : 1 Tuile Cœur + 2 tuiles par joueur assemblées en couronne
+  | 'double_plateau_34_56' // V0.3 : Plateau fixe Recto (3-4 joueurs, 9 zones) / Verso (5-6 joueurs, 13 zones)
+  | 'hex_couronne_19'      // V0.3 : Grille hexagonale fixe à 19 hexagones (1 Cœur + 6 Intérieurs + 12 Lisières)
+  | 'clairieres_sentiers'; // V0.3 : Réseau de 13 clairières et sentiers à embranchements (3 cols stratégiques)
 
 // Options de séquencement de la programmation
 export type ModeProgrammation =
@@ -50,13 +57,16 @@ export type StatutViabilite = 'non_teste' | 'viable' | 'eliminee';
 export interface VariantV01 {
   id: string;
   nom: string;
-  version: GameVersionId; // '0.1', '0.2', etc.
+  version: GameVersionId; // '0.1', '0.2', '0.3', etc.
   description: string;
-  origine: 'socle' | 'exploration' | 'utilisateur';
+  origine: 'socle' | 'exploration' | 'utilisateur' | 'hybride_gemini';
   statutViabilite: StatutViabilite;
   motifElimination?: string;
   scoreInteretDernierTest?: number;
   bandeSante?: 'vert' | 'orange' | 'rouge';
+
+  // Architecture géométrique du plateau (V0.3+, défaut 'modulaire_secteurs' pour V0.1/V0.2)
+  geometriePlateau?: GeometriePlateau;
 
   // Règles de séquencement
   modeProgrammation: ModeProgrammation;
@@ -103,6 +113,7 @@ export interface RuleOptionSpec {
   cleVariante: keyof VariantV01;
   nom: string;
   categorie:
+    | 'Géométrie & Topologie du Plateau'
     | 'Séquencement de la Programmation'
     | 'Séquencement de la Résolution'
     | 'Actions des Défenseurs'
@@ -151,7 +162,7 @@ export interface SetupStepSpec {
 }
 
 export interface GameVersionSpec {
-  id: GameVersionId; // ex. '0.1', '0.2'
+  id: GameVersionId; // ex. '0.1', '0.2', '0.3'
   nomJeu: string;    // "Défenseurs de la forêt"
   titreVersion: string;
   statut: 'active' | 'en_preparation' | 'archivee';
@@ -169,13 +180,15 @@ export interface GameVersionSpec {
 export interface CasePlateau {
   id: number;
   nom: string;
-  nomPhysique: string; // ex. "Tuile Cœur Central", "Tuile Secteur 1 — Lisière Nord"
+  nomPhysique: string; // ex. "Tuile Cœur Central", "Hexagone Couronne N1", "Clairière du Col Nord"
   secteurJoueur: number | null; // null pour le Cœur (0), 0..J-1 pour les secteurs joueurs
   anneau: 'coeur' | 'interieur' | 'lisiere';
   voisins: number[];
   foretsMax: number;
   x: number;
   y: number;
+  formeRendu?: 'cercle' | 'hexagone' | 'clairiere' | 'plateau_fixe';
+  rayonRendu?: number;
 }
 
 export interface PionDefenseur {
@@ -187,7 +200,7 @@ export interface PionDefenseur {
 }
 
 export interface PionMachine {
-  id: number; // 0 à 5 (les 6 Machines indifférenciées en V0.1)
+  id: number; // 0 à 5 (les 6 Machines indifférenciées)
   nom: string;
   caseId: number | null; // null = en Réserve / Chantier
   cibleDeclaree: number | null; // Case ciblée au milieu du tour avant la coupe
@@ -298,15 +311,20 @@ export type BotProfileId =
   | 'boucle'
   | 'reflexe'
   | 'glouton'
-  | 'deductif';
+  | 'deductif'
+  | 'expectimax_bayesien'
+  | 'beam_rollout'
+  | 'ismcts';
 
 export interface BotProfileSpec {
   id: BotProfileId;
   nom: string;
   roleDansTests: string;
   description: string;
+  algorithme?: string;
   utiliseTirageSecret: boolean;
   utiliseDeductionAllies: boolean;
+  estPointe?: boolean;
 }
 
 export interface CritereViabilite {
@@ -338,6 +356,7 @@ export interface ResultatBotEchelle {
   arbresCoupesMoyen: number;
   paradesMoyennes: number;
   sabotagesMoyens: number;
+  tempsMoyenMsParPartie?: number;
   tauxUsageActions: {
     deplacer: number;
     proteger: number;
@@ -346,9 +365,29 @@ export interface ResultatBotEchelle {
   };
 }
 
+export interface BilanJoueurs36 {
+  nbJoueurs: 3 | 4 | 5 | 6;
+  survieMoyennePct: number;
+  pireDecilePct: number;
+  scoreStrategique: number;
+  sabotagesMoyens: number;
+  ecartMechantVsGlouton: number;
+}
+
+export interface TroisAxesPrioritaires {
+  interetStrategique: number;      // /100
+  lisibiliteErgonomie: number;     // /100
+  equilibreJoueurs36: number;      // /100
+  detailStrategie: string;
+  detailErgonomie: string;
+  detailEquilibre36: string;
+}
+
 export interface RapportInteret32 {
   varianteId: string;
   varianteNom: string;
+  version?: GameVersionId;
+  geometriePlateau?: GeometriePlateau;
   dateExecution: string;
   nbPartiesParBot: number;
   dureeMs: number;
@@ -356,12 +395,15 @@ export interface RapportInteret32 {
   indicateurs: {
     progressionEchelleValide: boolean;
     ecartDeductifSurInerte: number;
-    margeGardeFouBoucle: number;       // score(deductif) - score(boucle)
-    gainDeductionSequentielle: number; // score(deductif) - score(glouton)
-    gainLecturePistes: number;         // score(glouton) - score(reflexe)
-    impactApprentissageMechant: number;// écart avec/sans apprentissage
-    equilibreActionsPct: number;       // entropie / équilibre entre déplacer, protéger, saboter
+    margeGardeFouBoucle: number;          // score(ismcts|deductif) - score(boucle)
+    gainDeductionSequentielle: number;    // score(deductif) - score(glouton)
+    gainLecturePistes: number;            // score(glouton) - score(reflexe)
+    gainBotsPointeSurDeductif?: number;   // score(ismcts) - score(deductif)
+    impactApprentissageMechant: number;   // écart avec/sans apprentissage
+    equilibreActionsPct: number;          // entropie / équilibre entre déplacer, protéger, saboter
   };
+  equilibreParJoueurs?: Record<3 | 4 | 5 | 6, BilanJoueurs36>;
+  troisAxesPrioritaires?: TroisAxesPrioritaires;
   scoreInteretGlobal: number; // 0 à 100
   bandeSante: 'vert' | 'orange' | 'rouge';
   syntheseAnalytique: string[];
@@ -370,6 +412,7 @@ export interface RapportInteret32 {
 export interface CampagneSelection33 {
   id: string;
   nom: string;
+  versionsCibles?: GameVersionId[];
   dateExecution: string;
   nbVariantesEntree: number;
   nbVariantesViables: number;
@@ -379,16 +422,51 @@ export interface CampagneSelection33 {
   meilleureVarianteId: string | null;
 }
 
+export interface HybrideRecommandeGemini {
+  titre: string;
+  justification: string;
+  inspirationVersions: string;
+  pointsFortsAttendus: string[];
+  varianteHybride: VariantV01;
+}
+
+export interface AnalyseGeminiCampagne {
+  id: string;
+  dateCreation: string;
+  campagneId: string;
+  campagneNom: string;
+  versionsAnalysees: GameVersionId[];
+  modeleUtilise: string;
+  resumeExecutif: string;
+  diagnosticStrategie: string;
+  diagnosticLisibiliteErgonomie: string;
+  diagnosticEquilibre36J: string;
+  comparatifGeometries: {
+    geometrie: GeometriePlateau;
+    nom: string;
+    verdict: string;
+    noteStrategie: number;
+    noteErgonomie: number;
+    noteEquilibre36: number;
+  }[];
+  hybridesRecommandes: HybrideRecommandeGemini[];
+  rapportMarkdown: string;
+}
+
 export interface ScheduledCampaignVM {
   id: string;
   nom: string;
   cibleExecution: 'vm_oracle_cloud' | 'serveur_local';
   cronExpression: string; // ex. "0 2 * * *" (tous les jours à 02:00 sur la VM Oracle Cloud)
   actif: boolean;
+  nbVariantesAGenerer?: number;
   nbPartiesViabilite: number;
   nbPartiesInteret: number;
   eliminerNonViablesAuto: boolean;
   autoCommitGithub: boolean;
+  versionsCibles?: GameVersionId[];
+  inclureBotsPointe?: boolean;
+  testerEquilibre36J?: boolean;
   statut: 'planifiee' | 'en_cours' | 'terminee' | 'erreur';
   derniereExecution?: string;
   prochaineExecutionEstimee: string;
@@ -404,6 +482,7 @@ export type LabIdeaMaturite =
   | 'Prête à tester'
   | 'Intégrée V0.1'
   | 'Intégrée V0.2'
+  | 'Intégrée V0.3'
   | 'Différée';
 
 export interface LabIdea {

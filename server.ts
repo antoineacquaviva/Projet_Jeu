@@ -2,9 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
+import { GoogleGenAI, Type } from '@google/genai';
 import {
+  AnalyseGeminiCampagne,
   CampagneSelection33,
+  GameVersionId,
   GameVersionSpec,
+  HybrideRecommandeGemini,
   LabIdea,
   RapportInteret32,
   RapportViabilite31,
@@ -14,6 +18,7 @@ import {
 import { VARIANTES_INITIALES_V01 } from './src/shared/moteur';
 import { VERSIONS_JEU_INITIALES } from './src/shared/versions-registry';
 import {
+  construireAnalyseCampagneStructurer,
   evaluerInteretVariante32,
   evaluerViabiliteVariante31,
   executerCampagneSelection33,
@@ -32,6 +37,7 @@ export interface AtelierPersistedState {
   rapportsInteret: RapportInteret32[];
   campagnesSelection: CampagneSelection33[];
   campagnesPlanifieesVM: ScheduledCampaignVM[];
+  analysesGemini: AnalyseGeminiCampagne[];
   ideesLabo: LabIdea[];
 }
 
@@ -41,14 +47,247 @@ const STATE_FILE_PATH = path.resolve(
   'atelier-v1-state.json'
 );
 
+export function sauvegarderRapportMarkdownGemini(
+  analyse: AnalyseGeminiCampagne
+): void {
+  try {
+    const dir = path.resolve(process.cwd(), 'resultats');
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const mdPath = path.join(dir, `analyse-gemini-${analyse.campagneId}.md`);
+    fs.writeFileSync(mdPath, analyse.rapportMarkdown, 'utf-8');
+    const latestPath = path.join(dir, 'derniere-analyse-gemini.md');
+    fs.writeFileSync(latestPath, analyse.rapportMarkdown, 'utf-8');
+  } catch (err) {
+    console.error('Erreur écriture rapport Markdown Gemini :', err);
+  }
+}
+
+export async function genererAnalyseGeminiOuFallback(
+  campagne: CampagneSelection33
+): Promise<AnalyseGeminiCampagne> {
+  const baseDeterministe = construireAnalyseCampagneStructurer(
+    campagne,
+    process.env.GEMINI_API_KEY
+      ? 'gemini-3-flash-preview (Google GenAI SDK)'
+      : 'Synthèse Analytique Multi-Critères Gemini (Moteur Expert Local / VM)'
+  );
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    sauvegarderRapportMarkdownGemini(baseDeterministe);
+    return baseDeterministe;
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const resumeDonnees = {
+      nomCampagne: campagne.nom,
+      versionsCibles: campagne.versionsCibles || ['0.1', '0.2', '0.3'],
+      nbVariantesEntree: campagne.nbVariantesEntree,
+      nbVariantesViables: campagne.nbVariantesViables,
+      nbVariantesEliminees: campagne.nbVariantesEliminees,
+      classementVariantes: campagne.rapportsInteret.slice(0, 8).map((r) => ({
+        varianteId: r.varianteId,
+        nom: r.varianteNom,
+        version: r.version || '0.1',
+        geometriePlateau: r.geometriePlateau || 'modulaire_secteurs',
+        scoreGlobal: r.scoreInteretGlobal,
+        troisAxesPrioritaires: r.troisAxesPrioritaires,
+        indicateurs: r.indicateurs,
+        equilibreParJoueurs: r.equilibreParJoueurs,
+      })),
+    };
+
+    const prompt = `Tu es un auteur et analyste senior de jeux de société coopératifs modernes.
+Analyse les résultats expérimentaux de la campagne de tests suivante pour le jeu « La Forêt qui Rêve / Défenseurs de la Forêt » (versions V0.1, V0.2, V0.3) :
+${JSON.stringify(resumeDonnees, null, 2)}
+
+Les 3 priorités absolues du créateur pour la version 0.3 et ses variantes de plateau sont :
+1. L'intérêt stratégique (évalué par une échelle de 9 bots allant du Bot Inerte jusqu'à Expectimax Bayésien, Beam Search Rollout et IS-MCTS).
+2. La lisibilité et l'ergonomie sur table (remplacer l'assemblage fastidieux d'une tuile par joueur par un Plateau Double Face 3-4J / 5-6J, une Grille Hexagonale à 19 cases ou un Réseau de Clairières & Sentiers à 3 Cols).
+3. L'équilibre selon le nombre de joueurs (stabilité de la difficulté et de l'entraide à 3, 4, 5 et 6 joueurs).
+
+Rédige en français :
+- Un résumé exécutif précis citant les scores observés.
+- Un diagnostic approfondi sur l'intérêt stratégique (apport des bots de pointe IS-MCTS, Beam Rollout, Expectimax Bayésien).
+- Un diagnostic sur la lisibilité et l'ergonomie des géométries de plateau V0.3.
+- Un diagnostic sur l'équilibre de 3 à 6 joueurs.
+- Un rapport Markdown complet et structuré présentant le comparatif V0.1 / V0.2 / V0.3 et les recommandations d'hybridation.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            resumeExecutif: { type: Type.STRING },
+            diagnosticStrategie: { type: Type.STRING },
+            diagnosticLisibiliteErgonomie: { type: Type.STRING },
+            diagnosticEquilibre36J: { type: Type.STRING },
+            rapportMarkdown: { type: Type.STRING },
+          },
+          required: [
+            'resumeExecutif',
+            'diagnosticStrategie',
+            'diagnosticLisibiliteErgonomie',
+            'diagnosticEquilibre36J',
+            'rapportMarkdown',
+          ],
+        },
+      },
+    });
+
+    if (response.text) {
+      const parsed = JSON.parse(response.text);
+      const enrichie: AnalyseGeminiCampagne = {
+        ...baseDeterministe,
+        modeleUtilise: 'gemini-3-flash-preview',
+        resumeExecutif: parsed.resumeExecutif || baseDeterministe.resumeExecutif,
+        diagnosticStrategie:
+          parsed.diagnosticStrategie || baseDeterministe.diagnosticStrategie,
+        diagnosticLisibiliteErgonomie:
+          parsed.diagnosticLisibiliteErgonomie ||
+          baseDeterministe.diagnosticLisibiliteErgonomie,
+        diagnosticEquilibre36J:
+          parsed.diagnosticEquilibre36J ||
+          baseDeterministe.diagnosticEquilibre36J,
+        rapportMarkdown:
+          parsed.rapportMarkdown || baseDeterministe.rapportMarkdown,
+      };
+      sauvegarderRapportMarkdownGemini(enrichie);
+      return enrichie;
+    }
+  } catch (err) {
+    console.warn(
+      'Appel API Gemini indisponible ou erreur réseau, bascule sur la synthèse analytique déterministe :',
+      err
+    );
+  }
+
+  sauvegarderRapportMarkdownGemini(baseDeterministe);
+  return baseDeterministe;
+}
+
 export function chargerEtatAtelier(): AtelierPersistedState {
   try {
     if (fs.existsSync(STATE_FILE_PATH)) {
       const raw = fs.readFileSync(STATE_FILE_PATH, 'utf-8');
       const parsed = JSON.parse(raw) as AtelierPersistedState;
       if (parsed && Array.isArray(parsed.variantes)) {
+        let modified = false;
+
+        // 1. Fusionner les nouvelles versions du registre de code (dont V0.3)
         if (!Array.isArray(parsed.versions) || parsed.versions.length === 0) {
           parsed.versions = [...VERSIONS_JEU_INITIALES];
+          modified = true;
+        } else {
+          const existingVersionIds = new Set(
+            parsed.versions.map((v) => v.version || v.id)
+          );
+          for (const ver of VERSIONS_JEU_INITIALES) {
+            if (!existingVersionIds.has(ver.id)) {
+              parsed.versions.push(ver);
+              modified = true;
+            }
+          }
+        }
+
+        // 2. Fusionner les nouvelles variantes initiales de code (dont V0.3)
+        const existingVariantIds = new Set(parsed.variantes.map((v) => v.id));
+        for (const varInit of VARIANTES_INITIALES_V01) {
+          if (!existingVariantIds.has(varInit.id)) {
+            parsed.variantes.push(varInit);
+            modified = true;
+          }
+        }
+
+        // 3. Fusionner les nouvelles idées initiales du Labo
+        if (!Array.isArray(parsed.ideesLabo)) {
+          parsed.ideesLabo = [...IDEES_INITIALES_LABO];
+          modified = true;
+        } else {
+          const existingIdeaIds = new Set(parsed.ideesLabo.map((i) => i.id));
+          for (const ideaInit of IDEES_INITIALES_LABO) {
+            if (!existingIdeaIds.has(ideaInit.id)) {
+              parsed.ideesLabo.push(ideaInit);
+              modified = true;
+            }
+          }
+        }
+
+        // 4. Fusionner les nouvelles campagnes planifiées VM
+        if (!Array.isArray(parsed.campagnesPlanifieesVM)) {
+          parsed.campagnesPlanifieesVM = [...CAMPAGNES_VM_INITIALES];
+          modified = true;
+        } else {
+          const existingVmIds = new Set(
+            parsed.campagnesPlanifieesVM.map((c) => c.id)
+          );
+          for (const vmInit of CAMPAGNES_VM_INITIALES) {
+            if (!existingVmIds.has(vmInit.id)) {
+              parsed.campagnesPlanifieesVM.unshift(vmInit);
+              modified = true;
+            }
+          }
+        }
+
+        // 5. Initialiser les analyses Gemini si absentes
+        if (!Array.isArray(parsed.analysesGemini)) {
+          parsed.analysesGemini = [];
+          modified = true;
+        }
+
+        const aCampagneV03 =
+          Array.isArray(parsed.campagnesSelection) &&
+          parsed.campagnesSelection.some((c) =>
+            (c.versionsCibles || []).includes('0.3')
+          );
+
+        if (!aCampagneV03) {
+          const ciblesInit = parsed.variantes.filter(
+            (v) => v.statutViabilite !== 'eliminee'
+          );
+          const { campagne, variantesMisesAJour } = executerCampagneSelection33(
+            ciblesInit,
+            'Campagne Comparative Initiale V0.1 · V0.2 · V0.3 (9 Bots + Banc 3–6J)',
+            6,
+            6,
+            ['0.1', '0.2', '0.3']
+          );
+          const mapMaj = new Map(variantesMisesAJour.map((v) => [v.id, v]));
+          parsed.variantes = parsed.variantes.map((v) => mapMaj.get(v.id) || v);
+          for (const rv of campagne.rapportsViabilite) {
+            parsed.rapportsViabilite = [
+              rv,
+              ...(parsed.rapportsViabilite || []).filter(
+                (r) => r.varianteId !== rv.varianteId
+              ),
+            ];
+          }
+          for (const ri of campagne.rapportsInteret) {
+            parsed.rapportsInteret = [
+              ri,
+              ...(parsed.rapportsInteret || []).filter(
+                (r) => r.varianteId !== ri.varianteId
+              ),
+            ];
+          }
+          parsed.campagnesSelection = [
+            campagne,
+            ...(parsed.campagnesSelection || []),
+          ];
+          const analyseInit = construireAnalyseCampagneStructurer(campagne);
+          parsed.analysesGemini = [analyseInit, ...(parsed.analysesGemini || [])];
+          sauvegarderRapportMarkdownGemini(analyseInit);
+          modified = true;
+        }
+
+        if (modified) {
+          sauvegarderEtatAtelier(parsed);
         }
         return parsed;
       }
@@ -57,23 +296,28 @@ export function chargerEtatAtelier(): AtelierPersistedState {
     console.error('Erreur lecture atelier-v1-state.json, réinitialisation :', err);
   }
 
-  // Générer un premier bilan initial sur le socle V0.1 pour que l'interface ait immédiatement des données réelles
-  const rapViabInitiales = VARIANTES_INITIALES_V01.map((v) =>
-    evaluerViabiliteVariante31(v, 10)
+  const variantesInit = [...VARIANTES_INITIALES_V01];
+  const { campagne, variantesMisesAJour } = executerCampagneSelection33(
+    variantesInit.filter((v) => v.statutViabilite !== 'eliminee'),
+    'Campagne Comparative Initiale V0.1 · V0.2 · V0.3 (9 Bots + Banc 3–6J)',
+    6,
+    6,
+    ['0.1', '0.2', '0.3']
   );
-  const rapInteretInitial = evaluerInteretVariante32(
-    VARIANTES_INITIALES_V01[0],
-    14
-  );
+  const mapMaj = new Map(variantesMisesAJour.map((v) => [v.id, v]));
+  const variantesFinales = variantesInit.map((v) => mapMaj.get(v.id) || v);
+  const analyseInitiale = construireAnalyseCampagneStructurer(campagne);
+  sauvegarderRapportMarkdownGemini(analyseInitiale);
 
   const etatInitial: AtelierPersistedState = {
     derniereSauvegarde: new Date().toISOString(),
     versions: [...VERSIONS_JEU_INITIALES],
-    variantes: [...VARIANTES_INITIALES_V01],
-    rapportsViabilite: rapViabInitiales,
-    rapportsInteret: [rapInteretInitial],
-    campagnesSelection: [],
+    variantes: variantesFinales,
+    rapportsViabilite: campagne.rapportsViabilite,
+    rapportsInteret: campagne.rapportsInteret,
+    campagnesSelection: [campagne],
     campagnesPlanifieesVM: [...CAMPAGNES_VM_INITIALES],
+    analysesGemini: [analyseInitiale],
     ideesLabo: [...IDEES_INITIALES_LABO],
   };
 
@@ -157,17 +401,22 @@ async function startServer() {
     res.json({ variante, state });
   });
 
-  // POST générer un lot de variantes exploratoires V0.1 et exécuter immédiatement le filtre coupe-circuit 3.1
+  // POST générer un lot de variantes exploratoires (V0.1 / V0.3) et exécuter immédiatement le filtre coupe-circuit 3.1
   app.post('/api/atelier/variants/generate', (req, res) => {
-    const { nbVariantes = 4, filtrerImmediatement = true } = req.body || {};
+    const {
+      nbVariantes = 4,
+      filtrerImmediatement = true,
+      versionCible = '0.3',
+    } = req.body || {};
     const nouvelles = genererVariantesExploratoiresV01(
       Math.min(12, Math.max(1, Number(nbVariantes))),
-      state.variantes.length + 1
+      state.variantes.length + 1,
+      versionCible as GameVersionId
     );
 
     if (filtrerImmediatement) {
       for (const v of nouvelles) {
-        const rapV = evaluerViabiliteVariante31(v, 14);
+        const rapV = evaluerViabiliteVariante31(v, 12);
         state.rapportsViabilite = [
           rapV,
           ...state.rapportsViabilite.filter((r) => r.varianteId !== v.id),
@@ -220,9 +469,9 @@ async function startServer() {
     res.json({ rapport, state });
   });
 
-  // POST Test 3.2 : Évaluation de l'intérêt sur l'échelle des 6 Bots
+  // POST Test 3.2 : Évaluation de l'intérêt sur l'échelle des 9 Bots + Banc 3-6 Joueurs
   app.post('/api/atelier/tests/interet', (req, res) => {
-    const { varianteId, nbPartiesParBot = 20 } = req.body || {};
+    const { varianteId, nbPartiesParBot = 16 } = req.body || {};
     const variante = state.variantes.find((v) => v.id === varianteId);
     if (!variante) {
       res.status(404).json({ error: 'Variante introuvable' });
@@ -250,14 +499,21 @@ async function startServer() {
     res.json({ rapport, state });
   });
 
-  // POST Test 3.3 : Campagne complète de criblage et sélection de variantes
-  app.post('/api/atelier/tests/selection', (req, res) => {
+  // POST Test 3.3 : Campagne complète de criblage et sélection de variantes (Mono ou Multi-Versions V0.1/V0.2/V0.3)
+  app.post('/api/atelier/tests/selection', async (req, res) => {
     const {
-      nomCampagne = `Campagne Sélection V0.1 (${new Date().toLocaleTimeString('fr-FR')})`,
-      nbPartiesViabilite = 14,
-      nbPartiesInteret = 18,
+      nomCampagne = `Campagne Multi-Versions V0.1·V0.2·V0.3 (${new Date().toLocaleTimeString('fr-FR')})`,
+      nbPartiesViabilite = 12,
+      nbPartiesInteret = 14,
       inclureDejaEliminees = false,
+      versionsCibles = ['0.1', '0.2', '0.3'],
+      lancerAnalyseGemini = true,
     } = req.body || {};
+
+    const versionsList =
+      Array.isArray(versionsCibles) && versionsCibles.length > 0
+        ? (versionsCibles as GameVersionId[])
+        : (['0.1', '0.2', '0.3'] as GameVersionId[]);
 
     const cibles = inclureDejaEliminees
       ? state.variantes
@@ -267,7 +523,8 @@ async function startServer() {
       cibles,
       nomCampagne,
       Number(nbPartiesViabilite),
-      Number(nbPartiesInteret)
+      Number(nbPartiesInteret),
+      versionsList
     );
 
     const mapMaj = new Map(variantesMisesAJour.map((v) => [v.id, v]));
@@ -287,8 +544,95 @@ async function startServer() {
     }
 
     state.campagnesSelection.unshift(campagne);
+
+    let analyseGemini: AnalyseGeminiCampagne | null = null;
+    if (lancerAnalyseGemini) {
+      analyseGemini = await genererAnalyseGeminiOuFallback(campagne);
+      state.analysesGemini = [
+        analyseGemini,
+        ...(state.analysesGemini || []).filter(
+          (a) => a.campagneId !== campagne.id
+        ),
+      ];
+    }
+
     sauvegarderEtatAtelier(state);
-    res.json({ campagne, state });
+    res.json({ campagne, analyseGemini, state });
+  });
+
+  // POST 3.4 : Analyse Gemini à la demande sur une campagne existante (ou la dernière campagne)
+  app.post('/api/atelier/campaigns/analyze-gemini', async (req, res) => {
+    const { campagneId } = req.body || {};
+    const campagne = campagneId
+      ? state.campagnesSelection.find((c) => c.id === campagneId)
+      : state.campagnesSelection[0];
+
+    if (!campagne) {
+      res.status(404).json({ error: 'Aucune campagne disponible à analyser' });
+      return;
+    }
+
+    const analyse = await genererAnalyseGeminiOuFallback(campagne);
+    state.analysesGemini = [
+      analyse,
+      ...(state.analysesGemini || []).filter(
+        (a) => a.campagneId !== campagne.id
+      ),
+    ];
+    sauvegarderEtatAtelier(state);
+    res.json({ analyse, state });
+  });
+
+  // POST 3.4 : Instancier en 1 clic une variante hybride recommandée par Gemini et l'évaluer immédiatement
+  app.post('/api/atelier/variants/from-gemini-recommendation', (req, res) => {
+    const { hybride, evaluerImmediatement = true } = req.body as {
+      hybride: HybrideRecommandeGemini;
+      evaluerImmediatement?: boolean;
+    };
+    if (!hybride || !hybride.varianteHybride) {
+      res.status(400).json({ error: 'Recommandation hybride invalide' });
+      return;
+    }
+
+    const nouvelleVariante: VariantV01 = {
+      ...hybride.varianteHybride,
+      id:
+        hybride.varianteHybride.id ||
+        `v03_hybride_${Date.now().toString(36)}`,
+      origine: 'hybride_gemini',
+      statutViabilite: 'viable',
+    };
+
+    if (evaluerImmediatement) {
+      const rapViab = evaluerViabiliteVariante31(nouvelleVariante, 10);
+      state.rapportsViabilite = [
+        rapViab,
+        ...state.rapportsViabilite.filter(
+          (r) => r.varianteId !== nouvelleVariante.id
+        ),
+      ];
+      const rapInt = evaluerInteretVariante32(nouvelleVariante, 10);
+      nouvelleVariante.scoreInteretDernierTest = rapInt.scoreInteretGlobal;
+      nouvelleVariante.bandeSante = rapInt.bandeSante;
+      state.rapportsInteret = [
+        rapInt,
+        ...state.rapportsInteret.filter(
+          (r) => r.varianteId !== nouvelleVariante.id
+        ),
+      ];
+    }
+
+    const existIdx = state.variantes.findIndex(
+      (v) => v.id === nouvelleVariante.id
+    );
+    if (existIdx >= 0) {
+      state.variantes[existIdx] = nouvelleVariante;
+    } else {
+      state.variantes.unshift(nouvelleVariante);
+    }
+
+    sauvegarderEtatAtelier(state);
+    res.json({ variante: nouvelleVariante, state });
   });
 
   // POST Planification VM Oracle Cloud : ajouter ou modifier une tâche planifiée
@@ -310,8 +654,8 @@ async function startServer() {
     res.json({ schedule, state });
   });
 
-  // POST Exécuter immédiatement une campagne planifiée VM Oracle Cloud
-  app.post('/api/atelier/vm/run-now', (req, res) => {
+  // POST Exécuter immédiatement une campagne planifiée VM Oracle Cloud (avec bots de pointe, banc 3-6J et synthèse Gemini)
+  app.post('/api/atelier/vm/run-now', async (req, res) => {
     const { scheduleId } = req.body || {};
     const schedule = state.campagnesPlanifieesVM.find(
       (c) => c.id === scheduleId
@@ -322,6 +666,11 @@ async function startServer() {
     }
 
     schedule.statut = 'en_cours';
+    const versionsCibles =
+      schedule.versionsCibles && schedule.versionsCibles.length > 0
+        ? schedule.versionsCibles
+        : (['0.1', '0.2', '0.3'] as GameVersionId[]);
+
     const cibles = schedule.eliminerNonViablesAuto
       ? state.variantes.filter((v) => v.statutViabilite !== 'eliminee')
       : state.variantes;
@@ -330,22 +679,43 @@ async function startServer() {
       cibles,
       `[VM Oracle Cloud] ${schedule.nom}`,
       schedule.nbPartiesViabilite,
-      schedule.nbPartiesInteret
+      schedule.nbPartiesInteret,
+      versionsCibles
     );
 
     const mapMaj = new Map(variantesMisesAJour.map((v) => [v.id, v]));
     state.variantes = state.variantes.map((v) => mapMaj.get(v.id) || v);
+    for (const rv of campagne.rapportsViabilite) {
+      state.rapportsViabilite = [
+        rv,
+        ...state.rapportsViabilite.filter((r) => r.varianteId !== rv.varianteId),
+      ];
+    }
+    for (const ri of campagne.rapportsInteret) {
+      state.rapportsInteret = [
+        ri,
+        ...state.rapportsInteret.filter((r) => r.varianteId !== ri.varianteId),
+      ];
+    }
     state.campagnesSelection.unshift(campagne);
+
+    const analyse = await genererAnalyseGeminiOuFallback(campagne);
+    state.analysesGemini = [
+      analyse,
+      ...(state.analysesGemini || []).filter(
+        (a) => a.campagneId !== campagne.id
+      ),
+    ];
 
     schedule.statut = 'terminee';
     schedule.derniereExecution = new Date().toISOString();
     schedule.dernierResultatId = campagne.id;
     schedule.journalVM.unshift(
-      `[${new Date().toLocaleTimeString('fr-FR')}] Exécution terminée : ${campagne.nbVariantesViables}/${campagne.nbVariantesEntree} variantes viables retenues, ${campagne.nbVariantesEliminees} éliminées. Meilleure : ${campagne.rapportsInteret[0]?.varianteNom || 'aucune'} (${campagne.rapportsInteret[0]?.scoreInteretGlobal || 0}/100).`
+      `[${new Date().toLocaleTimeString('fr-FR')}] Exécution VM terminée (${versionsCibles.map((v) => `V${v}`).join('+')}) : ${campagne.nbVariantesViables}/${campagne.nbVariantesEntree} viables retenues. Meilleure : ${campagne.rapportsInteret[0]?.varianteNom || 'aucune'} (${campagne.rapportsInteret[0]?.scoreInteretGlobal || 0}/100). Analyse Gemini générée.`
     );
 
     sauvegarderEtatAtelier(state);
-    res.json({ campagne, schedule, state });
+    res.json({ campagne, analyseGemini: analyse, schedule, state });
   });
 
   // POST Créer ou modifier une idée dans le Labo
@@ -398,9 +768,15 @@ async function startServer() {
   const PORT = Number(process.env.PORT) || 3000;
   app.listen(PORT, '0.0.0.0', () => {
     console.log(
-      `Atelier de conception V1 (Défenseurs de la forêt V0.1) démarré sur http://0.0.0.0:${PORT}`
+      `Atelier de conception V1 (Défenseurs de la forêt V0.1/V0.2/V0.3) démarré sur http://0.0.0.0:${PORT}`
     );
   });
 }
 
-startServer();
+if (
+  process.argv[1] &&
+  (process.argv[1].endsWith('server.ts') ||
+    process.argv[1].endsWith('server.js'))
+) {
+  startServer();
+}

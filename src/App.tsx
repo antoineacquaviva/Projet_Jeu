@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
+  AnalyseGeminiCampagne,
   AtelierComponentId,
   CampagneSelection33,
   EtatJeuV01,
@@ -18,8 +19,8 @@ import {
   IDEES_INITIALES_LABO,
 } from './shared/labo-initial';
 import {
-  evaluerInteretVariante32,
-  evaluerViabiliteVariante31,
+  construireAnalyseCampagneStructurer,
+  executerCampagneSelection33,
 } from './shared/tests-engine';
 import { JeuView } from './components/JeuView';
 import { DemoView } from './components/DemoView';
@@ -33,12 +34,12 @@ export const App: React.FC = () => {
   const [versions, setVersions] = useState<GameVersionSpec[]>(
     VERSIONS_JEU_INITIALES
   );
-  const [versionActiveId, setVersionActiveId] = useState<GameVersionId>('0.1');
+  const [versionActiveId, setVersionActiveId] = useState<GameVersionId>('0.3');
   const [variantes, setVariantes] = useState<VariantV01[]>(
     VARIANTES_INITIALES_V01
   );
   const [varianteActiveId, setVarianteActiveId] = useState<string>(
-    VARIANTES_INITIALES_V01[0].id
+    'v03_double_plateau_reference'
   );
   const [rapportsViabilite, setRapportsViabilite] = useState<
     RapportViabilite31[]
@@ -51,6 +52,9 @@ export const App: React.FC = () => {
   >([]);
   const [campagnesVM, setCampagnesVM] = useState<ScheduledCampaignVM[]>(
     CAMPAGNES_VM_INITIALES
+  );
+  const [analysesGemini, setAnalysesGemini] = useState<AnalyseGeminiCampagne[]>(
+    []
   );
   const [ideesLabo, setIdeesLabo] = useState<LabIdea[]>(IDEES_INITIALES_LABO);
   const [etatProtoExterne, setEtatProtoExterne] = useState<EtatJeuV01 | null>(
@@ -67,10 +71,15 @@ export const App: React.FC = () => {
           const data = await resp.json();
           if (!ignore && data) {
             if (Array.isArray(data.versions) && data.versions.length > 0) {
-              setVersions(data.versions);
+              const existVerIds = new Set(
+                data.versions.map((v: GameVersionSpec) => v.id)
+              );
+              const verManquantes = VERSIONS_JEU_INITIALES.filter(
+                (v) => !existVerIds.has(v.id)
+              );
+              setVersions([...data.versions, ...verManquantes]);
             }
             if (Array.isArray(data.variantes) && data.variantes.length > 0) {
-              // Fusionner les variantes initiales V0.2 si absentes de l'ancien fichier
               const existIds = new Set(
                 data.variantes.map((v: VariantV01) => v.id)
               );
@@ -91,6 +100,9 @@ export const App: React.FC = () => {
             if (Array.isArray(data.campagnesPlanifieesVM)) {
               setCampagnesVM(data.campagnesPlanifieesVM);
             }
+            if (Array.isArray(data.analysesGemini)) {
+              setAnalysesGemini(data.analysesGemini);
+            }
             if (Array.isArray(data.ideesLabo) && data.ideesLabo.length > 0) {
               const existIdeaIds = new Set(
                 data.ideesLabo.map((i: LabIdea) => i.id)
@@ -107,12 +119,20 @@ export const App: React.FC = () => {
         // Initialisation locale isomorphe si hors-ligne
       }
       if (!ignore) {
-        setRapportsViabilite(
-          VARIANTES_INITIALES_V01.map((v) => evaluerViabiliteVariante31(v, 8))
+        const cibles = VARIANTES_INITIALES_V01.filter(
+          (v) => v.statutViabilite !== 'eliminee'
         );
-        setRapportsInteret([
-          evaluerInteretVariante32(VARIANTES_INITIALES_V01[0], 10),
-        ]);
+        const { campagne } = executerCampagneSelection33(
+          cibles,
+          'Campagne Initiale V0.1 · V0.2 · V0.3 (9 Bots + Banc 3–6J)',
+          5,
+          5,
+          ['0.1', '0.2', '0.3']
+        );
+        setRapportsViabilite(campagne.rapportsViabilite);
+        setRapportsInteret(campagne.rapportsInteret);
+        setCampagnesSelection([campagne]);
+        setAnalysesGemini([construireAnalyseCampagneStructurer(campagne)]);
       }
     }
     fetchState();
@@ -152,6 +172,14 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleSelectVarianteGlobale = (id: string) => {
+    const cible = variantes.find((v) => v.id === id);
+    if (cible && cible.version && cible.version !== versionActiveId) {
+      setVersionActiveId(cible.version);
+    }
+    setVarianteActiveId(id);
+  };
+
   const handleSaveVariante = async (
     nouvelleOuMaj: VariantV01,
     estNouvelle: boolean
@@ -165,6 +193,9 @@ export const App: React.FC = () => {
       if (resp.ok) {
         const data = await resp.json();
         setVariantes(data.state.variantes);
+        if (nouvelleOuMaj.version) {
+          setVersionActiveId(nouvelleOuMaj.version);
+        }
         setVarianteActiveId(nouvelleOuMaj.id);
         return;
       }
@@ -177,6 +208,9 @@ export const App: React.FC = () => {
       }
       return prev.map((v) => (v.id === nouvelleOuMaj.id ? nouvelleOuMaj : v));
     });
+    if (nouvelleOuMaj.version) {
+      setVersionActiveId(nouvelleOuMaj.version);
+    }
     setVarianteActiveId(nouvelleOuMaj.id);
   };
 
@@ -193,7 +227,6 @@ export const App: React.FC = () => {
     setVersionActiveId(nouvelleVersion.id);
     setVarianteActiveId(varianteSocle.id);
 
-    // Mettre à jour la version cible des post-it promus
     setIdeesLabo((prev) =>
       prev.map((idee) =>
         ideesPromuesIds.includes(idee.id)
@@ -327,7 +360,7 @@ export const App: React.FC = () => {
             aria-label="Sélectionner la variante de la version active"
             value={varianteActive.id}
             onChange={(e) => setVarianteActiveId(e.target.value)}
-            className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] max-w-[260px] truncate"
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] max-w-[280px] truncate"
           >
             {variantesDeLaVersion.map((v) => (
               <option key={v.id} value={v.id}>
@@ -375,6 +408,19 @@ export const App: React.FC = () => {
         </div>
 
         <div className="font-mono-tabular">
+          <span>
+            Plateau :{' '}
+            <strong className="text-[#16211B]">
+              {varianteActive.geometriePlateau === 'double_plateau_34_56'
+                ? 'Double-Face 3–4J/5–6J'
+                : varianteActive.geometriePlateau === 'hex_couronne_19'
+                ? 'Hexagonal 19 cases'
+                : varianteActive.geometriePlateau === 'clairieres_sentiers'
+                ? 'Clairières & Sentiers'
+                : 'Modulaire Secteurs'}
+            </strong>
+          </span>
+          <span className="mx-2">·</span>
           <span>{varianteActive.nbJoueurs} Joueurs</span>
           <span className="mx-2">·</span>
           <span>{varianteActive.defenseursParJoueur} Déf./J</span>
@@ -395,7 +441,7 @@ export const App: React.FC = () => {
             varianteActive={varianteActive}
             ideesLabo={ideesLabo}
             onSelectVersion={handleSelectVersion}
-            onSelectVariante={(id) => setVarianteActiveId(id)}
+            onSelectVariante={(id) => handleSelectVarianteGlobale(id)}
             onNavigateTab={(tab) => setOngletActif(tab)}
             onCreateNewVersion={handleCreateNewVersion}
             onUpdateVarianteOption={(maj) => handleSaveVariante(maj, false)}
@@ -425,12 +471,14 @@ export const App: React.FC = () => {
           <TestsView
             varianteActive={varianteActive}
             variantes={variantesDeLaVersion}
+            toutesVariantes={variantes}
             rapportsViabilite={rapportsViabilite}
             rapportsInteret={rapportsInteret}
             campagnesSelection={campagnesSelection}
             campagnesVM={campagnesVM}
+            analysesGemini={analysesGemini}
             onSelectVariante={(id) => {
-              setVarianteActiveId(id);
+              handleSelectVarianteGlobale(id);
             }}
             onUpdateStateFromTests={(payload) => {
               if (payload.variantes) setVariantes(payload.variantes);
@@ -441,6 +489,8 @@ export const App: React.FC = () => {
               if (payload.campagnesSelection)
                 setCampagnesSelection(payload.campagnesSelection);
               if (payload.campagnesVM) setCampagnesVM(payload.campagnesVM);
+              if (payload.analysesGemini)
+                setAnalysesGemini(payload.analysesGemini);
             }}
           />
         )}
@@ -460,11 +510,7 @@ export const App: React.FC = () => {
             onSaveIdee={handleSaveIdeeLabo}
             onDeleteIdee={handleDeleteIdeeLabo}
             onSelectVariante={(id) => {
-              const target = variantes.find((v) => v.id === id);
-              if (target && target.version) {
-                setVersionActiveId(target.version);
-              }
-              setVarianteActiveId(id);
+              handleSelectVarianteGlobale(id);
               setOngletActif('proto');
             }}
             onSelectVersion={(verId) => {

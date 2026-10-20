@@ -332,6 +332,110 @@ export const VARIANTES_INITIALES_V01: VariantV01[] = [
     nbTours: 5,
     machinesInitiales: 5,
   },
+  {
+    id: 'v03_double_plateau_reference',
+    nom: 'V0.3 Socle — Plateau Double Face Fixe (3–4J / 5–6J) & Pose Alternée',
+    version: '0.3',
+    description:
+      'Plateau rigide double face remplaçant l’assemblage d’une tuile par joueur : Recto 9 zones calibré pour 3–4 joueurs avec diagonales d’entraide ; Verso 13 zones calibré pour 5–6 joueurs.',
+    origine: 'socle',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 91,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'individuel_chantier',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v03_hexagones_19_couronne',
+    nom: 'V0.3 Grille Hexagonale Fixe à 19 Cases (2 Couronnes) & Barrage',
+    version: '0.3',
+    description:
+      'Pavage hexagonal fixe de 19 hexagones (1 Cœur central, 6 hexagones en Couronne Intérieure à 6 connexions, 12 hexagones en Lisière). Maximise les manœuvres latérales et les tenailles.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 89,
+    bandeSante: 'vert',
+    geometriePlateau: 'hex_couronne_19',
+    modeProgrammation: 'sequentielle_2_ordres',
+    modeResolution: 'entrelacee_coupe_fin',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'individuel_chantier',
+    actionReplanterActive: true,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v03_clairieres_sentiers_cols',
+    nom: 'V0.3 Réseau de Clairières & Sentiers (3 Cols Stratégiques) & Alliance',
+    version: '0.3',
+    description:
+      'Graphe organique de 13 clairières reliées par des sentiers à embranchements : 6 Lisières convergent vers 3 Cols de Vallée et 3 Sous-Bois avant le Cœur. Idéal pour les alliances de sabotage.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 90,
+    bandeSante: 'vert',
+    geometriePlateau: 'clairieres_sentiers',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    effetProteger: 'coupe_seule',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: true,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v03_temoin_modulaire_v01',
+    nom: 'V0.3 Témoin — Couronne Modulable Historique (1 Secteur / Joueur)',
+    version: '0.3',
+    description:
+      'Variante témoin en V0.3 conservant l’assemblage modulaire d’un secteur de 2 tuiles par joueur afin de mesurer l’écart d’équilibrage 3–6J face aux 3 nouveaux plateaux.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 84,
+    bandeSante: 'vert',
+    geometriePlateau: 'modulaire_secteurs',
+    modeProgrammation: 'sequentielle_2_ordres',
+    modeResolution: 'entrelacee_coupe_fin',
+    effetProteger: 'coupe_seule',
+    effetSaboter: 'individuel_chantier',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
 ];
 
 // Générateur pseudo-aléatoire déterministe Mulberry32
@@ -349,15 +453,267 @@ export function tirerDe6(etatRng: number): { de: number; nextState: number } {
   return { de: 1 + Math.floor(val * 6), nextState };
 }
 
-// Construction géométrique et topologique du plateau modulable (3 à 6 joueurs)
+// Construction géométrique et topologique du plateau selon l'architecture (V0.1/V0.2/V0.3)
 export function construirePlateauV01(variante: VariantV01): CasePlateau[] {
   const J = variante.nbJoueurs;
-  const cases: CasePlateau[] = [];
+  const geom = variante.geometriePlateau || 'modulaire_secteurs';
 
-  // Case 0 : Tuile Cœur Central
+  // 1. ARCHITECTURE V0.3 : PLATEAU DOUBLE FACE FIXE (Recto 3–4J à 9 zones / Verso 5–6J à 13 zones)
+  if (geom === 'double_plateau_34_56') {
+    const nbSecteursFixes = J <= 4 ? 4 : 6;
+    const cases: CasePlateau[] = [];
+    const voisinsCoeur = Array.from({ length: nbSecteursFixes }, (_, i) => 1 + i);
+
+    cases.push({
+      id: 0,
+      nom: 'Cœur de la Forêt',
+      nomPhysique:
+        nbSecteursFixes === 4
+          ? 'Plateau Recto (3–4J) — Sanctuaire Cœur Central'
+          : 'Plateau Verso (5–6J) — Sanctuaire Cœur Central',
+      secteurJoueur: null,
+      anneau: 'coeur',
+      voisins: voisinsCoeur,
+      foretsMax: variante.foretsCoeur,
+      x: 0,
+      y: 0,
+      formeRendu: 'plateau_fixe',
+      rayonRendu: 48,
+    });
+
+    // Anneau intérieur : 4 Clairières (Recto 3-4J) ou 6 Clairières (Verso 5-6J)
+    for (let s = 0; s < nbSecteursFixes; s++) {
+      const idInt = 1 + s;
+      const sPrec = (s + nbSecteursFixes - 1) % nbSecteursFixes;
+      const sSuiv = (s + 1) % nbSecteursFixes;
+      const idLisDirecte = 1 + nbSecteursFixes + s;
+      const idLisCroisee = 1 + nbSecteursFixes + sPrec;
+
+      const angle = (s * 2 * Math.PI) / nbSecteursFixes - Math.PI / 2;
+      const rInt = 112;
+
+      cases.push({
+        id: idInt,
+        nom: `Clairière ${['Nord', 'Est', 'Sud', 'Ouest', 'Sud-Ouest', 'Nord-Ouest'][s] || `C${s + 1}`}`,
+        nomPhysique: `Plateau ${nbSecteursFixes === 4 ? '3–4J' : '5–6J'} — Clairière Intérieure ${s + 1}`,
+        secteurJoueur: s % J,
+        anneau: 'interieur',
+        // Chaque clairière est reliée au Cœur, aux 2 clairières latérales ET à 2 Lisières (diagonale d'entraide)
+        voisins: [0, 1 + sPrec, 1 + sSuiv, idLisDirecte, idLisCroisee],
+        foretsMax: variante.foretsParCaseSecteur,
+        x: Math.round(Math.cos(angle) * rInt),
+        y: Math.round(Math.sin(angle) * rInt),
+        formeRendu: 'plateau_fixe',
+        rayonRendu: 40,
+      });
+    }
+
+    // Anneau extérieur décalé de demi-angle : chaque Lisière irrigue 2 Clairières intérieures !
+    for (let s = 0; s < nbSecteursFixes; s++) {
+      const idLis = 1 + nbSecteursFixes + s;
+      const sPrec = (s + nbSecteursFixes - 1) % nbSecteursFixes;
+      const sSuiv = (s + 1) % nbSecteursFixes;
+      const idIntA = 1 + s;
+      const idIntB = 1 + sSuiv;
+      const idLisPrec = 1 + nbSecteursFixes + sPrec;
+      const idLisSuiv = 1 + nbSecteursFixes + sSuiv;
+
+      const angle = ((s + 0.5) * 2 * Math.PI) / nbSecteursFixes - Math.PI / 2;
+      const rLis = 212;
+
+      cases.push({
+        id: idLis,
+        nom: `Lisière ${['N-E', 'S-E', 'S-O', 'N-O', 'Ouest', 'Nord'][s] || `L${s + 1}`}`,
+        nomPhysique: `Plateau ${nbSecteursFixes === 4 ? '3–4J' : '5–6J'} — Lisière d'Entrée ${s + 1}`,
+        secteurJoueur: s % J,
+        anneau: 'lisiere',
+        voisins: [idIntA, idIntB, idLisPrec, idLisSuiv],
+        foretsMax: variante.foretsParCaseSecteur,
+        x: Math.round(Math.cos(angle) * rLis),
+        y: Math.round(Math.sin(angle) * rLis),
+        formeRendu: 'plateau_fixe',
+        rayonRendu: 38,
+      });
+    }
+
+    return cases;
+  }
+
+  // 2. ARCHITECTURE V0.3 : GRILLE HEXAGONALE FIXE À 19 CASES EN COURONNES (1 + 6 + 12)
+  if (geom === 'hex_couronne_19') {
+    // Coordonnées axiales (q, r) des 19 hexagones (rayon 2)
+    const coordsAxiales: { q: number; r: number; anneau: 'coeur' | 'interieur' | 'lisiere'; label: string }[] = [
+      { q: 0, r: 0, anneau: 'coeur', label: 'Hex Cœur' },
+      // Couronne 1 (6 hexagones intérieurs)
+      { q: 0, r: -1, anneau: 'interieur', label: 'Hex Int N' },
+      { q: 1, r: -1, anneau: 'interieur', label: 'Hex Int NE' },
+      { q: 1, r: 0, anneau: 'interieur', label: 'Hex Int SE' },
+      { q: 0, r: 1, anneau: 'interieur', label: 'Hex Int S' },
+      { q: -1, r: 1, anneau: 'interieur', label: 'Hex Int SO' },
+      { q: -1, r: 0, anneau: 'interieur', label: 'Hex Int NO' },
+      // Couronne 2 (12 hexagones de lisière)
+      { q: 0, r: -2, anneau: 'lisiere', label: 'Hex Lis N' },
+      { q: 1, r: -2, anneau: 'lisiere', label: 'Hex Lis NNE' },
+      { q: 2, r: -2, anneau: 'lisiere', label: 'Hex Lis NE' },
+      { q: 2, r: -1, anneau: 'lisiere', label: 'Hex Lis ENE' },
+      { q: 2, r: 0, anneau: 'lisiere', label: 'Hex Lis SE' },
+      { q: 1, r: 1, anneau: 'lisiere', label: 'Hex Lis SSE' },
+      { q: 0, r: 2, anneau: 'lisiere', label: 'Hex Lis S' },
+      { q: -1, r: 2, anneau: 'lisiere', label: 'Hex Lis SSO' },
+      { q: -2, r: 2, anneau: 'lisiere', label: 'Hex Lis SO' },
+      { q: -2, r: 1, anneau: 'lisiere', label: 'Hex Lis OSO' },
+      { q: -2, r: 0, anneau: 'lisiere', label: 'Hex Lis NO' },
+      { q: -1, r: -1, anneau: 'lisiere', label: 'Hex Lis NNO' },
+    ];
+
+    const tailleHex = 62;
+    const dirs = [
+      [1, 0],
+      [1, -1],
+      [0, -1],
+      [-1, 0],
+      [-1, 1],
+      [0, 1],
+    ];
+
+    const foretsLis = Math.max(2, Math.round(variante.foretsParCaseSecteur * 0.75));
+
+    return coordsAxiales.map((hc, idx) => {
+      const voisins: number[] = [];
+      for (const [dq, dr] of dirs) {
+        const vIdx = coordsAxiales.findIndex(
+          (other) => other.q === hc.q + dq && other.r === hc.r + dr
+        );
+        if (vIdx >= 0) voisins.push(vIdx);
+      }
+
+      // Conversion flat-top axial -> pixel (x, y)
+      const x = Math.round(tailleHex * (1.5 * hc.q));
+      const y = Math.round(tailleHex * (Math.sqrt(3) * (hc.r + hc.q / 2)));
+
+      return {
+        id: idx,
+        nom: hc.label,
+        nomPhysique: `Plateau Hexagonal 19 — ${hc.label}`,
+        secteurJoueur: idx === 0 ? null : (idx - 1) % J,
+        anneau: hc.anneau,
+        voisins,
+        foretsMax:
+          hc.anneau === 'coeur'
+            ? variante.foretsCoeur
+            : hc.anneau === 'interieur'
+            ? variante.foretsParCaseSecteur
+            : foretsLis,
+        x,
+        y,
+        formeRendu: 'hexagone',
+        rayonRendu: 31,
+      };
+    });
+  }
+
+  // 3. ARCHITECTURE V0.3 : RÉSEAU DE CLAIRIÈRES & SENTIERS À EMBRANCHEMENTS (13 Nœuds & 3 Cols)
+  if (geom === 'clairieres_sentiers') {
+    const cases: CasePlateau[] = [];
+
+    // 0 : Cœur Central, accessible uniquement par les 3 Cols Stratégiques (1, 2, 3)
+    cases.push({
+      id: 0,
+      nom: 'Sanctuaire Cœur',
+      nomPhysique: 'Clairière Centrale du Sanctuaire',
+      secteurJoueur: null,
+      anneau: 'coeur',
+      voisins: [1, 2, 3],
+      foretsMax: variante.foretsCoeur,
+      x: 0,
+      y: 0,
+      formeRendu: 'clairiere',
+      rayonRendu: 46,
+    });
+
+    // 1..3 : Les 3 Cols de Vallée (verrous intérieurs donnant sur le Cœur)
+    const nomsCols = ['Col du Nord', 'Col du Levant', 'Col du Couchant'];
+    for (let c = 0; c < 3; c++) {
+      const angle = (c * 2 * Math.PI) / 3 - Math.PI / 2;
+      const rCol = 98;
+      const sousBoisG = 4 + ((c + 2) % 3);
+      const sousBoisD = 4 + c;
+      const lisA = 7 + c * 2;
+      const lisB = 7 + c * 2 + 1;
+
+      cases.push({
+        id: 1 + c,
+        nom: nomsCols[c],
+        nomPhysique: `Sentier Forestier — ${nomsCols[c]} (Verrou du Cœur)`,
+        secteurJoueur: c % J,
+        anneau: 'interieur',
+        voisins: [0, sousBoisG, sousBoisD, lisA, lisB],
+        foretsMax: variante.foretsParCaseSecteur + 1,
+        x: Math.round(Math.cos(angle) * rCol),
+        y: Math.round(Math.sin(angle) * rCol),
+        formeRendu: 'clairiere',
+        rayonRendu: 37,
+      });
+    }
+
+    // 4..6 : 3 Carrefours de Sous-Bois reliant les Cols entre eux et aux Lisières
+    const nomsSousBois = ['Sous-Bois Est', 'Sous-Bois Sud', 'Sous-Bois Ouest'];
+    for (let sb = 0; sb < 3; sb++) {
+      const angle = ((sb + 0.5) * 2 * Math.PI) / 3 - Math.PI / 2;
+      const rSb = 142;
+      const colA = 1 + sb;
+      const colB = 1 + ((sb + 1) % 3);
+      const lisA = 7 + sb * 2 + 1;
+      const lisB = 7 + (((sb + 1) * 2) % 6);
+
+      cases.push({
+        id: 4 + sb,
+        nom: nomsSousBois[sb],
+        nomPhysique: `Carrefour de ${nomsSousBois[sb]}`,
+        secteurJoueur: (sb + 3) % J,
+        anneau: 'interieur',
+        voisins: [colA, colB, lisA, lisB],
+        foretsMax: variante.foretsParCaseSecteur,
+        x: Math.round(Math.cos(angle) * rSb),
+        y: Math.round(Math.sin(angle) * rSb),
+        formeRendu: 'clairiere',
+        rayonRendu: 34,
+      });
+    }
+
+    // 7..12 : 6 Campements de Lisière périphériques
+    for (let l = 0; l < 6; l++) {
+      const idLis = 7 + l;
+      const angle = ((l - 0.25) * 2 * Math.PI) / 6 - Math.PI / 2;
+      const rLis = 222;
+      const colAss = 1 + Math.floor(l / 2);
+      const sbAss = l % 2 === 1 ? 4 + Math.floor(l / 2) : 4 + ((Math.floor(l / 2) + 2) % 3);
+      const lisPrec = 7 + ((l + 5) % 6);
+      const lisSuiv = 7 + ((l + 1) % 6);
+
+      cases.push({
+        id: idLis,
+        nom: `Orée S${l + 1}`,
+        nomPhysique: `Campement d'Orée ${l + 1}`,
+        secteurJoueur: l % J,
+        anneau: 'lisiere',
+        voisins: [colAss, sbAss, lisPrec, lisSuiv],
+        foretsMax: Math.max(2, variante.foretsParCaseSecteur - 1),
+        x: Math.round(Math.cos(angle) * rLis),
+        y: Math.round(Math.sin(angle) * rLis),
+        formeRendu: 'clairiere',
+        rayonRendu: 33,
+      });
+    }
+
+    return cases;
+  }
+
+  // 4. ARCHITECTURE HISTORIQUE V0.1/V0.2 : COURONNE MODULABLE (1 Cœur + 2×J cases)
+  const cases: CasePlateau[] = [];
   const voisinsCoeur: number[] = [];
   for (let s = 0; s < J; s++) {
-    voisinsCoeur.push(1 + s * 2); // clairières intérieures
+    voisinsCoeur.push(1 + s * 2);
   }
 
   cases.push({
@@ -370,11 +726,10 @@ export function construirePlateauV01(variante: VariantV01): CasePlateau[] {
     foretsMax: variante.foretsCoeur,
     x: 0,
     y: 0,
+    formeRendu: 'cercle',
+    rayonRendu: 50,
   });
 
-  // Pour chaque joueur s = 0..J-1 :
-  // - Case 1 + 2*s : Clairière Intérieure du secteur s
-  // - Case 2 + 2*s : Lisière Extérieure du secteur s (zone d'entrée des Machines)
   for (let s = 0; s < J; s++) {
     const idInterieur = 1 + s * 2;
     const idLisiere = 2 + s * 2;
@@ -400,6 +755,8 @@ export function construirePlateauV01(variante: VariantV01): CasePlateau[] {
       foretsMax: variante.foretsParCaseSecteur,
       x: Math.round(Math.cos(angle) * rInt),
       y: Math.round(Math.sin(angle) * rInt),
+      formeRendu: 'cercle',
+      rayonRendu: 41,
     });
 
     cases.push({
@@ -412,6 +769,8 @@ export function construirePlateauV01(variante: VariantV01): CasePlateau[] {
       foretsMax: variante.foretsParCaseSecteur,
       x: Math.round(Math.cos(angle) * rLis),
       y: Math.round(Math.sin(angle) * rLis),
+      formeRendu: 'cercle',
+      rayonRendu: 41,
     });
   }
 
@@ -591,11 +950,13 @@ export function creerEtatInitialV01(
   const forets = cases.map((c) => c.foretsMax);
   const foretsInitialesTotales = forets.reduce((acc, v) => acc + v, 0);
 
-  // Placement initial des Défenseurs : sur la Clairière Intérieure de leur secteur
+  // Placement initial des Défenseurs : répartis équitablement sur les Clairières Intérieures quelle que soit la géométrie
+  const casesInterieures = cases.filter((c) => c.anneau === 'interieur');
   const defenseurs: PionDefenseur[] = [];
   let pionId = 0;
   for (let j = 0; j < variante.nbJoueurs; j++) {
-    const caseSecteurInt = 1 + j * 2;
+    const caseSecteurInt =
+      casesInterieures[j % Math.max(1, casesInterieures.length)]?.id ?? 0;
     for (let n = 1; n <= variante.defenseursParJoueur; n++) {
       defenseurs.push({
         id: pionId++,
@@ -607,14 +968,17 @@ export function creerEtatInitialV01(
     }
   }
 
-  // Placement initial des 6 Machines (M0..M5) :
-  // Les `machinesInitiales` premières sont sur les Lisières Extérieures, les autres en Réserve (caseId = null)
+  // Placement initial des 6 Machines (M0..M5) : réparties sur les Lisières Extérieures du plateau
+  const casesLisieres = cases.filter((c) => c.anneau === 'lisiere');
   const machines: PionMachine[] = [];
   for (let m = 0; m < 6; m++) {
     let caseInit: number | null = null;
-    if (m < variante.machinesInitiales) {
-      const secteurIndex = m % variante.nbJoueurs;
-      caseInit = 2 + secteurIndex * 2; // Lisière extérieure
+    if (m < variante.machinesInitiales && casesLisieres.length > 0) {
+      const pasRepartition = Math.max(
+        1,
+        Math.floor(casesLisieres.length / Math.max(1, variante.machinesInitiales))
+      );
+      caseInit = casesLisieres[(m * pasRepartition) % casesLisieres.length].id;
     }
     machines.push({
       id: m,
@@ -736,12 +1100,13 @@ export function calculerCibleMachine(
   tactique: TactiqueType,
   secteurPreferentiel = 0
 ): number {
-  // Si la Machine est en Réserve/Chantier (caseId === null), elle entre par une Lisière extérieure
+  // Si la Machine est en Réserve/Chantier (caseId === null), elle entre par une Lisière extérieure du plateau
   let candidats: number[] = [];
+  const lisieresIds = etat.cases
+    .filter((c) => c.anneau === 'lisiere')
+    .map((c) => c.id);
   if (machine.caseId === null) {
-    for (let s = 0; s < etat.variante.nbJoueurs; s++) {
-      candidats.push(2 + s * 2); // toutes les lisières extérieures
-    }
+    candidats = lisieresIds.length > 0 ? lisieresIds : etat.cases.map((c) => c.id);
   } else if (etat.variante.porteeTactiques === 'plateau_entier') {
     candidats = etat.cases.map((c) => c.id);
   } else {
@@ -798,7 +1163,11 @@ export function calculerCibleMachine(
     return etat.forets[b] - etat.forets[a];
   });
 
-  return ciblesTriees[0] ?? (2 + (secteurPreferentiel % etat.variante.nbJoueurs) * 2);
+  return (
+    ciblesTriees[0] ??
+    lisieresIds[secteurPreferentiel % Math.max(1, lisieresIds.length)] ??
+    0
+  );
 }
 
 // Exécution d'une vague d'actions des Défenseurs (étape 1 ou 2)

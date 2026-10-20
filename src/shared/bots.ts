@@ -4,12 +4,13 @@ import {
   BotProfileId,
   BotProfileSpec,
   EtatJeuV01,
-  PionDefenseur,
+  LancerSecret2D6,
   VariantV01,
 } from './types';
 import {
   avancerSousPhaseResolution,
   calculerCibleMachine,
+  calculerPourcentageForetSauvee,
   casesAccessiblesDefenseur,
   clonerEtatJeu,
   creerEtatInitialV01,
@@ -17,12 +18,14 @@ import {
   nextRng,
   PROBA_ECART_2D6,
   PROBA_SOMME_2D6,
+  tirerDe6,
 } from './moteur';
 
 export const CATALOGUE_BOTS_V01: BotProfileSpec[] = [
   {
     id: 'inerte',
     nom: 'Bot Inerte (Plancher)',
+    algorithme: 'Passif total',
     roleDansTests: 'Mesure le plancher de survie sans aucune action des joueurs.',
     description:
       'Les Défenseurs restent immobiles sur leur tuile de départ sans protéger ni saboter.',
@@ -32,6 +35,7 @@ export const CATALOGUE_BOTS_V01: BotProfileSpec[] = [
   {
     id: 'hasard',
     nom: 'Bot Hasard (Bruité)',
+    algorithme: 'Tirage uniforme pseudo-aléatoire',
     roleDansTests: 'Vérifie qu’agir au hasard fait mieux qu’être inerte mais moins bien qu’un jeu pensé.',
     description:
       'Choisit uniformément parmi les actions légales (Se déplacer, Protéger, Saboter, Replanter) sans lire les pistes.',
@@ -41,6 +45,7 @@ export const CATALOGUE_BOTS_V01: BotProfileSpec[] = [
   {
     id: 'boucle',
     nom: 'Bot Boucle Fixe (Garde-fou)',
+    algorithme: 'Automate cyclique aveugle',
     roleDansTests: 'Détecte les failles de règles où une routine aveugle suffit à gagner sans lire le jeu.',
     description:
       'Applique une routine mécanique invariable (Protéger ou Replanter sur place en boucle) sans jamais regarder ni les dés ni les Machines.',
@@ -50,6 +55,7 @@ export const CATALOGUE_BOTS_V01: BotProfileSpec[] = [
   {
     id: 'reflexe',
     nom: 'Bot Réflexe (Tape-taupe)',
+    algorithme: 'Heuristique locale sans lecture des pistes',
     roleDansTests: 'Mesure le score d’un joueur qui réagit aux Machines déjà posées sans lire les pistes 2D6.',
     description:
       'Se dirige vers les Machines déjà visibles sur le plateau pour protéger ou saboter, en ignorant les pistes et son gobelet 2D6.',
@@ -59,6 +65,7 @@ export const CATALOGUE_BOTS_V01: BotProfileSpec[] = [
   {
     id: 'glouton',
     nom: 'Bot Glouton (Pistes + Dés personnels)',
+    algorithme: 'Maximisation locale (A priori 36 tirages + 2D6 personnel)',
     roleDansTests: 'Évalue le gain procuré par la lecture des deux pistes publiques et de son propre gobelet 2D6.',
     description:
       'Lit son lancer secret 2D6 sur la Piste Tactique (2–12) et la Piste Machine (0–5), anticipe la case cible exacte de sa Machine et programme ses 2 actions pour la contrer.',
@@ -67,12 +74,46 @@ export const CATALOGUE_BOTS_V01: BotProfileSpec[] = [
   },
   {
     id: 'deductif',
-    nom: 'Bot Déductif & Coordonné (Référence Forte)',
-    roleDansTests: 'Mesure la profondeur maximale : lecture des pistes, déduction des dés alliés par leurs poses successives et alliances.',
+    nom: 'Bot Déductif & Coordonné (Référence Classique)',
+    algorithme: 'Heuristique séquentielle de coordination',
+    roleDansTests: 'Mesure le gain de la coordination implicite : évite les doublons et complète les alliances.',
     description:
-      'Combine son tirage secret 2D6, l’espérance mathématique des pistes publiques et la déduction des actions déjà posées tour à tour par les coéquipiers (évite les doublons et forme les alliances requises).',
+      'Combine son tirage secret 2D6, l’espérance mathématique des pistes publiques et l’observation des actions déjà posées par les coéquipiers.',
     utiliseTirageSecret: true,
     utiliseDeductionAllies: true,
+  },
+  {
+    id: 'expectimax_bayesien',
+    nom: 'Bot Expectimax Bayésien (Inférence des Dés Alliés)',
+    algorithme: 'Inférence Bayésienne P(2D6 | Actes) + Expectimax sur portefeuille d’actions',
+    roleDansTests: 'Évalue la profondeur de déduction probabiliste fine à partir des cartes posées autour de la table.',
+    description:
+      'Met à jour par règle de Bayes la distribution de probabilité des gobelets 2D6 alliés au vu de leurs mouvements, puis maximise l’espérance mathématique conjointe de ses pions.',
+    utiliseTirageSecret: true,
+    utiliseDeductionAllies: true,
+    estPointe: true,
+  },
+  {
+    id: 'beam_rollout',
+    nom: 'Bot Planificateur Multi-Tours (Beam Search Rollout)',
+    algorithme: 'Beam Search (Largeur K=8) + Projection de l’Apprentissage des Pistes',
+    roleDansTests: 'Mesure la valeur de la planification multi-tours et du contrôle de l’apprentissage du Méchant.',
+    description:
+      'Explore en faisceau les combinaisons conjointes (Action I + Action II) en simulant la résolution complète du tour et en pénalisant les coups qui rapprochent les cartes du Méchant des pics 7 et 1.',
+    utiliseTirageSecret: true,
+    utiliseDeductionAllies: true,
+    estPointe: true,
+  },
+  {
+    id: 'ismcts',
+    nom: 'Bot IS-MCTS (Monte Carlo à Information Imparfaite)',
+    algorithme: 'Information Set MCTS (Déterminisations Bayésiennes + Sélection UCB1)',
+    roleDansTests: 'Plafond théorique de référence : exploite la topologie du plateau, les alliances et l’information cachée.',
+    description:
+      'Échantillonne des mondes possibles (déterminisations des gobelets cachés compatibles avec les poses alliées) et sélectionne les actions par arbre de recherche Monte Carlo (UCB1).',
+    utiliseTirageSecret: true,
+    utiliseDeductionAllies: true,
+    estPointe: true,
   },
 ];
 
@@ -89,7 +130,9 @@ export function estimerMenacePistesParCase(etat: EtatJeuV01): number[] {
       const machine = etat.machines.find((m) => m.id === machineId);
       if (!machine) continue;
       const cible = calculerCibleMachine(etat, machine, tactique, 0);
-      menaces[cible] += pSomme * pEcart;
+      if (cible >= 0 && cible < menaces.length) {
+        menaces[cible] += pSomme * pEcart;
+      }
     }
   }
 
@@ -184,8 +227,8 @@ export function analyserPosesAlliesPrecedents(
   };
 }
 
-// Choisit un pas de déplacement vers une case cible
-function choisirPasVersCible(
+// Plus court chemin (BFS) sur n'importe quelle topologie de plateau (Modulaire, Double Face, Hex 19, Sentiers)
+export function choisirPasVersCible(
   etat: EtatJeuV01,
   caseDepart: number,
   caseObjectif: number
@@ -194,20 +237,405 @@ function choisirPasVersCible(
   const accessibles = casesAccessiblesDefenseur(etat, caseDepart);
   if (accessibles.includes(caseObjectif)) return caseObjectif;
 
-  // Sinon chercher un voisin qui est voisin de caseObjectif
-  const cObj = etat.cases[caseObjectif];
-  if (cObj) {
-    for (const acc of accessibles) {
-      if (cObj.voisins.includes(acc)) {
-        return acc;
+  // BFS depuis caseObjectif pour trouver quel case dans `accessibles` minimise la distance restante
+  const dist = new Array(etat.cases.length).fill(999);
+  const queue: number[] = [caseObjectif];
+  dist[caseObjectif] = 0;
+
+  while (queue.length > 0) {
+    const curr = queue.shift()!;
+    const dCurr = dist[curr];
+    for (const v of etat.cases[curr]?.voisins || []) {
+      if (dist[v] > dCurr + 1) {
+        dist[v] = dCurr + 1;
+        queue.push(v);
       }
     }
   }
-  return accessibles[1] ?? caseDepart;
+
+  let meilleurPas = accessibles[1] ?? caseDepart;
+  let meilleureDist = 999;
+  for (const acc of accessibles) {
+    if (acc === caseDepart) continue;
+    if (dist[acc] < meilleureDist) {
+      meilleureDist = dist[acc];
+      meilleurPas = acc;
+    }
+  }
+  return meilleurPas;
 }
 
-// Décide des actions programmées pour un joueur selon son profil de Bot
-export function calculerProgrammationBot(
+// ============================================================================
+// ALGORITHMES DE POINTE (V0.3) : INFÉRENCE BAYÉSIENNE, BEAM ROLLOUT & IS-MCTS
+// ============================================================================
+
+/**
+ * Calcule la distribution de menace Bayésienne a posteriori par case et par Machine :
+ * - Pour le joueur courant : son tirage 2D6 est connu avec certitude (P = 1).
+ * - Pour les alliés ayant déjà posé leurs cartes : réévalue par règle de Bayes les couples (somme, écart)
+ *   qui expliquent leurs déplacements/protections observés.
+ * - Pour les alliés n'ayant pas encore posé : utilise la distribution exacte a priori des 36 lancers.
+ */
+export function calculerMenaceBayesiennePosteriori(
+  etat: EtatJeuV01,
+  joueurObservateur: number
+): {
+  menaceParCase: number[];
+  ciblesProbablesMachines: Map<number, number>; // caseId -> machineId probable
+} {
+  const menaceParCase = etat.cases.map(() => 0);
+  const ciblesProbablesMachines = new Map<number, number>();
+
+  for (let j = 0; j < etat.variante.nbJoueurs; j++) {
+    if (j === joueurObservateur) {
+      const pred = predireCibleDeMonLancerSecret(etat, j);
+      if (pred && pred.caseCible >= 0 && pred.caseCible < menaceParCase.length) {
+        menaceParCase[pred.caseCible] += 1.35; // Certitude issue de mon propre gobelet
+        ciblesProbablesMachines.set(pred.caseCible, pred.machineId);
+      }
+      continue;
+    }
+
+    const progAllie = etat.programmations[j] || [];
+    const casesViseesParAllie = new Set<number>();
+    if (progAllie.length > 0) {
+      for (const d of etat.defenseurs.filter((p) => p.joueur === j)) {
+        let pos = d.caseId;
+        for (const a of progAllie.filter((x) => x.pionId === d.id)) {
+          if (a.type === 'deplacer' && a.caseCible !== null) pos = a.caseCible;
+        }
+        casesViseesParAllie.add(pos);
+      }
+    }
+
+    // Distribution de vraisemblance Bayésienne P(somme, ecart | poses de j)
+    let sommePoids = 0;
+    const hypotheses: { cible: number; machineId: number; poids: number }[] = [];
+
+    for (let somme = 2; somme <= 12; somme++) {
+      const pPriorSomme = PROBA_SOMME_2D6[somme] / 36;
+      const tactique = etat.pisteTactique[somme];
+      for (let ecart = 0; ecart <= 5; ecart++) {
+        const pPriorEcart = PROBA_ECART_2D6[ecart] / 36;
+        const machineId = etat.pisteMachine[ecart];
+        const machine = etat.machines.find((m) => m.id === machineId);
+        if (!machine) continue;
+        const cible = calculerCibleMachine(etat, machine, tactique, j);
+
+        // Si l'allié j a déjà programmé et se dirige vers `cible`, forte vraisemblance Bayésienne !
+        const vraisemblance =
+          casesViseesParAllie.size > 0
+            ? casesViseesParAllie.has(cible)
+              ? 6.0
+              : 0.35
+            : 1.0;
+
+        const poids = pPriorSomme * pPriorEcart * vraisemblance;
+        sommePoids += poids;
+        hypotheses.push({ cible, machineId, poids });
+      }
+    }
+
+    if (sommePoids > 0) {
+      for (const h of hypotheses) {
+        const probPost = h.poids / sommePoids;
+        if (h.cible >= 0 && h.cible < menaceParCase.length) {
+          menaceParCase[h.cible] += probPost;
+          if (probPost > 0.22 && !ciblesProbablesMachines.has(h.cible)) {
+            ciblesProbablesMachines.set(h.cible, h.machineId);
+          }
+        }
+      }
+    }
+  }
+
+  return { menaceParCase, ciblesProbablesMachines };
+}
+
+/**
+ * Génère un portefeuille de plans candidats diversifiés et intelligents pour les pions du joueur courant.
+ * Utilisé par Expectimax Bayésien, Beam Rollout et IS-MCTS.
+ */
+function genererPortefeuillePlansCandidats(
+  etat: EtatJeuV01,
+  joueur: number,
+  etapesACalculer: (1 | 2)[],
+  actionsExistantes: ActionProgrammee[]
+): ActionProgrammee[][] {
+  const pionsJoueur = etat.defenseurs.filter((d) => d.joueur === joueur);
+  const { menaceParCase, ciblesProbablesMachines } =
+    calculerMenaceBayesiennePosteriori(etat, joueur);
+  const analyseAllies = analyserPosesAlliesPrecedents(etat, joueur);
+  const besoinAlliance =
+    etat.variante.effetSaboter === 'alliance_requise' ||
+    etat.variante.effetProteger === 'protection_collective';
+
+  // Identifier les 5 cases les plus stratégiques du plateau à ce tour
+  const casesTriees = etat.cases
+    .map((c) => {
+      let urgence = menaceParCase[c.id] * 4.5;
+      const machsPresentes = etat.machines.filter(
+        (m) =>
+          (m.caseId === c.id || m.cibleDeclaree === c.id) && !m.neutraliseeCeTour
+      ).length;
+      urgence += machsPresentes * 2.8;
+      if (c.anneau === 'coeur') urgence += 1.2;
+      if (analyseAllies.casesAttendantAlliance.has(c.id)) urgence += 7.0;
+      if (analyseAllies.casesDejaCouvertes.has(c.id)) urgence -= 4.2;
+      if ((etat.forets[c.id] || 0) === 0) urgence -= 12;
+      return { caseId: c.id, urgence };
+    })
+    .sort((a, b) => b.urgence - a.urgence)
+    .slice(0, 6);
+
+  // Pour chaque pion du joueur, construire 4 à 5 séquences d'actions cohérentes
+  const sequencesParPion: ActionProgrammee[][][] = pionsJoueur.map((pion, idxPion) => {
+    const seqs: ActionProgrammee[][] = [];
+    let caseDepart = pion.caseId;
+    const act1Deja = actionsExistantes.find(
+      (a) => a.pionId === pion.id && a.etape === 1
+    );
+    if (act1Deja?.type === 'deplacer' && act1Deja.caseCible !== null) {
+      caseDepart = act1Deja.caseCible;
+    }
+
+    const ciblesCandidates = [
+      caseDepart,
+      ...casesTriees.map((ct) => ct.caseId).filter((cid) => cid !== caseDepart),
+    ].slice(0, 5);
+
+    for (const objCase of ciblesCandidates) {
+      const seq: ActionProgrammee[] = [];
+      let posCourante = caseDepart;
+
+      for (const etape of etapesACalculer) {
+        if (posCourante !== objCase && etape === 1) {
+          const pas = choisirPasVersCible(etat, posCourante, objCase);
+          posCourante = pas;
+          seq.push({
+            pionId: pion.id,
+            etape,
+            type: 'deplacer',
+            caseCible: pas,
+            machineCible: null,
+            explicationBot: `Cible prioritaire ${etat.cases[pas]?.nom} (menace Bayésienne ${(menaceParCase[pas] || 0).toFixed(2)}).`,
+          });
+        } else {
+          // Déjà sur la case cible : choisir entre Saboter, Protéger et Replanter
+          const machsIci = etat.machines.filter(
+            (m) =>
+              (m.caseId === posCourante || m.cibleDeclaree === posCourante) &&
+              !m.neutraliseeCeTour
+          );
+          const machProbable =
+            machsIci[0]?.id ?? ciblesProbablesMachines.get(posCourante) ?? null;
+          const nbAlliesIci =
+            etat.defenseurs.filter((d) => d.caseId === posCourante).length +
+            (analyseAllies.destinationsAllies.get(posCourante) || 0);
+
+          const peutSaboter =
+            (machsIci.length > 0 || (etape === 2 && machProbable !== null)) &&
+            (etat.variante.effetSaboter !== 'alliance_requise' ||
+              nbAlliesIci >= 2 ||
+              besoinAlliance);
+
+          if (peutSaboter && (idxPion % 2 === 1 || etape === 1)) {
+            seq.push({
+              pionId: pion.id,
+              etape,
+              type: 'saboter',
+              caseCible: null,
+              machineCible: machProbable,
+              explicationBot: `Sabotage tactique sur ${etat.cases[posCourante]?.nom}.`,
+            });
+          } else if (
+            etat.variante.actionReplanterActive &&
+            etape === 1 &&
+            machsIci.length === 0 &&
+            (etat.forets[posCourante] || 0) <
+              (etat.cases[posCourante]?.foretsMax || 4)
+          ) {
+            seq.push({
+              pionId: pion.id,
+              etape,
+              type: 'replanter',
+              caseCible: null,
+              machineCible: null,
+              explicationBot: `Replantation préventive sur ${etat.cases[posCourante]?.nom}.`,
+            });
+          } else {
+            seq.push({
+              pionId: pion.id,
+              etape,
+              type: 'proteger',
+              caseCible: null,
+              machineCible: null,
+              explicationBot: `Bouclier de protection sur ${etat.cases[posCourante]?.nom}.`,
+            });
+          }
+        }
+      }
+      seqs.push(seq);
+
+      // Ajouter une variante "Protéger + Saboter combinés" sur la case cible si on s'y trouve
+      if (etapesACalculer.length === 2 && objCase === caseDepart) {
+        seqs.push([
+          {
+            pionId: pion.id,
+            etape: 1,
+            type: 'proteger',
+            caseCible: null,
+            machineCible: null,
+            explicationBot: `Verrouillage Bouclier Étape I sur ${etat.cases[caseDepart]?.nom}.`,
+          },
+          {
+            pionId: pion.id,
+            etape: 2,
+            type: 'saboter',
+            caseCible: null,
+            machineCible: ciblesProbablesMachines.get(caseDepart) ?? null,
+            explicationBot: `Sabotage Étape II sur ${etat.cases[caseDepart]?.nom}.`,
+          },
+        ]);
+      }
+    }
+
+    return seqs;
+  });
+
+  // Produit cartésien des séquences des pions du joueur (limité à 12 plans conjoints)
+  if (sequencesParPion.length === 0) return [[...actionsExistantes]];
+  if (sequencesParPion.length === 1) {
+    return sequencesParPion[0].map((s) => [...actionsExistantes, ...s]);
+  }
+
+  const plansConjoints: ActionProgrammee[][] = [];
+  const seqsP0 = sequencesParPion[0];
+  const seqsP1 = sequencesParPion[1];
+  const seqsRestants = sequencesParPion.slice(2).map((s) => s[0] || []);
+
+  for (let i = 0; i < seqsP0.length; i++) {
+    for (let j = 0; j < seqsP1.length; j++) {
+      // Éviter que deux pions du même joueur protègent exactement la même case si l'alliance n'est pas requise
+      const c0 =
+        seqsP0[i].find((a) => a.type === 'deplacer')?.caseCible ??
+        pionsJoueur[0].caseId;
+      const c1 =
+        seqsP1[j].find((a) => a.type === 'deplacer')?.caseCible ??
+        pionsJoueur[1].caseId;
+      if (!besoinAlliance && c0 === c1 && i !== 0 && j !== 0) continue;
+
+      const plan = [
+        ...actionsExistantes,
+        ...seqsP0[i],
+        ...seqsP1[j],
+        ...seqsRestants.flat(),
+      ];
+      plansConjoints.push(plan);
+      if (plansConjoints.length >= 12) break;
+    }
+    if (plansConjoints.length >= 12) break;
+  }
+
+  return plansConjoints.length > 0
+    ? plansConjoints
+    : [[...actionsExistantes, ...(sequencesParPion[0]?.[0] || [])]];
+}
+
+/**
+ * Évalue la qualité multi-tours d'un état de jeu après résolution d'un tour :
+ * - Forêts préservées (%)
+ * - Intégrité du Cœur Central
+ * - Sabotages et parades réussis
+ * - Contrôle de l'apprentissage du Méchant (pénalise si Percée ou Cupidité occupent les cases 6, 7, 8)
+ */
+function evaluerEtatHorizonMultiTours(etat: EtatJeuV01): number {
+  const pctForet = calculerPourcentageForetSauvee(etat);
+  const foretsCoeur = etat.forets[0] || 0;
+  const machinesAuChantier = etat.machines.filter((m) => m.caseId === null).length;
+
+  // Mesurer le danger futur de la Piste Tactique (pics 6, 7, 8)
+  let penalitePiste = 0;
+  for (const casePic of [6, 7, 8]) {
+    const tac = etat.pisteTactique[casePic];
+    if (tac === 'percee' || tac === 'cupidite') {
+      penalitePiste += casePic === 7 ? 2.4 : 1.4;
+    }
+  }
+
+  return (
+    pctForet * 1.2 +
+    foretsCoeur * 1.5 +
+    machinesAuChantier * 2.8 +
+    etat.stats.coupesEviteesParProtection * 1.6 +
+    etat.stats.machinesSabotees * 2.5 -
+    penalitePiste
+  );
+}
+
+/**
+ * Simule la fin du tour courant à partir d'un état où le joueur `joueur` applique `planJoueur`,
+ * en complétant les joueurs non encore programmés par la politique Déductive rapide.
+ */
+function simulerFinDuTourAvecPlan(
+  etatDepart: EtatJeuV01,
+  joueur: number,
+  planJoueur: ActionProgrammee[],
+  lancersDeterminises?: LancerSecret2D6[]
+): EtatJeuV01 {
+  let sim = clonerEtatJeu(etatDepart);
+  if (lancersDeterminises) {
+    sim.lancersSecretsDuTour = lancersDeterminises.map((l) => ({ ...l }));
+  }
+  sim.programmations[joueur] = planJoueur.map((a) => ({ ...a }));
+
+  // Compléter les programmations manquantes des coéquipiers avec le bot déductif rapide
+  for (let j = 0; j < sim.variante.nbJoueurs; j++) {
+    if (j === joueur) continue;
+    const exist = sim.programmations[j] || [];
+    const nbAttendus =
+      sim.variante.modeProgrammation === 'un_seul_ordre'
+        ? sim.variante.defenseursParJoueur
+        : sim.variante.defenseursParJoueur * 2;
+    if (exist.length < nbAttendus) {
+      const complemente = calculerProgrammationBotClassique(sim, j, 'deductif');
+      sim.programmations[j] = complemente.actions;
+    }
+  }
+
+  const tourInitial = sim.tourActuel;
+  let iter = 0;
+  if (sim.sousPhase === 'programmation_1') {
+    sim.sousPhase = 'resolution_actions_1';
+  } else if (sim.sousPhase === 'programmation_2') {
+    sim.sousPhase = 'resolution_actions_2';
+  }
+
+  while (
+    sim.sousPhase !== 'fin_de_partie' &&
+    sim.tourActuel === tourInitial &&
+    iter < 12
+  ) {
+    iter++;
+    if (sim.sousPhase === 'programmation_2') {
+      for (let j = 0; j < sim.variante.nbJoueurs; j++) {
+        const exist = sim.programmations[j] || [];
+        if (!exist.some((a) => a.etape === 2)) {
+          const res2 = calculerProgrammationBotClassique(sim, j, 'deductif', 2);
+          sim.programmations[j] = res2.actions;
+        }
+      }
+      sim.sousPhase = 'resolution_actions_2';
+    } else {
+      sim = avancerSousPhaseResolution(sim);
+    }
+  }
+
+  return sim;
+}
+
+// Décide des actions programmées pour les 6 bots classiques (Inerte -> Déductif)
+function calculerProgrammationBotClassique(
   etat: EtatJeuV01,
   joueur: number,
   profil: BotProfileId,
@@ -229,8 +657,6 @@ export function calculerProgrammationBot(
   const menacesPistes = estimerMenacePistesParCase(etat);
   const maPrediction = predireCibleDeMonLancerSecret(etat, joueur);
   const analyseAllies = analyserPosesAlliesPrecedents(etat, joueur);
-
-  // Garder trace des cases déjà prises en charge par les propres pions de ce joueur
   const casesPrisesParMesPions = new Set<number>();
 
   for (const pion of pionsJoueur) {
@@ -243,7 +669,6 @@ export function calculerProgrammationBot(
     }
 
     for (const etape of etapesACalculer) {
-      // 1. BOT INERTE
       if (profil === 'inerte') {
         nouvellesActions.push({
           pionId: pion.id,
@@ -256,7 +681,6 @@ export function calculerProgrammationBot(
         continue;
       }
 
-      // 2. BOT BOUCLE FIXE (Garde-fou : fait toujours la même routine sur place)
       if (profil === 'boucle') {
         const typeBoucle: ActionDefenseurType =
           etat.variante.actionReplanterActive && etape === 1
@@ -273,7 +697,6 @@ export function calculerProgrammationBot(
         continue;
       }
 
-      // 3. BOT HASARD
       if (profil === 'hasard') {
         const r = nextRng(rng);
         rng = r.nextState;
@@ -306,7 +729,6 @@ export function calculerProgrammationBot(
         continue;
       }
 
-      // 4. BOT RÉFLEXE (ne regarde que les Machines actuellement posées sur le plateau)
       if (profil === 'reflexe') {
         const machinesSurMaCase = etat.machines.filter(
           (m) => m.caseId === caseSimulee && !m.neutraliseeCeTour
@@ -325,7 +747,6 @@ export function calculerProgrammationBot(
             explicationBot: `Réflexe : Machine visible sur ${etat.cases[caseSimulee]?.nom}, joue ${typeChoisi}.`,
           });
         } else {
-          // Cherche une case voisine contenant une Machine
           const acc = casesAccessiblesDefenseur(etat, caseSimulee);
           const voisineAvecMachine = acc.find((cid) =>
             etat.machines.some((m) => m.caseId === cid && !m.neutraliseeCeTour)
@@ -357,21 +778,16 @@ export function calculerProgrammationBot(
       // 5. BOT GLOUTON & 6. BOT DÉDUCTIF
       const estDeductif = profil === 'deductif';
 
-      // Évaluer l'intérêt de chaque case du plateau comme destination/cible pour ce pion
       const evaluerCaseObjectif = (cid: number): number => {
         let score = 0;
         const foretsRestantes = etat.forets[cid] || 0;
         if (foretsRestantes === 0) return -10;
 
-        // Menace issue de mon propre lancer 2D6 secret
         if (maPrediction && maPrediction.caseCible === cid) {
           score += 5.0;
         }
+        score += (menacesPistes[cid] || 0) * 3.5;
 
-        // Menace probabiliste des deux pistes publiques
-        score += menacesPistes[cid] * 3.5;
-
-        // Machines déjà présentes ou ayant déclaré cette cible (si ciblage déjà révélé)
         const nbMachinesPresentes = etat.machines.filter(
           (m) =>
             (m.caseId === cid || m.cibleDeclaree === cid) &&
@@ -379,21 +795,16 @@ export function calculerProgrammationBot(
         ).length;
         score += nbMachinesPresentes * 2.2;
 
-        // Valeur stratégique du Cœur
         if (cid === 0) score += 0.6;
 
-        // Si Déductif : ajuste selon les actions posées par les alliés précédents
         if (estDeductif) {
           if (analyseAllies.casesAttendantAlliance.has(cid)) {
-            // Un allié y va mais a besoin d'un 2e Défenseur pour l'alliance ! Priorité maximale
             score += 6.5;
           } else if (analyseAllies.casesDejaCouvertes.has(cid)) {
-            // Déjà protégée/couverte par un allié : éviter le doublon
             score -= 4.5;
           }
         }
 
-        // Éviter que mes 2 propres pions fassent doublon (sauf si alliance requise)
         const besoinAlliance =
           etat.variante.effetSaboter === 'alliance_requise' ||
           etat.variante.effetProteger === 'protection_collective';
@@ -408,11 +819,9 @@ export function calculerProgrammationBot(
       const accessibles = casesAccessiblesDefenseur(etat, caseSimulee);
 
       if (etape === 1) {
-        // À l'étape 1 : faut-il se déplacer vers une case très menacée, ou agir immédiatement sur place ?
         let meilleureCase = caseSimulee;
         let meilleurScore = evaluerCaseObjectif(caseSimulee);
 
-        // Considérer toutes les cases du plateau accessibles en 1 ou 2 pas
         for (const c of etat.cases) {
           const sc = evaluerCaseObjectif(c.id);
           const penaliteDist = accessibles.includes(c.id) ? 0.1 : 0.8;
@@ -436,7 +845,6 @@ export function calculerProgrammationBot(
               : `Glouton : se déplace vers ${etat.cases[pas]?.nom} pour intercepter la menace de son dé (${maPrediction?.tactique}).`,
           });
         } else {
-          // Déjà sur la meilleure case à l'étape 1
           const machinesSurPlace = etat.machines.filter(
             (m) => m.caseId === caseSimulee && !m.neutraliseeCeTour
           );
@@ -485,8 +893,6 @@ export function calculerProgrammationBot(
           }
         }
       } else {
-        // Étape 2 : Les Machines ont ciblé au milieu ! Il faut maintenant protéger ou saboter avant la coupe
-        // Si le ciblage a déjà eu lieu (mode 2e_apres_ciblage), on regarde les vraies Machines présentes
         const machinesMenacantesIci = etat.machines.filter(
           (m) =>
             (m.caseId === caseSimulee || m.cibleDeclaree === caseSimulee) &&
@@ -511,7 +917,8 @@ export function calculerProgrammationBot(
             etape: 2,
             type: 'saboter',
             caseCible: null,
-            machineCible: machinesMenacantesIci[0]?.id ?? maPrediction?.machineId ?? null,
+            machineCible:
+              machinesMenacantesIci[0]?.id ?? maPrediction?.machineId ?? null,
             explicationBot: `${estDeductif ? 'Déductif' : 'Glouton'} : sabote la Machine arrivée sur ${etat.cases[caseSimulee]?.nom} avant l'abattage.`,
           });
         } else {
@@ -531,6 +938,273 @@ export function calculerProgrammationBot(
   return { actions: nouvellesActions, nextRngState: rng };
 }
 
+// Point d'entrée principal : calcule la programmation d'un Bot (9 profils disponibles)
+export function calculerProgrammationBot(
+  etat: EtatJeuV01,
+  joueur: number,
+  profil: BotProfileId,
+  etapeUniquement?: 1 | 2
+): { actions: ActionProgrammee[]; nextRngState: number } {
+  // Si profil classique (1 à 6), déléguer directement
+  if (
+    profil !== 'expectimax_bayesien' &&
+    profil !== 'beam_rollout' &&
+    profil !== 'ismcts'
+  ) {
+    return calculerProgrammationBotClassique(
+      etat,
+      joueur,
+      profil,
+      etapeUniquement
+    );
+  }
+
+  let rng = etat.etatRng + joueur * 131 + etat.tourActuel * 53;
+  const etapesACalculer: (1 | 2)[] = etapeUniquement
+    ? [etapeUniquement]
+    : etat.variante.modeProgrammation === 'un_seul_ordre'
+    ? [1]
+    : [1, 2];
+
+  const actionsExistantes = (etat.programmations[joueur] || []).filter(
+    (a) => !etapesACalculer.includes(a.etape)
+  );
+
+  const plansCandidats = genererPortefeuillePlansCandidats(
+    etat,
+    joueur,
+    etapesACalculer,
+    actionsExistantes
+  );
+
+  // Ajouter également le plan du bot Déductif comme candidat de référence dans le portefeuille
+  const planDeductifRef = calculerProgrammationBotClassique(
+    etat,
+    joueur,
+    'deductif',
+    etapeUniquement
+  ).actions;
+  plansCandidats.unshift(planDeductifRef);
+
+  // 7. BOT EXPECTIMAX BAYÉSIEN : Évalue l'espérance mathématique sur la distribution Bayésienne a posteriori
+  if (profil === 'expectimax_bayesien') {
+    const { menaceParCase } = calculerMenaceBayesiennePosteriori(etat, joueur);
+    const analyseAllies = analyserPosesAlliesPrecedents(etat, joueur);
+
+    let meilleurPlan = plansCandidats[0];
+    let meilleurScore = -9999;
+
+    for (const plan of plansCandidats) {
+      let utiliteEsperee = 0;
+      const casesCouvertesParPlan = new Set<number>();
+
+      for (const pion of etat.defenseurs.filter((d) => d.joueur === joueur)) {
+        let pos = pion.caseId;
+        const actsPion = plan.filter((a) => a.pionId === pion.id);
+        for (const a of actsPion) {
+          if (a.type === 'deplacer' && a.caseCible !== null) pos = a.caseCible;
+          if (a.type === 'proteger') {
+            const pMenace = menaceParCase[pos] || 0;
+            const dejaCouvert =
+              analyseAllies.casesDejaCouvertes.has(pos) ||
+              casesCouvertesParPlan.has(pos);
+            utiliteEsperee += dejaCouvert ? pMenace * 0.6 : pMenace * 6.2;
+            if (analyseAllies.casesAttendantAlliance.has(pos)) {
+              utiliteEsperee += 5.5;
+            }
+            casesCouvertesParPlan.add(pos);
+          } else if (a.type === 'saboter') {
+            const pMenace = menaceParCase[pos] || 0;
+            const machPresente = etat.machines.some(
+              (m) => m.caseId === pos && !m.neutraliseeCeTour
+            );
+            utiliteEsperee += machPresente ? 6.8 : pMenace * 5.0;
+          } else if (a.type === 'replanter') {
+            utiliteEsperee +=
+              (etat.forets[pos] || 0) < (etat.cases[pos]?.foretsMax || 4)
+                ? 3.4
+                : -2.0;
+          }
+        }
+      }
+
+      // Vérification rapide par 1 simulation déterministe sur un tirage médian
+      const etatProjete = simulerFinDuTourAvecPlan(etat, joueur, plan);
+      utiliteEsperee += evaluerEtatHorizonMultiTours(etatProjete) * 0.35;
+
+      if (utiliteEsperee > meilleurScore) {
+        meilleurScore = utiliteEsperee;
+        meilleurPlan = plan;
+      }
+    }
+
+    return {
+      actions: meilleurPlan.map((a) => ({
+        ...a,
+        explicationBot: `Expectimax Bayésien : maximise l'espérance postérieure E[U]=${meilleurScore.toFixed(1)} (${a.explicationBot || a.type}).`,
+      })),
+      nextRngState: rng,
+    };
+  }
+
+  // 8. BOT PLANIFICATEUR MULTI-TOURS (BEAM SEARCH ROLLOUT)
+  if (profil === 'beam_rollout') {
+    const largeurFaisceau = Math.min(6, plansCandidats.length);
+    let meilleurPlan = plansCandidats[0];
+    let meilleureValeurHorizon = -9999;
+
+    for (let k = 0; k < largeurFaisceau; k++) {
+      const plan = plansCandidats[k];
+      let sommeValeurs = 0;
+
+      // Évaluer sur 2 scénarios de dés alliés (dont 1 déterminisation Bayésienne)
+      for (let s = 0; s < 2; s++) {
+        const lancersScen = etat.lancersSecretsDuTour.map((l, idxJ) => {
+          if (idxJ === joueur || etat.lancersReveles) return l;
+          const r1 = tirerDe6(rng + k * 19 + s * 37 + idxJ * 7);
+          const r2 = tirerDe6(r1.nextState);
+          rng = r2.nextState;
+          return {
+            joueurObservateur: idxJ,
+            d1: r1.de,
+            d2: r2.de,
+            somme: r1.de + r2.de,
+            ecart: Math.abs(r1.de - r2.de),
+          };
+        });
+
+        const finTour1 = simulerFinDuTourAvecPlan(
+          etat,
+          joueur,
+          plan,
+          lancersScen
+        );
+        sommeValeurs += evaluerEtatHorizonMultiTours(finTour1);
+      }
+
+      const valeurMoyenne = sommeValeurs / 2;
+      if (valeurMoyenne > meilleureValeurHorizon) {
+        meilleureValeurHorizon = valeurMoyenne;
+        meilleurPlan = plan;
+      }
+    }
+
+    return {
+      actions: meilleurPlan.map((a) => ({
+        ...a,
+        explicationBot: `Beam Rollout (K=${largeurFaisceau}) : valeur multi-tours V=${meilleureValeurHorizon.toFixed(1)} (${a.type}).`,
+      })),
+      nextRngState: rng,
+    };
+  }
+
+  // 9. BOT IS-MCTS (INFORMATION SET MONTE CARLO TREE SEARCH AVEC SÉLECTION UCB1)
+  const nbCandidats = Math.min(6, plansCandidats.length);
+  const visites = new Array(nbCandidats).fill(0);
+  const recompensesTotales = new Array(nbCandidats).fill(0);
+  const nbIterationsMCTS = Math.max(12, nbCandidats * 2);
+  const constanteExplorationC = 14.0;
+
+  for (let iter = 0; iter < nbIterationsMCTS; iter++) {
+    // 1. Sélection du bras (plan candidat) par formule UCB1
+    let idxChoisi = 0;
+    if (iter < nbCandidats) {
+      idxChoisi = iter; // Explorer chaque candidat au moins 1 fois
+    } else {
+      let meilleurUCB = -999999;
+      for (let i = 0; i < nbCandidats; i++) {
+        const moyenne = recompensesTotales[i] / Math.max(1, visites[i]);
+        const bonusExploration =
+          constanteExplorationC *
+          Math.sqrt(Math.log(iter + 1) / Math.max(1, visites[i]));
+        const ucb = moyenne + bonusExploration;
+        if (ucb > meilleurUCB) {
+          meilleurUCB = ucb;
+          idxChoisi = i;
+        }
+      }
+    }
+
+    // 2. Déterminisation de l'ensemble d'information (Information Set) :
+    // Mon propre gobelet 2D6 reste fixe ; les gobelets cachés des autres joueurs sont échantillonnés
+    // en privilégiant les tirages compatibles avec les poses déjà observées.
+    const lancersDeterminises: LancerSecret2D6[] =
+      etat.lancersSecretsDuTour.map((l, idxJ) => {
+        if (idxJ === joueur || etat.lancersReveles) return l;
+
+        const r1 = tirerDe6(rng);
+        const r2 = tirerDe6(r1.nextState);
+        rng = r2.nextState;
+
+        // Si le joueur idxJ a déjà programmé un mouvement, vérifier si un second tirage est plus cohérent
+        const progJ = etat.programmations[idxJ] || [];
+        if (progJ.length > 0) {
+          const destAllie = progJ.find((a) => a.type === 'deplacer')?.caseCible;
+          if (destAllie !== undefined && destAllie !== null) {
+            const som1 = r1.de + r2.de;
+            const ec1 = Math.abs(r1.de - r2.de);
+            const m1 = etat.machines.find(
+              (m) => m.id === etat.pisteMachine[ec1]
+            );
+            const cib1 = m1
+              ? calculerCibleMachine(etat, m1, etat.pisteTactique[som1], idxJ)
+              : -1;
+            if (cib1 !== destAllie) {
+              const r3 = tirerDe6(rng);
+              const r4 = tirerDe6(r3.nextState);
+              rng = r4.nextState;
+              return {
+                joueurObservateur: idxJ,
+                d1: r3.de,
+                d2: r4.de,
+                somme: r3.de + r4.de,
+                ecart: Math.abs(r3.de - r4.de),
+              };
+            }
+          }
+        }
+
+        return {
+          joueurObservateur: idxJ,
+          d1: r1.de,
+          d2: r2.de,
+          somme: r1.de + r2.de,
+          ecart: Math.abs(r1.de - r2.de),
+        };
+      });
+
+    // 3. Simulation (Rollout) et 4. Rétropropagation
+    const etatFinTour = simulerFinDuTourAvecPlan(
+      etat,
+      joueur,
+      plansCandidats[idxChoisi],
+      lancersDeterminises
+    );
+    const recompense = evaluerEtatHorizonMultiTours(etatFinTour);
+    visites[idxChoisi] += 1;
+    recompensesTotales[idxChoisi] += recompense;
+  }
+
+  // Choisir le plan ayant la meilleure récompense moyenne (Robust / Max-Value child)
+  let meilleurIdx = 0;
+  let meilleureMoyenne = -999999;
+  for (let i = 0; i < nbCandidats; i++) {
+    const moy = recompensesTotales[i] / Math.max(1, visites[i]);
+    if (moy > meilleureMoyenne) {
+      meilleureMoyenne = moy;
+      meilleurIdx = i;
+    }
+  }
+
+  return {
+    actions: plansCandidats[meilleurIdx].map((a) => ({
+      ...a,
+      explicationBot: `IS-MCTS (${nbIterationsMCTS} déterminisations UCB1, Q=${meilleureMoyenne.toFixed(1)}) : ${a.explicationBot || a.type}.`,
+    })),
+    nextRngState: rng,
+  };
+}
+
 // Simule une partie complète de bout en bout avec les profils de Bots choisis
 export function simulerPartieCompleteV01(
   variante: VariantV01,
@@ -545,7 +1219,6 @@ export function simulerPartieCompleteV01(
 
     if (etat.sousPhase === 'programmation_1') {
       if (variante.modeProgrammation === 'alternee_1_par_1') {
-        // Tour de table pour l'étape 1, puis tour de table pour l'étape 2
         for (let j = 0; j < variante.nbJoueurs; j++) {
           const res = calculerProgrammationBot(
             etat,
@@ -578,7 +1251,6 @@ export function simulerPartieCompleteV01(
           etat.etatRng = res.nextRngState;
         }
       } else {
-        // Séquentiel (2 ordres ou 1 seul ordre)
         for (let j = 0; j < variante.nbJoueurs; j++) {
           const res = calculerProgrammationBot(
             etat,

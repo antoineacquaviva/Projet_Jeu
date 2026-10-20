@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   EffetProteger,
   EffetSaboter,
+  GeometriePlateau,
   ModeProgrammation,
   ModeResolution,
   PorteeTactiques,
@@ -31,7 +32,7 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
     const cible: VariantV01 = creerNouvelle
       ? {
           ...form,
-          id: `v01_custom_${Date.now().toString(36)}`,
+          id: `v${(form.version || '0.3').replace('.', '')}_custom_${Date.now().toString(36)}`,
           nom: `${form.nom} (Copie)`,
           origine: 'utilisateur',
         }
@@ -57,10 +58,10 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
       <div className="bg-white rounded-xl p-4 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-lg font-semibold text-[#16211B]">
-            Moteur & Bots — Configurateur de Variantes (V{form.version}) & Joueurs Virtuels
+            Moteur & Bots — Configurateur de Variantes (V{form.version || '0.1'}) & 9 Joueurs Virtuels
           </h2>
           <p className="text-xs text-[#55645B]">
-            Explorez les options de séquencement (programmation / résolution), les règles d’actions et les paramètres de « Défenseurs de la forêt » (Version {form.version}).
+            Configurez la géométrie du plateau (V0.3), le séquencement, les règles d’actions et éprouvez-les face aux 6 bots classiques et 3 algorithmes de pointe (Expectimax Bayésien, Beam Search, IS-MCTS).
           </p>
         </div>
 
@@ -75,7 +76,7 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
             onClick={() => handleSave(true)}
             className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#16211B] text-white hover:bg-black whitespace-nowrap shrink-0"
           >
-            Dupliquer comme nouvelle variante V{form.version}
+            Dupliquer comme nouvelle variante V{form.version || '0.1'}
           </button>
         </div>
       </div>
@@ -86,13 +87,13 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
         </div>
       )}
 
-      {/* Éditeur complet d'une variante V0.1 */}
+      {/* Éditeur complet d'une variante */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Colonne Gauche (7 cols) : Options de règles (Séquencement & Actions) */}
+        {/* Colonne Gauche (7 cols) : Options de règles (Plateau, Séquencement & Actions) */}
         <div className="lg:col-span-7 bg-white rounded-xl p-5 border border-[#D8DFD5] space-y-5">
           <div>
             <h3 className="font-display text-base font-semibold text-[#16211B] mb-3">
-              1. Composant MOTEUR — Règles de Séquencement & d’Actions (Version 0.1)
+              1. Composant MOTEUR — Géométrie du Plateau, Séquencement & Actions
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
@@ -119,6 +120,46 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
                   }
                   className="w-full px-3 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
                 />
+              </div>
+            </div>
+
+            {/* A0. Architecture Géométrique du Plateau (V0.3 & Hybrides) */}
+            <div className="p-4 rounded-lg bg-emerald-50/60 border border-[#256B45]/40 space-y-2.5 mb-4">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-mono-tabular font-bold text-[#256B45]">
+                  ARCHITECTURE & GÉOMÉTRIE DU PLATEAU (NOUVEAUTÉ V0.3)
+                </div>
+                <span className="text-[11px] font-mono-tabular text-[#55645B]">
+                  Priorités : Stratégie · Lisibilité · Équilibre 3–6J
+                </span>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#16211B] mb-1">
+                  Topologie physique du plateau
+                </label>
+                <select
+                  value={form.geometriePlateau || 'modulaire_secteurs'}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      geometriePlateau: e.target.value as GeometriePlateau,
+                    })
+                  }
+                  className="w-full px-2.5 py-2 text-xs font-semibold border border-[#256B45] rounded-lg bg-white text-[#16211B]"
+                >
+                  <option value="double_plateau_34_56">
+                    Plateau Double-Face Fixe : Recto 3–4J (9 zones) / Verso 5–6J (13 zones)
+                  </option>
+                  <option value="hex_couronne_19">
+                    Grille Hexagonale Fixe à 19 Cases en 3 Couronnes (Cœur + 6 + 12)
+                  </option>
+                  <option value="clairieres_sentiers">
+                    Réseau de Clairières & Sentiers Forestiers (1 Sanctuaire + 3 Cols + 6 Lisières)
+                  </option>
+                  <option value="modulaire_secteurs">
+                    Plateau Modulaire V0.1 (1 Tuile Cœur + 2×N Tuiles Secteurs)
+                  </option>
+                </select>
               </div>
             </div>
 
@@ -259,7 +300,7 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
                     }
                   />
                   <span>
-                    Activer la 4e carte Action « Replanter » (+1 Forêt sur tuile libre)
+                    Activer la 4e carte Action « Replanter » (+1 Forêt sur zone libre)
                   </span>
                 </label>
 
@@ -274,9 +315,7 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
                       })
                     }
                   />
-                  <span>
-                    Activer le « Déplacement à 2 tuiles » (Éclaireur)
-                  </span>
+                  <span>Activer le « Déplacement à 2 zones » (Éclaireur)</span>
                 </label>
               </div>
             </div>
@@ -330,7 +369,7 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
 
                 <div>
                   <label className="block text-xs font-semibold text-[#16211B] mb-1">
-                    Forêts / Case Secteur
+                    Forêts / Zone
                   </label>
                   <input
                     type="number"
@@ -349,7 +388,7 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
 
                 <div>
                   <label className="block text-xs font-semibold text-[#16211B] mb-1">
-                    Forêts Tuile Cœur
+                    Forêts Cœur Central
                   </label>
                   <input
                     type="number"
@@ -436,7 +475,7 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
                     }
                     className="w-full px-2.5 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-white"
                   >
-                    <option value="voisinage">Tuile actuelle + voisines</option>
+                    <option value="voisinage">Zone actuelle + voisines</option>
                     <option value="plateau_entier">Tout le plateau</option>
                   </select>
                 </div>
@@ -445,34 +484,40 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
           </div>
         </div>
 
-        {/* Colonne Droite (5 cols) : Composant 2 (BOTS) */}
+        {/* Colonne Droite (5 cols) : Composant 2 (BOTS — 6 Classiques + 3 Algorithmes de Pointe) */}
         <div className="lg:col-span-5 bg-white rounded-xl p-5 border border-[#D8DFD5] space-y-4">
           <div>
             <h3 className="font-display text-base font-semibold text-[#16211B]">
-              2. Composant BOTS — Panel des 6 Joueurs Virtuels
+              2. Composant BOTS — Échelle des 9 Joueurs Virtuels (dont 3 IA de Pointe)
             </h3>
             <p className="text-xs text-[#55645B]">
-              Chaque bot simule un niveau de compétence ou un comportement témoin pour éprouver les variantes dans le composant Tests.
+              L’échelle complète mesure à la fois le plancher naïf et le plafond stratégique (Inférence Bayésienne, Beam Rollout multi-tours et IS-MCTS).
             </p>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 max-h-[760px] overflow-y-auto pr-1">
             {CATALOGUE_BOTS_V01.map((bot, idx) => (
               <div
                 key={bot.id}
-                className="p-3.5 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5]"
+                className={`p-3.5 rounded-lg border ${
+                  bot.estPointe
+                    ? 'bg-emerald-50/70 border-[#256B45]'
+                    : 'bg-[#F4F5F0] border-[#D8DFD5]'
+                }`}
               >
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between gap-2 mb-1">
                   <div className="font-semibold text-xs text-[#16211B]">
                     {idx + 1}. {bot.nom}
                   </div>
-                  <div className="text-[11px] font-mono-tabular text-[#55645B]">
-                    {bot.utiliseTirageSecret ? 'Dés 2D6: Oui' : 'Dés 2D6: Non'} ·{' '}
-                    {bot.utiliseDeductionAllies
-                      ? 'Déduction alliés: Oui'
-                      : 'Déduction: Non'}
-                  </div>
+                  <span className="text-[10px] font-mono-tabular text-[#256B45] font-semibold">
+                    {bot.estPointe ? 'ALGO DE POINTE' : 'SOCLE'}
+                  </span>
                 </div>
+                {bot.algorithme && (
+                  <div className="text-[11px] font-mono-tabular text-[#16211B] mb-1">
+                    Méthode : {bot.algorithme}
+                  </div>
+                )}
                 <p className="text-xs text-[#55645B] leading-relaxed">
                   {bot.description}
                 </p>

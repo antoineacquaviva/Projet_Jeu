@@ -341,20 +341,67 @@ export const OPTIONS_REGLES_V02_MODULES: RuleOptionSpec[] = [
   },
 ];
 
+export const OPTIONS_REGLES_V03_PLATEAU: RuleOptionSpec[] = [
+  {
+    id: 'opt_geometrie_plateau',
+    cleVariante: 'geometriePlateau',
+    nom: 'Architecture Géométrique du Plateau (Chantier V0.3)',
+    categorie: 'Géométrie & Topologie du Plateau',
+    introduiteEnVersion: '0.3',
+    description:
+      'Remplace l’assemblage modulaire d’une tuile par joueur par des architectures de plateau fixes, calibrées pour l’intérêt stratégique, la lisibilité sur table et l’équilibre de 3 à 6 joueurs.',
+    choix: [
+      {
+        valeur: 'double_plateau_34_56',
+        label: 'Plateau Double Face Fixe (Recto 3–4J à 9 zones / Verso 5–6J à 13 zones)',
+        estReference: true,
+        description:
+          'Deux plateaux fixes dédiés : le Recto (9 zones : 1 Cœur, 4 Clairières, 4 Lisières) est calibré pour 3 et 4 joueurs ; le Verso (13 zones : 1 Cœur, 6 Clairières, 6 Lisières) pour 5 et 6 joueurs, avec diagonales d’entraide.',
+        impactPhysique:
+          'Dépliez le grand plateau central sur sa face « 3–4 Joueurs » ou « 5–6 Joueurs » : aucun assemblage de tuiles requis.',
+      },
+      {
+        valeur: 'hex_couronne_19',
+        label: 'Grille Hexagonale Fixe en Couronnes (19 hexagones : 1 + 6 + 12)',
+        description:
+          'Un plateau unique de 19 cases hexagonales (1 Cœur central, 6 hexagones en Couronne Intérieure, 12 hexagones en Lisière Extérieure). Chaque case intérieure possède 6 voisins directs.',
+        impactPhysique:
+          'Posez le plateau hexagonal à 19 cases : les déplacements suivent les 6 côtés de chaque hexagone.',
+      },
+      {
+        valeur: 'clairieres_sentiers',
+        label: 'Réseau de Clairières & Sentiers à Embranchements (13 nœuds & 3 Cols)',
+        description:
+          'Carte forestière point-à-point composée de 6 Lisières d’entrée convergeant vers 3 Cols de Vallée et 3 Sanctuaires Intérieurs autour du Cœur. Crée des carrefours stratégiques très lisibles.',
+        impactPhysique:
+          'Suivez les sentiers forestiers tracés sur le plateau entre les clairières et verrouillez les 3 Cols de passage.',
+      },
+      {
+        valeur: 'modulaire_secteurs',
+        label: 'Couronne Modulable Historique V0.1 (1 Cœur + 2 tuiles par joueur)',
+        description:
+          'Témoin de référence V0.1 : on assemble exactement J secteurs de 2 tuiles autour de la Tuile Cœur Central.',
+        impactPhysique:
+          'Encastrez 2 tuiles par joueur présent autour de la Tuile Cœur.',
+      },
+    ],
+  },
+];
+
 export const PARAMETRES_VARIABLES_COMMUNS: VariableParameterSpec[] = [
   {
     id: 'param_nb_joueurs',
     cleVariante: 'nbJoueurs',
-    nom: 'Nombre de Joueurs (Couronne modulable)',
+    nom: 'Nombre de Joueurs autour de la table',
     unite: 'joueurs',
     min: 3,
     max: 6,
     pas: 1,
     valeurReference: 4,
     description:
-      'Détermine le nombre de secteurs assemblés autour de la Tuile Cœur (1 + 2×J tuiles) et le nombre de lancers 2D6 de Machines par tour.',
+      'Détermine le nombre de Peuples en jeu (3 à 6 joueurs), la face du plateau utilisée (en mode Double Face) et le nombre de lancers 2D6 de Machines par tour.',
     impactMateriel:
-      'Assemblez J secteurs de 2 tuiles autour du Cœur et distribuez J gobelets 2D6.',
+      'Distribuez 1 plateau Peuple et 1 gobelet 2D6 à chacun des J joueurs.',
   },
   {
     id: 'param_defenseurs_par_joueur',
@@ -368,26 +415,26 @@ export const PARAMETRES_VARIABLES_COMMUNS: VariableParameterSpec[] = [
     description:
       'Nombre de pions Défenseurs que chaque joueur contrôle et programme à chaque tour.',
     impactMateriel:
-      'Chaque joueur prend n pions en bois de sa couleur et les pose sur son secteur.',
+      'Chaque joueur prend n pions en bois de sa couleur et les pose sur sa zone de départ.',
   },
   {
     id: 'param_forets_secteur',
     cleVariante: 'foretsParCaseSecteur',
-    nom: 'Forêts initiales par Tuile de Secteur',
-    unite: 'arbres / tuile',
+    nom: 'Forêts initiales par Case / Clairière périphérique',
+    unite: 'arbres / case',
     min: 2,
     max: 6,
     pas: 1,
     valeurReference: 4,
     description:
-      'Nombre de pions Forêt en bois posés au départ sur chaque tuile Intérieure et Lisière.',
+      'Nombre de pions Forêt en bois posés au départ sur chaque case Intérieure et Lisière.',
     impactMateriel:
-      'Posez ce nombre de pions Forêt verts sur chacune des 2×J tuiles périphériques.',
+      'Posez ce nombre de pions Forêt verts sur chacune des cases périphériques du plateau.',
   },
   {
     id: 'param_forets_coeur',
     cleVariante: 'foretsCoeur',
-    nom: 'Forêts initiales sur la Tuile Cœur Central',
+    nom: 'Forêts initiales sur le Cœur Central',
     unite: 'arbres',
     min: 3,
     max: 8,
@@ -396,7 +443,7 @@ export const PARAMETRES_VARIABLES_COMMUNS: VariableParameterSpec[] = [
     description:
       'Réserve d’arbres du sanctuaire central vers lequel convergent les Machines en tactique Percée.',
     impactMateriel:
-      'Posez ces pions Forêt au centre sur la grande Tuile Cœur.',
+      'Posez ces pions Forêt au centre sur la case Cœur de la Forêt.',
   },
   {
     id: 'param_machines_initiales',
@@ -410,7 +457,7 @@ export const PARAMETRES_VARIABLES_COMMUNS: VariableParameterSpec[] = [
     description:
       'Nombre de figurines Machines placées en Lisière dès le début de la partie (les autres démarrent au Chantier).',
     impactMateriel:
-      'Posez M0 à M(k-1) sur les tuiles Lisière et laissez les autres sur la zone Chantier.',
+      'Posez M0 à M(k-1) sur les cases Lisière et laissez les autres sur la zone Chantier.',
   },
   {
     id: 'param_nb_tours',
@@ -539,6 +586,34 @@ export const ETAPES_MISE_EN_PLACE_V01: SetupStepSpec[] = [
   },
 ];
 
+export const COMPOSANTS_BOITE_V03: BoxComponentSpec[] = [
+  {
+    id: 'comp_plateau_v03',
+    categorie: 'Plateaux Fixes V0.3 (Remplacent les tuiles modulaires)',
+    nom: '1 Grand Plateau Pliable Double Face (3–4J / 5–6J) + Calques Topologiques (Hexagones 19 & Sentiers)',
+    quantiteFormule: '1 plateau recto-verso (9 ou 13 zones) / 19 hexagones / 13 clairières',
+    descriptionMat:
+      'Plateau central rigide éliminant l’assemblage d’une tuile par joueur : Face A calibrée pour 3–4 joueurs (9 zones), Face B pour 5–6 joueurs (13 zones), ou variantes Grille Hexagonale (19 hexagones) et Réseau de Clairières & Sentiers (13 nœuds et 3 cols).',
+    usageRegle:
+      'Dépliez directement le plateau correspondant à la géométrie V0.3 testée : les connexions et distances au Cœur sont immédiatement lisibles.',
+    nouveauteVersion: true,
+  },
+  ...COMPOSANTS_BOITE_V01.slice(1),
+];
+
+export const ETAPES_MISE_EN_PLACE_V03: SetupStepSpec[] = [
+  {
+    numero: 1,
+    titre: 'Déplier le Plateau Fixe V0.3 (Double Face 3–4J/5–6J, Hexagones 19 ou Clairières & Sentiers)',
+    materiel: 'Grand Plateau V0.3 au centre de la table',
+    consigne:
+      'En mode Double Face, choisissez la face « 3–4 Joueurs » (9 zones) ou « 5–6 Joueurs » (13 zones). En mode Hexagonal (19 cases) ou Clairières & Sentiers (13 nœuds), posez le plateau fixe correspondant.',
+    astuceTable:
+      'Aucun assemblage de tuiles par joueur : la mise en place du plateau prend 5 secondes et la géométrie reste stable quel que soit le nombre de joueurs.',
+  },
+  ...ETAPES_MISE_EN_PLACE_V01.slice(1),
+];
+
 export const VERSIONS_JEU_INITIALES: GameVersionSpec[] = [
   {
     id: '0.1',
@@ -562,10 +637,8 @@ export const VERSIONS_JEU_INITIALES: GameVersionSpec[] = [
     ideesLaboIds: [
       'idea-seq-entrelace',
       'idea-prog-alternee',
-      'idea-prog-reactive',
+      'idea-prog-reaction-ouverte',
       'idea-sabotage-alliance',
-      'idea-barrage-entree',
-      'idea-gobelet-physique',
     ],
     optionsRegles: OPTIONS_REGLES_COMMUNES,
     parametresVariables: PARAMETRES_VARIABLES_COMMUNS,
@@ -576,7 +649,7 @@ export const VERSIONS_JEU_INITIALES: GameVersionSpec[] = [
     id: '0.2',
     nomJeu: 'Défenseurs de la forêt',
     titreVersion: 'Version 0.2 — Éclaireur & Spécialisation des Peuples (Chantier Labo)',
-    statut: 'en_preparation',
+    statut: 'active',
     dateCreation: '2026-10-20',
     pitch:
       'Deuxième version du Jeu intégrant les premières idées retenues du Labo : ajout du Jeton Éclaireur (signalisation silencieuse d’une tuile menacée) et spécialisation asymétrique optionnelle des Peuples de Défenseurs face à une pression accrue des Machines.',
@@ -589,7 +662,7 @@ export const VERSIONS_JEU_INITIALES: GameVersionSpec[] = [
       'Introduction du module « Spécialisation Asymétrique des Peuples » (issu du post-it Labo sur les Peuples).',
       'Activation par défaut de la 4e carte « Replanter » face à 5 Machines initiales.',
     ],
-    ideesLaboIds: ['idea-peuples-asym', 'idea-sabotage-alliance'],
+    ideesLaboIds: ['idea-jeton-eclaireur-v02', 'idea-peuples-asym', 'idea-sabotage-alliance'],
     optionsRegles: [...OPTIONS_REGLES_COMMUNES, ...OPTIONS_REGLES_V02_MODULES],
     parametresVariables: PARAMETRES_VARIABLES_COMMUNS,
     composantsBoite: [
@@ -618,6 +691,36 @@ export const VERSIONS_JEU_INITIALES: GameVersionSpec[] = [
           'Le Jeton Éclaireur est récupéré en fin de tour pour être réutilisé au tour suivant.',
       },
     ],
+  },
+  {
+    id: '0.3',
+    nomJeu: 'Défenseurs de la forêt',
+    titreVersion: 'Version 0.3 — Architectures de Plateau (Double Face 3–4J/5–6J, Hexagones 19 & Sentiers)',
+    statut: 'active',
+    dateCreation: '2026-10-20',
+    pitch:
+      'Troisième version dérivée de la V0.1 dédiée à la refonte géométrique et ergonomique du plateau : abandon de l’assemblage d’une tuile par joueur au profit de trois architectures fixes comparées sur l’intérêt stratégique, la lisibilité sur table et l’équilibrage de 3 à 6 joueurs.',
+    invariantsConception: [
+      'Dérivée directement du socle mécanique V0.1 (Peuples symétriques, Double Piste 2–12 / 0–5, Gobelets 2D6 secrets, 2 actions programmées).',
+      'Remplace la couronne modulaire 1 tuile/joueur par une topologie de plateau explicite évaluée sur 3, 4, 5 et 6 joueurs.',
+      'Mesure systématique des 3 priorités : Intérêt Stratégique (9 bots dont IS-MCTS), Lisibilité & Ergonomie, et Équilibre selon le nombre de joueurs (3 à 6J).',
+    ],
+    evolutionsDepuisPrecedente: [
+      'Architecture 1 : Plateau Double Face Fixe — Recto calibré pour 3–4 joueurs (9 zones) et Verso calibré pour 5–6 joueurs (13 zones avec diagonales d’entraide).',
+      'Architecture 2 : Grille Hexagonale Fixe en Couronnes (19 hexagones : 1 Cœur central, 6 hexagones Intérieurs à 6 connexions, 12 hexagones de Lisière).',
+      'Architecture 3 : Réseau de Clairières & Sentiers à Embranchements (13 clairières reliées par des sentiers forestiers formant 3 Cols stratégiques vers le Cœur).',
+      'Intégration de 3 bots de pointe (Expectimax Bayésien, Beam Rollout, IS-MCTS) et de l’analyse comparative par Gemini.',
+    ],
+    ideesLaboIds: [
+      'idea-v03-double-plateau',
+      'idea-v03-hex-19',
+      'idea-v03-clairieres-sentiers',
+      'idea-bots-pointe-ismcts',
+    ],
+    optionsRegles: [...OPTIONS_REGLES_V03_PLATEAU, ...OPTIONS_REGLES_COMMUNES],
+    parametresVariables: PARAMETRES_VARIABLES_COMMUNS,
+    composantsBoite: COMPOSANTS_BOITE_V03,
+    etapesMiseEnPlace: ETAPES_MISE_EN_PLACE_V03,
   },
 ];
 
@@ -664,12 +767,13 @@ export function creerNouvelleVersionDepuisLabo(
     evolutionsDepuisPrecedente: evolutions,
     ideesLaboIds: ideesSelectionnees.map((i) => i.id),
     optionsRegles: [
+      ...OPTIONS_REGLES_V03_PLATEAU,
       ...OPTIONS_REGLES_COMMUNES,
       ...OPTIONS_REGLES_V02_MODULES,
     ],
     parametresVariables: [...PARAMETRES_VARIABLES_COMMUNS],
-    composantsBoite: [...COMPOSANTS_BOITE_V01, ...composantsSupp],
-    etapesMiseEnPlace: [...ETAPES_MISE_EN_PLACE_V01],
+    composantsBoite: [...COMPOSANTS_BOITE_V03, ...composantsSupp],
+    etapesMiseEnPlace: [...ETAPES_MISE_EN_PLACE_V03],
   };
 
   const varianteSocle: VariantV01 = {
@@ -679,6 +783,7 @@ export function creerNouvelleVersionDepuisLabo(
     description: pitch,
     origine: 'socle',
     statutViabilite: 'non_teste',
+    geometriePlateau: 'double_plateau_34_56',
     modeProgrammation: 'alternee_1_par_1',
     modeResolution: 'entrelacee_coupe_fin',
     effetProteger: 'barrage_entree_et_coupe',
@@ -687,7 +792,7 @@ export function creerNouvelleVersionDepuisLabo(
     deplacementDoubleActif: false,
     rythmeApprentissage: 'chaque_machine',
     porteeTactiques: 'voisinage',
-    peuplesAsymetriquesActifs: true,
+    peuplesAsymetriquesActifs: false,
     jetonEclaireurActif: true,
     nbJoueurs: 4,
     defenseursParJoueur: 2,

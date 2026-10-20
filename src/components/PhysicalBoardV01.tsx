@@ -1,12 +1,12 @@
 import React from 'react';
 import {
   EtatJeuV01,
+  GeometriePlateau,
   TactiqueType,
 } from '../shared/types';
 import {
   caseEstProtegeeContreCoupe,
   COULEURS_PEUPLES_V01,
-  NOMS_TACTIQUES,
   PROBA_ECART_2D6,
   PROBA_SOMME_2D6,
 } from '../shared/moteur';
@@ -29,6 +29,54 @@ const COULEUR_TACTIQUE: Record<TactiqueType, { bg: string; text: string; border:
   represailles: { bg: '#F3E8FF', text: '#6B21A8', border: '#A855F7' },
 };
 
+function pointsHexagone(rayon: number): string {
+  const pts: string[] = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 180) * (60 * i - 30);
+    const px = Math.round(rayon * Math.cos(angle) * 10) / 10;
+    const py = Math.round(rayon * Math.sin(angle) * 10) / 10;
+    pts.push(`${px},${py}`);
+  }
+  return pts.join(' ');
+}
+
+function titreGeometriePlateau(geometrie: GeometriePlateau | undefined, nbJoueurs: number, nbCases: number): {
+  titre: string;
+  sousTitre: string;
+} {
+  switch (geometrie) {
+    case 'double_plateau_34_56':
+      return {
+        titre:
+          nbJoueurs <= 4
+            ? `Plateau Double-Face — Face Recto 3–4 Joueurs (${nbCases} zones)`
+            : `Plateau Double-Face — Face Verso 5–6 Joueurs (${nbCases} zones)`,
+        sousTitre:
+          nbJoueurs <= 4
+            ? 'Géométrie dédiée 3–4J : 1 Cœur + 4 Vallées croisées + 4 Lisières (aucun assemblage modulaire)'
+            : 'Géométrie dédiée 5–6J : 1 Cœur + 6 Vallées + 6 Lisières (densité calibrée grands groupes)',
+      };
+    case 'hex_couronne_19':
+      return {
+        titre: `Plateau Hexagonal Fixe en Couronnes (${nbCases} hexagones)`,
+        sousTitre:
+          'Ruche fixe à 3 couronnes (1 Cœur + 6 Couronne I + 12 Lisières) — Triangulation à 3–6 voisins par case',
+      };
+    case 'clairieres_sentiers':
+      return {
+        titre: `Réseau de Clairières & Sentiers Forestiers (${nbCases} clairières)`,
+        sousTitre:
+          'Graphe organique à embranchements : 1 Sanctuaire + 3 Cols de Vallée (goulots) + 6 Campements de Lisière',
+      };
+    default:
+      return {
+        titre: `Plateau Modulable (${nbJoueurs} Secteurs + Tuile Cœur · ${nbCases} cases)`,
+        sousTitre:
+          'Cliquez sur un pion Défenseur ou sur une zone pour programmer une action physique',
+      };
+  }
+}
+
 export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
   etat,
   caseSelectionneeId = null,
@@ -40,21 +88,26 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
   surlignerEcartPiste = null,
 }) => {
   const machinesEnReserve = etat.machines.filter((m) => m.caseId === null);
+  const geometrie: GeometriePlateau =
+    etat.variante.geometriePlateau || 'modulaire_secteurs';
+  const infoGeo = titreGeometriePlateau(
+    geometrie,
+    etat.variante.nbJoueurs,
+    etat.cases.length
+  );
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
-      {/* Zone gauche : Tapis de jeu en feutre forestier (Plateau modulable 3-6J) */}
+      {/* Zone gauche : Tapis de jeu en feutre forestier (Multi-géométries V0.1 / V0.2 / V0.3) */}
       <div className="xl:col-span-7 bg-[#1E3528] text-[#F4F5F0] rounded-xl p-4 border border-[#14241B] flex flex-col justify-between">
         <div className="flex items-center justify-between gap-4 pb-3 border-b border-white/10">
           <div>
             <h3 className="font-display text-base font-semibold text-white">
-              Plateau Modulable ({etat.variante.nbJoueurs} Secteurs + Tuile Cœur)
+              {infoGeo.titre}
             </h3>
-            <p className="text-xs text-emerald-200/80">
-              Cliquez sur un pion Défenseur ou sur une tuile pour programmer une action physique
-            </p>
+            <p className="text-xs text-emerald-200/80">{infoGeo.sousTitre}</p>
           </div>
-          <div className="text-right font-mono-tabular text-xs text-emerald-100">
+          <div className="text-right font-mono-tabular text-xs text-emerald-100 shrink-0">
             <span>
               Forêts debout :{' '}
               <strong className="text-white">
@@ -70,54 +123,114 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
           </div>
         </div>
 
-        {/* SVG du plateau circulaire modulable */}
+        {/* SVG du plateau selon l'architecture géométrique */}
         <div className="relative flex items-center justify-center my-2">
           <svg
-            viewBox="-290 -285 580 570"
-            className="w-full max-w-[540px] h-auto select-none"
+            viewBox="-295 -290 590 580"
+            className="w-full max-w-[550px] h-auto select-none"
           >
-            {/* Cercles guides d'anneaux physiques */}
-            <circle
-              cx={0}
-              cy={0}
-              r={215}
-              fill="none"
-              stroke="rgba(255,255,255,0.08)"
-              strokeWidth={1.5}
-              strokeDasharray="4 4"
-            />
-            <circle
-              cx={0}
-              cy={0}
-              r={115}
-              fill="none"
-              stroke="rgba(255,255,255,0.12)"
-              strokeWidth={1.5}
-              strokeDasharray="4 4"
-            />
+            {/* Guides de fond selon la géométrie */}
+            {geometrie === 'hex_couronne_19' ? (
+              <>
+                <polygon
+                  points={pointsHexagone(245)}
+                  fill="rgba(16, 36, 24, 0.35)"
+                  stroke="rgba(255,255,255,0.10)"
+                  strokeWidth={1.5}
+                  strokeDasharray="6 4"
+                />
+                <polygon
+                  points={pointsHexagone(135)}
+                  fill="none"
+                  stroke="rgba(255,255,255,0.12)"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 4"
+                />
+              </>
+            ) : geometrie === 'clairieres_sentiers' ? (
+              <>
+                <circle
+                  cx={0}
+                  cy={0}
+                  r={220}
+                  fill="none"
+                  stroke="rgba(251, 191, 36, 0.14)"
+                  strokeWidth={2}
+                  strokeDasharray="3 6"
+                />
+                <polygon
+                  points="0,-95 82,47 -82,47"
+                  fill="rgba(52, 211, 153, 0.04)"
+                  stroke="rgba(52, 211, 153, 0.16)"
+                  strokeWidth={1.5}
+                  strokeDasharray="5 4"
+                />
+              </>
+            ) : (
+              <>
+                <circle
+                  cx={0}
+                  cy={0}
+                  r={215}
+                  fill="none"
+                  stroke="rgba(255,255,255,0.08)"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 4"
+                />
+                <circle
+                  cx={0}
+                  cy={0}
+                  r={115}
+                  fill="none"
+                  stroke="rgba(255,255,255,0.12)"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 4"
+                />
+              </>
+            )}
 
-            {/* Chemins d'adjacence entre tuiles */}
+            {/* Chemins d'adjacence / Sentiers entre zones */}
             {etat.cases.map((c) =>
               c.voisins
                 .filter((vId) => vId > c.id)
                 .map((vId) => {
                   const v = etat.cases[vId];
                   if (!v) return null;
+                  const estSentier = geometrie === 'clairieres_sentiers';
                   return (
-                    <line
-                      key={`edge-${c.id}-${vId}`}
-                      x1={c.x}
-                      y1={c.y}
-                      x2={v.x}
-                      y2={v.y}
-                      stroke="rgba(255,255,255,0.22)"
-                      strokeWidth={2.5}
-                    />
+                    <g key={`edge-${c.id}-${vId}`}>
+                      {estSentier && (
+                        <line
+                          x1={c.x}
+                          y1={c.y}
+                          x2={v.x}
+                          y2={v.y}
+                          stroke="rgba(217, 155, 22, 0.28)"
+                          strokeWidth={7}
+                          strokeLinecap="round"
+                        />
+                      )}
+                      <line
+                        x1={c.x}
+                        y1={c.y}
+                        x2={v.x}
+                        y2={v.y}
+                        stroke={
+                          estSentier
+                            ? 'rgba(254, 243, 199, 0.55)'
+                            : geometrie === 'hex_couronne_19'
+                            ? 'rgba(167, 243, 208, 0.18)'
+                            : 'rgba(255,255,255,0.24)'
+                        }
+                        strokeWidth={estSentier ? 2.2 : 2.5}
+                        strokeDasharray={estSentier ? '5 4' : undefined}
+                      />
+                    </g>
                   );
                 })
             )}
 
-            {/* Tuiles du plateau */}
+            {/* Zones / Cases du plateau */}
             {etat.cases.map((c) => {
               const nbForets = etat.forets[c.id] || 0;
               const defsIci = etat.defenseurs.filter((d) => d.caseId === c.id);
@@ -129,15 +242,34 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
               const estSelectionnee = caseSelectionneeId === c.id;
               const estAccessible = casesSurligneesIds.includes(c.id);
 
-              const rayonTuile = c.anneau === 'coeur' ? 50 : 41;
+              const rayonTuile =
+                c.rayonRendu ||
+                (geometrie === 'hex_couronne_19'
+                  ? 38
+                  : c.anneau === 'coeur'
+                  ? 48
+                  : 40);
+
               const couleurFondTuile =
                 nbForets === 0
                   ? '#3B2F2F'
                   : c.anneau === 'coeur'
-                  ? '#26533B'
+                  ? '#1F4E37'
                   : c.anneau === 'interieur'
-                  ? '#2B5B40'
-                  : '#324B3A';
+                  ? '#28593E'
+                  : '#314939';
+
+              const couleurBordure = estProtegee
+                ? '#34D399'
+                : c.secteurJoueur !== null
+                ? COULEURS_PEUPLES_V01[
+                    c.secteurJoueur % COULEURS_PEUPLES_V01.length
+                  ]
+                : '#A7F3D0';
+
+              const estHex = c.formeRendu === 'hexagone' || geometrie === 'hex_couronne_19';
+              const estClairiere =
+                c.formeRendu === 'clairiere' || geometrie === 'clairieres_sentiers';
 
               return (
                 <g
@@ -147,67 +279,104 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                   className="cursor-pointer"
                 >
                   {/* Halo de sélection ou d'accessibilité */}
-                  {(estSelectionnee || estAccessible) && (
-                    <circle
-                      r={rayonTuile + 6}
-                      fill="none"
-                      stroke={estSelectionnee ? '#FBBF24' : '#34D399'}
-                      strokeWidth={3}
-                      strokeDasharray={estAccessible && !estSelectionnee ? '5 3' : undefined}
-                    />
-                  )}
+                  {(estSelectionnee || estAccessible) &&
+                    (estHex ? (
+                      <polygon
+                        points={pointsHexagone(rayonTuile + 5)}
+                        fill="none"
+                        stroke={estSelectionnee ? '#FBBF24' : '#34D399'}
+                        strokeWidth={3}
+                        strokeDasharray={
+                          estAccessible && !estSelectionnee ? '5 3' : undefined
+                        }
+                      />
+                    ) : (
+                      <circle
+                        r={rayonTuile + 6}
+                        fill="none"
+                        stroke={estSelectionnee ? '#FBBF24' : '#34D399'}
+                        strokeWidth={3}
+                        strokeDasharray={
+                          estAccessible && !estSelectionnee ? '5 3' : undefined
+                        }
+                      />
+                    ))}
 
                   {/* Halo de menace Machine déclarée */}
-                  {machsCiblantIci.length > 0 && (
+                  {machsCiblantIci.length > 0 &&
+                    (estHex ? (
+                      <polygon
+                        points={pointsHexagone(rayonTuile + 2.5)}
+                        fill="none"
+                        stroke="#EF4444"
+                        strokeWidth={2.5}
+                      />
+                    ) : (
+                      <circle
+                        r={rayonTuile + 3}
+                        fill="none"
+                        stroke="#EF4444"
+                        strokeWidth={2.5}
+                      />
+                    ))}
+
+                  {/* Corps de la Case selon la géométrie */}
+                  {estHex ? (
+                    <polygon
+                      points={pointsHexagone(rayonTuile)}
+                      fill={couleurFondTuile}
+                      stroke={couleurBordure}
+                      strokeWidth={estProtegee ? 3.2 : 2}
+                    />
+                  ) : estClairiere ? (
+                    <>
+                      <circle
+                        r={rayonTuile + 2}
+                        fill="rgba(20, 36, 27, 0.55)"
+                      />
+                      <circle
+                        r={rayonTuile}
+                        fill={couleurFondTuile}
+                        stroke={couleurBordure}
+                        strokeWidth={estProtegee ? 3.5 : 2.4}
+                      />
+                    </>
+                  ) : (
                     <circle
-                      r={rayonTuile + 3}
-                      fill="none"
-                      stroke="#EF4444"
-                      strokeWidth={2.5}
+                      r={rayonTuile}
+                      fill={couleurFondTuile}
+                      stroke={couleurBordure}
+                      strokeWidth={estProtegee ? 3.5 : 2}
                     />
                   )}
 
-                  {/* Corps de la Tuile en carton épais */}
-                  <circle
-                    r={rayonTuile}
-                    fill={couleurFondTuile}
-                    stroke={
-                      estProtegee
-                        ? '#34D399'
-                        : c.secteurJoueur !== null
-                        ? COULEURS_PEUPLES_V01[c.secteurJoueur % COULEURS_PEUPLES_V01.length]
-                        : '#A7F3D0'
-                    }
-                    strokeWidth={estProtegee ? 3.5 : 2}
-                  />
-
-                  {/* Nom de la tuile */}
+                  {/* Nom de la zone */}
                   <text
-                    y={-rayonTuile + 13}
+                    y={-rayonTuile + (estHex ? 14 : 13)}
                     textAnchor="middle"
                     fill="#E2E8F0"
-                    fontSize={9.5}
+                    fontSize={estHex ? 8.5 : 9.2}
                     fontWeight={600}
                   >
                     {c.nom}
                   </text>
 
-                  {/* Pions Forêt en bois vert (représentés par de petits arbres/cylindres) */}
-                  <g transform="translate(0, -6)">
+                  {/* Pions Forêt en bois vert */}
+                  <g transform="translate(0, -5)">
                     <rect
-                      x={-24}
-                      y={-9}
-                      width={48}
-                      height={18}
+                      x={-22}
+                      y={-8}
+                      width={44}
+                      height={16}
                       rx={4}
                       fill="rgba(0,0,0,0.28)"
                     />
                     <text
                       x={0}
-                      y={4}
+                      y={3.5}
                       textAnchor="middle"
                       fill={nbForets > 0 ? '#86EFAC' : '#FCA5A5'}
-                      fontSize={12}
+                      fontSize={estHex ? 10.5 : 11.5}
                       fontWeight={700}
                       fontFamily="IBM Plex Mono, monospace"
                     >
@@ -219,33 +388,35 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                   {estProtegee && (
                     <text
                       x={0}
-                      y={-21}
+                      y={-19}
                       textAnchor="middle"
                       fill="#6EE7B7"
-                      fontSize={9}
+                      fontSize={8}
                       fontWeight={700}
                     >
-                      BOUCLIER ACTIF
+                      BOUCLIER
                     </text>
                   )}
 
-                  {/* Pions Défenseurs présents sur la tuile */}
+                  {/* Pions Défenseurs présents sur la zone */}
                   {defsIci.map((d, idx) => {
-                    const offsetX = (idx - (defsIci.length - 1) / 2) * 20;
+                    const offsetX = (idx - (defsIci.length - 1) / 2) * 18;
                     const estPionSel = pionSelectionneId === d.id;
                     const couleurJ =
-                      COULEURS_PEUPLES_V01[d.joueur % COULEURS_PEUPLES_V01.length];
+                      COULEURS_PEUPLES_V01[
+                        d.joueur % COULEURS_PEUPLES_V01.length
+                      ];
                     return (
                       <g
                         key={`def-${d.id}`}
-                        transform={`translate(${offsetX}, 14)`}
+                        transform={`translate(${offsetX}, ${estHex ? 11 : 13})`}
                         onClick={(e) => {
                           e.stopPropagation();
                           if (onSelectPion) onSelectPion(d.id);
                         }}
                       >
                         <circle
-                          r={9.5}
+                          r={estHex ? 8.5 : 9.2}
                           fill={couleurJ}
                           stroke={
                             estPionSel
@@ -254,13 +425,13 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                               ? '#6EE7B7'
                               : '#FFFFFF'
                           }
-                          strokeWidth={estPionSel ? 3 : 1.8}
+                          strokeWidth={estPionSel ? 2.8 : 1.6}
                         />
                         <text
-                          y={3.5}
+                          y={3}
                           textAnchor="middle"
                           fill="#FFFFFF"
-                          fontSize={8.5}
+                          fontSize={8}
                           fontWeight={700}
                         >
                           J{d.joueur + 1}
@@ -269,29 +440,31 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                     );
                   })}
 
-                  {/* Figurines Machines présentes sur la tuile */}
+                  {/* Figurines Machines présentes sur la zone */}
                   {machsIci.map((m, idx) => {
-                    const offsetX = (idx - (machsIci.length - 1) / 2) * 22;
+                    const offsetX = (idx - (machsIci.length - 1) / 2) * 20;
                     return (
                       <g
                         key={`mach-${m.id}`}
-                        transform={`translate(${offsetX}, 31)`}
+                        transform={`translate(${offsetX}, ${
+                          estHex ? 25 : 29
+                        })`}
                       >
                         <rect
-                          x={-11}
-                          y={-8}
-                          width={22}
-                          height={15}
+                          x={-10}
+                          y={-7}
+                          width={20}
+                          height={14}
                           rx={3}
                           fill={m.neutraliseeCeTour ? '#64748B' : '#D99B16'}
                           stroke="#18181B"
-                          strokeWidth={1.5}
+                          strokeWidth={1.4}
                         />
                         <text
                           y={3}
                           textAnchor="middle"
                           fill="#18181B"
-                          fontSize={8.5}
+                          fontSize={8}
                           fontWeight={800}
                           fontFamily="IBM Plex Mono, monospace"
                         >
@@ -314,7 +487,7 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
             </span>
             {machinesEnReserve.length === 0 ? (
               <span className="text-emerald-300/70">
-                Aucune (les 6 Machines sont sur le plateau)
+                Aucune (toutes les Machines sont en forêt)
               </span>
             ) : (
               <div className="flex items-center gap-1.5">
@@ -455,20 +628,20 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
         {/* Légende des 4 cartes Tactiques physiques */}
         <div className="bg-[#F4F5F0] rounded-lg p-3 border border-[#D8DFD5]">
           <div className="text-xs font-semibold text-[#16211B] mb-1.5">
-            Rappel des Cartes Tactiques (applicables en toute configuration) :
+            Rappel des Cartes Tactiques (applicables en toute géométrie) :
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-[#55645B]">
             <div>
-              <strong className="text-[#92400E]">Cupidité :</strong> vise la tuile la plus boisée.
+              <strong className="text-[#92400E]">Cupidité :</strong> vise la zone la plus boisée.
             </div>
             <div>
               <strong className="text-[#991B1B]">Percée :</strong> se rapproche du Cœur Central.
             </div>
             <div>
-              <strong className="text-[#1E40AF]">Opportunisme :</strong> vise une tuile sans Défenseur.
+              <strong className="text-[#1E40AF]">Opportunisme :</strong> vise une zone sans Défenseur.
             </div>
             <div>
-              <strong className="text-[#6B21A8]">Représailles :</strong> vise la tuile la plus défendue.
+              <strong className="text-[#6B21A8]">Représailles :</strong> vise la zone la plus défendue.
             </div>
           </div>
 
@@ -479,9 +652,7 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
               </div>
               <ul className="space-y-1 text-xs text-[#55645B]">
                 {etat.mouvementsApprentissageTour.slice(-4).map((m, i) => (
-                  <li key={i}>
-                    • {m.explicationPhysique}
-                  </li>
+                  <li key={i}>• {m.explicationPhysique}</li>
                 ))}
               </ul>
             </div>

@@ -1,127 +1,162 @@
 /**
- * Worker CLI & Ordonnanceur autonome pour la VM Oracle Cloud
- * Usage sur la VM Oracle Cloud :
- *   npm run vm:worker
- *   npm run vm:worker -- --generate=8 --viabilite=24 --interet=50 --push
+ * Démon & Exécuteur de Campagnes VM Oracle Cloud (Atelier V1 — V0.1 / V0.2 / V0.3)
+ *
+ * Permet de faire tourner en tâche de fond ou via cron sur votre VM Oracle Cloud :
+ * 1. La génération automatique de nouvelles variantes exploratoires (notamment V0.3 géométries de plateau),
+ * 2. Le filtre éliminatoire coupe-circuit 3.1 (purgeant immédiatement les variantes non viables),
+ * 3. L'évaluation complète 3.2 sur l'échelle des 9 bots (jusqu'à Expectimax Bayésien, Beam Rollout et IS-MCTS) + Banc 3, 4, 5 et 6 joueurs,
+ * 4. La synthèse analytique Gemini et la génération des variantes hybrides recommandées + rapport Markdown.
+ *
+ * Usage sur votre VM Oracle Cloud :
+ *   npx tsx scripts/vm-worker.ts --once
+ *   npx tsx scripts/vm-worker.ts --daemon
  */
-import { execSync } from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
-import { VARIANTES_INITIALES_V01 } from '../src/shared/moteur';
+
 import {
+  chargerEtatAtelier,
+  genererAnalyseGeminiOuFallback,
+  sauvegarderEtatAtelier,
+} from '../server';
+import {
+  evaluerViabiliteVariante31,
   executerCampagneSelection33,
   genererVariantesExploratoiresV01,
 } from '../src/shared/tests-engine';
-import { VariantV01 } from '../src/shared/types';
 
-const STATE_FILE = path.resolve(
-  process.cwd(),
-  'resultats',
-  'atelier-v1-state.json'
-);
-
-function parseArg(prefix: string, defaultVal: number): number {
-  const found = process.argv.find((a) => a.startsWith(`--${prefix}=`));
-  if (!found) return defaultVal;
-  const n = Number(found.split('=')[1]);
-  return Number.isFinite(n) && n > 0 ? n : defaultVal;
-}
-
-function main() {
-  const nbGen = parseArg('generate', 4);
-  const nbViab = parseArg('viabilite', 20);
-  const nbInteret = parseArg('interet', 40);
-  const autoPush =
-    process.argv.includes('--push') || process.env.AUTO_GIT_PUSH === '1';
-
-  console.log('==============================================================');
-  console.log(' ATELIER DE CONCEPTION V1 — WORKER VM ORACLE CLOUD');
-  console.log(' Jeu : Défenseurs de la forêt (V0.1)');
-  console.log('==============================================================');
-
-  let variantes: VariantV01[] = [...VARIANTES_INITIALES_V01];
-  let existingState: Record<string, unknown> = {};
-
-  if (fs.existsSync(STATE_FILE)) {
-    try {
-      existingState = JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8'));
-      if (Array.isArray(existingState.variantes)) {
-        variantes = existingState.variantes as VariantV01[];
-      }
-    } catch (e) {
-      console.warn('État existant non lisible, utilisation du socle V0.1.');
-    }
-  }
-
-  if (nbGen > 0) {
-    const nouvelles = genererVariantesExploratoiresV01(
-      nbGen,
-      variantes.length + 1
-    );
-    console.log(
-      `[+] ${nouvelles.length} nouvelles variantes exploratoires générées (séquencement & actions).`
-    );
-    variantes = [...nouvelles, ...variantes];
-  }
-
+async function executerCycleVM() {
   console.log(
-    `[*] Lancement du Filtre de Viabilité (3.1 : ${nbViab} parties/bot) puis Intérêt (3.2 : ${nbInteret} parties/bot)...`
+    `[VM Oracle Cloud - ${new Date().toISOString()}] Démarrage du cycle intensif V0.1 · V0.2 · V0.3 (9 Bots + Banc 3–6J)...`
   );
+  const state = chargerEtatAtelier();
 
-  const { campagne, variantesMisesAJour } = executerCampagneSelection33(
-    variantes,
-    `Campagne VM Oracle Cloud (${new Date().toISOString().slice(0, 16)})`,
-    nbViab,
-    nbInteret
-  );
+  for (const sched of state.campagnesPlanifieesVM) {
+    if (!sched.actif) continue;
 
-  console.log('--------------------------------------------------------------');
-  console.log(`Variantes inspectées : ${campagne.nbVariantesEntree}`);
-  console.log(`Variantes VIABLES    : ${campagne.nbVariantesViables}`);
-  console.log(
-    `Variantes ÉLIMINÉES  : ${campagne.nbVariantesEliminees} (écartées directement par le filtre 3.1)`
-  );
-  console.log('--------------------------------------------------------------');
+    console.log(`\n---> Exécution de la tâche planifiée : ${sched.nom}`);
+    sched.statut = 'en_cours';
 
-  for (const r of campagne.rapportsInteret.slice(0, 5)) {
-    console.log(
-      `  [VIABLE - ${r.bandeSante.toUpperCase()}] ${r.varianteNom} -> Score d'intérêt : ${r.scoreInteretGlobal}/100 (Marge anti-boucle: +${r.indicateurs.margeGardeFouBoucle} pts)`
-    );
-  }
+    const versionsCibles =
+      sched.versionsCibles && sched.versionsCibles.length > 0
+        ? sched.versionsCibles
+        : ['0.1', '0.2', '0.3'];
 
-  const outDir = path.dirname(STATE_FILE);
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
-
-  const updatedState = {
-    ...existingState,
-    derniereSauvegarde: new Date().toISOString(),
-    variantes: variantesMisesAJour,
-    rapportsViabilite: campagne.rapportsViabilite,
-    rapportsInteret: campagne.rapportsInteret,
-    campagnesSelection: [
-      campagne,
-      ...(Array.isArray(existingState.campagnesSelection)
-        ? existingState.campagnesSelection.slice(0, 9)
-        : []),
-    ],
-  };
-
-  fs.writeFileSync(STATE_FILE, JSON.stringify(updatedState, null, 2), 'utf-8');
-  console.log(`[OK] État sauvegardé dans ${STATE_FILE}`);
-
-  if (autoPush) {
-    try {
-      execSync(
-        'git add resultats/atelier-v1-state.json && git commit -m "chore(vm): mise à jour automatique des tests V0.1 depuis la VM Oracle Cloud" && git push',
-        { stdio: 'inherit' }
+    // 1. Générer de nouvelles variantes exploratoires si configuré
+    const nbGen = sched.nbVariantesAGenerer ?? 4;
+    if (nbGen > 0) {
+      const verGen = versionsCibles.includes('0.3')
+        ? '0.3'
+        : versionsCibles[0] || '0.3';
+      const nouvelles = genererVariantesExploratoiresV01(
+        nbGen,
+        state.variantes.length + 1,
+        verGen
       );
-      console.log('[OK] Résultats committés et poussés sur GitHub.');
-    } catch (gitErr) {
-      console.warn('[Info] Git push ignoré ou aucun changement à committer.');
+      let viablesCount = 0;
+      for (const v of nouvelles) {
+        const rapV = evaluerViabiliteVariante31(v, sched.nbPartiesViabilite);
+        state.rapportsViabilite = [
+          rapV,
+          ...state.rapportsViabilite.filter((r) => r.varianteId !== v.id),
+        ];
+        if (rapV.viable) {
+          v.statutViabilite = 'viable';
+          v.bandeSante = 'vert';
+          viablesCount++;
+        } else {
+          v.statutViabilite = 'eliminee';
+          v.motifElimination = rapV.motifElimination;
+          v.bandeSante = 'rouge';
+        }
+      }
+      state.variantes = [...nouvelles, ...state.variantes];
+      console.log(
+        `   [Filtre 3.1] ${nouvelles.length} variantes V${verGen} générées -> ${viablesCount} viables, ${
+          nouvelles.length - viablesCount
+        } éliminées.`
+      );
     }
+
+    // 2. Purger automatiquement les variantes non viables si demandé
+    if (sched.eliminerNonViablesAuto) {
+      const avant = state.variantes.length;
+      state.variantes = state.variantes.filter(
+        (v) => v.statutViabilite !== 'eliminee'
+      );
+      const purgees = avant - state.variantes.length;
+      if (purgees > 0) {
+        console.log(
+          `   [Purge 3.1] ${purgees} variantes non viables supprimées du registre.`
+        );
+      }
+    }
+
+    // 3. Lancer la campagne 3.3 sur les variantes viables des versions cibles
+    const cibles = state.variantes.filter(
+      (v) => v.statutViabilite !== 'eliminee'
+    );
+
+    const { campagne, variantesMisesAJour } = executerCampagneSelection33(
+      cibles,
+      `[VM Auto] ${sched.nom}`,
+      sched.nbPartiesViabilite,
+      sched.nbPartiesInteret,
+      versionsCibles
+    );
+
+    const mapMaj = new Map(variantesMisesAJour.map((v) => [v.id, v]));
+    state.variantes = state.variantes.map((v) => mapMaj.get(v.id) || v);
+    state.campagnesSelection.unshift(campagne);
+
+    for (const rv of campagne.rapportsViabilite) {
+      state.rapportsViabilite = [
+        rv,
+        ...state.rapportsViabilite.filter((r) => r.varianteId !== rv.varianteId),
+      ];
+    }
+    for (const ri of campagne.rapportsInteret) {
+      state.rapportsInteret = [
+        ri,
+        ...state.rapportsInteret.filter((r) => r.varianteId !== ri.varianteId),
+      ];
+    }
+
+    // 4. Générer la synthèse analytique Gemini et sauvegarder le rapport Markdown
+    const analyse = await genererAnalyseGeminiOuFallback(campagne);
+    state.analysesGemini = [
+      analyse,
+      ...(state.analysesGemini || []).filter(
+        (a) => a.campagneId !== campagne.id
+      ),
+    ];
+
+    sched.statut = 'terminee';
+    sched.derniereExecution = new Date().toISOString();
+    sched.dernierResultatId = campagne.id;
+    const meilleure = campagne.rapportsInteret[0];
+    const logLine = `[${new Date().toLocaleTimeString('fr-FR')}] Cycle VM terminé (${versionsCibles
+      .map((v) => `V${v}`)
+      .join('+')}) : ${campagne.nbVariantesViables} viables classées. N°1 : ${
+      meilleure ? `${meilleure.varianteNom} (${meilleure.scoreInteretGlobal}/100)` : 'N/A'
+    }. Rapport Gemini mis à jour.`;
+    sched.journalVM.unshift(logLine);
+    console.log(`   ${logLine}`);
   }
+
+  sauvegarderEtatAtelier(state);
+  console.log(
+    `[VM Oracle Cloud] État et rapport Gemini sauvegardés dans resultats/atelier-v1-state.json et resultats/derniere-analyse-gemini.md.`
+  );
 }
 
-main();
+const args = process.argv.slice(2);
+if (args.includes('--daemon')) {
+  console.log(
+    'Démon VM Oracle Cloud actif (exécution toutes les 6 heures)...'
+  );
+  executerCycleVM();
+  setInterval(() => {
+    executerCycleVM();
+  }, 6 * 3600 * 1000);
+} else {
+  executerCycleVM();
+}
