@@ -141,6 +141,25 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  // Variante recommandée par les campagnes de tests (meilleur score d'intérêt parmi les variantes viables)
+  const varianteRecommandee = useMemo(() => {
+    const viables = variantes.filter((v) => v.statutViabilite === 'viable');
+    if (viables.length === 0) return variantes[0];
+
+    const premiereCampagneId = campagnesSelection[0]?.meilleureVarianteId;
+    return [...viables].sort((a, b) => {
+      const scoreA =
+        (a.scoreInteretDernierTest ?? 0) +
+        (a.id === premiereCampagneId ? 3 : 0) +
+        (a.version === '0.3' ? 1 : 0);
+      const scoreB =
+        (b.scoreInteretDernierTest ?? 0) +
+        (b.id === premiereCampagneId ? 3 : 0) +
+        (b.version === '0.3' ? 1 : 0);
+      return scoreB - scoreA;
+    })[0];
+  }, [variantes, campagnesSelection]);
+
   const versionActive = useMemo(
     () => versions.find((v) => v.id === versionActiveId) || versions[0],
     [versions, versionActiveId]
@@ -164,6 +183,10 @@ export const App: React.FC = () => {
 
   const handleSelectVersion = (nouvelleVersionId: GameVersionId) => {
     setVersionActiveId(nouvelleVersionId);
+    if ((varianteRecommandee?.version || '0.3') === nouvelleVersionId) {
+      setVarianteActiveId(varianteRecommandee.id);
+      return;
+    }
     const premiereVar = variantes.find(
       (v) => (v.version || '0.1') === nouvelleVersionId
     );
@@ -345,8 +368,32 @@ export const App: React.FC = () => {
           })}
         </nav>
 
-        {/* Zone 3 : Sélecteur de Version du Jeu + Sélecteur de Variante */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Zone 3 : Sélecteur de Version du Jeu + Sélecteur de Variante + Accès rapide Recommandée */}
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          {varianteRecommandee &&
+            varianteActive.id !== varianteRecommandee.id && (
+              <button
+                type="button"
+                onClick={() =>
+                  handleSelectVarianteGlobale(
+                    varianteRecommandee.id,
+                    varianteRecommandee.version || '0.3'
+                  )
+                }
+                className="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-amber-100 text-amber-900 border border-amber-400 hover:bg-amber-200 transition-colors whitespace-nowrap"
+                title={`Revenir à la variante recommandée par les tests : ${varianteRecommandee.nom}`}
+              >
+                ★ Variante recommandée
+              </button>
+            )}
+
+          {varianteRecommandee &&
+            varianteActive.id === varianteRecommandee.id && (
+              <span className="px-2.5 py-1 text-[11px] font-bold rounded-md bg-emerald-100 text-[#165B36] border border-emerald-300 whitespace-nowrap">
+                ★ Recommandée par les tests
+              </span>
+            )}
+
           <select
             aria-label="Sélectionner la version du Jeu"
             value={versionActive.id}
@@ -356,6 +403,7 @@ export const App: React.FC = () => {
             {versions.map((ver) => (
               <option key={ver.id} value={ver.id}>
                 Jeu V{ver.id}
+                {varianteRecommandee?.version === ver.id ? ' ★' : ''}
               </option>
             ))}
           </select>
@@ -364,10 +412,11 @@ export const App: React.FC = () => {
             aria-label="Sélectionner la variante de la version active"
             value={varianteActive.id}
             onChange={(e) => setVarianteActiveId(e.target.value)}
-            className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] max-w-[280px] truncate"
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] max-w-[300px] truncate"
           >
             {variantesDeLaVersion.map((v) => (
               <option key={v.id} value={v.id}>
+                {v.id === varianteRecommandee?.id ? '★ [RECOMMANDÉE] ' : ''}
                 {v.statutViabilite === 'eliminee' ? '[ÉLIMINÉE] ' : ''}
                 {v.nom}
               </option>
@@ -443,9 +492,10 @@ export const App: React.FC = () => {
             versionActive={versionActive}
             variantesVersion={variantesDeLaVersion}
             varianteActive={varianteActive}
+            varianteRecommandee={varianteRecommandee}
             ideesLabo={ideesLabo}
             onSelectVersion={handleSelectVersion}
-            onSelectVariante={(id) => handleSelectVarianteGlobale(id)}
+            onSelectVariante={(id, ver) => handleSelectVarianteGlobale(id, ver)}
             onNavigateTab={(tab) => setOngletActif(tab)}
             onCreateNewVersion={handleCreateNewVersion}
             onUpdateVarianteOption={(maj) => handleSaveVariante(maj, false)}

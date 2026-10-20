@@ -1,5 +1,5 @@
 {
-  "derniereSauvegarde": "2026-10-20T13:53:32.303Z",
+  "derniereSauvegarde": "2026-10-20T13:59:43.216Z",
   "versions": [
     {
       "id": "0.1",
@@ -1383,7 +1383,7 @@
       "description": "Hybride issu de la synthèse Gemini : Plateau Double Face (Recto 3–4J / Verso 5–6J) + Programmation Alternée (Carte I puis II) + Jeton Éclaireur V0.2 + Barrage Complet.",
       "origine": "hybride_gemini",
       "statutViabilite": "viable",
-      "scoreInteretDernierTest": 60,
+      "scoreInteretDernierTest": 59,
       "bandeSante": "orange",
       "geometriePlateau": "double_plateau_34_56",
       "modeProgrammation": "alternee_1_par_1",
@@ -1757,6 +1757,56 @@
   ],
   "rapportsViabilite": [
     {
+      "varianteId": "v03_hybride_double_eclaireur_h1k5",
+      "varianteNom": "V0.3 Hybride Recommandé — Double Plateau (3–4J/5–6J) & Jeton Éclaireur",
+      "dateExecution": "2026-10-20T13:59:30.405Z",
+      "nbPartiesTestees": 12,
+      "dureeMs": 147,
+      "viable": true,
+      "criteres": [
+        {
+          "code": "V1_TERMINAISON",
+          "intitule": "Terminaison & Intégrité Topologique du Moteur",
+          "valide": true,
+          "valeurObservee": "4/4 parties terminées en 4 tours (double_plateau_34_56)",
+          "seuilAttendu": "100 % sans blocage ni état invalide",
+          "detail": "Toutes les parties se résolvent jusqu’au décompte final."
+        },
+        {
+          "code": "V2_BANDE_SURVIE",
+          "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
+          "valide": true,
+          "valeurObservee": "Moyenne 81.6 % (Pire décile 76.3 %)",
+          "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
+          "detail": "La pression exercée par les Machines est bien calibrée."
+        },
+        {
+          "code": "V3_IMPACT_JOUEURS",
+          "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
+          "valide": true,
+          "valeurObservee": "+23 pts de forêt sauvée sur Inerte (58.6 %)",
+          "seuilAttendu": "Écart ≥ +12 pts",
+          "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
+        },
+        {
+          "code": "V4_GARDE_FOU_BOUCLE",
+          "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
+          "valide": true,
+          "valeurObservee": "Déductif 81.6 % vs Boucle 75.7 % (écart +5.9 pts)",
+          "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
+          "detail": "Une routine aveugle est nettement battue par la lecture du jeu."
+        },
+        {
+          "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
+          "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
+          "valide": true,
+          "valeurObservee": "Dépl. 50% · Prot. 41% · Sabotages/partie: 5",
+          "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
+          "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
+        }
+      ]
+    },
+    {
       "varianteId": "v03_hybride_hex19_peuples_h1k5",
       "varianteNom": "V0.3 Hybride Recommandé — Hexagones 19 & Peuples Asymétriques",
       "dateExecution": "2026-10-20T13:53:25.505Z",
@@ -1853,57 +1903,6 @@
           "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
           "valide": true,
           "valeurObservee": "Dépl. 46% · Prot. 44% · Sabotages/partie: 5.5",
-          "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
-          "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
-        }
-      ]
-    },
-    {
-      "varianteId": "v03_hybride_double_eclaireur_h1k5",
-      "varianteNom": "V0.3 Hybride Recommandé — Double Plateau (3–4J/5–6J) & Jeton Éclaireur",
-      "dateExecution": "2026-10-20T13:47:06.477Z",
-      "nbPartiesTestees": 30,
-      "dureeMs": 666,
-      "viable": false,
-      "motifElimination": "Éliminée (V4_GARDE_FOU_BOUCLE) : Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.",
-      "criteres": [
-        {
-          "code": "V1_TERMINAISON",
-          "intitule": "Terminaison & Intégrité Topologique du Moteur",
-          "valide": true,
-          "valeurObservee": "10/10 parties terminées en 4 tours (double_plateau_34_56)",
-          "seuilAttendu": "100 % sans blocage ni état invalide",
-          "detail": "Toutes les parties se résolvent jusqu’au décompte final."
-        },
-        {
-          "code": "V2_BANDE_SURVIE",
-          "intitule": "Bande de survie viable (Ni submersion, ni trivialité)",
-          "valide": true,
-          "valeurObservee": "Moyenne 79.5 % (Pire décile 73.7 %)",
-          "seuilAttendu": "Moyenne entre 42 % et 93 %, pire décile ≥ 30 %",
-          "detail": "La pression exercée par les Machines est bien calibrée."
-        },
-        {
-          "code": "V3_IMPACT_JOUEURS",
-          "intitule": "Impact décisif des Défenseurs (vs Bot Inerte)",
-          "valide": true,
-          "valeurObservee": "+20.8 pts de forêt sauvée sur Inerte (58.7 %)",
-          "seuilAttendu": "Écart ≥ +12 pts",
-          "detail": "Les décisions des Défenseurs sauvent une part majeure de la forêt."
-        },
-        {
-          "code": "V4_GARDE_FOU_BOUCLE",
-          "intitule": "Garde-fou contre les boucles gagnantes (vs Bot Boucle)",
-          "valide": false,
-          "valeurObservee": "Déductif 79.5 % vs Boucle 76.8 % (écart +2.7 pts)",
-          "seuilAttendu": "Écart Déductif - Boucle ≥ +4.5 pts",
-          "detail": "Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort."
-        },
-        {
-          "code": "V5_USAGE_SABOTAGE_ET_MOUVEMENT",
-          "intitule": "Utilité effective des 3 actions (Déplacer, Protéger, Saboter)",
-          "valide": true,
-          "valeurObservee": "Dépl. 48% · Prot. 43% · Sabotages/partie: 5.1",
           "seuilAttendu": "Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie",
           "detail": "Les trois actions fondamentales sont mobilisées à chaque partie."
         }
@@ -2619,6 +2618,230 @@
   ],
   "rapportsInteret": [
     {
+      "varianteId": "v03_hybride_double_eclaireur_h1k5",
+      "varianteNom": "V0.3 Hybride Recommandé — Double Plateau (3–4J/5–6J) & Jeton Éclaireur",
+      "version": "0.3",
+      "geometriePlateau": "double_plateau_34_56",
+      "dateExecution": "2026-10-20T13:59:43.216Z",
+      "nbPartiesParBot": 4,
+      "dureeMs": 12810,
+      "echelleBots": [
+        {
+          "botId": "inerte",
+          "botNom": "Bot Inerte (Plancher)",
+          "foretSauveeMoyennePct": 59.9,
+          "ecartTypePct": 2.2,
+          "pireDecilePct": 57.9,
+          "arbresCoupesMoyen": 15.3,
+          "paradesMoyennes": 0,
+          "sabotagesMoyens": 0,
+          "tempsMoyenMsParPartie": 7,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 0,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "hasard",
+          "botNom": "Bot Hasard (Bruité)",
+          "foretSauveeMoyennePct": 77,
+          "ecartTypePct": 7.5,
+          "pireDecilePct": 65.8,
+          "arbresCoupesMoyen": 10,
+          "paradesMoyennes": 3.3,
+          "sabotagesMoyens": 3.8,
+          "tempsMoyenMsParPartie": 7.5,
+          "tauxUsageActions": {
+            "deplacer": 43,
+            "proteger": 43,
+            "saboter": 10,
+            "replanter": 3
+          }
+        },
+        {
+          "botId": "boucle",
+          "botNom": "Bot Boucle Fixe (Garde-fou)",
+          "foretSauveeMoyennePct": 75,
+          "ecartTypePct": 2.9,
+          "pireDecilePct": 71.1,
+          "arbresCoupesMoyen": 9.5,
+          "paradesMoyennes": 6,
+          "sabotagesMoyens": 0,
+          "tempsMoyenMsParPartie": 7.5,
+          "tauxUsageActions": {
+            "deplacer": 0,
+            "proteger": 100,
+            "saboter": 0,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "reflexe",
+          "botNom": "Bot Réflexe (Tape-taupe)",
+          "foretSauveeMoyennePct": 80.3,
+          "ecartTypePct": 8,
+          "pireDecilePct": 71.1,
+          "arbresCoupesMoyen": 7.5,
+          "paradesMoyennes": 5.8,
+          "sabotagesMoyens": 6.5,
+          "tempsMoyenMsParPartie": 8,
+          "tauxUsageActions": {
+            "deplacer": 32,
+            "proteger": 57,
+            "saboter": 11,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "glouton",
+          "botNom": "Bot Glouton (Pistes + Dés personnels)",
+          "foretSauveeMoyennePct": 82.2,
+          "ecartTypePct": 4.3,
+          "pireDecilePct": 78.9,
+          "arbresCoupesMoyen": 6.8,
+          "paradesMoyennes": 3.8,
+          "sabotagesMoyens": 6.8,
+          "tempsMoyenMsParPartie": 9,
+          "tauxUsageActions": {
+            "deplacer": 43,
+            "proteger": 46,
+            "saboter": 11,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "deductif",
+          "botNom": "Bot Déductif & Coordonné (Référence Classique)",
+          "foretSauveeMoyennePct": 78.3,
+          "ecartTypePct": 6.8,
+          "pireDecilePct": 71.1,
+          "arbresCoupesMoyen": 8.3,
+          "paradesMoyennes": 3.8,
+          "sabotagesMoyens": 5.3,
+          "tempsMoyenMsParPartie": 7.8,
+          "tauxUsageActions": {
+            "deplacer": 45,
+            "proteger": 46,
+            "saboter": 9,
+            "replanter": 0
+          }
+        },
+        {
+          "botId": "expectimax_bayesien",
+          "botNom": "Bot Expectimax Bayésien (Inférence des Dés Alliés)",
+          "foretSauveeMoyennePct": 66.5,
+          "ecartTypePct": 6.3,
+          "pireDecilePct": 57.9,
+          "arbresCoupesMoyen": 13.3,
+          "paradesMoyennes": 1.3,
+          "sabotagesMoyens": 1.3,
+          "tempsMoyenMsParPartie": 309,
+          "tauxUsageActions": {
+            "deplacer": 8,
+            "proteger": 89,
+            "saboter": 2,
+            "replanter": 1
+          }
+        },
+        {
+          "botId": "beam_rollout",
+          "botNom": "Bot Planificateur Multi-Tours (Beam Search Rollout)",
+          "foretSauveeMoyennePct": 75.4,
+          "ecartTypePct": 5.4,
+          "pireDecilePct": 68.4,
+          "arbresCoupesMoyen": 10.3,
+          "paradesMoyennes": 1.7,
+          "sabotagesMoyens": 3.3,
+          "tempsMoyenMsParPartie": 273,
+          "tauxUsageActions": {
+            "deplacer": 20,
+            "proteger": 73,
+            "saboter": 6,
+            "replanter": 2
+          }
+        },
+        {
+          "botId": "ismcts",
+          "botNom": "Bot IS-MCTS (Monte Carlo à Information Imparfaite)",
+          "foretSauveeMoyennePct": 78.9,
+          "ecartTypePct": 2.2,
+          "pireDecilePct": 76.3,
+          "arbresCoupesMoyen": 9,
+          "paradesMoyennes": 2.7,
+          "sabotagesMoyens": 7,
+          "tempsMoyenMsParPartie": 244.7,
+          "tauxUsageActions": {
+            "deplacer": 21,
+            "proteger": 66,
+            "saboter": 11,
+            "replanter": 2
+          }
+        }
+      ],
+      "indicateurs": {
+        "progressionEchelleValide": false,
+        "ecartDeductifSurInerte": 19,
+        "margeGardeFouBoucle": 3.9,
+        "gainDeductionSequentielle": -3.9,
+        "gainLecturePistes": 1.9,
+        "gainBotsPointeSurDeductif": 0.6,
+        "impactApprentissageMechant": 0.7,
+        "equilibreActionsPct": 75
+      },
+      "equilibreParJoueurs": {
+        "3": {
+          "nbJoueurs": 3,
+          "survieMoyennePct": 72.8,
+          "pireDecilePct": 68.4,
+          "scoreStrategique": 36,
+          "sabotagesMoyens": 0.3,
+          "ecartMechantVsGlouton": -13.4
+        },
+        "4": {
+          "nbJoueurs": 4,
+          "survieMoyennePct": 64.1,
+          "pireDecilePct": 57.9,
+          "scoreStrategique": 25,
+          "sabotagesMoyens": 1.5,
+          "ecartMechantVsGlouton": -15.5
+        },
+        "5": {
+          "nbJoueurs": 5,
+          "survieMoyennePct": 73.2,
+          "pireDecilePct": 64.8,
+          "scoreStrategique": 47,
+          "sabotagesMoyens": 2.3,
+          "ecartMechantVsGlouton": -9.2
+        },
+        "6": {
+          "nbJoueurs": 6,
+          "survieMoyennePct": 61.1,
+          "pireDecilePct": 57.4,
+          "scoreStrategique": 20,
+          "sabotagesMoyens": 1.3,
+          "ecartMechantVsGlouton": -17.6
+        }
+      },
+      "troisAxesPrioritaires": {
+        "interetStrategique": 26,
+        "lisibiliteErgonomie": 94,
+        "equilibreJoueurs36": 80,
+        "detailStrategie": "Gain Pistes +1.9 pts · Gain Déduction +-3.9 pts · Gain Bots de Pointe (IS-MCTS/Expectimax) +0.6 pts.",
+        "detailErgonomie": "Mise en place instantanée sans assemblage (1 plateau double face Recto 9 zones / Verso 13 zones, degré moyen 4.4 liaisons/zone). Excellente lisibilité autour de la table.",
+        "detailEquilibre36": "Survie de 3 à 6 joueurs : 3J=72.8% · 4J=64.1% · 5J=73.2% · 6J=61.1% (Amplitude 12.1 pts, σ=5.3%)."
+      },
+      "scoreInteretGlobal": 59,
+      "bandeSante": "orange",
+      "syntheseAnalytique": [
+        "Échelle des 9 Bots : Inerte 59.9% → Réflexe 80.3% → Glouton 82.2% → Déductif 78.3% → Expectimax 66.5% → Beam 75.4% → IS-MCTS 78.9%.",
+        "Gain apporté par les algorithmes de pointe (IS-MCTS / Expectimax Bayésien vs Déductif classique) : +0.6 pts de forêt sauvée.",
+        "Équilibre 3 à 6 joueurs (80/100) : Survie de 3 à 6 joueurs : 3J=72.8% · 4J=64.1% · 5J=73.2% · 6J=61.1% (Amplitude 12.1 pts, σ=5.3%).",
+        "Lisibilité & Ergonomie du plateau (94/100) : Mise en place instantanée sans assemblage (1 plateau double face Recto 9 zones / Verso 13 zones, degré moyen 4.4 liaisons/zone). Excellente lisibilité autour de la table."
+      ]
+    },
+    {
       "varianteId": "v03_hybride_hex19_peuples_h1k5",
       "varianteNom": "V0.3 Hybride Recommandé — Hexagones 19 & Peuples Asymétriques",
       "version": "0.3",
@@ -3064,230 +3287,6 @@
         "Gain apporté par les algorithmes de pointe (IS-MCTS / Expectimax Bayésien vs Déductif classique) : +1 pts de forêt sauvée.",
         "Équilibre 3 à 6 joueurs (90/100) : Survie de 3 à 6 joueurs : 3J=88.2% · 4J=86.3% · 5J=83.7% · 6J=84% (Amplitude 4.5 pts, σ=1.8%).",
         "Lisibilité & Ergonomie du plateau (91/100) : Réseau organique de 13 clairières avec 3 Cols de passage immédiatement identifiables (degré moyen 4.2 sentiers/clairière). Lecture naturelle des goulets d'étranglement."
-      ]
-    },
-    {
-      "varianteId": "v03_hybride_double_eclaireur_h1k5",
-      "varianteNom": "V0.3 Hybride Recommandé — Double Plateau (3–4J/5–6J) & Jeton Éclaireur",
-      "version": "0.3",
-      "geometriePlateau": "double_plateau_34_56",
-      "dateExecution": "2026-10-20T13:47:28.102Z",
-      "nbPartiesParBot": 10,
-      "dureeMs": 21625,
-      "echelleBots": [
-        {
-          "botId": "inerte",
-          "botNom": "Bot Inerte (Plancher)",
-          "foretSauveeMoyennePct": 59.5,
-          "ecartTypePct": 2.1,
-          "pireDecilePct": 57.9,
-          "arbresCoupesMoyen": 15.4,
-          "paradesMoyennes": 0,
-          "sabotagesMoyens": 0,
-          "tempsMoyenMsParPartie": 10.9,
-          "tauxUsageActions": {
-            "deplacer": 0,
-            "proteger": 0,
-            "saboter": 0,
-            "replanter": 0
-          }
-        },
-        {
-          "botId": "hasard",
-          "botNom": "Bot Hasard (Bruité)",
-          "foretSauveeMoyennePct": 73.9,
-          "ecartTypePct": 6.1,
-          "pireDecilePct": 65.8,
-          "arbresCoupesMoyen": 10.8,
-          "paradesMoyennes": 2.6,
-          "sabotagesMoyens": 3.7,
-          "tempsMoyenMsParPartie": 11.6,
-          "tauxUsageActions": {
-            "deplacer": 44,
-            "proteger": 44,
-            "saboter": 10,
-            "replanter": 2
-          }
-        },
-        {
-          "botId": "boucle",
-          "botNom": "Bot Boucle Fixe (Garde-fou)",
-          "foretSauveeMoyennePct": 78.4,
-          "ecartTypePct": 6.1,
-          "pireDecilePct": 71.1,
-          "arbresCoupesMoyen": 8.2,
-          "paradesMoyennes": 7.4,
-          "sabotagesMoyens": 0,
-          "tempsMoyenMsParPartie": 11.6,
-          "tauxUsageActions": {
-            "deplacer": 0,
-            "proteger": 100,
-            "saboter": 0,
-            "replanter": 0
-          }
-        },
-        {
-          "botId": "reflexe",
-          "botNom": "Bot Réflexe (Tape-taupe)",
-          "foretSauveeMoyennePct": 78.7,
-          "ecartTypePct": 6.3,
-          "pireDecilePct": 71.1,
-          "arbresCoupesMoyen": 8.1,
-          "paradesMoyennes": 6.2,
-          "sabotagesMoyens": 6.1,
-          "tempsMoyenMsParPartie": 9.6,
-          "tauxUsageActions": {
-            "deplacer": 31,
-            "proteger": 58,
-            "saboter": 10,
-            "replanter": 0
-          }
-        },
-        {
-          "botId": "glouton",
-          "botNom": "Bot Glouton (Pistes + Dés personnels)",
-          "foretSauveeMoyennePct": 81.8,
-          "ecartTypePct": 7.9,
-          "pireDecilePct": 73.7,
-          "arbresCoupesMoyen": 6.9,
-          "paradesMoyennes": 3.5,
-          "sabotagesMoyens": 5.8,
-          "tempsMoyenMsParPartie": 14,
-          "tauxUsageActions": {
-            "deplacer": 46,
-            "proteger": 45,
-            "saboter": 10,
-            "replanter": 0
-          }
-        },
-        {
-          "botId": "deductif",
-          "botNom": "Bot Déductif & Coordonné (Référence Classique)",
-          "foretSauveeMoyennePct": 81.1,
-          "ecartTypePct": 7.3,
-          "pireDecilePct": 71.1,
-          "arbresCoupesMoyen": 7.2,
-          "paradesMoyennes": 3.8,
-          "sabotagesMoyens": 5.4,
-          "tempsMoyenMsParPartie": 11,
-          "tauxUsageActions": {
-            "deplacer": 46,
-            "proteger": 44,
-            "saboter": 9,
-            "replanter": 0
-          }
-        },
-        {
-          "botId": "expectimax_bayesien",
-          "botNom": "Bot Expectimax Bayésien (Inférence des Dés Alliés)",
-          "foretSauveeMoyennePct": 67.7,
-          "ecartTypePct": 7,
-          "pireDecilePct": 60.5,
-          "arbresCoupesMoyen": 13,
-          "paradesMoyennes": 1.3,
-          "sabotagesMoyens": 1.4,
-          "tempsMoyenMsParPartie": 383.7,
-          "tauxUsageActions": {
-            "deplacer": 8,
-            "proteger": 88,
-            "saboter": 2,
-            "replanter": 1
-          }
-        },
-        {
-          "botId": "beam_rollout",
-          "botNom": "Bot Planificateur Multi-Tours (Beam Search Rollout)",
-          "foretSauveeMoyennePct": 75.6,
-          "ecartTypePct": 3.7,
-          "pireDecilePct": 68.4,
-          "arbresCoupesMoyen": 10,
-          "paradesMoyennes": 1.9,
-          "sabotagesMoyens": 5,
-          "tempsMoyenMsParPartie": 306,
-          "tauxUsageActions": {
-            "deplacer": 23,
-            "proteger": 68,
-            "saboter": 8,
-            "replanter": 1
-          }
-        },
-        {
-          "botId": "ismcts",
-          "botNom": "Bot IS-MCTS (Monte Carlo à Information Imparfaite)",
-          "foretSauveeMoyennePct": 77.6,
-          "ecartTypePct": 5.7,
-          "pireDecilePct": 63.2,
-          "arbresCoupesMoyen": 9.4,
-          "paradesMoyennes": 2.3,
-          "sabotagesMoyens": 6.5,
-          "tempsMoyenMsParPartie": 302.6,
-          "tauxUsageActions": {
-            "deplacer": 25,
-            "proteger": 63,
-            "saboter": 11,
-            "replanter": 1
-          }
-        }
-      ],
-      "indicateurs": {
-        "progressionEchelleValide": false,
-        "ecartDeductifSurInerte": 21.6,
-        "margeGardeFouBoucle": 2.7,
-        "gainDeductionSequentielle": -0.7,
-        "gainLecturePistes": 3.1,
-        "gainBotsPointeSurDeductif": 0,
-        "impactApprentissageMechant": 2.9,
-        "equilibreActionsPct": 80
-      },
-      "equilibreParJoueurs": {
-        "3": {
-          "nbJoueurs": 3,
-          "survieMoyennePct": 72.8,
-          "pireDecilePct": 68.4,
-          "scoreStrategique": 37,
-          "sabotagesMoyens": 0.3,
-          "ecartMechantVsGlouton": -13.1
-        },
-        "4": {
-          "nbJoueurs": 4,
-          "survieMoyennePct": 64.1,
-          "pireDecilePct": 57.9,
-          "scoreStrategique": 20,
-          "sabotagesMoyens": 1.5,
-          "ecartMechantVsGlouton": -17.9
-        },
-        "5": {
-          "nbJoueurs": 5,
-          "survieMoyennePct": 73.2,
-          "pireDecilePct": 64.8,
-          "scoreStrategique": 49,
-          "sabotagesMoyens": 2.3,
-          "ecartMechantVsGlouton": -8.3
-        },
-        "6": {
-          "nbJoueurs": 6,
-          "survieMoyennePct": 61.1,
-          "pireDecilePct": 57.4,
-          "scoreStrategique": 25,
-          "sabotagesMoyens": 1.3,
-          "ecartMechantVsGlouton": -14.8
-        }
-      },
-      "troisAxesPrioritaires": {
-        "interetStrategique": 27,
-        "lisibiliteErgonomie": 94,
-        "equilibreJoueurs36": 80,
-        "detailStrategie": "Gain Pistes +3.1 pts · Gain Déduction +-0.7 pts · Gain Bots de Pointe (IS-MCTS/Expectimax) +0 pts.",
-        "detailErgonomie": "Mise en place instantanée sans assemblage (1 plateau double face Recto 9 zones / Verso 13 zones, degré moyen 4.4 liaisons/zone). Excellente lisibilité autour de la table.",
-        "detailEquilibre36": "Survie de 3 à 6 joueurs : 3J=72.8% · 4J=64.1% · 5J=73.2% · 6J=61.1% (Amplitude 12.1 pts, σ=5.3%)."
-      },
-      "scoreInteretGlobal": 60,
-      "bandeSante": "orange",
-      "syntheseAnalytique": [
-        "Échelle des 9 Bots : Inerte 59.5% → Réflexe 78.7% → Glouton 81.8% → Déductif 81.1% → Expectimax 67.7% → Beam 75.6% → IS-MCTS 77.6%.",
-        "Gain apporté par les algorithmes de pointe (IS-MCTS / Expectimax Bayésien vs Déductif classique) : +0 pts de forêt sauvée.",
-        "Équilibre 3 à 6 joueurs (80/100) : Survie de 3 à 6 joueurs : 3J=72.8% · 4J=64.1% · 5J=73.2% · 6J=61.1% (Amplitude 12.1 pts, σ=5.3%).",
-        "Lisibilité & Ergonomie du plateau (94/100) : Mise en place instantanée sans assemblage (1 plateau double face Recto 9 zones / Verso 13 zones, degré moyen 4.4 liaisons/zone). Excellente lisibilité autour de la table."
       ]
     },
     {

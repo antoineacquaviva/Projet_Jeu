@@ -13,9 +13,10 @@ interface JeuViewProps {
   versionActive: GameVersionSpec;
   variantesVersion: VariantV01[];
   varianteActive: VariantV01;
+  varianteRecommandee?: VariantV01;
   ideesLabo: LabIdea[];
   onSelectVersion: (versionId: GameVersionId) => void;
-  onSelectVariante: (varianteId: string) => void;
+  onSelectVariante: (varianteId: string, versionId?: GameVersionId) => void;
   onNavigateTab: (tab: AtelierComponentId) => void;
   onCreateNewVersion: (
     nouvelleVersion: GameVersionSpec,
@@ -30,6 +31,7 @@ export const JeuView: React.FC<JeuViewProps> = ({
   versionActive,
   variantesVersion,
   varianteActive,
+  varianteRecommandee,
   ideesLabo,
   onSelectVersion,
   onSelectVariante,
@@ -85,8 +87,92 @@ export const JeuView: React.FC<JeuViewProps> = ({
     new Set(versionActive.optionsRegles.map((o) => o.categorie))
   );
 
+  const estRecommandeeActive =
+    varianteRecommandee && varianteActive.id === varianteRecommandee.id;
+
   return (
     <div className="space-y-6">
+      {/* Encart permanent : Variante Recommandée par les Tests (sélectionnée par défaut et réactivable en 1 clic) */}
+      {varianteRecommandee && (
+        <div
+          className={`rounded-xl p-4 border-2 flex flex-wrap items-center justify-between gap-4 ${
+            estRecommandeeActive
+              ? 'bg-emerald-50/90 border-[#256B45]'
+              : 'bg-amber-50/90 border-amber-400'
+          }`}
+        >
+          <div className="space-y-1 max-w-4xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded bg-[#1E3528] text-amber-300 text-xs font-extrabold uppercase tracking-wide">
+                ★ Variante Recommandée par les Tests
+              </span>
+              <span className="font-mono-tabular text-xs font-bold px-2 py-0.5 rounded bg-white border border-[#D8DFD5] text-[#16211B]">
+                Version {varianteRecommandee.version || '0.3'} · Score d’intérêt{' '}
+                {varianteRecommandee.scoreInteretDernierTest ?? 91}/100
+              </span>
+              {estRecommandeeActive ? (
+                <span className="px-2.5 py-0.5 rounded bg-[#256B45] text-white text-xs font-bold">
+                  ✓ Sélectionnée actuellement
+                </span>
+              ) : (
+                <span className="px-2.5 py-0.5 rounded bg-amber-200 text-amber-900 text-xs font-bold">
+                  Une autre variante est actuellement affichée ({varianteActive.nom})
+                </span>
+              )}
+            </div>
+            <div className="font-display text-base font-bold text-[#16211B]">
+              {varianteRecommandee.nom}
+            </div>
+            <p className="text-xs text-[#55645B] leading-relaxed">
+              {varianteRecommandee.description}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            {!estRecommandeeActive && (
+              <button
+                type="button"
+                onClick={() =>
+                  onSelectVariante(
+                    varianteRecommandee.id,
+                    varianteRecommandee.version || '0.3'
+                  )
+                }
+                className="px-4 py-2 text-xs font-extrabold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] shadow-xs transition-colors whitespace-nowrap"
+              >
+                ★ Resélectionner la variante recommandée
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                onSelectVariante(
+                  varianteRecommandee.id,
+                  varianteRecommandee.version || '0.3'
+                );
+                onNavigateTab('demo');
+              }}
+              className="px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-[#D8DFD5] text-[#16211B] hover:bg-stone-100 transition-colors whitespace-nowrap"
+            >
+              Voir en Démo →
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onSelectVariante(
+                  varianteRecommandee.id,
+                  varianteRecommandee.version || '0.3'
+                );
+                onNavigateTab('proto');
+              }}
+              className="px-3.5 py-2 text-xs font-bold rounded-lg bg-[#16211B] text-white hover:bg-black transition-colors whitespace-nowrap"
+            >
+              Jouer dans Proto →
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Bandeau supérieur : Sélecteur des Versions du Jeu & Création d'une Version X */}
       <div className="bg-white rounded-xl p-6 border border-[#D8DFD5] shadow-xs">
         <div className="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-[#D8DFD5]">
@@ -141,6 +227,8 @@ export const JeuView: React.FC<JeuViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {versions.map((ver) => {
               const estActive = ver.id === versionActive.id;
+              const contientRecommandee =
+                (varianteRecommandee?.version || '0.3') === ver.id;
               return (
                 <button
                   key={ver.id}
@@ -152,9 +240,16 @@ export const JeuView: React.FC<JeuViewProps> = ({
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono-tabular text-xs font-bold uppercase px-2 py-0.5 rounded bg-black/15">
-                      Version {ver.id}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono-tabular text-xs font-bold uppercase px-2 py-0.5 rounded bg-black/15">
+                        Version {ver.id}
+                      </span>
+                      {contientRecommandee && (
+                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-[#16211B]">
+                          ★ Recommandée
+                        </span>
+                      )}
+                    </div>
                     <span
                       className={`text-[11px] font-medium ${
                         estActive ? 'text-emerald-200' : 'text-[#55645B]'
@@ -550,6 +645,7 @@ export const JeuView: React.FC<JeuViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {variantesVersion.map((v) => {
               const estSelectionnee = v.id === varianteActive.id;
+              const estLaRecommandee = v.id === varianteRecommandee?.id;
               return (
                 <div
                   key={v.id}
@@ -560,22 +656,29 @@ export const JeuView: React.FC<JeuViewProps> = ({
                   }`}
                 >
                   <div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span
-                        className={`text-[11px] font-bold px-2 py-0.5 rounded ${
-                          v.statutViabilite === 'viable'
-                            ? 'bg-emerald-100 text-[#256B45]'
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        {estLaRecommandee && (
+                          <span className="text-[11px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-[#16211B]">
+                            ★ Recommandée par les tests
+                          </span>
+                        )}
+                        <span
+                          className={`text-[11px] font-bold px-2 py-0.5 rounded ${
+                            v.statutViabilite === 'viable'
+                              ? 'bg-emerald-100 text-[#256B45]'
+                              : v.statutViabilite === 'eliminee'
+                              ? 'bg-red-100 text-[#C2412D]'
+                              : 'bg-amber-100 text-amber-800'
+                          }`}
+                        >
+                          {v.statutViabilite === 'viable'
+                            ? `Viable · Intérêt ${v.scoreInteretDernierTest ?? '—'}/100`
                             : v.statutViabilite === 'eliminee'
-                            ? 'bg-red-100 text-[#C2412D]'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
-                        {v.statutViabilite === 'viable'
-                          ? `Viable · Intérêt ${v.scoreInteretDernierTest ?? '—'}/100`
-                          : v.statutViabilite === 'eliminee'
-                          ? 'Éliminée (Non viable)'
-                          : 'À tester'}
-                      </span>
+                            ? 'Éliminée (Non viable)'
+                            : 'À tester'}
+                        </span>
+                      </div>
                       <span className="font-mono-tabular text-xs text-[#55645B]">
                         {v.nbJoueurs}J · {v.defenseursParJoueur} Déf./J ·{' '}
                         {v.machinesInitiales} Mach. · {v.nbTours} Tours

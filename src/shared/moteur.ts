@@ -39,6 +39,65 @@ export const PROBA_ECART_2D6: Record<number, number> = {
   5: 2,
 };
 
+// Ordre statistique monotone de la Piste Machine (du plus probable 10/36 au moins probable 2/36, avec 0 à côté de 3 à 6/36)
+export const ORDRE_PISTE_MACHINE: number[] = [1, 2, 3, 0, 4, 5];
+
+export const CODES_COURTS_BOTS: Record<
+  string,
+  { nomCourt: string; codePion: string }
+> = {
+  humain: { nomCourt: 'Moi', codePion: 'MOI' },
+  deductif: { nomCourt: 'Bot Déd.', codePion: 'DÉD' },
+  ismcts: { nomCourt: 'Bot MCTS', codePion: 'MCTS' },
+  beam_rollout: { nomCourt: 'Bot Beam', codePion: 'BEAM' },
+  expectimax_bayesien: { nomCourt: 'Bot Bayes', codePion: 'BAY' },
+  glouton: { nomCourt: 'Bot Glout.', codePion: 'GLOU' },
+  reflexe: { nomCourt: 'Bot Réfl.', codePion: 'RÉF' },
+  hasard: { nomCourt: 'Bot Aléa', codePion: 'ALÉA' },
+  boucle: { nomCourt: 'Bot Bouc.', codePion: 'BOUC' },
+  inerte: { nomCourt: 'Bot Inerte', codePion: 'INER' },
+};
+
+export function formaterNomSiege(
+  joueurIndex: number,
+  sieges?: string[]
+): { nomCourt: string; codePion: string; estHumain: boolean } {
+  const defautBots = [
+    'humain',
+    'deductif',
+    'expectimax_bayesien',
+    'beam_rollout',
+    'ismcts',
+    'glouton',
+  ];
+  const typeSiege =
+    sieges?.[joueurIndex] || defautBots[joueurIndex] || 'deductif';
+  const info = CODES_COURTS_BOTS[typeSiege] || {
+    nomCourt: typeSiege === 'humain' ? 'Moi' : `Bot ${typeSiege.slice(0, 4)}`,
+    codePion:
+      typeSiege === 'humain' ? 'MOI' : typeSiege.slice(0, 4).toUpperCase(),
+  };
+
+  if (typeSiege !== 'humain' && sieges) {
+    const totalMemes = sieges.filter((s) => s === typeSiege).length;
+    if (totalMemes > 1) {
+      const rang =
+        sieges.slice(0, joueurIndex).filter((s) => s === typeSiege).length + 1;
+      return {
+        nomCourt: `${info.nomCourt}${rang}`,
+        codePion: `${info.codePion}${rang}`,
+        estHumain: false,
+      };
+    }
+  }
+
+  return {
+    nomCourt: info.nomCourt,
+    codePion: info.codePion,
+    estHumain: typeSiege === 'humain',
+  };
+}
+
 export const NOMS_TACTIQUES: Record<TactiqueType, string> = {
   cupidite: 'Cupidité (Plus boisée)',
   percee: 'Percée (Vers le Cœur)',
@@ -1362,15 +1421,20 @@ export function appliquerApprentissagePistes(
     });
   }
 
-  // 2. Piste Machine (0..5) : l'écart 1 est le plus fréquent (10/36), 5 le plus rare (2/36)
-  // Succès rapproche de la case 1 ; échec recule vers 5 (ou 0 si en 1)
-  let cibleEcart = ecart;
-  if (succesCoupe) {
-    if (ecart > 1) cibleEcart = ecart - 1;
-    else if (ecart === 0) cibleEcart = 1;
-  } else {
-    if (ecart < 5) cibleEcart = ecart + 1;
+  // 2. Piste Machine : ordonnée statistiquement du plus au moins probable : [1, 2, 3, 0, 4, 5]
+  // Probabilités respectives : 1 (10/36), 2 (8/36), 3 (6/36), 0 (6/36), 4 (4/36), 5 (2/36).
+  // Succès rapproche du début de piste (vers 1, indice - 1) ; échec recule vers la fin de piste (vers 5, indice + 1).
+  const idxActuel = ORDRE_PISTE_MACHINE.indexOf(ecart);
+  let idxCible = idxActuel;
+  if (idxActuel !== -1) {
+    if (succesCoupe && idxActuel > 0) {
+      idxCible = idxActuel - 1;
+    } else if (!succesCoupe && idxActuel < ORDRE_PISTE_MACHINE.length - 1) {
+      idxCible = idxActuel + 1;
+    }
   }
+  const cibleEcart =
+    idxCible !== -1 ? ORDRE_PISTE_MACHINE[idxCible] : ecart;
 
   if (cibleEcart !== ecart) {
     const mCourante = etat.pisteMachine[ecart];
@@ -1384,7 +1448,9 @@ export function appliquerApprentissagePistes(
       versCase: cibleEcart,
       element: `Machine M${mCourante}`,
       verdict: succesCoupe ? 'succes_coupe' : 'echec_parade',
-      explicationPhysique: `Sur la Piste Machine, échangez la carte de la case ${ecart} (M${mCourante}) avec celle de la case ${cibleEcart} (M${mVoisine}).`,
+      explicationPhysique: `Sur la Piste Machine (1–2–3–0–4–5), échangez la carte Écart ${ecart} (M${mCourante}) avec sa voisine ${
+        succesCoupe ? 'plus probable' : 'moins probable'
+      } Écart ${cibleEcart} (M${mVoisine}).`,
     });
   }
 }
