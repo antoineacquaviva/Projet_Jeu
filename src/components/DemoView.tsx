@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { EtatJeuV01, VariantV01 } from '../shared/types';
+import { EtatJeuV01, GameVersionSpec, VariantV01 } from '../shared/types';
 import {
   avancerSousPhaseResolution,
   clonerEtatJeu,
@@ -12,6 +12,7 @@ import { PhysicalBoardV01 } from './PhysicalBoardV01';
 
 interface DemoViewProps {
   variante: VariantV01;
+  versionSpec?: GameVersionSpec;
   onOpenInProto: (etat: EtatJeuV01) => void;
 }
 
@@ -19,6 +20,7 @@ type DemoSubTab = 'boite' | 'mise_en_place' | 'tour_guide';
 
 export const DemoView: React.FC<DemoViewProps> = ({
   variante,
+  versionSpec,
   onOpenInProto,
 }) => {
   const [subTab, setSubTab] = useState<DemoSubTab>('boite');
@@ -134,7 +136,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
       <div className="bg-white rounded-xl p-4 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-lg font-semibold text-[#16211B]">
-            4. Démo — Présentation matérielle & Démonstrateur de « Défenseurs de la forêt » (V0.1)
+            Démo — Présentation matérielle & Démonstrateur de « Défenseurs de la forêt » (V{variante.version})
           </h2>
           <p className="text-xs text-[#55645B]">
             Variante présentée : <strong className="text-[#16211B]">{variante.nom}</strong> ·{' '}
@@ -151,7 +153,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
                 : 'text-[#16211B] hover:bg-white'
             }`}
           >
-            1. Contenu de la boîte
+            Contenu de la boîte
           </button>
           <button
             onClick={() => setSubTab('mise_en_place')}
@@ -161,7 +163,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
                 : 'text-[#16211B] hover:bg-white'
             }`}
           >
-            2. Mise en place sur table
+            Mise en place sur table
           </button>
           <button
             onClick={() => setSubTab('tour_guide')}
@@ -171,7 +173,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
                 : 'text-[#16211B] hover:bg-white'
             }`}
           >
-            3. Démo pas-à-pas d’un tour
+            Démo pas-à-pas d’un tour
           </button>
         </div>
       </div>
@@ -286,6 +288,30 @@ export const DemoView: React.FC<DemoViewProps> = ({
                 Révélation : Tous les gobelets sont levés au milieu du tour lors du ciblage des Machines.
               </div>
             </div>
+
+            {versionSpec?.composantsBoite
+              .filter((c) => c.nouveauteVersion)
+              .map((comp) => (
+                <div
+                  key={comp.id}
+                  className="bg-emerald-50/70 rounded-xl p-5 border-2 border-[#256B45] flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="text-xs font-mono-tabular text-[#256B45] font-bold uppercase mb-1">
+                      {comp.categorie} · {comp.quantiteFormule}
+                    </div>
+                    <h3 className="font-display text-base font-semibold text-[#16211B] mb-2">
+                      {comp.nom}
+                    </h3>
+                    <p className="text-sm text-[#55645B] leading-relaxed">
+                      {comp.descriptionMat}
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-[#D8DFD5] text-xs text-[#16211B] font-medium">
+                    Usage V{versionSpec.id} : {comp.usageRegle}
+                  </div>
+                </div>
+              ))}
           </div>
 
           {/* Catalogue des 4 cartes Tactiques de la V0.1 */}

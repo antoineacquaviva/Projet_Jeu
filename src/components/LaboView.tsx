@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
+  GameVersionId,
+  GameVersionSpec,
   LabIdea,
   LabIdeaCible,
   LabIdeaMaturite,
@@ -10,25 +12,37 @@ import {
 interface LaboViewProps {
   idees: LabIdea[];
   variantes: VariantV01[];
+  versions?: GameVersionSpec[];
   onSaveIdee: (idee: LabIdea) => void;
   onDeleteIdee: (id: string) => void;
   onSelectVariante?: (id: string) => void;
+  onSelectVersion?: (versionId: GameVersionId) => void;
 }
 
 export const LaboView: React.FC<LaboViewProps> = ({
   idees,
   variantes,
+  versions = [],
   onSaveIdee,
   onDeleteIdee,
   onSelectVariante,
+  onSelectVersion,
 }) => {
   const [filtreCible, setFiltreCible] = useState<'Tous' | LabIdeaCible>('Tous');
-  const [filtreMaturite, setFiltreMaturite] = useState<'Toutes' | LabIdeaMaturite>('Toutes');
+  const [filtreMaturite, setFiltreMaturite] = useState<
+    'Toutes' | LabIdeaMaturite
+  >('Toutes');
+  const [filtreVersion, setFiltreVersion] = useState<'Toutes' | string>(
+    'Toutes'
+  );
   const [triPar, setTriPar] = useState<'interet' | 'priorite'>('interet');
+  const [formulaireOuvert, setFormulaireOuvert] = useState<boolean>(false);
+  const [idEnEdition, setIdEnEdition] = useState<string | null>(null);
 
-  // Formulaire de création d'une nouvelle idée
+  // État du formulaire de création / édition de post-it
   const [titre, setTitre] = useState<string>('');
   const [cible, setCible] = useState<LabIdeaCible>('Jeu');
+  const [versionCible, setVersionCible] = useState<string>('0.2');
   const [categorie, setCategorie] =
     useState<LabIdea['categorie']>('Séquencement & Tour');
   const [description, setDescription] = useState<string>('');
@@ -49,6 +63,11 @@ export const LaboView: React.FC<LaboViewProps> = ({
       .filter((i) =>
         filtreMaturite === 'Toutes' ? true : i.maturite === filtreMaturite
       )
+      .filter((i) =>
+        filtreVersion === 'Toutes'
+          ? true
+          : (i.versionCible || '0.1') === filtreVersion
+      )
       .sort((a, b) => {
         if (triPar === 'interet') {
           if (b.interet !== a.interet) return b.interet - a.interet;
@@ -59,60 +78,145 @@ export const LaboView: React.FC<LaboViewProps> = ({
         }
         return b.interet - a.interet;
       });
-  }, [idees, filtreCible, filtreMaturite, triPar]);
+  }, [idees, filtreCible, filtreMaturite, filtreVersion, triPar]);
 
-  const handleSubmitNouvelleIdee = (e: React.FormEvent) => {
+  const ouvrirNouveauPostIt = () => {
+    setIdEnEdition(null);
+    setTitre('');
+    setCible('Jeu');
+    setVersionCible('0.2');
+    setCategorie('Séquencement & Tour');
+    setDescription('');
+    setAuteur('Auteur');
+    setPriorite('Haute');
+    setMaturite('Prête à tester');
+    setInteret(8);
+    setFormulaireOuvert(true);
+  };
+
+  const ouvrirEditionPostIt = (idee: LabIdea) => {
+    setIdEnEdition(idee.id);
+    setTitre(idee.titre);
+    setCible(idee.cible);
+    setVersionCible(idee.versionCible || '0.2');
+    setCategorie(idee.categorie);
+    setDescription(idee.description);
+    setAuteur(idee.auteur);
+    setPriorite(idee.priorite);
+    setMaturite(idee.maturite);
+    setInteret(idee.interet);
+    setFormulaireOuvert(true);
+  };
+
+  const handleSubmitPostIt = (e: React.FormEvent) => {
     e.preventDefault();
     if (!titre.trim()) return;
     const today = new Date().toISOString().slice(0, 10);
+    const existante = idEnEdition
+      ? idees.find((i) => i.id === idEnEdition)
+      : undefined;
+
     const nouvelle: LabIdea = {
-      id: `idea_${Date.now().toString(36)}`,
+      id: existante ? existante.id : `idea_${Date.now().toString(36)}`,
       titre: titre.trim(),
       cible,
+      versionCible,
       categorie,
-      description: description.trim() || 'À détailler lors des prochains essais.',
+      description:
+        description.trim() || 'À détailler lors des prochains essais.',
       auteur,
       priorite,
       maturite,
       interet,
-      dateCreation: today,
+      varianteLieeId: existante?.varianteLieeId,
+      dateCreation: existante ? existante.dateCreation : today,
       dateMaj: today,
     };
     onSaveIdee(nouvelle);
     setTitre('');
     setDescription('');
+    setIdEnEdition(null);
+    setFormulaireOuvert(false);
+  };
+
+  // Style visuel type Post-it d'atelier selon maturité et cible
+  const getPostItStyle = (idee: LabIdea) => {
+    if (idee.cible === 'Atelier') {
+      return {
+        cardBg: 'bg-[#EEF5F9] border-[#BBD4E5]',
+        tapeBg: 'bg-[#3B6E8C] text-white',
+        accentText: 'text-[#234B63]',
+      };
+    }
+    if (
+      idee.maturite === 'Intégrée V0.1' ||
+      idee.maturite === 'Intégrée V0.2'
+    ) {
+      return {
+        cardBg: 'bg-[#ECF6EE] border-[#B6DBC0]',
+        tapeBg: 'bg-[#256B45] text-white',
+        accentText: 'text-[#1E3528]',
+      };
+    }
+    if (idee.maturite === 'Différée') {
+      return {
+        cardBg: 'bg-[#F3EFEA] border-[#D8CFC4]',
+        tapeBg: 'bg-[#6E6256] text-white',
+        accentText: 'text-[#554A40]',
+      };
+    }
+    // Post-it jaune paille / ambre chaleureux pour les idées actives (Idée brute, En étude, Prête à tester)
+    return {
+      cardBg: 'bg-[#FFFBE6] border-[#E8D78C]',
+      tapeBg: 'bg-[#B45309] text-white',
+      accentText: 'text-[#78350F]',
+    };
   };
 
   return (
     <div className="space-y-6">
-      {/* En-tête et filtres du Labo */}
-      <div className="bg-white rounded-xl p-4 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4">
+      {/* Barre supérieure du Mur de Post-it : Filtres + Bouton Nouveau Post-it */}
+      <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div>
-          <h2 className="font-display text-lg font-semibold text-[#16211B]">
-            6. Labo — Tableau Partagé d’Idées pour Le Jeu & L’Atelier
-          </h2>
-          <p className="text-xs text-[#55645B]">
-            Consignez vos idées (Auteur ou Gemini) et pilotez leur Priorité, leur Maturité et leur Intérêt (1 à 10).
+          <h1 className="font-display text-xl font-bold text-[#16211B]">
+            Labo — Mur de Post-it (Idées pour Le Jeu & L’Atelier)
+          </h1>
+          <p className="text-xs text-[#55645B] mt-0.5">
+            {ideesFiltrees.length} post-it affichés sur {idees.length} · Notez vos pistes de règles, évaluez leur priorité/maturité et embarquez-les dans les versions successives du Jeu.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Filtre Cible */}
           <div className="flex items-center gap-1 bg-[#F4F5F0] p-1 rounded-lg border border-[#D8DFD5]">
             {(['Tous', 'Jeu', 'Atelier'] as const).map((c) => (
               <button
                 key={c}
                 onClick={() => setFiltreCible(c)}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors whitespace-nowrap shrink-0 ${
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors whitespace-nowrap ${
                   filtreCible === c
-                    ? 'bg-[#256B45] text-white'
+                    ? 'bg-[#1E3528] text-white'
                     : 'text-[#16211B] hover:bg-white'
                 }`}
               >
-                {c === 'Tous' ? 'Tout voir' : `Cible : ${c}`}
+                {c === 'Tous' ? 'Tout le mur' : c === 'Jeu' ? 'Le Jeu' : 'L’Atelier'}
               </button>
             ))}
           </div>
 
+          {/* Filtre Version Cible */}
+          <select
+            value={filtreVersion}
+            onChange={(e) => setFiltreVersion(e.target.value)}
+            className="px-2.5 py-1.5 text-xs font-semibold border border-[#D8DFD5] rounded-lg bg-white text-[#16211B]"
+          >
+            <option value="Toutes">Toutes versions</option>
+            <option value="0.1">Cible : Version 0.1</option>
+            <option value="0.2">Cible : Version 0.2</option>
+            <option value="0.3">Cible : Version 0.3+</option>
+          </select>
+
+          {/* Filtre Maturité */}
           <select
             value={filtreMaturite}
             onChange={(e) =>
@@ -125,196 +229,65 @@ export const LaboView: React.FC<LaboViewProps> = ({
             <option value="En étude">En étude</option>
             <option value="Prête à tester">Prête à tester</option>
             <option value="Intégrée V0.1">Intégrée V0.1</option>
+            <option value="Intégrée V0.2">Intégrée V0.2</option>
             <option value="Différée">Différée</option>
           </select>
 
+          {/* Tri */}
           <select
             value={triPar}
             onChange={(e) => setTriPar(e.target.value as 'interet' | 'priorite')}
             className="px-2.5 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-white text-[#16211B]"
           >
-            <option value="interet">Trier par Intérêt (10 → 1)</option>
-            <option value="priorite">Trier par Priorité</option>
+            <option value="interet">Tri : Intérêt (10 → 1)</option>
+            <option value="priorite">Tri : Priorité</option>
           </select>
+
+          {/* Bouton Nouveau Post-it */}
+          <button
+            onClick={() =>
+              formulaireOuvert ? setFormulaireOuvert(false) : ouvrirNouveauPostIt()
+            }
+            className="px-4 py-2 text-xs font-semibold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] transition-colors shadow-xs whitespace-nowrap"
+          >
+            {formulaireOuvert ? 'Fermer l’éditeur ✕' : '+ Nouveau Post-it'}
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Colonne Gauche (8 cols) : Tableau des idées */}
-        <div className="lg:col-span-8 bg-white rounded-xl p-5 border border-[#D8DFD5]">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-[#D8DFD5] text-[#55645B]">
-                  <th className="py-2 pr-3 font-semibold">Idée & Description</th>
-                  <th className="py-2 px-3 font-semibold">Cible · Catégorie</th>
-                  <th className="py-2 px-3 font-semibold">Priorité</th>
-                  <th className="py-2 px-3 font-semibold">Maturité</th>
-                  <th className="py-2 px-3 font-semibold text-right">Intérêt</th>
-                  <th className="py-2 pl-3 font-semibold text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#D8DFD5]">
-                {ideesFiltrees.map((item) => {
-                  const varLiee = variantes.find(
-                    (v) => v.id === item.varianteLieeId
-                  );
-                  return (
-                    <tr key={item.id} className="hover:bg-[#F4F5F0]/50 align-top">
-                      <td className="py-3 pr-3">
-                        <div className="font-semibold text-sm text-[#16211B]">
-                          {item.titre}
-                        </div>
-                        <p className="text-xs text-[#55645B] mt-1 leading-relaxed">
-                          {item.description}
-                        </p>
-                        <div className="text-[11px] text-[#55645B] mt-1.5">
-                          Proposé par <strong>{item.auteur}</strong> · Mis à jour le{' '}
-                          <span className="font-mono-tabular">{item.dateMaj}</span>
-                          {varLiee && onSelectVariante && (
-                            <>
-                              {' · '}
-                              <button
-                                onClick={() => onSelectVariante(varLiee.id)}
-                                className="text-[#256B45] underline font-semibold"
-                              >
-                                Variante liée : {varLiee.nom}
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-
-                      <td className="py-3 px-3 text-[#55645B] whitespace-nowrap">
-                        <strong className="text-[#16211B]">{item.cible}</strong> ·{' '}
-                        {item.categorie}
-                      </td>
-
-                      <td className="py-3 px-3">
-                        <select
-                          value={item.priorite}
-                          onChange={(e) =>
-                            onSaveIdee({
-                              ...item,
-                              priorite: e.target.value as LabIdeaPriorite,
-                            })
-                          }
-                          className="bg-[#F4F5F0] border border-[#D8DFD5] rounded px-2 py-1 text-xs font-semibold text-[#16211B]"
-                        >
-                          <option value="Haute">Haute</option>
-                          <option value="Moyenne">Moyenne</option>
-                          <option value="Basse">Basse</option>
-                        </select>
-                      </td>
-
-                      <td className="py-3 px-3">
-                        <select
-                          value={item.maturite}
-                          onChange={(e) =>
-                            onSaveIdee({
-                              ...item,
-                              maturite: e.target.value as LabIdeaMaturite,
-                            })
-                          }
-                          className="bg-[#F4F5F0] border border-[#D8DFD5] rounded px-2 py-1 text-xs font-medium text-[#16211B]"
-                        >
-                          <option value="Idée brute">Idée brute</option>
-                          <option value="En étude">En étude</option>
-                          <option value="Prête à tester">Prête à tester</option>
-                          <option value="Intégrée V0.1">Intégrée V0.1</option>
-                          <option value="Différée">Différée</option>
-                        </select>
-                      </td>
-
-                      <td className="py-3 px-3 text-right font-mono-tabular">
-                        <select
-                          value={item.interet}
-                          onChange={(e) =>
-                            onSaveIdee({
-                              ...item,
-                              interet: Number(e.target.value),
-                            })
-                          }
-                          className="bg-[#F4F5F0] border border-[#D8DFD5] rounded px-2 py-1 text-xs font-bold text-[#256B45]"
-                        >
-                          {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((n) => (
-                            <option key={n} value={n}>
-                              {n}/10
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-
-                      <td className="py-3 pl-3 text-right">
-                        <button
-                          onClick={() => onDeleteIdee(item.id)}
-                          className="text-xs text-[#C2412D] hover:underline whitespace-nowrap"
-                        >
-                          Retirer
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      {/* Tiroir repliable pour écrire ou modifier un Post-it (n'écrase jamais la largeur du mur) */}
+      {formulaireOuvert && (
+        <form
+          onSubmit={handleSubmitPostIt}
+          className="bg-[#FFFBE6] border-2 border-[#E8D78C] rounded-xl p-6 shadow-sm space-y-4"
+        >
+          <div className="flex items-center justify-between border-b border-[#E8D78C] pb-3">
+            <h2 className="font-display text-base font-bold text-[#16211B]">
+              {idEnEdition
+                ? 'Modifier le Post-it sur le mur du Labo'
+                : 'Coller un nouveau Post-it sur le mur du Labo'}
+            </h2>
+            <span className="text-xs text-[#78350F] font-medium">
+              Auteur : {auteur} · Cible : {cible} (V{versionCible})
+            </span>
           </div>
-        </div>
 
-        {/* Colonne Droite (4 cols) : Formulaire d'écriture d'une idée sur le tableau Labo */}
-        <div className="lg:col-span-4 bg-white rounded-xl p-5 border border-[#D8DFD5]">
-          <form onSubmit={handleSubmitNouvelleIdee} className="space-y-3.5">
-            <h3 className="font-display text-base font-semibold text-[#16211B]">
-              Inscrire une nouvelle idée au Labo
-            </h3>
-
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div className="md:col-span-5">
               <label className="block text-xs font-semibold text-[#16211B] mb-1">
                 Titre de l’idée
               </label>
               <input
                 type="text"
                 required
-                placeholder="Ex. Option de sabotage à distance..."
+                placeholder="Ex. Sabotage à distance par l’Éclaireur..."
                 value={titre}
                 onChange={(e) => setTitre(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
+                className="w-full px-3 py-2 text-xs border border-[#D8CFC4] rounded-lg bg-white text-[#16211B]"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className="block text-xs font-semibold text-[#16211B] mb-1">
-                  Cible
-                </label>
-                <select
-                  value={cible}
-                  onChange={(e) => setCible(e.target.value as LabIdeaCible)}
-                  className="w-full px-2.5 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
-                >
-                  <option value="Jeu">Le Jeu</option>
-                  <option value="Atelier">L’Atelier</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#16211B] mb-1">
-                  Auteur
-                </label>
-                <select
-                  value={auteur}
-                  onChange={(e) =>
-                    setAuteur(e.target.value as 'Auteur' | 'Gemini')
-                  }
-                  className="w-full px-2.5 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
-                >
-                  <option value="Auteur">Auteur</option>
-                  <option value="Gemini">Gemini</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
+            <div className="md:col-span-3">
               <label className="block text-xs font-semibold text-[#16211B] mb-1">
                 Catégorie
               </label>
@@ -323,7 +296,7 @@ export const LaboView: React.FC<LaboViewProps> = ({
                 onChange={(e) =>
                   setCategorie(e.target.value as LabIdea['categorie'])
                 }
-                className="w-full px-2.5 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
+                className="w-full px-2.5 py-2 text-xs border border-[#D8CFC4] rounded-lg bg-white text-[#16211B]"
               >
                 <option value="Séquencement & Tour">Séquencement & Tour</option>
                 <option value="Défenseurs & Actions">Défenseurs & Actions</option>
@@ -336,46 +309,98 @@ export const LaboView: React.FC<LaboViewProps> = ({
               </select>
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <label className="block text-xs font-semibold text-[#16211B] mb-1">
-                  Priorité
-                </label>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-[#16211B] mb-1">
+                Cible & Version
+              </label>
+              <div className="flex gap-1.5">
                 <select
-                  value={priorite}
-                  onChange={(e) =>
-                    setPriorite(e.target.value as LabIdeaPriorite)
-                  }
-                  className="w-full px-2 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
+                  value={cible}
+                  onChange={(e) => setCible(e.target.value as LabIdeaCible)}
+                  className="w-1/2 px-2 py-2 text-xs border border-[#D8CFC4] rounded-lg bg-white"
                 >
-                  <option value="Haute">Haute</option>
-                  <option value="Moyenne">Moyenne</option>
-                  <option value="Basse">Basse</option>
+                  <option value="Jeu">Jeu</option>
+                  <option value="Atelier">Atelier</option>
                 </select>
+                <input
+                  type="text"
+                  value={versionCible}
+                  onChange={(e) => setVersionCible(e.target.value)}
+                  placeholder="0.2"
+                  title="Version cible (ex. 0.1, 0.2, 0.3)"
+                  className="w-1/2 px-2 py-2 text-xs font-mono-tabular border border-[#D8CFC4] rounded-lg bg-white"
+                />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-[#16211B] mb-1">
-                  Maturité
-                </label>
-                <select
-                  value={maturite}
-                  onChange={(e) =>
-                    setMaturite(e.target.value as LabIdeaMaturite)
-                  }
-                  className="w-full px-2 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
-                >
-                  <option value="Idée brute">Idée brute</option>
-                  <option value="En étude">En étude</option>
-                  <option value="Prête à tester">Prête à tester</option>
-                  <option value="Intégrée V0.1">Intégrée V0.1</option>
-                  <option value="Différée">Différée</option>
-                </select>
-              </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-[#16211B] mb-1">
+                Auteur
+              </label>
+              <select
+                value={auteur}
+                onChange={(e) =>
+                  setAuteur(e.target.value as 'Auteur' | 'Gemini')
+                }
+                className="w-full px-2.5 py-2 text-xs border border-[#D8CFC4] rounded-lg bg-white"
+              >
+                <option value="Auteur">Auteur</option>
+                <option value="Gemini">Gemini</option>
+              </select>
+            </div>
+          </div>
 
-              <div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            <div className="md:col-span-6">
+              <label className="block text-xs font-semibold text-[#16211B] mb-1">
+                Description concrète (règle, geste matériel ou comportement)
+              </label>
+              <textarea
+                rows={2}
+                placeholder="Décrivez comment cette idée se traduit sur la table de jeu ou dans l’Atelier..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full px-3 py-2 text-xs border border-[#D8CFC4] rounded-lg bg-white text-[#16211B]"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-[#16211B] mb-1">
+                Priorité
+              </label>
+              <select
+                value={priorite}
+                onChange={(e) => setPriorite(e.target.value as LabIdeaPriorite)}
+                className="w-full px-2.5 py-2 text-xs border border-[#D8CFC4] rounded-lg bg-white"
+              >
+                <option value="Haute">Haute</option>
+                <option value="Moyenne">Moyenne</option>
+                <option value="Basse">Basse</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-[#16211B] mb-1">
+                Maturité
+              </label>
+              <select
+                value={maturite}
+                onChange={(e) => setMaturite(e.target.value as LabIdeaMaturite)}
+                className="w-full px-2.5 py-2 text-xs border border-[#D8CFC4] rounded-lg bg-white"
+              >
+                <option value="Idée brute">Idée brute</option>
+                <option value="En étude">En étude</option>
+                <option value="Prête à tester">Prête à tester</option>
+                <option value="Intégrée V0.1">Intégrée V0.1</option>
+                <option value="Intégrée V0.2">Intégrée V0.2</option>
+                <option value="Différée">Différée</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2 flex gap-2">
+              <div className="w-20">
                 <label className="block text-xs font-semibold text-[#16211B] mb-1">
-                  Intérêt (1–10)
+                  Note /10
                 </label>
                 <input
                   type="number"
@@ -383,32 +408,182 @@ export const LaboView: React.FC<LaboViewProps> = ({
                   max={10}
                   value={interet}
                   onChange={(e) => setInteret(Number(e.target.value))}
-                  className="w-full px-2 py-1.5 text-xs font-mono-tabular border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
+                  className="w-full px-2.5 py-2 text-xs font-mono-tabular border border-[#D8CFC4] rounded-lg bg-white"
                 />
               </div>
+              <button
+                type="submit"
+                className="flex-1 py-2 px-3 text-xs font-bold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637]"
+              >
+                {idEnEdition ? 'Enregistrer' : 'Épingler'}
+              </button>
             </div>
+          </div>
+        </form>
+      )}
 
-            <div>
-              <label className="block text-xs font-semibold text-[#16211B] mb-1">
-                Description & hypothèse de conception
-              </label>
-              <textarea
-                rows={3}
-                placeholder="Décrivez comment cette idée se traduit sur la table physique ou dans l’Atelier..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
-              />
-            </div>
+      {/* MUR DE POST-IT SUR TOUTE LA LARGEUR (1 à 3 ou 4 colonnes fluides) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {ideesFiltrees.map((item) => {
+          const style = getPostItStyle(item);
+          const varLiee = variantes.find((v) => v.id === item.varianteLieeId);
+          const versionAssociee = versions.find(
+            (ver) => ver.id === (item.versionCible || '0.1')
+          );
 
-            <button
-              type="submit"
-              className="w-full px-4 py-2 text-xs font-semibold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] transition-colors whitespace-nowrap"
+          return (
+            <article
+              key={item.id}
+              className={`rounded-xl border-2 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between ${style.cardBg}`}
             >
-              Ajouter l’idée au tableau Labo
-            </button>
-          </form>
-        </div>
+              {/* En-tête du Post-it : Bandeau adhésif + Note d'intérêt */}
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span
+                      className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded ${style.tapeBg}`}
+                    >
+                      {item.cible === 'Jeu' ? 'Le Jeu' : 'L’Atelier'} ·{' '}
+                      {item.categorie}
+                    </span>
+                    {item.versionCible && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          versionAssociee &&
+                          onSelectVersion &&
+                          onSelectVersion(versionAssociee.id)
+                        }
+                        className="text-[10px] font-mono-tabular font-bold px-2 py-0.5 rounded bg-white/80 border border-black/15 text-[#16211B] hover:bg-white"
+                        title="Version cible du Jeu"
+                      >
+                        V{item.versionCible}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Pastille Note d'Intérêt */}
+                  <div className="flex items-center gap-1 bg-white/90 px-2 py-0.5 rounded-md border border-black/10 shrink-0">
+                    <span className="text-[10px] text-[#55645B] font-medium">
+                      Intérêt
+                    </span>
+                    <select
+                      aria-label="Note d'intérêt"
+                      value={item.interet}
+                      onChange={(e) =>
+                        onSaveIdee({
+                          ...item,
+                          interet: Number(e.target.value),
+                        })
+                      }
+                      className="text-xs font-mono-tabular font-bold text-[#256B45] bg-transparent cursor-pointer"
+                    >
+                      {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((n) => (
+                        <option key={n} value={n}>
+                          {n}/10
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Titre du Post-it */}
+                <h3 className="font-display text-base font-bold text-[#16211B] leading-snug">
+                  {item.titre}
+                </h3>
+
+                {/* Corps de texte du Post-it */}
+                <p className="text-xs text-[#2B3730] mt-2 leading-relaxed">
+                  {item.description}
+                </p>
+
+                {/* Lien direct vers la variante si existante */}
+                {varLiee && onSelectVariante && (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => onSelectVariante(varLiee.id)}
+                      className="text-xs font-semibold text-[#256B45] bg-white/80 hover:bg-white px-2.5 py-1 rounded border border-[#256B45]/30 inline-flex items-center gap-1"
+                    >
+                      <span>▶ Tester dans Proto : {varLiee.nom}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Pied du Post-it : Contrôles directs de Priorité, Maturité et Actions */}
+              <div className="mt-4 pt-3 border-t border-black/10 space-y-2.5">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[10px] font-semibold uppercase tracking-wider text-[#55645B] mb-0.5">
+                      Priorité
+                    </label>
+                    <select
+                      value={item.priorite}
+                      onChange={(e) =>
+                        onSaveIdee({
+                          ...item,
+                          priorite: e.target.value as LabIdeaPriorite,
+                        })
+                      }
+                      className="w-full bg-white/85 border border-black/15 rounded px-2 py-1 text-xs font-semibold text-[#16211B]"
+                    >
+                      <option value="Haute">Haute priorité</option>
+                      <option value="Moyenne">Priorité moyenne</option>
+                      <option value="Basse">Priorité basse</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-semibold uppercase tracking-wider text-[#55645B] mb-0.5">
+                      Maturité
+                    </label>
+                    <select
+                      value={item.maturite}
+                      onChange={(e) =>
+                        onSaveIdee({
+                          ...item,
+                          maturite: e.target.value as LabIdeaMaturite,
+                        })
+                      }
+                      className="w-full bg-white/85 border border-black/15 rounded px-2 py-1 text-xs font-semibold text-[#16211B]"
+                    >
+                      <option value="Idée brute">Idée brute</option>
+                      <option value="En étude">En étude</option>
+                      <option value="Prête à tester">Prête à tester</option>
+                      <option value="Intégrée V0.1">Intégrée V0.1</option>
+                      <option value="Intégrée V0.2">Intégrée V0.2</option>
+                      <option value="Différée">Différée</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-[#55645B] pt-1">
+                  <span>
+                    Par <strong className="text-[#16211B]">{item.auteur}</strong> ·{' '}
+                    <span className="font-mono-tabular">{item.dateMaj}</span>
+                  </span>
+
+                  <div className="flex items-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => ouvrirEditionPostIt(item)}
+                      className="font-semibold text-[#16211B] hover:underline"
+                    >
+                      Modifier
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteIdee(item.id)}
+                      className="font-semibold text-[#C2412D] hover:underline"
+                    >
+                      Décoller
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </div>
   );

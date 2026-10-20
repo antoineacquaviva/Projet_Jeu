@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   AtelierComponentId,
   CampagneSelection33,
   EtatJeuV01,
+  GameVersionId,
+  GameVersionSpec,
   LabIdea,
   RapportInteret32,
   RapportViabilite31,
@@ -10,6 +12,7 @@ import {
   VariantV01,
 } from './shared/types';
 import { VARIANTES_INITIALES_V01 } from './shared/moteur';
+import { VERSIONS_JEU_INITIALES } from './shared/versions-registry';
 import {
   CAMPAGNES_VM_INITIALES,
   IDEES_INITIALES_LABO,
@@ -18,6 +21,7 @@ import {
   evaluerInteretVariante32,
   evaluerViabiliteVariante31,
 } from './shared/tests-engine';
+import { JeuView } from './components/JeuView';
 import { DemoView } from './components/DemoView';
 import { ProtoView } from './components/ProtoView';
 import { TestsView } from './components/TestsView';
@@ -25,7 +29,11 @@ import { MoteurBotsView } from './components/MoteurBotsView';
 import { LaboView } from './components/LaboView';
 
 export const App: React.FC = () => {
-  const [ongletActif, setOngletActif] = useState<AtelierComponentId>('proto');
+  const [ongletActif, setOngletActif] = useState<AtelierComponentId>('jeu');
+  const [versions, setVersions] = useState<GameVersionSpec[]>(
+    VERSIONS_JEU_INITIALES
+  );
+  const [versionActiveId, setVersionActiveId] = useState<GameVersionId>('0.1');
   const [variantes, setVariantes] = useState<VariantV01[]>(
     VARIANTES_INITIALES_V01
   );
@@ -58,8 +66,18 @@ export const App: React.FC = () => {
         if (resp.ok) {
           const data = await resp.json();
           if (!ignore && data) {
+            if (Array.isArray(data.versions) && data.versions.length > 0) {
+              setVersions(data.versions);
+            }
             if (Array.isArray(data.variantes) && data.variantes.length > 0) {
-              setVariantes(data.variantes);
+              // Fusionner les variantes initiales V0.2 si absentes de l'ancien fichier
+              const existIds = new Set(
+                data.variantes.map((v: VariantV01) => v.id)
+              );
+              const manquantes = VARIANTES_INITIALES_V01.filter(
+                (v) => !existIds.has(v.id)
+              );
+              setVariantes([...data.variantes, ...manquantes]);
             }
             if (Array.isArray(data.rapportsViabilite)) {
               setRapportsViabilite(data.rapportsViabilite);
@@ -73,8 +91,14 @@ export const App: React.FC = () => {
             if (Array.isArray(data.campagnesPlanifieesVM)) {
               setCampagnesVM(data.campagnesPlanifieesVM);
             }
-            if (Array.isArray(data.ideesLabo)) {
-              setIdeesLabo(data.ideesLabo);
+            if (Array.isArray(data.ideesLabo) && data.ideesLabo.length > 0) {
+              const existIdeaIds = new Set(
+                data.ideesLabo.map((i: LabIdea) => i.id)
+              );
+              const ideesManquantes = IDEES_INITIALES_LABO.filter(
+                (i) => !existIdeaIds.has(i.id)
+              );
+              setIdeesLabo([...data.ideesLabo, ...ideesManquantes]);
             }
             return;
           }
@@ -97,8 +121,36 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  const varianteActive =
-    variantes.find((v) => v.id === varianteActiveId) || variantes[0];
+  const versionActive = useMemo(
+    () => versions.find((v) => v.id === versionActiveId) || versions[0],
+    [versions, versionActiveId]
+  );
+
+  // Variantes appartenant à la version active du Jeu
+  const variantesDeLaVersion = useMemo(() => {
+    const filtrees = variantes.filter(
+      (v) => (v.version || '0.1') === versionActive.id
+    );
+    return filtrees.length > 0 ? filtrees : variantes;
+  }, [variantes, versionActive]);
+
+  const varianteActive = useMemo(
+    () =>
+      variantesDeLaVersion.find((v) => v.id === varianteActiveId) ||
+      variantesDeLaVersion[0] ||
+      variantes[0],
+    [variantesDeLaVersion, variantes, varianteActiveId]
+  );
+
+  const handleSelectVersion = (nouvelleVersionId: GameVersionId) => {
+    setVersionActiveId(nouvelleVersionId);
+    const premiereVar = variantes.find(
+      (v) => (v.version || '0.1') === nouvelleVersionId
+    );
+    if (premiereVar) {
+      setVarianteActiveId(premiereVar.id);
+    }
+  };
 
   const handleSaveVariante = async (
     nouvelleOuMaj: VariantV01,
@@ -126,6 +178,47 @@ export const App: React.FC = () => {
       return prev.map((v) => (v.id === nouvelleOuMaj.id ? nouvelleOuMaj : v));
     });
     setVarianteActiveId(nouvelleOuMaj.id);
+  };
+
+  const handleCreateNewVersion = async (
+    nouvelleVersion: GameVersionSpec,
+    varianteSocle: VariantV01,
+    ideesPromuesIds: string[]
+  ) => {
+    setVersions((prev) => [
+      ...prev.filter((v) => v.id !== nouvelleVersion.id),
+      nouvelleVersion,
+    ]);
+    setVariantes((prev) => [varianteSocle, ...prev]);
+    setVersionActiveId(nouvelleVersion.id);
+    setVarianteActiveId(varianteSocle.id);
+
+    // Mettre à jour la version cible des post-it promus
+    setIdeesLabo((prev) =>
+      prev.map((idee) =>
+        ideesPromuesIds.includes(idee.id)
+          ? {
+              ...idee,
+              versionCible: nouvelleVersion.id,
+              varianteLieeId: varianteSocle.id,
+            }
+          : idee
+      )
+    );
+
+    try {
+      await fetch('/api/atelier/versions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          version: nouvelleVersion,
+          varianteSocle,
+          ideesPromuesIds,
+        }),
+      });
+    } catch (_e) {
+      // Conservé en mémoire locale
+    }
   };
 
   const handleSaveIdeeLabo = async (idee: LabIdea) => {
@@ -172,29 +265,30 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F4F5F0] text-[#16211B]">
-      {/* TOP BAR CONTRACT : 3 ZONES (Brand | 5 Navigation Links | 1 Primary Variant Selector) */}
-      <header className="bg-white border-b border-[#D8DFD5] px-6 py-3.5 flex items-center justify-between gap-8">
-        {/* Zone 1 : Brand Wordmark (single text element) */}
+      {/* BARRE SUPÉRIEURE DE L'ATELIER : Marque | Onglets sans numérotation | Sélecteur de Version & Variante */}
+      <header className="bg-white border-b border-[#D8DFD5] px-6 py-3.5 flex flex-wrap items-center justify-between gap-6">
+        {/* Zone 1 : Identité de l'Atelier */}
         <a
           href="#atelier"
           onClick={(e) => {
             e.preventDefault();
-            setOngletActif('proto');
+            setOngletActif('jeu');
           }}
           className="font-display text-lg font-bold tracking-tight text-[#16211B] whitespace-nowrap shrink-0"
         >
-          Atelier de conception V1
+          Atelier de conception
         </a>
 
-        {/* Zone 2 : 5 Single-Line Navigation Links */}
+        {/* Zone 2 : Navigation principale ordonnée et sans numérotation */}
         <nav className="flex items-center gap-6 text-sm font-medium text-[#55645B] overflow-x-auto">
           {(
             [
-              { id: 'demo', label: '4. Démo' },
-              { id: 'proto', label: '5. Proto' },
-              { id: 'tests', label: '3. Tests' },
-              { id: 'moteur_bots', label: '1–2. Moteur & Bots' },
-              { id: 'labo', label: '6. Labo' },
+              { id: 'jeu', label: 'Le Jeu' },
+              { id: 'demo', label: 'Démo' },
+              { id: 'proto', label: 'Proto' },
+              { id: 'moteur_bots', label: 'Moteur & Bots' },
+              { id: 'tests', label: 'Tests' },
+              { id: 'labo', label: 'Labo' },
             ] as { id: AtelierComponentId; label: string }[]
           ).map((item) => {
             const actif = ongletActif === item.id;
@@ -214,15 +308,28 @@ export const App: React.FC = () => {
           })}
         </nav>
 
-        {/* Zone 3 : Sélecteur de Variante V0.1 */}
+        {/* Zone 3 : Sélecteur de Version du Jeu + Sélecteur de Variante */}
         <div className="flex items-center gap-2 shrink-0">
           <select
-            aria-label="Sélectionner la variante de Défenseurs de la forêt V0.1"
+            aria-label="Sélectionner la version du Jeu"
+            value={versionActive.id}
+            onChange={(e) => handleSelectVersion(e.target.value)}
+            className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-[#1E3528] bg-[#1E3528] text-white"
+          >
+            {versions.map((ver) => (
+              <option key={ver.id} value={ver.id}>
+                Jeu V{ver.id}
+              </option>
+            ))}
+          </select>
+
+          <select
+            aria-label="Sélectionner la variante de la version active"
             value={varianteActive.id}
             onChange={(e) => setVarianteActiveId(e.target.value)}
-            className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] max-w-[270px] truncate"
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] max-w-[260px] truncate"
           >
-            {variantes.map((v) => (
+            {variantesDeLaVersion.map((v) => (
               <option key={v.id} value={v.id}>
                 {v.statutViabilite === 'eliminee' ? '[ÉLIMINÉE] ' : ''}
                 {v.nom}
@@ -232,15 +339,19 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Sous-barre de contexte du Jeu actif : Défenseurs de la forêt V0.1 */}
+      {/* Sous-barre de contexte de la Version et Variante actives */}
       <div className="bg-[#EAECE4] border-b border-[#D8DFD5] px-6 py-2 text-xs text-[#55645B] flex flex-wrap items-center justify-between gap-3">
         <div>
           <span>
-            Le Jeu : <strong className="text-[#16211B]">Défenseurs de la forêt (Version 0.1)</strong>
+            Le Jeu :{' '}
+            <strong className="text-[#16211B]">
+              {versionActive.nomJeu} (Version {versionActive.id})
+            </strong>
           </span>
           <span className="mx-2">·</span>
           <span>
-            Variante active : <strong className="text-[#16211B]">{varianteActive.nom}</strong>
+            Variante :{' '}
+            <strong className="text-[#16211B]">{varianteActive.nom}</strong>
           </span>
           <span className="mx-2">·</span>
           <span>
@@ -255,7 +366,7 @@ export const App: React.FC = () => {
               }
             >
               {varianteActive.statutViabilite === 'viable'
-                ? 'Viable (3.1 OK)'
+                ? 'Viable'
                 : varianteActive.statutViabilite === 'eliminee'
                 ? 'Éliminée (Non viable)'
                 : 'À tester'}
@@ -268,17 +379,33 @@ export const App: React.FC = () => {
           <span className="mx-2">·</span>
           <span>{varianteActive.defenseursParJoueur} Déf./J</span>
           <span className="mx-2">·</span>
-          <span>6 Machines (Piste 0–5)</span>
+          <span>{varianteActive.machinesInitiales}/6 Machines</span>
           <span className="mx-2">·</span>
-          <span>Piste Tactique (2–12)</span>
+          <span>{varianteActive.nbTours} Tours</span>
         </div>
       </div>
 
       {/* Contenu principal (1440px max-width centré) */}
       <main className="flex-1 w-full max-w-[1440px] mx-auto px-6 py-6">
+        {ongletActif === 'jeu' && (
+          <JeuView
+            versions={versions}
+            versionActive={versionActive}
+            variantesVersion={variantesDeLaVersion}
+            varianteActive={varianteActive}
+            ideesLabo={ideesLabo}
+            onSelectVersion={handleSelectVersion}
+            onSelectVariante={(id) => setVarianteActiveId(id)}
+            onNavigateTab={(tab) => setOngletActif(tab)}
+            onCreateNewVersion={handleCreateNewVersion}
+            onUpdateVarianteOption={(maj) => handleSaveVariante(maj, false)}
+          />
+        )}
+
         {ongletActif === 'demo' && (
           <DemoView
             variante={varianteActive}
+            versionSpec={versionActive}
             onOpenInProto={(etatDemo) => {
               setEtatProtoExterne(etatDemo);
               setOngletActif('proto');
@@ -297,7 +424,7 @@ export const App: React.FC = () => {
         {ongletActif === 'tests' && (
           <TestsView
             varianteActive={varianteActive}
-            variantes={variantes}
+            variantes={variantesDeLaVersion}
             rapportsViabilite={rapportsViabilite}
             rapportsInteret={rapportsInteret}
             campagnesSelection={campagnesSelection}
@@ -329,11 +456,20 @@ export const App: React.FC = () => {
           <LaboView
             idees={ideesLabo}
             variantes={variantes}
+            versions={versions}
             onSaveIdee={handleSaveIdeeLabo}
             onDeleteIdee={handleDeleteIdeeLabo}
             onSelectVariante={(id) => {
+              const target = variantes.find((v) => v.id === id);
+              if (target && target.version) {
+                setVersionActiveId(target.version);
+              }
               setVarianteActiveId(id);
               setOngletActif('proto');
+            }}
+            onSelectVersion={(verId) => {
+              handleSelectVersion(verId);
+              setOngletActif('jeu');
             }}
           />
         )}

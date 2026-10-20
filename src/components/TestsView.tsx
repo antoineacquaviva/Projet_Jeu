@@ -326,10 +326,10 @@ export const TestsView: React.FC<TestsViewProps> = ({
       <div className="bg-white rounded-xl p-4 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-lg font-semibold text-[#16211B]">
-            3. Tests — Viabilité (3.1), Intérêt (3.2), Sélection (3.3) & Planification VM Oracle Cloud
+            Tests — Viabilité, Intérêt Stratégique & Sélection des Variantes (V{varianteActive.version})
           </h2>
           <p className="text-xs text-[#55645B]">
-            Catalogue V0.1 : <strong className="text-[#256B45]">{nbViables} variantes viables</strong> ·{' '}
+            Catalogue actif : <strong className="text-[#256B45]">{nbViables} variantes viables</strong> ·{' '}
             <strong className="text-[#C2412D]">{nbEliminees} variantes éliminées</strong> ·{' '}
             Variante active : <strong className="text-[#16211B]">{varianteActive.nom}</strong>
           </p>

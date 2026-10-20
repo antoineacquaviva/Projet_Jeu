@@ -264,7 +264,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
       <div className="bg-white rounded-xl p-4 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-lg font-semibold text-[#16211B]">
-            5. Proto — Prototype Jouable & Projection Matérielle (« {variante.nom} »)
+            Proto — Prototype Jouable & Projection Matérielle (« {variante.nom} »)
           </h2>
           <p className="text-xs text-[#55645B]">
              Séquencement : <strong className="text-[#16211B]">{variante.modeProgrammation}</strong> ·{' '}

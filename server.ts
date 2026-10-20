@@ -4,6 +4,7 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import {
   CampagneSelection33,
+  GameVersionSpec,
   LabIdea,
   RapportInteret32,
   RapportViabilite31,
@@ -11,6 +12,7 @@ import {
   VariantV01,
 } from './src/shared/types';
 import { VARIANTES_INITIALES_V01 } from './src/shared/moteur';
+import { VERSIONS_JEU_INITIALES } from './src/shared/versions-registry';
 import {
   evaluerInteretVariante32,
   evaluerViabiliteVariante31,
@@ -24,6 +26,7 @@ import {
 
 export interface AtelierPersistedState {
   derniereSauvegarde: string;
+  versions: GameVersionSpec[];
   variantes: VariantV01[];
   rapportsViabilite: RapportViabilite31[];
   rapportsInteret: RapportInteret32[];
@@ -44,6 +47,9 @@ export function chargerEtatAtelier(): AtelierPersistedState {
       const raw = fs.readFileSync(STATE_FILE_PATH, 'utf-8');
       const parsed = JSON.parse(raw) as AtelierPersistedState;
       if (parsed && Array.isArray(parsed.variantes)) {
+        if (!Array.isArray(parsed.versions) || parsed.versions.length === 0) {
+          parsed.versions = [...VERSIONS_JEU_INITIALES];
+        }
         return parsed;
       }
     }
@@ -62,6 +68,7 @@ export function chargerEtatAtelier(): AtelierPersistedState {
 
   const etatInitial: AtelierPersistedState = {
     derniereSauvegarde: new Date().toISOString(),
+    versions: [...VERSIONS_JEU_INITIALES],
     variantes: [...VARIANTES_INITIALES_V01],
     rapportsViabilite: rapViabInitiales,
     rapportsInteret: [rapInteretInitial],
@@ -98,7 +105,42 @@ async function startServer() {
     res.json(state);
   });
 
-  // POST créer ou modifier une variante V0.1
+  // POST créer ou mettre à jour une Version du Jeu (ex. V0.2, V0.3 depuis le Labo)
+  app.post('/api/atelier/versions', (req, res) => {
+    const { version, varianteSocle, ideesPromuesIds } = req.body as {
+      version: GameVersionSpec;
+      varianteSocle?: VariantV01;
+      ideesPromuesIds?: string[];
+    };
+    if (!version || !version.id) {
+      res.status(400).json({ error: 'Version invalide' });
+      return;
+    }
+    const idx = state.versions.findIndex((v) => v.id === version.id);
+    if (idx >= 0) {
+      state.versions[idx] = version;
+    } else {
+      state.versions.push(version);
+    }
+    if (varianteSocle && varianteSocle.id) {
+      state.variantes.unshift(varianteSocle);
+    }
+    if (Array.isArray(ideesPromuesIds) && ideesPromuesIds.length > 0) {
+      state.ideesLabo = state.ideesLabo.map((idee) =>
+        ideesPromuesIds.includes(idee.id)
+          ? {
+              ...idee,
+              versionCible: version.id,
+              varianteLieeId: varianteSocle?.id || idee.varianteLieeId,
+            }
+          : idee
+      );
+    }
+    sauvegarderEtatAtelier(state);
+    res.json({ version, state });
+  });
+
+  // POST créer ou modifier une variante
   app.post('/api/atelier/variants', (req, res) => {
     const variante = req.body as VariantV01;
     if (!variante || !variante.id) {

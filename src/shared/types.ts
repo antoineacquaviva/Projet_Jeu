@@ -1,23 +1,31 @@
-export type AtelierComponentId = 'demo' | 'proto' | 'tests' | 'moteur_bots' | 'labo';
+export type AtelierComponentId =
+  | 'jeu'
+  | 'demo'
+  | 'proto'
+  | 'moteur_bots'
+  | 'tests'
+  | 'labo';
+
+export type GameVersionId = string; // ex. '0.1', '0.2'
 
 export type TactiqueType = 'cupidite' | 'percee' | 'opportunisme' | 'represailles';
 
 export type ActionDefenseurType = 'deplacer' | 'proteger' | 'saboter' | 'replanter' | 'attendre';
 
-// Options de séquencement de la programmation en V0.1
+// Options de séquencement de la programmation
 export type ModeProgrammation =
   | 'sequentielle_2_ordres' // Référence : chaque joueur programme ses 2 actions d'affilée à son tour
   | 'alternee_1_par_1'      // Tour de table pour Action I, puis 2e tour de table pour Action II
   | '2e_apres_ciblage'      // Action I programmée -> 1res actions + Ciblage Machines -> Action II programmée en réaction
   | 'un_seul_ordre';        // 1 seule action par Défenseur et par tour
 
-// Options de séquencement de la résolution en V0.1
+// Options de séquencement de la résolution
 export type ModeResolution =
-  | 'entrelacee_coupe_fin'  // Référence confirmée : 1res actions -> Ciblage/Déplacement Machines -> 2es actions -> Coupe des Forêts & Apprentissage
-  | 'deux_vagues_completes' // Vague I (1res actions + moitié des Machines ciblent et coupent) -> Vague II (2es actions + reste des Machines)
+  | 'entrelacee_coupe_fin'   // Référence confirmée : 1res actions -> Ciblage/Déplacement Machines -> 2es actions -> Coupe des Forêts & Apprentissage
+  | 'deux_vagues_completes'  // Vague I (1res actions + moitié des Machines ciblent et coupent) -> Vague II (2es actions + reste des Machines)
   | 'machines_avant_actions'; // Les Machines ciblent et se déplacent en premier -> 1res et 2es actions Défenseurs -> Coupe des Forêts
 
-// Options sur les actions en V0.1
+// Options sur les actions
 export type EffetProteger =
   | 'coupe_seule'             // Référence : empêche la coupe de Forêt sur la case ce tour
   | 'barrage_entree_et_coupe' // Empêche aussi une Machine d'entrer sur la case ET bloque la coupe
@@ -42,7 +50,7 @@ export type StatutViabilite = 'non_teste' | 'viable' | 'eliminee';
 export interface VariantV01 {
   id: string;
   nom: string;
-  version: '0.1';
+  version: GameVersionId; // '0.1', '0.2', etc.
   description: string;
   origine: 'socle' | 'exploration' | 'utilisateur';
   statutViabilite: StatutViabilite;
@@ -64,6 +72,10 @@ export interface VariantV01 {
   rythmeApprentissage: RythmeApprentissage;
   porteeTactiques: PorteeTactiques;
 
+  // Options additionnelles de versions ultérieures (ex. V0.2+)
+  peuplesAsymetriquesActifs?: boolean;
+  jetonEclaireurActif?: boolean;
+
   // Paramètres numériques (3 à 6 joueurs)
   nbJoueurs: 3 | 4 | 5 | 6;
   defenseursParJoueur: number;       // n pions Défenseurs par joueur (1 à 3)
@@ -71,6 +83,87 @@ export interface VariantV01 {
   foretsCoeur: number;               // Forêts initiales sur la Tuile Cœur (3 à 8)
   nbTours: number;                   // Durée de la partie en tours (3 à 6)
   machinesInitiales: number;         // Nombre de Machines sur le plateau au départ sur les 6 disponibles (2 à 6)
+}
+
+/**
+ * Contrat générique d'une Version du Jeu dans l'Atelier de conception.
+ * Toute nouvelle version (V0.1, V0.2, V0.3...) déclare ce manifeste et bénéficie
+ * automatiquement de l'ensemble des composants de l'Atelier (Le Jeu, Démo, Proto, Moteur & Bots, Tests, Labo).
+ */
+export interface RuleChoiceSpec {
+  valeur: string;
+  label: string;
+  estReference?: boolean;
+  description: string;
+  impactPhysique: string;
+}
+
+export interface RuleOptionSpec {
+  id: string;
+  cleVariante: keyof VariantV01;
+  nom: string;
+  categorie:
+    | 'Séquencement de la Programmation'
+    | 'Séquencement de la Résolution'
+    | 'Actions des Défenseurs'
+    | 'Automatismes du Méchant'
+    | 'Modules Avancés (Labo)';
+  introduiteEnVersion: GameVersionId;
+  description: string;
+  choix: RuleChoiceSpec[];
+}
+
+export interface VariableParameterSpec {
+  id: string;
+  cleVariante:
+    | 'nbJoueurs'
+    | 'defenseursParJoueur'
+    | 'foretsParCaseSecteur'
+    | 'foretsCoeur'
+    | 'nbTours'
+    | 'machinesInitiales';
+  nom: string;
+  unite: string;
+  min: number;
+  max: number;
+  pas: number;
+  valeurReference: number;
+  description: string;
+  impactMateriel: string;
+}
+
+export interface BoxComponentSpec {
+  id: string;
+  categorie: string;
+  nom: string;
+  quantiteFormule: 'dynamique_joueurs' | 'dynamique_forets' | string;
+  descriptionMat: string;
+  usageRegle: string;
+  nouveauteVersion?: boolean;
+}
+
+export interface SetupStepSpec {
+  numero: number;
+  titre: string;
+  materiel: string;
+  consigne: string;
+  astuceTable: string;
+}
+
+export interface GameVersionSpec {
+  id: GameVersionId; // ex. '0.1', '0.2'
+  nomJeu: string;    // "Défenseurs de la forêt"
+  titreVersion: string;
+  statut: 'active' | 'en_preparation' | 'archivee';
+  dateCreation: string;
+  pitch: string;
+  invariantsConception: string[];
+  evolutionsDepuisPrecedente: string[];
+  ideesLaboIds: string[];
+  optionsRegles: RuleOptionSpec[];
+  parametresVariables: VariableParameterSpec[];
+  composantsBoite: BoxComponentSpec[];
+  etapesMiseEnPlace: SetupStepSpec[];
 }
 
 export interface CasePlateau {
@@ -305,13 +398,26 @@ export interface ScheduledCampaignVM {
 
 export type LabIdeaCible = 'Jeu' | 'Atelier';
 export type LabIdeaPriorite = 'Haute' | 'Moyenne' | 'Basse';
-export type LabIdeaMaturite = 'Idée brute' | 'En étude' | 'Prête à tester' | 'Intégrée V0.1' | 'Différée';
+export type LabIdeaMaturite =
+  | 'Idée brute'
+  | 'En étude'
+  | 'Prête à tester'
+  | 'Intégrée V0.1'
+  | 'Intégrée V0.2'
+  | 'Différée';
 
 export interface LabIdea {
   id: string;
   titre: string;
   cible: LabIdeaCible;
-  categorie: 'Méchant & Pistes' | 'Défenseurs & Actions' | 'Séquencement & Tour' | 'Matériel Physique' | 'Tests & VM' | 'Différé (Rêve / Peuples)';
+  versionCible?: GameVersionId; // ex. '0.1', '0.2', '0.3'
+  categorie:
+    | 'Méchant & Pistes'
+    | 'Défenseurs & Actions'
+    | 'Séquencement & Tour'
+    | 'Matériel Physique'
+    | 'Tests & VM'
+    | 'Différé (Rêve / Peuples)';
   description: string;
   auteur: 'Auteur' | 'Gemini';
   priorite: LabIdeaPriorite;

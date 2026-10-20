@@ -57,10 +57,10 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
       <div className="bg-white rounded-xl p-4 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-lg font-semibold text-[#16211B]">
-            1 & 2. Moteur & Bots — Configurateur de Variantes V0.1 & Joueurs Virtuels
+            Moteur & Bots — Configurateur de Variantes (V{form.version}) & Joueurs Virtuels
           </h2>
           <p className="text-xs text-[#55645B]">
-            Explorez les options de séquencement (programmation / résolution), les règles d’actions et les paramètres de « Défenseurs de la forêt » V0.1.
+            Explorez les options de séquencement (programmation / résolution), les règles d’actions et les paramètres de « Défenseurs de la forêt » (Version {form.version}).
           </p>
         </div>
 
@@ -69,13 +69,13 @@ export const MoteurBotsView: React.FC<MoteurBotsViewProps> = ({
             onClick={() => handleSave(false)}
             className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] whitespace-nowrap shrink-0"
           >
-            Mettre à jour & Tester la viabilité (3.1)
+            Mettre à jour & Tester la viabilité
           </button>
           <button
             onClick={() => handleSave(true)}
             className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#16211B] text-white hover:bg-black whitespace-nowrap shrink-0"
           >
-            Dupliquer comme nouvelle variante V0.1
+            Dupliquer comme nouvelle variante V{form.version}
           </button>
         </div>
       </div>
