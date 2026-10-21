@@ -41,7 +41,7 @@ export const ETAPES_TOUR_VISUELLES = [
     numero: 3,
     code: 'resolution_actions_1',
     titreCourt: '3. 1res Actions',
-    detail: 'Exécution Action I',
+    detail: 'Exécution Carte I',
   },
   {
     numero: 4,
@@ -53,7 +53,7 @@ export const ETAPES_TOUR_VISUELLES = [
     numero: 5,
     code: 'resolution_actions_2',
     titreCourt: '5. 2es Actions',
-    detail: 'Exécution Action II',
+    detail: 'Exécution Carte II',
   },
   {
     numero: 6,
@@ -107,9 +107,9 @@ export const TurnPhaseStepper: React.FC<TurnPhaseStepperProps> = ({
             TOUR {tourActuel} / {nbTours}
           </span>
           <span className="text-xs font-semibold text-[#16211B]">
-            Progression dans le tour de jeu :
+            Progression dans le tour :
           </span>
-          <span className="text-xs font-bold text-[#256B45]">
+          <span className="text-xs font-extrabold text-[#256B45]">
             Étape {indexActif + 1} sur 6 —{' '}
             {ETAPES_TOUR_VISUELLES[indexActif]?.titreCourt.replace(/^\d+\.\s*/, '')}
           </span>
@@ -118,14 +118,14 @@ export const TurnPhaseStepper: React.FC<TurnPhaseStepperProps> = ({
         {nomJoueurActif &&
           (sousPhase === 'programmation_1' || sousPhase === 'programmation_2') && (
             <div
-              className={`px-2.5 py-0.5 rounded-md text-xs font-bold flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-md text-xs font-extrabold flex items-center gap-2 ${
                 estTourHumain
-                  ? 'bg-emerald-100 text-[#165B36] border border-emerald-400'
-                  : 'bg-indigo-100 text-indigo-900 border border-indigo-300'
+                  ? 'bg-emerald-100 text-[#165B36] border-2 border-emerald-500 shadow-2xs'
+                  : 'bg-indigo-100 text-indigo-900 border-2 border-indigo-400'
               }`}
             >
               <span
-                className={`w-2 h-2 rounded-full ${
+                className={`w-2.5 h-2.5 rounded-full ${
                   estTourHumain ? 'bg-emerald-600 animate-ping' : 'bg-indigo-600'
                 }`}
               />
@@ -150,13 +150,13 @@ export const TurnPhaseStepper: React.FC<TurnPhaseStepperProps> = ({
               type="button"
               disabled={!cliquable}
               onClick={() => onSelectEtape && onSelectEtape(idx)}
-              className={`text-left p-2 rounded-lg border transition-all flex flex-col justify-between ${
-                cliquable ? 'cursor-pointer' : 'cursor-default'
+              className={`text-left p-2.5 rounded-lg border transition-all flex flex-col justify-between ${
+                cliquable ? 'cursor-pointer hover:border-[#256B45]' : 'cursor-default'
               } ${
                 estCourante
-                  ? 'bg-[#256B45] text-white border-[#16211B] ring-2 ring-[#256B45]/40 shadow-xs'
+                  ? 'bg-[#256B45] text-white border-2 border-[#16211B] ring-2 ring-[#256B45]/40 shadow-sm'
                   : estPassee
-                  ? 'bg-emerald-50/70 text-[#1E3528] border-emerald-300'
+                  ? 'bg-emerald-50/80 text-[#1E3528] border-emerald-300'
                   : 'bg-[#F4F5F0] text-[#55645B] border-[#D8DFD5]'
               }`}
             >
@@ -165,20 +165,20 @@ export const TurnPhaseStepper: React.FC<TurnPhaseStepperProps> = ({
                   {etape.titreCourt}
                 </span>
                 <span
-                  className={`text-[10px] font-mono-tabular font-bold px-1.5 py-0.2 rounded ${
+                  className={`text-[10px] font-mono-tabular font-bold px-1.5 py-0.5 rounded ${
                     estCourante
-                      ? 'bg-white/20 text-white'
+                      ? 'bg-amber-400 text-[#16211B]'
                       : estPassee
                       ? 'bg-emerald-200/80 text-[#165B36]'
                       : 'bg-stone-200 text-[#55645B]'
                   }`}
                 >
-                  {estCourante ? 'EN COURS' : estPassee ? '✓' : `${idx + 1}/6`}
+                  {estCourante ? 'ACTIF' : estPassee ? '✓' : `${idx + 1}/6`}
                 </span>
               </div>
               <div
                 className={`text-[11px] mt-0.5 truncate ${
-                  estCourante ? 'text-emerald-100' : 'text-[#55645B]'
+                  estCourante ? 'text-emerald-100 font-medium' : 'text-[#55645B]'
                 }`}
               >
                 {etape.detail}
@@ -193,6 +193,7 @@ export const TurnPhaseStepper: React.FC<TurnPhaseStepperProps> = ({
 
 interface PhysicalBoardV01Props {
   etat: EtatJeuV01;
+  etatPrecedent?: EtatJeuV01 | null;
   sieges?: string[];
   caseSelectionneeId?: number | null;
   casesSurligneesIds?: number[];
@@ -211,6 +212,7 @@ const COULEUR_TACTIQUE: Record<
   percee: { bg: '#FEE2E2', text: '#991B1B', border: '#EF4444' },
   opportunisme: { bg: '#E0E7FF', text: '#1E40AF', border: '#6366F1' },
   represailles: { bg: '#F3E8FF', text: '#6B21A8', border: '#A855F7' },
+  acharnement: { bg: '#FFE4E6', text: '#9F1239', border: '#F43F5E' },
 };
 
 function pointsHexagone(rayon: number): string {
@@ -233,6 +235,21 @@ function titreGeometriePlateau(
   sousTitre: string;
 } {
   switch (geometrie) {
+    case 'compact_9_cases':
+      return {
+        titre: `Micro-Plateau Compact (${nbCases} zones · Forte Tension)`,
+        sousTitre: '1 Cœur + 4 Clairières Intérieures + 4 Lisières',
+      };
+    case 'sentiers_goulots_15':
+      return {
+        titre: `Sentiers à Goulots d’Étranglement (${nbCases} zones · Cap. 1)`,
+        sousTitre: '1 Cœur + 4 Sous-Bois + 4 Cols Goulots + 6 Lisières',
+      };
+    case 'reseau_etendu_21':
+      return {
+        titre: `Grand Réseau Étendu (${nbCases} zones · Calibré 5–6J)`,
+        sousTitre: '1 Sanctuaire + 6 Clairières + 6 Sous-Bois + 8 Lisières',
+      };
     case 'double_plateau_34_56':
       return {
         titre:
@@ -264,6 +281,7 @@ function titreGeometriePlateau(
 
 export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
   etat,
+  etatPrecedent = null,
   sieges,
   caseSelectionneeId = null,
   casesSurligneesIds = [],
@@ -287,9 +305,15 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
     etat.cases.length
   );
 
-  // Calculer les vecteurs de déplacements programmés et postures programmées pour la lisibilité sur le plateau
-  const vecteursProgrammes = useMemo(() => {
-    const fleches: {
+  // Calculer les vecteurs de déplacements programmés, les mouvements réalisés (si etatPrecedent ou journal), et les éléments agissants
+  const {
+    flechesProgrammees,
+    flechesRealisees,
+    badgesSurPlace,
+    pionsAgissantsIds,
+    machinesAgissantesIds,
+  } = useMemo(() => {
+    const flechesProg: {
       id: string;
       fromId: number;
       toId: number;
@@ -297,13 +321,80 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
       couleur: string;
       label: string;
       estMoi: boolean;
+      offsetCurve: number;
     }[] = [];
 
-    const badgesSurPlace: Record<
+    const flechesExec: {
+      id: string;
+      fromId: number;
+      toId: number;
+      couleur: string;
+      label: string;
+      type: 'defenseur' | 'machine';
+      offsetCurve: number;
+    }[] = [];
+
+    const badges: Record<
       number,
       { label: string; couleur: string; type: string }[]
     > = {};
 
+    const pionsActifs = new Set<number>();
+    const machinesActives = new Set<number>();
+
+    // 1. Si nous avons un état précédent (ex: Démo ou transition d'étape), détecter les déplacements qui viennent d'être réalisés !
+    if (etatPrecedent) {
+      let curveIdx = 0;
+      for (const d of etat.defenseurs) {
+        const dAvant = etatPrecedent.defenseurs.find((x) => x.id === d.id);
+        if (dAvant && dAvant.caseId !== d.caseId) {
+          pionsActifs.add(d.id);
+          const info = formaterNomSiege(d.joueur, sieges);
+          flechesExec.push({
+            id: `exec-def-${d.id}`,
+            fromId: dAvant.caseId,
+            toId: d.caseId,
+            couleur: info.estHumain ? '#10B981' : '#38BDF8',
+            label: `${
+              info.estHumain ? `MOI ${d.numeroPion}` : `${info.codePion}#${d.numeroPion}`
+            } ➔`,
+            type: 'defenseur',
+            offsetCurve: (curveIdx++ % 2 === 0 ? 1 : -1) * 14,
+          });
+        } else if (dAvant && !dAvant.postureProtection && d.postureProtection) {
+          pionsActifs.add(d.id);
+        }
+      }
+
+      for (const m of etat.machines) {
+        const mAvant = etatPrecedent.machines.find((x) => x.id === m.id);
+        if (m.caseId !== null && mAvant && mAvant.caseId !== m.caseId) {
+          machinesActives.add(m.id);
+          if (mAvant.caseId !== null) {
+            flechesExec.push({
+              id: `exec-mach-${m.id}`,
+              fromId: mAvant.caseId,
+              toId: m.caseId,
+              couleur: '#F59E0B',
+              label: `🎯 M${m.id} ➔`,
+              type: 'machine',
+              offsetCurve: (curveIdx++ % 2 === 0 ? 1 : -1) * 18,
+            });
+          } else {
+            // Entrée depuis le Chantier sur une Lisière
+            if (!badges[m.caseId]) badges[m.caseId] = [];
+            badges[m.caseId].push({
+              label: `🚨 ENTRÉE M${m.id}`,
+              couleur: '#EF4444',
+              type: 'machine',
+            });
+          }
+        }
+      }
+    }
+
+    // 2. Calculer les flèches d'actions programmées (intentions non encore résolues)
+    let progCurveIdx = 0;
     for (let j = 0; j < etat.variante.nbJoueurs; j++) {
       const acts = etat.programmations[j] || [];
       if (acts.length === 0) continue;
@@ -317,7 +408,6 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
         const act1 = acts.find((a) => a.pionId === pion.id && a.etape === 1);
         const act2 = acts.find((a) => a.pionId === pion.id && a.etape === 2);
 
-        // Si on est encore avant la résolution de l'Action I
         const montrerEtape1 =
           etat.sousPhase === 'programmation_1' ||
           etat.sousPhase === 'resolution_actions_1';
@@ -326,42 +416,42 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
           etat.sousPhase === 'programmation_2' ||
           etat.sousPhase === 'resolution_actions_2';
 
+        const nomCourtPion = infoSiege.estHumain
+          ? `MOI ${pion.numeroPion}`
+          : `${infoSiege.codePion}#${pion.numeroPion}`;
+
         if (act1 && montrerEtape1) {
+          pionsActifs.add(pion.id);
           if (
             act1.type === 'deplacer' &&
             act1.caseCible !== null &&
             act1.caseCible !== posCourante
           ) {
-            fleches.push({
+            flechesProg.push({
               id: `f1-${pion.id}`,
               fromId: posCourante,
               toId: act1.caseCible,
               etape: 1,
               couleur,
-              label: `${infoSiege.codePion}#${pion.numeroPion} (I)`,
+              label: `${nomCourtPion} (I)`,
               estMoi: infoSiege.estHumain,
+              offsetCurve: (progCurveIdx++ % 2 === 0 ? 1 : -1) * 14,
             });
             posCourante = act1.caseCible;
           } else if (act1.type !== 'attendre') {
-            if (!badgesSurPlace[posCourante]) badgesSurPlace[posCourante] = [];
-            badgesSurPlace[posCourante].push({
+            if (!badges[posCourante]) badges[posCourante] = [];
+            badges[posCourante].push({
               label: `${
                 act1.type === 'proteger'
                   ? '🛡️'
                   : act1.type === 'saboter'
                   ? '⚡'
                   : '🌱'
-              }I ${infoSiege.codePion}`,
+              }I ${nomCourtPion}`,
               couleur,
               type: act1.type,
             });
           }
-        } else if (
-          act1 &&
-          act1.type === 'deplacer' &&
-          act1.caseCible !== null
-        ) {
-          posCourante = pion.caseId;
         }
 
         if (act2 && montrerEtape2) {
@@ -370,25 +460,26 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
             act2.caseCible !== null &&
             act2.caseCible !== posCourante
           ) {
-            fleches.push({
+            flechesProg.push({
               id: `f2-${pion.id}`,
               fromId: posCourante,
               toId: act2.caseCible,
               etape: 2,
               couleur,
-              label: `${infoSiege.codePion}#${pion.numeroPion} (II)`,
+              label: `${nomCourtPion} (II)`,
               estMoi: infoSiege.estHumain,
+              offsetCurve: (progCurveIdx++ % 2 === 0 ? 1 : -1) * 20,
             });
           } else if (act2.type !== 'attendre') {
-            if (!badgesSurPlace[posCourante]) badgesSurPlace[posCourante] = [];
-            badgesSurPlace[posCourante].push({
+            if (!badges[posCourante]) badges[posCourante] = [];
+            badges[posCourante].push({
               label: `${
                 act2.type === 'proteger'
                   ? '🛡️'
                   : act2.type === 'saboter'
                   ? '⚡'
                   : '🌱'
-              }II ${infoSiege.codePion}`,
+              }II ${nomCourtPion}`,
               couleur,
               type: act2.type,
             });
@@ -397,22 +488,32 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
       }
     }
 
-    return { fleches, badgesSurPlace };
+    return {
+      flechesProgrammees: flechesProg,
+      flechesRealisees: flechesExec,
+      badgesSurPlace: badges,
+      pionsAgissantsIds: pionsActifs,
+      machinesAgissantesIds: machinesActives,
+    };
   }, [
     etat.programmations,
     etat.defenseurs,
+    etat.machines,
     etat.sousPhase,
     etat.variante.nbJoueurs,
+    etatPrecedent,
     sieges,
   ]);
 
   // Extraire les dernières actions réalisées du tour courant pour les afficher clairement
   const dernieresActionsRealisees = useMemo(() => {
     const entreesTour = etat.journal.filter(
-      (e) => e.tour === etat.tourActuel && !e.id.startsWith('init-') && !e.id.startsWith('tour-start-')
+      (e) =>
+        e.tour === etat.tourActuel &&
+        !e.id.startsWith('init-') &&
+        !e.id.startsWith('tour-start-')
     );
     return entreesTour.slice(-5).map((e) => {
-      // Remplacer J1, J2... dans le message par le nom court du siège (Moi / Bot Code)
       const msgFormate = e.message.replace(/J(\d+)/g, (_m, numStr) => {
         const idx = Number(numStr) - 1;
         return formaterNomSiege(idx, sieges).nomCourt;
@@ -424,33 +525,36 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
     });
   }, [etat.journal, etat.tourActuel, sieges]);
 
+  const nbFlechesTotales =
+    flechesProgrammees.length + flechesRealisees.length;
+
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch">
-      {/* Zone gauche : Tapis de jeu en feutre forestier (7 colonnes) */}
-      <div className="xl:col-span-7 bg-[#1E3528] text-[#F4F5F0] rounded-xl p-4 border border-[#14241B] flex flex-col justify-between">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b border-white/10">
+      {/* Zone gauche : Grand Tapis de jeu en feutre forestier (7 colonnes) */}
+      <div className="xl:col-span-7 bg-[#182C21] text-[#F4F5F0] rounded-xl p-4 border-2 border-[#0F1E16] flex flex-col justify-between shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 border-b border-white/15">
           <div>
-            <h3 className="font-display text-base font-semibold text-white">
+            <h3 className="font-display text-base font-bold text-white">
               {infoGeo.titre}
             </h3>
-            <p className="text-xs text-emerald-200/80">{infoGeo.sousTitre}</p>
+            <p className="text-xs text-emerald-200/90">{infoGeo.sousTitre}</p>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setAfficherIntentionsProgrammees((v) => !v)}
-              className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-colors ${
+              className={`px-3 py-1 rounded-md text-xs font-bold border transition-colors ${
                 afficherIntentionsProgrammees
-                  ? 'bg-emerald-500/25 border-emerald-400 text-emerald-100'
-                  : 'bg-white/5 border-white/15 text-emerald-200/70'
+                  ? 'bg-emerald-500/30 border-emerald-400 text-white'
+                  : 'bg-white/5 border-white/20 text-emerald-200/70'
               }`}
             >
               {afficherIntentionsProgrammees
-                ? '👁️ Flèches d’actions : Visibles'
-                : '👁️ Flèches d’actions : Masquées'}
+                ? `👁️ Flèches & Ordres (${nbFlechesTotales} flèches)`
+                : '👁️ Afficher flèches & ordres'}
             </button>
-            <div className="text-right font-mono-tabular text-xs text-emerald-100 shrink-0">
+            <div className="text-right font-mono-tabular text-xs text-emerald-100 shrink-0 bg-black/30 px-2.5 py-1 rounded-md border border-white/10">
               <span>
                 🌲{' '}
                 <strong className="text-white text-sm">
@@ -464,10 +568,10 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
 
         {/* Bandeau synthétique des Actions Réalisées lors de ce tour */}
         {dernieresActionsRealisees.length > 0 && (
-          <div className="mt-2.5 bg-black/25 border border-white/10 rounded-lg px-3 py-2">
+          <div className="mt-2.5 bg-black/35 border border-emerald-400/30 rounded-lg px-3 py-2">
             <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 mb-1 flex items-center justify-between">
-              <span>⚡ Dernières actions réalisées sur le plateau :</span>
-              <span className="text-emerald-200/70 font-normal">
+              <span>⚡ Actions réalisées sur le plateau :</span>
+              <span className="text-emerald-200/80 font-mono-tabular">
                 Tour {etat.tourActuel}
               </span>
             </div>
@@ -475,14 +579,14 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
               {dernieresActionsRealisees.map((act) => (
                 <span
                   key={act.id}
-                  className={`text-[11px] px-2 py-0.5 rounded font-medium border ${
+                  className={`text-xs px-2.5 py-0.5 rounded font-semibold border ${
                     act.type === 'coupe'
-                      ? 'bg-red-950/90 border-red-400 text-red-200'
+                      ? 'bg-red-950 border-red-400 text-red-100'
                       : act.type === 'machine'
-                      ? 'bg-amber-950/90 border-amber-400 text-amber-200'
+                      ? 'bg-amber-950 border-amber-400 text-amber-100'
                       : act.type === 'apprentissage'
-                      ? 'bg-purple-950/80 border-purple-400 text-purple-200'
-                      : 'bg-emerald-950/90 border-emerald-400 text-emerald-100'
+                      ? 'bg-purple-950 border-purple-400 text-purple-100'
+                      : 'bg-emerald-950 border-emerald-400 text-emerald-50'
                   }`}
                 >
                   {act.type === 'coupe'
@@ -499,34 +603,56 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
           </div>
         )}
 
-        {/* SVG du plateau selon l'architecture géométrique */}
+        {/* SVG du plateau agrandi (viewBox resserré + max-w-[680px] pour un plateau et des pions nettement plus grands) */}
         <div className="relative flex items-center justify-center my-2">
           <svg
-            viewBox="-300 -295 600 590"
-            className="w-full max-w-[580px] h-auto select-none"
+            viewBox="-275 -270 550 540"
+            className="w-full max-w-[680px] h-auto select-none"
           >
             <defs>
               <marker
                 id="arrow-plan-moi"
                 viewBox="0 0 10 10"
-                refX="7"
+                refX="8"
                 refY="5"
-                markerWidth="6"
-                markerHeight="6"
+                markerWidth="6.5"
+                markerHeight="6.5"
                 orient="auto-start-reverse"
               >
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#34D399" />
+                <path d="M 0 0.5 L 10 5 L 0 9.5 z" fill="#34D399" />
               </marker>
               <marker
                 id="arrow-plan-bot"
                 viewBox="0 0 10 10"
-                refX="7"
+                refX="8"
                 refY="5"
-                markerWidth="6"
-                markerHeight="6"
+                markerWidth="6.5"
+                markerHeight="6.5"
                 orient="auto-start-reverse"
               >
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#FDE047" />
+                <path d="M 0 0.5 L 10 5 L 0 9.5 z" fill="#FDE047" />
+              </marker>
+              <marker
+                id="arrow-exec-def"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 0.5 L 10 5 L 0 9.5 z" fill="#10B981" />
+              </marker>
+              <marker
+                id="arrow-exec-mach"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="7"
+                markerHeight="7"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 0.5 L 10 5 L 0 9.5 z" fill="#F59E0B" />
               </marker>
             </defs>
 
@@ -534,17 +660,17 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
             {geometrie === 'hex_couronne_19' ? (
               <>
                 <polygon
-                  points={pointsHexagone(245)}
-                  fill="rgba(16, 36, 24, 0.35)"
-                  stroke="rgba(255,255,255,0.10)"
-                  strokeWidth={1.5}
+                  points={pointsHexagone(242)}
+                  fill="rgba(16, 36, 24, 0.45)"
+                  stroke="rgba(255,255,255,0.12)"
+                  strokeWidth={1.8}
                   strokeDasharray="6 4"
                 />
                 <polygon
-                  points={pointsHexagone(135)}
+                  points={pointsHexagone(132)}
                   fill="none"
-                  stroke="rgba(255,255,255,0.12)"
-                  strokeWidth={1.5}
+                  stroke="rgba(255,255,255,0.15)"
+                  strokeWidth={1.8}
                   strokeDasharray="4 4"
                 />
               </>
@@ -553,17 +679,17 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                 <circle
                   cx={0}
                   cy={0}
-                  r={220}
+                  r={215}
                   fill="none"
-                  stroke="rgba(251, 191, 36, 0.14)"
-                  strokeWidth={2}
+                  stroke="rgba(251, 191, 36, 0.18)"
+                  strokeWidth={2.2}
                   strokeDasharray="3 6"
                 />
                 <polygon
                   points="0,-95 82,47 -82,47"
-                  fill="rgba(52, 211, 153, 0.04)"
-                  stroke="rgba(52, 211, 153, 0.16)"
-                  strokeWidth={1.5}
+                  fill="rgba(52, 211, 153, 0.05)"
+                  stroke="rgba(52, 211, 153, 0.2)"
+                  strokeWidth={1.8}
                   strokeDasharray="5 4"
                 />
               </>
@@ -572,19 +698,19 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                 <circle
                   cx={0}
                   cy={0}
-                  r={215}
+                  r={210}
                   fill="none"
-                  stroke="rgba(255,255,255,0.08)"
-                  strokeWidth={1.5}
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth={1.8}
                   strokeDasharray="4 4"
                 />
                 <circle
                   cx={0}
                   cy={0}
-                  r={115}
+                  r={112}
                   fill="none"
-                  stroke="rgba(255,255,255,0.12)"
-                  strokeWidth={1.5}
+                  stroke="rgba(255,255,255,0.15)"
+                  strokeWidth={1.8}
                   strokeDasharray="4 4"
                 />
               </>
@@ -613,8 +739,8 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                           y1={c.y}
                           x2={v.x}
                           y2={v.y}
-                          stroke="rgba(217, 155, 22, 0.28)"
-                          strokeWidth={7}
+                          stroke="rgba(217, 155, 22, 0.32)"
+                          strokeWidth={8}
                           strokeLinecap="round"
                         />
                       )}
@@ -627,17 +753,17 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                           estLienActionPossible
                             ? '#34D399'
                             : estSentier
-                            ? 'rgba(254, 243, 199, 0.55)'
+                            ? 'rgba(254, 243, 199, 0.65)'
                             : geometrie === 'hex_couronne_19'
-                            ? 'rgba(167, 243, 208, 0.18)'
-                            : 'rgba(255,255,255,0.24)'
+                            ? 'rgba(167, 243, 208, 0.24)'
+                            : 'rgba(255,255,255,0.32)'
                         }
                         strokeWidth={
-                          estLienActionPossible ? 3.5 : estSentier ? 2.2 : 2.5
+                          estLienActionPossible ? 4.5 : estSentier ? 2.6 : 3
                         }
                         strokeDasharray={
                           estLienActionPossible
-                            ? '6 4'
+                            ? '7 4'
                             : estSentier
                             ? '5 4'
                             : undefined
@@ -648,7 +774,7 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                 })
             )}
 
-            {/* Zones / Cases du plateau */}
+            {/* Zones / Cases du plateau (Agrandies avec focus renforcé) */}
             {etat.cases.map((c) => {
               const nbForets = etat.forets[c.id] || 0;
               const defsIci = etat.defenseurs.filter((d) => d.caseId === c.id);
@@ -659,31 +785,40 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
               const estProtegee = caseEstProtegeeContreCoupe(etat, c.id);
               const estSelectionnee = caseSelectionneeId === c.id;
               const estAccessible = casesSurligneesIds.includes(c.id);
-              const badgesIci = vecteursProgrammes.badgesSurPlace[c.id] || [];
+              const badgesIci = badgesSurPlace[c.id] || [];
 
-              const rayonTuile =
+              // Agrandissement du rayon des zones (+15%) pour une bien meilleure lisibilité
+              const baseRayon =
                 c.rayonRendu ||
                 (geometrie === 'hex_couronne_19'
                   ? 38
                   : c.anneau === 'coeur'
                   ? 48
                   : 40);
+              const rayonTuile =
+                geometrie === 'hex_couronne_19'
+                  ? baseRayon + 3
+                  : baseRayon + 6;
 
               const couleurFondTuile =
                 nbForets === 0
-                  ? '#3B2F2F'
+                  ? '#3F2727'
+                  : estSelectionnee
+                  ? '#1F5C3D'
                   : c.anneau === 'coeur'
-                  ? '#1F4E37'
+                  ? '#1E5239'
                   : c.anneau === 'interieur'
-                  ? '#28593E'
-                  : '#314939';
+                  ? '#265B40'
+                  : '#2E4737';
 
               const couleurBordure = estSelectionnee
-                ? '#FBBF24'
+                ? '#FDE047'
                 : estAccessible
                 ? '#34D399'
                 : estProtegee
                 ? '#34D399'
+                : machsCiblantIci.length > 0
+                ? '#EF4444'
                 : c.secteurJoueur !== null
                 ? COULEURS_PEUPLES_V01[
                     c.secteurJoueur % COULEURS_PEUPLES_V01.length
@@ -692,9 +827,6 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
 
               const estHex =
                 c.formeRendu === 'hexagone' || geometrie === 'hex_couronne_19';
-              const estClairiere =
-                c.formeRendu === 'clairiere' ||
-                geometrie === 'clairieres_sentiers';
 
               return (
                 <g
@@ -703,126 +835,117 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                   onClick={() => onSelectCase && onSelectCase(c.id)}
                   className="cursor-pointer"
                 >
-                  {/* Halo de sélection ou d'action possible */}
+                  {/* Focus fort sur la zone sélectionnée ou accessible */}
                   {(estSelectionnee || estAccessible) &&
                     (estHex ? (
                       <polygon
-                        points={pointsHexagone(rayonTuile + 6)}
+                        points={pointsHexagone(rayonTuile + 7)}
                         fill={
-                          estAccessible && !estSelectionnee
-                            ? 'rgba(52, 211, 153, 0.14)'
-                            : 'rgba(251, 191, 36, 0.14)'
+                          estSelectionnee
+                            ? 'rgba(253, 224, 71, 0.22)'
+                            : 'rgba(52, 211, 153, 0.18)'
                         }
-                        stroke={estSelectionnee ? '#FBBF24' : '#34D399'}
-                        strokeWidth={3.5}
+                        stroke={estSelectionnee ? '#FDE047' : '#34D399'}
+                        strokeWidth={estSelectionnee ? 4.5 : 3.8}
                         strokeDasharray={
-                          estAccessible && !estSelectionnee ? '6 3' : undefined
+                          estAccessible && !estSelectionnee ? '7 3' : undefined
                         }
                       />
                     ) : (
                       <circle
-                        r={rayonTuile + 7}
+                        r={rayonTuile + 8}
                         fill={
-                          estAccessible && !estSelectionnee
-                            ? 'rgba(52, 211, 153, 0.14)'
-                            : 'rgba(251, 191, 36, 0.14)'
+                          estSelectionnee
+                            ? 'rgba(253, 224, 71, 0.22)'
+                            : 'rgba(52, 211, 153, 0.18)'
                         }
-                        stroke={estSelectionnee ? '#FBBF24' : '#34D399'}
-                        strokeWidth={3.5}
+                        stroke={estSelectionnee ? '#FDE047' : '#34D399'}
+                        strokeWidth={estSelectionnee ? 4.5 : 3.8}
                         strokeDasharray={
-                          estAccessible && !estSelectionnee ? '6 3' : undefined
+                          estAccessible && !estSelectionnee ? '7 3' : undefined
                         }
                       />
                     ))}
 
-                  {/* Halo de menace Machine déclarée */}
+                  {/* Focus fort de menace Machine déclarée */}
                   {machsCiblantIci.length > 0 &&
                     (estHex ? (
                       <polygon
-                        points={pointsHexagone(rayonTuile + 3)}
-                        fill="none"
+                        points={pointsHexagone(rayonTuile + 4)}
+                        fill="rgba(239, 68, 68, 0.14)"
                         stroke="#EF4444"
-                        strokeWidth={3}
+                        strokeWidth={3.5}
                       />
                     ) : (
                       <circle
-                        r={rayonTuile + 3.5}
-                        fill="none"
+                        r={rayonTuile + 4.5}
+                        fill="rgba(239, 68, 68, 0.14)"
                         stroke="#EF4444"
-                        strokeWidth={3}
+                        strokeWidth={3.5}
                       />
                     ))}
 
-                  {/* Corps de la Case selon la géométrie */}
+                  {/* Corps de la Case */}
                   {estHex ? (
                     <polygon
                       points={pointsHexagone(rayonTuile)}
                       fill={couleurFondTuile}
                       stroke={couleurBordure}
                       strokeWidth={
-                        estProtegee || estSelectionnee || estAccessible
-                          ? 3.2
-                          : 2.2
+                        estSelectionnee || estAccessible || estProtegee
+                          ? 3.8
+                          : 2.5
                       }
                     />
-                  ) : estClairiere ? (
+                  ) : (
                     <>
                       <circle
                         r={rayonTuile + 2}
-                        fill="rgba(20, 36, 27, 0.55)"
+                        fill="rgba(10, 22, 16, 0.65)"
                       />
                       <circle
                         r={rayonTuile}
                         fill={couleurFondTuile}
                         stroke={couleurBordure}
                         strokeWidth={
-                          estProtegee || estSelectionnee || estAccessible
-                            ? 3.5
-                            : 2.4
+                          estSelectionnee || estAccessible || estProtegee
+                            ? 4
+                            : 2.6
                         }
                       />
                     </>
-                  ) : (
-                    <circle
-                      r={rayonTuile}
-                      fill={couleurFondTuile}
-                      stroke={couleurBordure}
-                      strokeWidth={
-                        estProtegee || estSelectionnee || estAccessible
-                          ? 3.5
-                          : 2.2
-                      }
-                    />
                   )}
 
-                  {/* Nom de la zone */}
+                  {/* Nom de la zone (plus grand et contrasté) */}
                   <text
-                    y={-rayonTuile + (estHex ? 13 : 12)}
+                    y={-rayonTuile + (estHex ? 14 : 14)}
                     textAnchor="middle"
-                    fill="#F8FAFC"
-                    fontSize={estHex ? 8.8 : 9.5}
-                    fontWeight={700}
+                    fill="#FFFFFF"
+                    fontSize={estHex ? 9.5 : 10.5}
+                    fontWeight={800}
                   >
                     {c.nom}
                   </text>
 
-                  {/* Pions Forêt en bois vert */}
-                  <g transform="translate(0, -7)">
+                  {/* Compteur Pions Forêt en bois vert */}
+                  <g transform="translate(0, -10)">
                     <rect
-                      x={-23}
-                      y={-8}
-                      width={46}
-                      height={16}
-                      rx={4}
-                      fill="rgba(0,0,0,0.42)"
+                      x={-26}
+                      y={-9}
+                      width={52}
+                      height={18}
+                      rx={5}
+                      fill="rgba(0,0,0,0.52)"
+                      stroke="rgba(255,255,255,0.15)"
+                      strokeWidth={1}
                     />
                     <text
                       x={0}
-                      y={3.5}
+                      y={4}
                       textAnchor="middle"
                       fill={nbForets > 0 ? '#86EFAC' : '#FCA5A5'}
-                      fontSize={estHex ? 10.5 : 11.5}
-                      fontWeight={700}
+                      fontSize={estHex ? 11.5 : 12.5}
+                      fontWeight={800}
                       fontFamily="IBM Plex Mono, monospace"
                     >
                       🌲 {nbForets}/{c.foretsMax}
@@ -831,69 +954,69 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
 
                   {/* Indicateur de Protection active ou d'Action Possible au clic */}
                   {estProtegee ? (
-                    <g transform="translate(0, -21)">
+                    <g transform="translate(0, -26)">
                       <rect
-                        x={-25}
-                        y={-6}
-                        width={50}
-                        height={11}
-                        rx={3}
+                        x={-29}
+                        y={-7}
+                        width={58}
+                        height={13}
+                        rx={4}
                         fill="#065F46"
                         stroke="#34D399"
-                        strokeWidth={1}
+                        strokeWidth={1.4}
                       />
                       <text
                         x={0}
                         y={2.5}
                         textAnchor="middle"
-                        fill="#A7F3D0"
-                        fontSize={7.5}
+                        fill="#D1FAE5"
+                        fontSize={8.2}
                         fontWeight={800}
                       >
                         🛡️ PROTÉGÉ
                       </text>
                     </g>
                   ) : estAccessible && !estSelectionnee ? (
-                    <g transform="translate(0, -21)">
+                    <g transform="translate(0, -26)">
                       <rect
-                        x={-27}
-                        y={-6}
-                        width={54}
-                        height={11}
-                        rx={3}
+                        x={-31}
+                        y={-7}
+                        width={62}
+                        height={13}
+                        rx={4}
                         fill="#064E3B"
                         stroke="#34D399"
-                        strokeWidth={1}
+                        strokeWidth={1.4}
                       />
                       <text
                         x={0}
                         y={2.5}
                         textAnchor="middle"
                         fill="#6EE7B7"
-                        fontSize={7.2}
+                        fontSize={8}
                         fontWeight={800}
                       >
                         ➔ ALLER ICI
                       </text>
                     </g>
                   ) : estSelectionnee && casesSurligneesIds.length > 0 ? (
-                    <g transform="translate(0, -21)">
+                    <g transform="translate(0, -26)">
                       <rect
-                        x={-26}
-                        y={-6}
-                        width={52}
-                        height={11}
-                        rx={3}
+                        x={-31}
+                        y={-7}
+                        width={62}
+                        height={13}
+                        rx={4}
                         fill="#78350F"
-                        stroke="#FBBF24"
-                        strokeWidth={1}
+                        stroke="#FDE047"
+                        strokeWidth={1.4}
                       />
                       <text
                         x={0}
                         y={2.5}
                         textAnchor="middle"
-                        fill="#FDE68A"
-                        fontSize={7.2}
+                        fill="#FEF08A"
+                        fontSize={8}
                         fontWeight={800}
                       >
                         🛡️ SUR PLACE
@@ -903,32 +1026,32 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
 
                   {/* Badges d'actions sur place programmées */}
                   {afficherIntentionsProgrammees && badgesIci.length > 0 && (
-                    <g transform={`translate(0, ${-rayonTuile - 6})`}>
+                    <g transform={`translate(0, ${-rayonTuile - 9})`}>
                       {badgesIci.slice(0, 2).map((b, bIdx) => (
                         <g
                           key={bIdx}
                           transform={`translate(${
                             (bIdx - (Math.min(2, badgesIci.length) - 1) / 2) *
-                            38
+                            52
                           }, 0)`}
                         >
                           <rect
-                            x={-18}
-                            y={-6}
-                            width={36}
-                            height={12}
-                            rx={3}
+                            x={-25}
+                            y={-7}
+                            width={50}
+                            height={14}
+                            rx={4}
                             fill="#0F172A"
                             stroke={b.couleur}
-                            strokeWidth={1.2}
+                            strokeWidth={1.5}
                           />
                           <text
                             x={0}
-                            y={2.5}
+                            y={3}
                             textAnchor="middle"
-                            fill="#F8FAFC"
-                            fontSize={7}
-                            fontWeight={700}
+                            fill="#FFFFFF"
+                            fontSize={7.8}
+                            fontWeight={800}
                           >
                             {b.label}
                           </text>
@@ -937,11 +1060,13 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                     </g>
                   )}
 
-                  {/* Pions Défenseurs présents sur la zone (Agrandis + MOI ou Code Bot) */}
+                  {/* Pions Défenseurs présents sur la zone (Agrandis + Focus Sélection/Action) */}
                   {defsIci.map((d, idx) => {
-                    const espacement = estHex ? 22 : 25;
-                    const offsetX = (idx - (defsIci.length - 1) / 2) * espacement;
+                    const espacement = estHex ? 30 : 35;
+                    const offsetX =
+                      (idx - (defsIci.length - 1) / 2) * espacement;
                     const estPionSel = pionSelectionneId === d.id;
+                    const estAgissant = pionsAgissantsIds.has(d.id);
                     const infoSiege = formaterNomSiege(d.joueur, sieges);
                     const couleurJ =
                       COULEURS_PEUPLES_V01[
@@ -949,7 +1074,7 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                       ];
                     const textePion = infoSiege.estHumain
                       ? `MOI ${d.numeroPion}`
-                      : infoSiege.codePion;
+                      : `${infoSiege.codePion}#${d.numeroPion}`;
 
                     return (
                       <g
@@ -961,24 +1086,29 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                         }}
                         className="cursor-pointer"
                       >
-                        {estPionSel && (
+                        {/* Halo de focus fort si le pion est sélectionné ou vient d'agir */}
+                        {(estPionSel || estAgissant) && (
                           <rect
-                            x={-16}
-                            y={-11}
-                            width={32}
-                            height={20}
-                            rx={9}
-                            fill="none"
-                            stroke="#FDE047"
-                            strokeWidth={2.5}
+                            x={-21}
+                            y={-13}
+                            width={42}
+                            height={24}
+                            rx={11}
+                            fill={
+                              estPionSel
+                                ? 'rgba(253, 224, 71, 0.35)'
+                                : 'rgba(52, 211, 153, 0.25)'
+                            }
+                            stroke={estPionSel ? '#FDE047' : '#6EE7B7'}
+                            strokeWidth={estPionSel ? 3.2 : 2.2}
                           />
                         )}
                         <rect
-                          x={-14}
-                          y={-9}
-                          width={28}
-                          height={16}
-                          rx={8}
+                          x={-18}
+                          y={-10}
+                          width={36}
+                          height={18}
+                          rx={9}
                           fill={couleurJ}
                           stroke={
                             estPionSel
@@ -987,13 +1117,13 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                               ? '#6EE7B7'
                               : '#FFFFFF'
                           }
-                          strokeWidth={estPionSel ? 2.4 : 1.6}
+                          strokeWidth={estPionSel ? 2.8 : 2}
                         />
                         <text
-                          y={2}
+                          y={3}
                           textAnchor="middle"
                           fill="#FFFFFF"
-                          fontSize={7.2}
+                          fontSize={8.5}
                           fontWeight={800}
                           fontFamily="IBM Plex Mono, monospace"
                         >
@@ -1003,44 +1133,58 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                     );
                   })}
 
-                  {/* Figurines Machines présentes sur la zone */}
+                  {/* Figurines Machines présentes sur la zone (Agrandies + Focus Menace) */}
                   {machsIci.map((m, idx) => {
-                    const offsetX = (idx - (machsIci.length - 1) / 2) * 26;
+                    const offsetX = (idx - (machsIci.length - 1) / 2) * 32;
                     const estCibleActive =
                       m.cibleDeclaree === c.id && !m.neutraliseeCeTour;
+                    const vientDeBouger = machinesAgissantesIds.has(m.id);
+
                     return (
                       <g
                         key={`mach-${m.id}`}
                         transform={`translate(${offsetX}, ${
-                          estHex ? 26 : 30
+                          estHex ? 28 : 33
                         })`}
                       >
+                        {(estCibleActive || vientDeBouger) && (
+                          <rect
+                            x={-18}
+                            y={-12}
+                            width={36}
+                            height={22}
+                            rx={6}
+                            fill="rgba(239, 68, 68, 0.28)"
+                            stroke="#FCA5A5"
+                            strokeWidth={2.2}
+                          />
+                        )}
                         <rect
-                          x={-12}
-                          y={-8}
-                          width={24}
-                          height={15}
-                          rx={3.5}
+                          x={-15}
+                          y={-9}
+                          width={30}
+                          height={17}
+                          rx={4.5}
                           fill={
                             m.neutraliseeCeTour
                               ? '#475569'
                               : estCibleActive
-                              ? '#EF4444'
+                              ? '#DC2626'
                               : '#F59E0B'
                           }
                           stroke="#09090B"
-                          strokeWidth={1.6}
+                          strokeWidth={2}
                         />
                         <text
-                          y={2.5}
+                          y={3}
                           textAnchor="middle"
                           fill={
                             m.neutraliseeCeTour || estCibleActive
                               ? '#FFFFFF'
                               : '#09090B'
                           }
-                          fontSize={8}
-                          fontWeight={800}
+                          fontSize={9.2}
+                          fontWeight={900}
                           fontFamily="IBM Plex Mono, monospace"
                         >
                           {m.neutraliseeCeTour ? `⚡M${m.id}` : `M${m.id}`}
@@ -1052,9 +1196,9 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
               );
             })}
 
-            {/* Flèches vectorielles des déplacements programmés (Intentions) */}
+            {/* 1. Flèches des MOUVEMENTS RÉALISÉS à l'étape courante (Traits pleins lumineux) */}
             {afficherIntentionsProgrammees &&
-              vecteursProgrammes.fleches.map((fl) => {
+              flechesRealisees.map((fl) => {
                 const cFrom = etat.cases[fl.fromId];
                 const cTo = etat.cases[fl.toId];
                 if (!cFrom || !cTo) return null;
@@ -1063,26 +1207,112 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                 const dist = Math.hypot(dx, dy) || 1;
                 const ux = dx / dist;
                 const uy = dy / dist;
-                const x1 = cFrom.x + ux * 24;
-                const y1 = cFrom.y + uy * 24;
-                const x2 = cTo.x - ux * 28;
-                const y2 = cTo.y - uy * 28;
-                const mx = (x1 + x2) / 2;
-                const my = (y1 + y2) / 2;
+                const nx = -uy;
+                const ny = ux;
+
+                const x1 = cFrom.x + ux * 26;
+                const y1 = cFrom.y + uy * 26;
+                const x2 = cTo.x - ux * 32;
+                const y2 = cTo.y - uy * 32;
+                const cx = (x1 + x2) / 2 + nx * fl.offsetCurve;
+                const cy = (y1 + y2) / 2 + ny * fl.offsetCurve;
+                const labelX = (x1 + 2 * cx + x2) / 4;
+                const labelY = (y1 + 2 * cy + y2) / 4;
 
                 return (
-                  <g
-                    key={fl.id}
-                    className="pointer-events-none"
-                  >
-                    <line
-                      x1={x1}
-                      y1={y1}
-                      x2={x2}
-                      y2={y2}
+                  <g key={fl.id} className="pointer-events-none">
+                    {/* Cercle de départ fantôme */}
+                    <circle
+                      cx={x1}
+                      cy={y1}
+                      r={5}
+                      fill={fl.couleur}
+                      stroke="#0F172A"
+                      strokeWidth={1.5}
+                    />
+                    <path
+                      d={`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`}
+                      fill="none"
+                      stroke="#0F172A"
+                      strokeWidth={6}
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d={`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`}
+                      fill="none"
+                      stroke={fl.couleur}
+                      strokeWidth={3.8}
+                      strokeLinecap="round"
+                      markerEnd={
+                        fl.type === 'machine'
+                          ? 'url(#arrow-exec-mach)'
+                          : 'url(#arrow-exec-def)'
+                      }
+                    />
+                    <rect
+                      x={labelX - 28}
+                      y={labelY - 8}
+                      width={56}
+                      height={15}
+                      rx={4}
+                      fill="#0F172A"
+                      stroke={fl.couleur}
+                      strokeWidth={1.5}
+                    />
+                    <text
+                      x={labelX}
+                      y={labelY + 2.5}
+                      textAnchor="middle"
+                      fill="#FFFFFF"
+                      fontSize={7.8}
+                      fontWeight={800}
+                      fontFamily="IBM Plex Mono, monospace"
+                    >
+                      {fl.label}
+                    </text>
+                  </g>
+                );
+              })}
+
+            {/* 2. Flèches vectorielles des DÉPLACEMENTS PROGRAMMÉS (Pointillés courbes) */}
+            {afficherIntentionsProgrammees &&
+              flechesProgrammees.map((fl) => {
+                const cFrom = etat.cases[fl.fromId];
+                const cTo = etat.cases[fl.toId];
+                if (!cFrom || !cTo) return null;
+                const dx = cTo.x - cFrom.x;
+                const dy = cTo.y - cFrom.y;
+                const dist = Math.hypot(dx, dy) || 1;
+                const ux = dx / dist;
+                const uy = dy / dist;
+                const nx = -uy;
+                const ny = ux;
+
+                const x1 = cFrom.x + ux * 26;
+                const y1 = cFrom.y + uy * 26;
+                const x2 = cTo.x - ux * 32;
+                const y2 = cTo.y - uy * 32;
+                const cx = (x1 + x2) / 2 + nx * fl.offsetCurve;
+                const cy = (y1 + y2) / 2 + ny * fl.offsetCurve;
+                const labelX = (x1 + 2 * cx + x2) / 4;
+                const labelY = (y1 + 2 * cy + y2) / 4;
+
+                return (
+                  <g key={fl.id} className="pointer-events-none">
+                    <path
+                      d={`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`}
+                      fill="none"
+                      stroke="rgba(15, 23, 42, 0.75)"
+                      strokeWidth={5.5}
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d={`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`}
+                      fill="none"
                       stroke={fl.estMoi ? '#34D399' : '#FDE047'}
-                      strokeWidth={fl.estMoi ? 3 : 2.2}
-                      strokeDasharray={fl.etape === 1 ? '6 3' : '3 3'}
+                      strokeWidth={fl.estMoi ? 3.6 : 3}
+                      strokeDasharray={fl.etape === 1 ? '8 4' : '4 4'}
+                      strokeLinecap="round"
                       markerEnd={
                         fl.estMoi
                           ? 'url(#arrow-plan-moi)'
@@ -1090,22 +1320,22 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                       }
                     />
                     <rect
-                      x={mx - 20}
-                      y={my - 7}
-                      width={40}
-                      height={13}
-                      rx={3}
+                      x={labelX - 28}
+                      y={labelY - 8}
+                      width={56}
+                      height={15}
+                      rx={4}
                       fill="#0F172A"
                       stroke={fl.estMoi ? '#34D399' : '#FDE047'}
-                      strokeWidth={1}
+                      strokeWidth={1.5}
                     />
                     <text
-                      x={mx}
-                      y={my + 2}
+                      x={labelX}
+                      y={labelY + 2.5}
                       textAnchor="middle"
                       fill="#FFFFFF"
-                      fontSize={6.8}
-                      fontWeight={700}
+                      fontSize={7.8}
+                      fontWeight={800}
                       fontFamily="IBM Plex Mono, monospace"
                     >
                       {fl.label}
@@ -1117,9 +1347,9 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
         </div>
 
         {/* Barre inférieure du plateau : Réserve / Chantier des Machines & Légende claire */}
-        <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="pt-3 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2">
-            <span className="text-emerald-200 font-medium">
+            <span className="text-emerald-200 font-semibold">
               Chantier (Réserve) :
             </span>
             {machinesEnReserve.length === 0 ? (
@@ -1131,7 +1361,7 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                 {machinesEnReserve.map((m) => (
                   <span
                     key={m.id}
-                    className="px-2 py-0.5 bg-amber-500/20 border border-amber-400/50 text-amber-200 rounded font-mono-tabular font-semibold"
+                    className="px-2 py-0.5 bg-amber-500/25 border border-amber-400 text-amber-200 rounded font-mono-tabular font-bold"
                   >
                     M{m.id}
                   </span>
@@ -1139,16 +1369,16 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
               </div>
             )}
           </div>
-          <div className="text-emerald-200/90 flex flex-wrap items-center gap-2.5 text-[11px]">
-            <span className="px-2 py-0.5 rounded bg-emerald-800/80 border border-emerald-400/50 text-white font-bold">
-              MOI = Vos pions
+          <div className="text-emerald-100 flex flex-wrap items-center gap-2 text-[11px]">
+            <span className="px-2 py-0.5 rounded bg-emerald-700 border border-emerald-300 text-white font-bold">
+              MOI 1 / MOI 2 = Vos 2 pions
             </span>
             <span>·</span>
-            <span>DÉD / MCTS / BEAM = Bots alliés</span>
-            <span>·</span>
-            <span className="text-amber-300 font-semibold">
-              M0–M5 = Machines
+            <span className="px-2 py-0.5 rounded bg-slate-800 border border-yellow-300 text-yellow-200 font-bold">
+              Flèches = Déplacements (I / II)
             </span>
+            <span>·</span>
+            <span className="text-amber-300 font-bold">M0–M5 = Machines</span>
           </div>
         </div>
       </div>
@@ -1192,9 +1422,9 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                       backgroundColor: styleT.bg,
                       borderColor: estSurlignee ? '#16211B' : styleT.border,
                     }}
-                    className={`rounded-md p-1.5 border text-center flex flex-col justify-between min-h-[74px] transition-transform ${
+                    className={`rounded-md p-1.5 border text-center flex flex-col justify-between min-h-[76px] transition-transform ${
                       estSurlignee
-                        ? 'ring-2 ring-[#16211B] -translate-y-0.5 shadow-xs'
+                        ? 'ring-2 ring-[#16211B] -translate-y-1 shadow-sm'
                         : estPic7
                         ? 'ring-1 ring-amber-500'
                         : ''
@@ -1250,7 +1480,7 @@ export const PhysicalBoardV01: React.FC<PhysicalBoardV01Props> = ({
                     key={`mach-track-${ecart}`}
                     className={`rounded-lg p-2 border text-center flex flex-col justify-between transition-transform ${
                       estSurlignee
-                        ? 'bg-amber-100 border-amber-800 ring-2 ring-amber-800 -translate-y-0.5'
+                        ? 'bg-amber-100 border-amber-800 ring-2 ring-amber-800 -translate-y-1 shadow-sm'
                         : surPlateau
                         ? 'bg-amber-50/80 border-amber-300'
                         : 'bg-stone-100 border-stone-300'

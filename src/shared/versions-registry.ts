@@ -614,45 +614,515 @@ export const ETAPES_MISE_EN_PLACE_V03: SetupStepSpec[] = [
   ...ETAPES_MISE_EN_PLACE_V01.slice(1),
 ];
 
+export const OPTIONS_REGLES_V04_PLACEMENT: RuleOptionSpec[] = [
+  {
+    id: 'opt_geometrie_plateau_v04',
+    cleVariante: 'geometriePlateau',
+    nom: 'Architecture Géométrique & Dimension du Plateau (V0.4)',
+    categorie: 'Géométrie & Topologie du Plateau',
+    introduiteEnVersion: '0.4',
+    description:
+      'Six architectures fixes et dimensions explorées en V0.4 (9 à 21 zones) : détermine les goulots d’étranglement pour barrer les Machines à 1 Défenseur, la saturation de clairière et les carrefours de Coalition.',
+    choix: [
+      {
+        valeur: 'double_plateau_34_56',
+        label: 'Plateau Double Face Fixe (Recto 3–4J à 9 zones / Verso 5–6J à 13 zones)',
+        estReference: true,
+        description:
+          'Recto 9 zones pour 3–4J et Verso 13 zones pour 5–6J, avec diagonales d’entraide permettant à 2 Peuples voisins de se rejoindre en 1 seul déplacement.',
+        impactPhysique:
+          'Dépliez le plateau central sur la face « 3–4 Joueurs » ou « 5–6 Joueurs ».',
+      },
+      {
+        valeur: 'compact_9_cases',
+        label: 'Micro-Plateau Compact 9 Zones (1 Cœur + 4 Clairières + 4 Lisières)',
+        description:
+          'Dimension ultra-dense à 9 zones quel que soit le nombre de joueurs : favorise les collisions rapides, la saturation des clairières et une tension immédiate à chaque choix.',
+        impactPhysique:
+          'Utilisez la face compacte à 9 clairières : les pions se croisent dès le premier déplacement.',
+      },
+      {
+        valeur: 'clairieres_sentiers',
+        label: 'Réseau de Clairières & Sentiers à Embranchements (13 nœuds & 3 Cols)',
+        description:
+          '6 Lisières convergent vers 3 Cols de Vallée et 3 Sous-Bois avant le Cœur : placer 1 Défenseur sur un Col bloque l’accès au Cœur.',
+        impactPhysique:
+          'Posez le plateau Clairières & Sentiers : repérez les 3 Cols stratégiques.',
+      },
+      {
+        valeur: 'sentiers_goulots_15',
+        label: 'Sentiers à Goulots d’Étranglement 15 Zones (4 Cols à Capacité 1)',
+        description:
+          '15 zones comprenant 4 Cols Goulots étroits qui n’acceptent qu’un seul Défenseur en transit : si 2 joueurs visent le même col, le second voit son mouvement contrarié et son 2e ordre annulé !',
+        impactPhysique:
+          'Les 4 Cols étroits portent un pictogramme « Max 1 Défenseur hors Machine » : tout second pion arrivant sur un col occupé reste sur sa case de départ.',
+      },
+      {
+        valeur: 'hex_couronne_19',
+        label: 'Grille Hexagonale Fixe en Couronnes (19 hexagones : 1 + 6 + 12)',
+        description:
+          '19 cases hexagonales offrant 6 directions par case intérieure : maximise les manœuvres d’encerclement mais demande une couverture attentive.',
+        impactPhysique:
+          'Posez le plateau hexagonal à 19 cases.',
+      },
+      {
+        valeur: 'reseau_etendu_21',
+        label: 'Grand Réseau Étendu 21 Zones (1 Cœur + 6 Clairières + 6 Sous-Bois + 8 Lisières)',
+        description:
+          'Macro-dimension à 21 zones conçue pour 5 à 6 joueurs ou pour jouer avec 3 Défenseurs par joueur : valorise la planification à plusieurs coups d’avance.',
+        impactPhysique:
+          'Dépliez le grand plateau forestier à 21 zones avec anneau médian de sous-bois.',
+      },
+    ],
+  },
+  {
+    id: 'opt_mouvement_contrarie_v04',
+    cleVariante: 'regleMouvementContrarie',
+    nom: 'Risque de « Mouvement Contrarié » & Annulation en Cascade',
+    categorie: 'Actions des Défenseurs',
+    introduiteEnVersion: '0.4',
+    description:
+      'Détermine dans quels cas le 1er déplacement programmé d’un Défenseur peut être bloqué en cours de résolution, ce qui annule automatiquement son 2e déplacement programmé (plan brisé).',
+    choix: [
+      {
+        valeur: 'capacite_max_tuile',
+        label: 'Option 1 : Saturation de Clairière (Plafond Global : Max 2 Défenseurs par case)',
+        estReference: true,
+        description:
+          'Une clairière accueille au maximum 2 Défenseurs (le juste nombre pour une Coalition). Si un 3e Défenseur tente d’y entrer à l’Étape 1, son mouvement est contrarié : il reste sur sa case de départ et son Déplacement II est annulé !',
+        impactPhysique:
+          'Si la case visée compte déjà 2 pions Défenseurs, laissez votre pion sur sa case d’origine et ignorez son 2e déplacement programmé.',
+      },
+      {
+        valeur: 'goulots_sentiers_seuls',
+        label: 'Option 2 : Goulots de Sentier Uniquement (Clairières libres, Cols étroits limités à 1)',
+        description:
+          'Les clairières n’ont aucune limite de saturation entre alliés. En revanche, les cols et sentiers étroits ne laissent passer qu’un seul Défenseur à la fois. Tenter d’entrer dans un col déjà occupé bloque le pion sur place et annule en cascade son 2e mouvement.',
+        impactPhysique:
+          'Clairières sans plafond. Sur un Col étroit, seul 1 pion Défenseur peut stationner ou transiter : tout 2e pion rebondit sur sa case d’origine.',
+      },
+      {
+        valeur: 'interception_machine',
+        label: 'Option 4 : Interception par Machine Active (Assaut solitaire repoussé, coalition requise)',
+        description:
+          'Clairières libres entre alliés. Mais si une Machine active occupe une clairière, un Défenseur isolé qui tente d’y entrer seul est intercepté et repoussé (son 2e mouvement est annulé). Pour pénétrer sur la Machine, au moins 2 peuples distincts doivent y converger à la même étape (assaut coordonné) !',
+        impactPhysique:
+          'Une Machine active repousse tout défenseur solitaire. Si deux peuples distincts entrent ensemble à la même étape, l’assaut perce et verrouille la Machine.',
+      },
+      {
+        valeur: 'goulots_et_interception',
+        label: 'Options 2 & 4 Combinées (Goulots étroits à 1 ET Interception par Machine active)',
+        description:
+          'Combine la topologie des passages étroits (cols limités à 1 pion) et le danger des Machines actives (repoussent les assauts solitaires non coordonnés).',
+        impactPhysique:
+          'Cols étroits limités à 1 pion ET entrée sur case de Machine active réservée aux assauts coordonnés à 2 peuples.',
+      },
+      {
+        valeur: 'aucun',
+        label: 'Option 3 : Déplacement Libre sans Contrainte (Capacité illimitée, pas d’interception)',
+        description:
+          'Témoin sans contrainte de capacité ni interception : les Défenseurs ne se bloquent jamais et tout déplacement adjacent programmé réussit toujours.',
+        impactPhysique:
+          'Aucune limite de pions Défenseurs par case et aucune interception par les Machines.',
+      },
+    ],
+  },
+  {
+    id: 'opt_barrage_machine_v04',
+    cleVariante: 'comportementBarrageMachine',
+    nom: 'Barrage d’Entrée des Machines (Case avec ≥ 1 Défenseur)',
+    categorie: 'Actions des Défenseurs',
+    introduiteEnVersion: '0.4',
+    description:
+      'En V0.4, une Machine ne peut jamais entrer sur une case occupée par au moins 1 Défenseur. Cette option règle ce que fait la Machine lorsque sa case cible théorique est gardée.',
+    choix: [
+      {
+        valeur: 'annulation_stricte',
+        label: 'Annulation stricte du déplacement (La Machine reste sur place)',
+        estReference: true,
+        description:
+          'Si la case cible désignée par la Tactique contient au moins 1 Défenseur, le déplacement programmé de la Machine est annulé : elle reste sur sa case de départ (ou au Chantier si elle devait entrer).',
+        impactPhysique:
+          'Vérifiez la case visée par la Machine : s’il y a au moins 1 pion Défenseur dessus, ne bougez pas la figurine Machine !',
+      },
+      {
+        valeur: 'report_cible_libre',
+        label: 'Report sur la meilleure case voisine libre de Défenseur',
+        description:
+          'La Machine contourne les cases occupées par des Défenseurs et choisit la meilleure case voisine non gardée selon sa Tactique (si toutes sont gardées, elle ne bouge pas).',
+        impactPhysique:
+          'Ignorez les cases voisines contenant un Défenseur et déplacez la Machine vers la meilleure case libre restante.',
+      },
+    ],
+  },
+  {
+    id: 'opt_coalition_v04',
+    cleVariante: 'effetCoalitionSurMachine',
+    nom: 'Coalition Multi-Peuples contre la Coupe (≥ 2 Peuples différents)',
+    categorie: 'Actions des Défenseurs',
+    introduiteEnVersion: '0.4',
+    description:
+      'Deux Défenseurs appartenant à des Peuples (joueurs) différents présents sur la même case qu’une Machine l’empêchent de couper une forêt en fin de tour. Cette option règle le sort de la Machine neutralisée.',
+    choix: [
+      {
+        valeur: 'bloquer_coupe_sur_place',
+        label: 'Neutralisation de la coupe sur place (La Machine reste sur la case)',
+        estReference: true,
+        description:
+          'La coalition d’au moins 2 Peuples différents bloque la coupe d’arbre (et provoque un apprentissage négatif sur les pistes), mais la Machine demeure sur cette case pour le tour suivant.',
+        impactPhysique:
+          'Si au moins 2 pions Défenseurs de couleurs différentes entourent la Machine, ne retirez aucun arbre et laissez la Machine sur la case.',
+      },
+      {
+        valeur: 'renvoyer_au_chantier',
+        label: 'Démantèlement vers le Chantier (Bloque la coupe ET renvoie en Réserve)',
+        description:
+          'La coalition d’au moins 2 Peuples différents bloque la coupe ET démonte la Machine, qui est renvoyée au Chantier hors plateau.',
+        impactPhysique:
+          'Si au moins 2 pions Défenseurs de couleurs différentes occupent la case de la Machine, retirez la figurine Machine et posez-la au Chantier.',
+      },
+      {
+        valeur: 'chantier_a_3_peuples',
+        label: 'Graduée (2 Peuples bloquent la coupe sur place · 3 Peuples renvoient au Chantier)',
+        description:
+          '2 Peuples différents suffisent pour empêcher la coupe sur place ; réunir 3 Peuples différents sur la même case démonte la Machine vers le Chantier.',
+        impactPhysique:
+          '2 couleurs différentes = pas d’arbre coupé ; 3 couleurs différentes = Machine renvoyée au Chantier.',
+      },
+    ],
+  },
+  {
+    id: 'opt_palette_tactiques_v04',
+    cleVariante: 'paletteTactiques',
+    nom: 'Palette des Tactiques du Méchant (Piste 2 à 12)',
+    categorie: 'Automatismes du Méchant',
+    introduiteEnVersion: '0.4',
+    description:
+      'Compare 3 configurations de la Piste Tactique adaptées au jeu de pur placement où 1 Défenseur interdit l’entrée d’une case.',
+    choix: [
+      {
+        valeur: '4_tactiques_acharnement',
+        label: '4 Tactiques avec « Acharnement / Coupe Rase » (Remplace Représailles)',
+        estReference: true,
+        description:
+          'Nouvelle 4e tactique « Acharnement » : cible la case boisée ayant le MOINS d’arbres restants (> 0) pour achever de raser une clairière entamée. Forme un quatuor 100 % cohérent avec Cupidité (+ d’arbres), Percée (vers le Cœur) et Opportunisme (zone la plus dégarnie).',
+        impactPhysique:
+          'Remplacez les cartes Représailles par « Acharnement » (cible la case ayant 1 ou 2 arbres restants pour la raser).',
+      },
+      {
+        valeur: '3_tactiques_sans_represailles',
+        label: '3 Tactiques Épurées (Cupidité, Percée, Opportunisme — sans Représailles)',
+        description:
+          'La piste 2–12 n’utilise que les 3 tactiques fondamentales : Cupidité (forêt dense), Percée (vers le Cœur) et Opportunisme (loin des Défenseurs). Lecture immédiate.',
+        impactPhysique:
+          'Utilisez uniquement les 11 cartes réparties entre Cupidité, Percée et Opportunisme sur la piste 2–12.',
+      },
+      {
+        valeur: '4_tactiques_represailles_perce_1',
+        label: '4 Tactiques avec « Représailles Brise-Barrage » (Force 1 Défenseur isolé)',
+        description:
+          'Conserve Représailles : c’est la seule tactique autorisant une Machine à entrer sur une case tenue par 1 seul Défenseur isolé (il faut alors 2 Défenseurs pour lui barrer l’entrée).',
+        impactPhysique:
+          'En Représailles uniquement, la Machine peut entrer sur une case où se trouve 1 seul Défenseur.',
+      },
+    ],
+  },
+  {
+    id: 'opt_mode_programmation_v04',
+    cleVariante: 'modeProgrammation',
+    nom: 'Séquencement Public des Déplacements',
+    categorie: 'Séquencement de la Programmation',
+    introduiteEnVersion: '0.4',
+    description:
+      'Définit comment les joueurs annoncent publiquement à tour de rôle les déplacements de leurs Défenseurs après avoir regardé leurs 2D6 sous le gobelet.',
+    choix: [
+      {
+        valeur: 'alternee_1_par_1',
+        label: 'Alternée en 2 tours de table (Déplacement I puis Déplacement II)',
+        estReference: true,
+        description:
+          '1er tour de table public pour programmer le Déplacement I (barrage d’entrée), puis 2e tour de table public pour le Déplacement II (coalitions à 2 Peuples).',
+        impactPhysique:
+          'Chacun son tour, indiquez publiquement le Déplacement I de vos Défenseurs ; puis faites un 2e tour de table pour le Déplacement II.',
+      },
+      {
+        valeur: 'sequentielle_2_ordres',
+        label: 'Séquentielle (Déplacement I + II d’affilée par joueur)',
+        description:
+          'Chaque joueur programme publiquement à son tour la trajectoire complète (Déplacement I puis II) de ses Défenseurs avant de passer au joueur suivant.',
+        impactPhysique:
+          'À votre tour, annoncez publiquement les 2 déplacements successifs de vos pions Défenseurs.',
+      },
+      {
+        valeur: '2e_apres_ciblage',
+        label: 'Réactive (Déplacement I avant Machines → Déplacement II programmé à vue après ciblage)',
+        description:
+          'On programme et exécute le Déplacement I (pour barrer l’entrée), les Machines se déplacent, puis les joueurs programment le Déplacement II à vue pour former les coalitions à 2 Peuples.',
+        impactPhysique:
+          'Programmez et jouez le Déplacement I, déplacez les Machines, puis programmez le Déplacement II en voyant où sont les Machines.',
+      },
+      {
+        valeur: 'un_seul_ordre',
+        label: 'Simplifiée (1 seul déplacement par Défenseur et par tour)',
+        description:
+          'Chaque Défenseur n’effectue qu’un seul déplacement par tour : il faut choisir entre barrer une case libre ou rejoindre un allié sur une Machine.',
+        impactPhysique:
+          'Un seul tour de table de déplacement par tour.',
+      },
+    ],
+  },
+  {
+    id: 'opt_rythme_apprentissage_v04',
+    cleVariante: 'rythmeApprentissage',
+    nom: 'Apprentissage du Méchant sur la Double Piste (7 & Ordre 1–2–3–0–4–5)',
+    categorie: 'Automatismes du Méchant',
+    introduiteEnVersion: '0.4',
+    description:
+      'Règle la façon dont les cartes Tactiques (vers 7) et Machines (vers la gauche de la piste statistique 1–2–3–0–4–5) permutent selon le succès ou l’échec de la coupe.',
+    choix: [
+      {
+        valeur: 'chaque_machine',
+        label: 'Continu (Permutation après chaque Machine résolue)',
+        estReference: true,
+        description:
+          'Chaque coupe réussie rapproche la Tactique de 7 et la Machine du 1 (à gauche sur 1–2–3–0–4–5) ; chaque coupe bloquée par coalition les éloigne.',
+        impactPhysique:
+          'Permutez immédiatement la carte Tactique et la tuile Machine d’un cran après le verdict de chaque Machine.',
+      },
+      {
+        valeur: 'fin_de_tour',
+        label: 'Groupé en fin de tour (Après toutes les coupes)',
+        description:
+          'On résout d’abord toutes les coupes du tour, puis on applique les permutations sur les deux pistes.',
+        impactPhysique:
+          'Appliquez les échanges sur les pistes Tactique et Machine une fois toutes les Machines résolues.',
+      },
+      {
+        valeur: 'aucun',
+        label: 'Désactivé (Pistes statiques — témoin de test)',
+        description:
+          'Les pistes restent fixes toute la partie (permet d’isoler la valeur pure de l’apprentissage).',
+        impactPhysique:
+          'Ne déplacez aucune tuile sur les pistes.',
+      },
+    ],
+  },
+  {
+    id: 'opt_portee_tactiques_v04',
+    cleVariante: 'porteeTactiques',
+    nom: 'Portée de Déplacement des Machines',
+    categorie: 'Automatismes du Méchant',
+    introduiteEnVersion: '0.4',
+    description:
+      'Définit si une Machine choisit sa cible parmi son voisinage immédiat ou sur tout le plateau.',
+    choix: [
+      {
+        valeur: 'voisinage',
+        label: 'Locale (Case actuelle + cases adjacentes)',
+        estReference: true,
+        description:
+          'La Machine évalue sa Tactique uniquement sur sa case et les cases directement reliées.',
+        impactPhysique:
+          'Comparez uniquement la case de la Machine et ses voisines immédiates.',
+      },
+      {
+        valeur: 'plateau_entier',
+        label: 'Globale (Saut sur n’importe quelle case du plateau)',
+        description:
+          'La Machine peut bondir sur n’importe quelle case du plateau répondant à sa Tactique.',
+        impactPhysique:
+          'Inspectez tout le plateau pour déplacer la Machine.',
+      },
+    ],
+  },
+  {
+    id: 'opt_jeton_eclaireur_v04',
+    cleVariante: 'jetonEclaireurActif',
+    nom: 'Jeton Éclaireur (Indice silencieux partagé)',
+    categorie: 'Modules Avancés (Labo)',
+    introduiteEnVersion: '0.4',
+    description:
+      'Permet de tester si un jeton d’indice silencieux posé une fois par tour enrichit ou non la déduction dans un jeu 100 % placement.',
+    choix: [
+      {
+        valeur: 'false',
+        label: 'Désactivé (Déduction 100 % par les déplacements publics)',
+        estReference: true,
+        description:
+          'Aucun jeton d’indice : seules les trajectoires choisies publiquement par chaque joueur servent de signal aux alliés.',
+        impactPhysique:
+          'Laissez le Jeton Éclaireur dans la boîte.',
+      },
+      {
+        valeur: 'true',
+        label: 'Activé (1 Jeton Éclaireur posable par tour)',
+        description:
+          'Un joueur par tour peut poser le Jeton Éclaireur sur une case menacée par son gobelet.',
+        impactPhysique:
+          'Posez le Jeton Éclaireur doré sur une case menacée.',
+      },
+    ],
+  },
+];
+
+export const COMPOSANTS_BOITE_V04: BoxComponentSpec[] = [
+  {
+    id: 'comp_plateau_v04',
+    categorie: 'Plateaux Fixes V0.4',
+    nom: '1 Grand Plateau Double Face (Recto 3–4J / Verso 5–6J) + Variantes Topologiques (Sentiers & Hexagones 19)',
+    quantiteFormule: '1 plateau recto-verso (9 ou 13 zones)',
+    descriptionMat:
+      'Plateau central rigide avec liaisons et diagonales d’entraide clairement tracées pour visualiser immédiatement les barrages à 1 Défenseur et les coalitions à 2 Peuples.',
+    usageRegle:
+      '1 Défenseur sur une case interdit l’entrée des Machines ; 2 Défenseurs de Peuples différents sur la case d’une Machine bloquent sa coupe.',
+    nouveauteVersion: true,
+  },
+  {
+    id: 'comp_pions_defenseurs_v04',
+    categorie: 'Peuples Défenseurs (Pur Placement)',
+    nom: 'Pions Défenseurs en bois aux couleurs des 6 Peuples + Marqueurs de Programmation (I & II)',
+    quantiteFormule: 'dynamique_defenseurs',
+    descriptionMat:
+      'Pions Défenseurs de couleurs et silhouettes distinctes par Peuple (plus besoin de cartes Action Protéger/Saboter/Replanter ni de coucher les pions).',
+    usageRegle:
+      'Se déplacent d’une case adjacente par étape. Leur seule présence physique crée le barrage (≥ 1 pion) ou la coalition anti-coupe (≥ 2 couleurs différentes).',
+    nouveauteVersion: true,
+  },
+  {
+    id: 'comp_piste_tactique_v04',
+    categorie: 'Automatismes & Apprentissage Statistique',
+    nom: 'Plateau Double Piste du Méchant (Tactique 2–12 & Piste Machine Statistique 1–2–3–0–4–5)',
+    quantiteFormule: '1 plateau + 11 tuiles Tactiques + 6 tuiles Machine',
+    descriptionMat:
+      'Piste Tactique (2 à 12, pic au 7) incluant la nouvelle tactique « Acharnement » et Piste Machine ordonnée du plus au moins probable : 1 (10/36), 2 (8/36), 3 (6/36), 0 (6/36), 4 (4/36), 5 (2/36).',
+    usageRegle:
+      'Quand une Machine coupe, ses tuiles glissent vers le 7 et vers la gauche (case 1). Quand une coalition de 2 Peuples bloque sa coupe, elles reculent !',
+    nouveauteVersion: true,
+  },
+  COMPOSANTS_BOITE_V01[1], // Pions Forêt en bois
+  COMPOSANTS_BOITE_V01[3], // 6 Figurines Machines M0 à M5
+  {
+    id: 'comp_gobelets_v04',
+    categorie: 'Dés Secrets & Déduction',
+    nom: 'Gobelets Opaques & Paires de Dés 2D6 (Sans paquet de cartes Action)',
+    quantiteFormule: 'dynamique_gobelets',
+    descriptionMat:
+      '1 gobelet opaque et 2 dés à 6 faces par joueur. Le matériel est épuré de tout paquet de cartes d’action complexe.',
+    usageRegle:
+      'Chaque joueur consulte ses 2D6 en secret sous son gobelet, puis programme publiquement les déplacements de ses pions à son tour.',
+  },
+];
+
+export const ETAPES_MISE_EN_PLACE_V04: SetupStepSpec[] = [
+  {
+    numero: 1,
+    titre: 'Déplier le Plateau Fixe V0.4 (Double Face 3–4J / 5–6J, Sentiers ou Hexagones 19)',
+    materiel: 'Plateau Central V0.4',
+    consigne:
+      'Posez le plateau central sur sa face « 3–4 Joueurs » (9 zones) ou « 5–6 Joueurs » (13 zones), ou utilisez le plateau Sentiers (3 Cols) / Hexagones (19 cases) selon la variante.',
+    astuceTable:
+      'Repérez d’un coup d’œil les carrefours qui permettent à deux Peuples voisins de se rejoindre en un déplacement.',
+  },
+  {
+    numero: 2,
+    titre: 'Planter les Pions Forêt en Bois',
+    materiel: 'Pions Forêt verts',
+    consigne:
+      'Placez les pions Forêt initiaux sur le Cœur Central et sur chaque zone périphérique.',
+    astuceTable:
+      'Les zones les plus boisées attirent « Cupidité », tandis que les zones entamées (1–2 arbres) attirent la nouvelle tactique « Acharnement » !',
+  },
+  {
+    numero: 3,
+    titre: 'Installer la Double Piste Statistique (2–12 et 1–2–3–0–4–5)',
+    materiel: 'Plateau Double Piste + Tuiles Tactiques & Machines',
+    consigne:
+      'Placez les tuiles Tactiques sur les cases 2 à 12 et les 6 tuiles Machines sur la piste ordonnée 1 – 2 – 3 – 0 – 4 – 5 (du plus probable 10/36 à gauche au moins probable 2/36 à droite).',
+    astuceTable:
+      'Notez bien que l’écart 0 (les doubles, 6/36) se situe juste à droite de l’écart 3 (6/36).',
+  },
+  {
+    numero: 4,
+    titre: 'Positionner les Machines (Lisières & Chantier) et les Pions Défenseurs',
+    materiel: 'Figurines M0 à M5, Pions Défenseurs et Gobelets 2D6',
+    consigne:
+      'Posez les Machines initiales en Lisière (les autres au Chantier), placez vos pions Défenseurs sur votre Clairière de départ et prenez votre gobelet 2D6 : aucun paquet de cartes Action n’est nécessaire !',
+    astuceTable:
+      'Rappel d’or V0.4 : 1 Défenseur sur une case interdit à toute Machine d’y entrer ; 2 Défenseurs de couleurs différentes sur la case d’une Machine bloquent sa coupe.',
+  },
+];
+
 export const VERSIONS_JEU_INITIALES: GameVersionSpec[] = [
   {
-    id: '0.1',
+    id: '0.4',
     nomJeu: 'Défenseurs de la forêt',
-    titreVersion: 'Version 0.1 — Socle Double Piste & Programmation Séquentielle',
+    titreVersion: 'Version 0.4 — Pur Placement, Barrage de Position (≥1 Déf.) & Coalition Multi-Peuples (≥2 Peuples)',
     statut: 'active',
-    dateCreation: '2026-10-19',
+    dateCreation: '2026-10-20',
     pitch:
-      'Socle fondateur du jeu coopératif (3 à 6 joueurs) : plateau modulable en couronne, Peuples Défenseurs symétriques, 6 Machines pilotées par une double piste publique (Tactique 2–12 par la somme, Machine 0–5 par l’écart) qui apprend à chaque coupe, tirage 2D6 secret sous gobelet et double programmation séquentielle.',
+      'Refonte épurée centrée à 100 % sur le placement coopératif et la déduction : les Défenseurs peuvent uniquement se déplacer (1 case adjacente). Une Machine ne peut pas entrer sur une case occupée par au moins 1 Défenseur (ce qui annule ou détourne son déplacement), et 2 Défenseurs de Peuples différents sur la même case qu’une Machine l’empêchent de couper une forêt.',
     invariantsConception: [
-      'Plateau modulable en couronne (3 à 6 joueurs) centré sur la Tuile Cœur.',
-      'Double piste publique du Méchant : Somme 2D6 (2–12) → Tactique, Écart 2D6 (0–5) → Machine.',
-      'Apprentissage physique par permutation vers les pics de probabilité (Somme 7 et Écart 1).',
-      'Observation secrète d’une paire de 2D6 par joueur (N joueurs = N Machines activées).',
-      'Programmation tour à tour de 2 actions par Défenseur permettant la déduction par les actes.',
+      'Action unique des Défenseurs : Se déplacer d’une case adjacente (ou rester sur place) — suppression des cartes Protéger, Saboter et Replanter du socle.',
+      'Barrage de position : toute case contenant au moins 1 Défenseur est interdite d’entrée aux Machines.',
+      'Coalition multi-peuples : au moins 2 Défenseurs de Peuples (joueurs) différents sur la case d’une Machine bloquent sa coupe en fin de tour.',
+      'Piste Machine ordonnée statistiquement de gauche à droite : 1 (10/36) – 2 (8/36) – 3 (6/36) – 0 (6/36) – 4 (4/36) – 5 (2/36).',
+      'Séquencement entrelacé : Déplacement I (barrage d’entrée) → Ciblage & Déplacement des Machines → Déplacement II (convergence en coalition) → Coupe & Apprentissage.',
     ],
     evolutionsDepuisPrecedente: [
-      'Refondation complète sur une architecture générique supportant les options de séquencement et d’actions.',
-      'Remplacement des anciens prototypes isolés par un socle unique paramétrable.',
+      'Archivage des versions V0.1, V0.2 et V0.3 pour dégager l’Atelier et concentrer les tests sur la V0.4.',
+      'Remplacement des actions Protéger/Saboter/Replanter par deux règles spatiales émergentes : Barrage d’entrée à 1 Défenseur et Coalition anti-coupe à 2 Peuples différents.',
+      'Création de la nouvelle 4e Tactique « Acharnement / Coupe Rase » (cible la case boisée ayant le moins d’arbres restants) et option à 3 Tactiques sans Représailles.',
+      'Programme de test paramétrique intensif variabilisant le comportement de barrage, l’effet de coalition, la palette de tactiques, les 3 plateaux fixes, le séquencement et les effectifs (3–6J, 1–3 pions/J, 2–6 Machines).',
     ],
     ideesLaboIds: [
-      'idea-seq-entrelace',
-      'idea-prog-alternee',
-      'idea-prog-reaction-ouverte',
+      'idea-v03-double-plateau',
+      'idea-v03-clairieres-sentiers',
       'idea-sabotage-alliance',
+      'idea-bots-pointe-ismcts',
     ],
-    optionsRegles: OPTIONS_REGLES_COMMUNES,
+    optionsRegles: OPTIONS_REGLES_V04_PLACEMENT,
     parametresVariables: PARAMETRES_VARIABLES_COMMUNS,
-    composantsBoite: COMPOSANTS_BOITE_V01,
-    etapesMiseEnPlace: ETAPES_MISE_EN_PLACE_V01,
+    composantsBoite: COMPOSANTS_BOITE_V04,
+    etapesMiseEnPlace: ETAPES_MISE_EN_PLACE_V04,
+  },
+  {
+    id: '0.3',
+    nomJeu: 'Défenseurs de la forêt',
+    titreVersion: 'Version 0.3 (Archivée) — Architectures de Plateau (Double Face 3–4J/5–6J, Hexagones 19 & Sentiers)',
+    statut: 'archivee',
+    dateCreation: '2026-10-20',
+    pitch:
+      '[Version archivée] Troisième version dédiée à la refonte géométrique et ergonomique du plateau : comparaison de trois architectures fixes sur l’intérêt stratégique, la lisibilité sur table et l’équilibrage de 3 à 6 joueurs.',
+    invariantsConception: [
+      'Dérivée directement du socle mécanique V0.1 (Peuples symétriques, Double Piste 2–12 / 0–5, Gobelets 2D6 secrets, 2 actions programmées).',
+      'Remplace la couronne modulaire 1 tuile/joueur par une topologie de plateau explicite évaluée sur 3, 4, 5 et 6 joueurs.',
+      'Mesure systématique des 3 priorités : Intérêt Stratégique (9 bots dont IS-MCTS), Lisibilité & Ergonomie, et Équilibre selon le nombre de joueurs (3 à 6J).',
+    ],
+    evolutionsDepuisPrecedente: [
+      'Architecture 1 : Plateau Double Face Fixe — Recto calibré pour 3–4 joueurs (9 zones) et Verso calibré pour 5–6 joueurs (13 zones avec diagonales d’entraide).',
+      'Architecture 2 : Grille Hexagonale Fixe en Couronnes (19 hexagones : 1 Cœur central, 6 hexagones Intérieurs à 6 connexions, 12 hexagones de Lisière).',
+      'Architecture 3 : Réseau de Clairières & Sentiers à Embranchements (13 clairières reliées par des sentiers forestiers formant 3 Cols stratégiques vers le Cœur).',
+      'Intégration de 3 bots de pointe (Expectimax Bayésien, Beam Rollout, IS-MCTS) et de l’analyse comparative par Gemini.',
+    ],
+    ideesLaboIds: [
+      'idea-v03-double-plateau',
+      'idea-v03-hex-19',
+      'idea-v03-clairieres-sentiers',
+      'idea-bots-pointe-ismcts',
+    ],
+    optionsRegles: [...OPTIONS_REGLES_V03_PLATEAU, ...OPTIONS_REGLES_COMMUNES],
+    parametresVariables: PARAMETRES_VARIABLES_COMMUNS,
+    composantsBoite: COMPOSANTS_BOITE_V03,
+    etapesMiseEnPlace: ETAPES_MISE_EN_PLACE_V03,
   },
   {
     id: '0.2',
     nomJeu: 'Défenseurs de la forêt',
-    titreVersion: 'Version 0.2 — Éclaireur & Spécialisation des Peuples (Chantier Labo)',
-    statut: 'active',
+    titreVersion: 'Version 0.2 (Archivée) — Éclaireur & Spécialisation des Peuples (Chantier Labo)',
+    statut: 'archivee',
     dateCreation: '2026-10-20',
     pitch:
-      'Deuxième version du Jeu intégrant les premières idées retenues du Labo : ajout du Jeton Éclaireur (signalisation silencieuse d’une tuile menacée) et spécialisation asymétrique optionnelle des Peuples de Défenseurs face à une pression accrue des Machines.',
+      '[Version archivée] Deuxième version du Jeu intégrant les premières idées retenues du Labo : ajout du Jeton Éclaireur et spécialisation asymétrique optionnelle des Peuples de Défenseurs.',
     invariantsConception: [
       'Conserve intégralement le socle matériel V0.1 (Double piste 2–12 / 0–5, gobelets 2D6, couronne modulable).',
       'Ajoute les modules issus du Labo sous forme d’interrupteurs activables sans casser la compatibilité du Moteur.',
@@ -693,34 +1163,34 @@ export const VERSIONS_JEU_INITIALES: GameVersionSpec[] = [
     ],
   },
   {
-    id: '0.3',
+    id: '0.1',
     nomJeu: 'Défenseurs de la forêt',
-    titreVersion: 'Version 0.3 — Architectures de Plateau (Double Face 3–4J/5–6J, Hexagones 19 & Sentiers)',
-    statut: 'active',
-    dateCreation: '2026-10-20',
+    titreVersion: 'Version 0.1 (Archivée) — Socle Double Piste & Programmation Séquentielle',
+    statut: 'archivee',
+    dateCreation: '2026-10-19',
     pitch:
-      'Troisième version dérivée de la V0.1 dédiée à la refonte géométrique et ergonomique du plateau : abandon de l’assemblage d’une tuile par joueur au profit de trois architectures fixes comparées sur l’intérêt stratégique, la lisibilité sur table et l’équilibrage de 3 à 6 joueurs.',
+      '[Version archivée] Socle fondateur du jeu coopératif (3 à 6 joueurs) : plateau modulable en couronne, Peuples Défenseurs symétriques, 6 Machines pilotées par une double piste publique.',
     invariantsConception: [
-      'Dérivée directement du socle mécanique V0.1 (Peuples symétriques, Double Piste 2–12 / 0–5, Gobelets 2D6 secrets, 2 actions programmées).',
-      'Remplace la couronne modulaire 1 tuile/joueur par une topologie de plateau explicite évaluée sur 3, 4, 5 et 6 joueurs.',
-      'Mesure systématique des 3 priorités : Intérêt Stratégique (9 bots dont IS-MCTS), Lisibilité & Ergonomie, et Équilibre selon le nombre de joueurs (3 à 6J).',
+      'Plateau modulable en couronne (3 à 6 joueurs) centré sur la Tuile Cœur.',
+      'Double piste publique du Méchant : Somme 2D6 (2–12) → Tactique, Écart 2D6 (0–5) → Machine.',
+      'Apprentissage physique par permutation vers les pics de probabilité (Somme 7 et Écart 1).',
+      'Observation secrète d’une paire de 2D6 par joueur (N joueurs = N Machines activées).',
+      'Programmation tour à tour de 2 actions par Défenseur permettant la déduction par les actes.',
     ],
     evolutionsDepuisPrecedente: [
-      'Architecture 1 : Plateau Double Face Fixe — Recto calibré pour 3–4 joueurs (9 zones) et Verso calibré pour 5–6 joueurs (13 zones avec diagonales d’entraide).',
-      'Architecture 2 : Grille Hexagonale Fixe en Couronnes (19 hexagones : 1 Cœur central, 6 hexagones Intérieurs à 6 connexions, 12 hexagones de Lisière).',
-      'Architecture 3 : Réseau de Clairières & Sentiers à Embranchements (13 clairières reliées par des sentiers forestiers formant 3 Cols stratégiques vers le Cœur).',
-      'Intégration de 3 bots de pointe (Expectimax Bayésien, Beam Rollout, IS-MCTS) et de l’analyse comparative par Gemini.',
+      'Refondation complète sur une architecture générique supportant les options de séquencement et d’actions.',
+      'Remplacement des anciens prototypes isolés par un socle unique paramétrable.',
     ],
     ideesLaboIds: [
-      'idea-v03-double-plateau',
-      'idea-v03-hex-19',
-      'idea-v03-clairieres-sentiers',
-      'idea-bots-pointe-ismcts',
+      'idea-seq-entrelace',
+      'idea-prog-alternee',
+      'idea-prog-reaction-ouverte',
+      'idea-sabotage-alliance',
     ],
-    optionsRegles: [...OPTIONS_REGLES_V03_PLATEAU, ...OPTIONS_REGLES_COMMUNES],
+    optionsRegles: OPTIONS_REGLES_COMMUNES,
     parametresVariables: PARAMETRES_VARIABLES_COMMUNS,
-    composantsBoite: COMPOSANTS_BOITE_V03,
-    etapesMiseEnPlace: ETAPES_MISE_EN_PLACE_V03,
+    composantsBoite: COMPOSANTS_BOITE_V01,
+    etapesMiseEnPlace: ETAPES_MISE_EN_PLACE_V01,
   },
 ];
 
@@ -766,14 +1236,10 @@ export function creerNouvelleVersionDepuisLabo(
     invariantsConception: [...versionParente.invariantsConception],
     evolutionsDepuisPrecedente: evolutions,
     ideesLaboIds: ideesSelectionnees.map((i) => i.id),
-    optionsRegles: [
-      ...OPTIONS_REGLES_V03_PLATEAU,
-      ...OPTIONS_REGLES_COMMUNES,
-      ...OPTIONS_REGLES_V02_MODULES,
-    ],
+    optionsRegles: [...OPTIONS_REGLES_V04_PLACEMENT],
     parametresVariables: [...PARAMETRES_VARIABLES_COMMUNS],
-    composantsBoite: [...COMPOSANTS_BOITE_V03, ...composantsSupp],
-    etapesMiseEnPlace: [...ETAPES_MISE_EN_PLACE_V03],
+    composantsBoite: [...COMPOSANTS_BOITE_V04, ...composantsSupp],
+    etapesMiseEnPlace: [...ETAPES_MISE_EN_PLACE_V04],
   };
 
   const varianteSocle: VariantV01 = {
@@ -786,14 +1252,18 @@ export function creerNouvelleVersionDepuisLabo(
     geometriePlateau: 'double_plateau_34_56',
     modeProgrammation: 'alternee_1_par_1',
     modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_acharnement',
     effetProteger: 'barrage_entree_et_coupe',
-    effetSaboter: 'individuel_chantier',
-    actionReplanterActive: true,
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
     deplacementDoubleActif: false,
     rythmeApprentissage: 'chaque_machine',
     porteeTactiques: 'voisinage',
     peuplesAsymetriquesActifs: false,
-    jetonEclaireurActif: true,
+    jetonEclaireurActif: false,
     nbJoueurs: 4,
     defenseursParJoueur: 2,
     foretsParCaseSecteur: 4,

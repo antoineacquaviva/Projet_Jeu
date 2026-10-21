@@ -128,6 +128,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
       ? clonerEtatJeu(etatInitialExterne)
       : creerEtatInitialV01(variante, 20261019)
   );
+  const [etatPrecedent, setEtatPrecedent] = useState<EtatJeuV01 | null>(null);
   const [modeBotsAuto, setModeBotsAuto] = useState<boolean>(true);
   const [gobeletSouleve, setGobeletSouleve] = useState<boolean>(true);
   const [pionSelectionneId, setPionSelectionneId] = useState<number | null>(0);
@@ -145,12 +146,14 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
   useEffect(() => {
     if (etatInitialExterne) {
       setEtat(clonerEtatJeu(etatInitialExterne));
+      setEtatPrecedent(null);
       if (onClearEtatExterne) onClearEtatExterne();
       return;
     }
     setSieges((prev) => construireSiegesDefaut(variante.nbJoueurs, prev));
     const nouvelEtat = creerEtatInitialV01(variante, graine);
     setEtat(nouvelEtat);
+    setEtatPrecedent(null);
     setPionSelectionneId(nouvelEtat.defenseurs[0]?.id ?? null);
     setEtapeEdition(1);
   }, [variante, graine, etatInitialExterne]);
@@ -606,7 +609,10 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
               <button
                 type="button"
                 onClick={() =>
-                  setEtat((prev) => avancerSousPhaseResolution(prev))
+                  setEtat((prev) => {
+                    setEtatPrecedent(clonerEtatJeu(prev));
+                    return avancerSousPhaseResolution(prev);
+                  })
                 }
                 className="px-5 py-2.5 text-xs font-extrabold rounded-lg bg-amber-400 text-[#16211B] hover:bg-amber-300 shadow-xs transition-colors whitespace-nowrap"
               >
@@ -628,6 +634,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
       {/* 4. PLATEAU DE JEU INTERACTIF + PISTE DU MÉCHANT */}
       <PhysicalBoardV01
         etat={etat}
+        etatPrecedent={etatPrecedent}
         sieges={sieges}
         caseSelectionneeId={enProgrammation ? caseDepartPourEtape : null}
         casesSurligneesIds={enProgrammation ? casesAccessiblesPion : []}

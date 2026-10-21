@@ -13,7 +13,9 @@ import {
   calculerPourcentageForetSauvee,
   casesAccessiblesDefenseur,
   clonerEtatJeu,
+  compterPeuplesDistinctsSurCase,
   creerEtatInitialV01,
+  estVariantePlacementV04,
   NOMS_TACTIQUES,
   nextRng,
   PROBA_ECART_2D6,
@@ -174,10 +176,83 @@ export function analyserPosesAlliesPrecedents(
   casesDejaCouvertes: Set<number>;
   casesAttendantAlliance: Set<number>;
   destinationsAllies: Map<number, number>; // caseId -> nb de défenseurs alliés qui s'y rendent ou y agissent
+  peuplesParCaseEtape1: Map<number, Set<number>>;
+  peuplesParCaseEtape2: Map<number, Set<number>>;
 } {
   const casesDejaCouvertes = new Set<number>();
   const casesAttendantAlliance = new Set<number>();
   const destinationsAllies = new Map<number, number>();
+  const peuplesParCaseEtape1 = new Map<number, Set<number>>();
+  const peuplesParCaseEtape2 = new Map<number, Set<number>>();
+
+  const estV04 = estVariantePlacementV04(etat.variante);
+
+  if (estV04) {
+    // En V0.4, tout pion présent ou programmé sur une case apporte la présence de son Peuple
+    for (const d of etat.defenseurs) {
+      if (d.joueur === joueurCourant) continue;
+      const prog = etat.programmations[d.joueur] || [];
+      const act1 = prog.find((a) => a.pionId === d.id && a.etape === 1);
+      const act2 = prog.find((a) => a.pionId === d.id && a.etape === 2);
+
+      let caseE1 = d.caseId;
+      if (act1?.type === 'deplacer' && act1.caseCible !== null) {
+        caseE1 = act1.caseCible;
+      }
+      let caseE2 = caseE1;
+      if (act2?.type === 'deplacer' && act2.caseCible !== null) {
+        caseE2 = act2.caseCible;
+      }
+
+      if (!peuplesParCaseEtape1.has(caseE1)) {
+        peuplesParCaseEtape1.set(caseE1, new Set());
+      }
+      peuplesParCaseEtape1.get(caseE1)!.add(d.joueur);
+
+      if (!peuplesParCaseEtape2.has(caseE2)) {
+        peuplesParCaseEtape2.set(caseE2, new Set());
+      }
+      peuplesParCaseEtape2.get(caseE2)!.add(d.joueur);
+
+      // Si le joueur allié a déjà programmé ce tour (ou si on est en programmation_2)
+      if (prog.length > 0 || etat.sousPhase === 'programmation_2') {
+        const compteActuel = destinationsAllies.get(caseE2) || 0;
+        destinationsAllies.set(caseE2, compteActuel + 1);
+      }
+    }
+
+    // Évaluer pour chaque case si elle est déjà barrée ou si elle attend un 2e Peuple pour Coalition
+    for (const c of etat.cases) {
+      const peuplesE1 = peuplesParCaseEtape1.get(c.id) || new Set<number>();
+      const peuplesE2 = peuplesParCaseEtape2.get(c.id) || new Set<number>();
+      const machineDejaSurCase = etat.machines.some(
+        (m) =>
+          (m.caseId === c.id || m.cibleDeclaree === c.id) && !m.neutraliseeCeTour
+      );
+
+      if (machineDejaSurCase) {
+        // Une machine est sur place (ou y arrive) : il faut 2 Peuples distincts en Étape 2 pour la Coalition !
+        if (peuplesE2.size === 1 && !peuplesE2.has(joueurCourant)) {
+          casesAttendantAlliance.add(c.id);
+        } else if (peuplesE2.size >= 2) {
+          casesDejaCouvertes.add(c.id);
+        }
+      } else {
+        // Pas encore de machine sur place : 1 seul Défenseur en Étape 1 suffit à faire Barrage !
+        if (peuplesE1.size >= 1) {
+          casesDejaCouvertes.add(c.id);
+        }
+      }
+    }
+
+    return {
+      casesDejaCouvertes,
+      casesAttendantAlliance,
+      destinationsAllies,
+      peuplesParCaseEtape1,
+      peuplesParCaseEtape2,
+    };
+  }
 
   const besoinAlliance =
     etat.variante.effetSaboter === 'alliance_requise' ||
@@ -224,6 +299,8 @@ export function analyserPosesAlliesPrecedents(
     casesDejaCouvertes,
     casesAttendantAlliance,
     destinationsAllies,
+    peuplesParCaseEtape1,
+    peuplesParCaseEtape2,
   };
 }
 
@@ -266,7 +343,7 @@ export function choisirPasVersCible(
 }
 
 // ============================================================================
-// ALGORITHMES DE POINTE (V0.3) : INFÉRENCE BAYÉSIENNE, BEAM ROLLOUT & IS-MCTS
+// ALGORITHMES DE POINTE (V0.3 / V0.4) : INFÉRENCE BAYÉSIENNE, BEAM ROLLOUT & IS-MCTS
 // ============================================================================
 
 /**
@@ -362,15 +439,17 @@ function genererPortefeuillePlansCandidats(
   etapesACalculer: (1 | 2)[],
   actionsExistantes: ActionProgrammee[]
 ): ActionProgrammee[][] {
+  const estV04 = estVariantePlacementV04(etat.variante);
   const pionsJoueur = etat.defenseurs.filter((d) => d.joueur === joueur);
   const { menaceParCase, ciblesProbablesMachines } =
     calculerMenaceBayesiennePosteriori(etat, joueur);
   const analyseAllies = analyserPosesAlliesPrecedents(etat, joueur);
   const besoinAlliance =
+    estV04 ||
     etat.variante.effetSaboter === 'alliance_requise' ||
     etat.variante.effetProteger === 'protection_collective';
 
-  // Identifier les 5 cases les plus stratégiques du plateau à ce tour
+  // Identifier les 6 cases les plus stratégiques du plateau à ce tour
   const casesTriees = etat.cases
     .map((c) => {
       let urgence = menaceParCase[c.id] * 4.5;
@@ -378,9 +457,9 @@ function genererPortefeuillePlansCandidats(
         (m) =>
           (m.caseId === c.id || m.cibleDeclaree === c.id) && !m.neutraliseeCeTour
       ).length;
-      urgence += machsPresentes * 2.8;
+      urgence += machsPresentes * 3.2;
       if (c.anneau === 'coeur') urgence += 1.2;
-      if (analyseAllies.casesAttendantAlliance.has(c.id)) urgence += 7.0;
+      if (analyseAllies.casesAttendantAlliance.has(c.id)) urgence += 7.5;
       if (analyseAllies.casesDejaCouvertes.has(c.id)) urgence -= 4.2;
       if ((etat.forets[c.id] || 0) === 0) urgence -= 12;
       return { caseId: c.id, urgence };
@@ -388,120 +467,232 @@ function genererPortefeuillePlansCandidats(
     .sort((a, b) => b.urgence - a.urgence)
     .slice(0, 6);
 
-  // Pour chaque pion du joueur, construire 4 à 5 séquences d'actions cohérentes
-  const sequencesParPion: ActionProgrammee[][][] = pionsJoueur.map((pion, idxPion) => {
-    const seqs: ActionProgrammee[][] = [];
-    let caseDepart = pion.caseId;
-    const act1Deja = actionsExistantes.find(
-      (a) => a.pionId === pion.id && a.etape === 1
-    );
-    if (act1Deja?.type === 'deplacer' && act1Deja.caseCible !== null) {
-      caseDepart = act1Deja.caseCible;
-    }
+  // Pour chaque pion du joueur, construire 4 à 6 séquences d'actions cohérentes
+  const sequencesParPion: ActionProgrammee[][][] = pionsJoueur.map(
+    (pion, idxPion) => {
+      const seqs: ActionProgrammee[][] = [];
+      let caseDepart = pion.caseId;
+      const act1Deja = actionsExistantes.find(
+        (a) => a.pionId === pion.id && a.etape === 1
+      );
+      if (act1Deja?.type === 'deplacer' && act1Deja.caseCible !== null) {
+        caseDepart = act1Deja.caseCible;
+      }
 
-    const ciblesCandidates = [
-      caseDepart,
-      ...casesTriees.map((ct) => ct.caseId).filter((cid) => cid !== caseDepart),
-    ].slice(0, 5);
+      const ciblesCandidates = [
+        caseDepart,
+        ...casesTriees.map((ct) => ct.caseId).filter((cid) => cid !== caseDepart),
+      ].slice(0, 5);
 
-    for (const objCase of ciblesCandidates) {
-      const seq: ActionProgrammee[] = [];
-      let posCourante = caseDepart;
+      if (estV04) {
+        // En V0.4 (Pur Placement) : chaque étape est soit un déplacement vers une case voisine, soit rester sur place ('attendre')
+        for (const objCase of ciblesCandidates) {
+          const seq: ActionProgrammee[] = [];
+          let posCourante = caseDepart;
 
-      for (const etape of etapesACalculer) {
-        if (posCourante !== objCase && etape === 1) {
-          const pas = choisirPasVersCible(etat, posCourante, objCase);
-          posCourante = pas;
-          seq.push({
-            pionId: pion.id,
-            etape,
-            type: 'deplacer',
-            caseCible: pas,
-            machineCible: null,
-            explicationBot: `Cible prioritaire ${etat.cases[pas]?.nom} (menace Bayésienne ${(menaceParCase[pas] || 0).toFixed(2)}).`,
-          });
-        } else {
-          // Déjà sur la case cible : choisir entre Saboter, Protéger et Replanter
-          const machsIci = etat.machines.filter(
-            (m) =>
-              (m.caseId === posCourante || m.cibleDeclaree === posCourante) &&
-              !m.neutraliseeCeTour
-          );
-          const machProbable =
-            machsIci[0]?.id ?? ciblesProbablesMachines.get(posCourante) ?? null;
-          const nbAlliesIci =
-            etat.defenseurs.filter((d) => d.caseId === posCourante).length +
-            (analyseAllies.destinationsAllies.get(posCourante) || 0);
+          for (const etape of etapesACalculer) {
+            if (posCourante !== objCase) {
+              const pas = choisirPasVersCible(etat, posCourante, objCase);
+              if (pas !== posCourante) {
+                posCourante = pas;
+                seq.push({
+                  pionId: pion.id,
+                  etape,
+                  type: 'deplacer',
+                  caseCible: pas,
+                  machineCible: null,
+                  explicationBot:
+                    etape === 1
+                      ? `Déplacement I (Barrage) vers ${etat.cases[pas]?.nom} (menace ${(menaceParCase[pas] || 0).toFixed(2)}).`
+                      : `Déplacement II (Coalition) vers ${etat.cases[pas]?.nom}.`,
+                });
+              } else {
+                seq.push({
+                  pionId: pion.id,
+                  etape,
+                  type: 'attendre',
+                  caseCible: null,
+                  machineCible: null,
+                  explicationBot: `Maintien de position sur ${etat.cases[posCourante]?.nom}.`,
+                });
+              }
+            } else {
+              // Déjà arrivé sur objCase à l'étape 1 : en étape 2, soit rester en Coalition/Barrage, soit pivoter vers un voisin critique
+              if (etape === 2) {
+                const voisinsCritiques = (etat.cases[posCourante]?.voisins || [])
+                  .filter((v) => analyseAllies.casesAttendantAlliance.has(v))
+                  .sort((a, b) => (menaceParCase[b] || 0) - (menaceParCase[a] || 0));
+                const dejaEnCoalitionIci =
+                  (analyseAllies.peuplesParCaseEtape2.get(posCourante)?.size || 0) >= 1 &&
+                  etat.machines.some((m) => m.caseId === posCourante);
 
-          const peutSaboter =
-            (machsIci.length > 0 || (etape === 2 && machProbable !== null)) &&
-            (etat.variante.effetSaboter !== 'alliance_requise' ||
-              nbAlliesIci >= 2 ||
-              besoinAlliance);
+                if (!dejaEnCoalitionIci && voisinsCritiques.length > 0 && idxPion === 1) {
+                  const vCible = voisinsCritiques[0];
+                  posCourante = vCible;
+                  seq.push({
+                    pionId: pion.id,
+                    etape: 2,
+                    type: 'deplacer',
+                    caseCible: vCible,
+                    machineCible: null,
+                    explicationBot: `Déplacement II : rejoint ${etat.cases[vCible]?.nom} pour former une Coalition Inter-Peuples.`,
+                  });
+                } else {
+                  seq.push({
+                    pionId: pion.id,
+                    etape: 2,
+                    type: 'attendre',
+                    caseCible: null,
+                    machineCible: null,
+                    explicationBot: `Maintien sur ${etat.cases[posCourante]?.nom} (Barrage / Coalition).`,
+                  });
+                }
+              } else {
+                seq.push({
+                  pionId: pion.id,
+                  etape: 1,
+                  type: 'attendre',
+                  caseCible: null,
+                  machineCible: null,
+                  explicationBot: `Barrage sur place sur ${etat.cases[posCourante]?.nom}.`,
+                });
+              }
+            }
+          }
+          seqs.push(seq);
+        }
 
-          if (peutSaboter && (idxPion % 2 === 1 || etape === 1)) {
+        // Ajouter aussi une séquence "Barrage Étape 1 sur Cible A puis Pivot Étape 2 sur Cible B voisine"
+        if (etapesACalculer.length === 2 && ciblesCandidates.length >= 2) {
+          const pas1 = choisirPasVersCible(etat, caseDepart, ciblesCandidates[1]);
+          const voisinsPas1 = etat.cases[pas1]?.voisins || [];
+          const meilleurVoisin2 = voisinsPas1
+            .filter((v) => (etat.forets[v] || 0) > 0)
+            .sort((a, b) => (menaceParCase[b] || 0) - (menaceParCase[a] || 0))[0];
+          if (meilleurVoisin2 !== undefined) {
+            seqs.push([
+              {
+                pionId: pion.id,
+                etape: 1,
+                type: pas1 !== caseDepart ? 'deplacer' : 'attendre',
+                caseCible: pas1 !== caseDepart ? pas1 : null,
+                machineCible: null,
+                explicationBot: `Barrage Étape I sur ${etat.cases[pas1]?.nom}.`,
+              },
+              {
+                pionId: pion.id,
+                etape: 2,
+                type: 'deplacer',
+                caseCible: meilleurVoisin2,
+                machineCible: null,
+                explicationBot: `Pivot Étape II vers ${etat.cases[meilleurVoisin2]?.nom}.`,
+              },
+            ]);
+          }
+        }
+
+        return seqs;
+      }
+
+      for (const objCase of ciblesCandidates) {
+        const seq: ActionProgrammee[] = [];
+        let posCourante = caseDepart;
+
+        for (const etape of etapesACalculer) {
+          if (posCourante !== objCase && etape === 1) {
+            const pas = choisirPasVersCible(etat, posCourante, objCase);
+            posCourante = pas;
             seq.push({
               pionId: pion.id,
               etape,
-              type: 'saboter',
-              caseCible: null,
-              machineCible: machProbable,
-              explicationBot: `Sabotage tactique sur ${etat.cases[posCourante]?.nom}.`,
-            });
-          } else if (
-            etat.variante.actionReplanterActive &&
-            etape === 1 &&
-            machsIci.length === 0 &&
-            (etat.forets[posCourante] || 0) <
-              (etat.cases[posCourante]?.foretsMax || 4)
-          ) {
-            seq.push({
-              pionId: pion.id,
-              etape,
-              type: 'replanter',
-              caseCible: null,
+              type: 'deplacer',
+              caseCible: pas,
               machineCible: null,
-              explicationBot: `Replantation préventive sur ${etat.cases[posCourante]?.nom}.`,
+              explicationBot: `Cible prioritaire ${etat.cases[pas]?.nom} (menace Bayésienne ${(menaceParCase[pas] || 0).toFixed(2)}).`,
             });
           } else {
-            seq.push({
+            // Déjà sur la case cible : choisir entre Saboter, Protéger et Replanter
+            const machsIci = etat.machines.filter(
+              (m) =>
+                (m.caseId === posCourante || m.cibleDeclaree === posCourante) &&
+                !m.neutraliseeCeTour
+            );
+            const machProbable =
+              machsIci[0]?.id ?? ciblesProbablesMachines.get(posCourante) ?? null;
+            const nbAlliesIci =
+              etat.defenseurs.filter((d) => d.caseId === posCourante).length +
+              (analyseAllies.destinationsAllies.get(posCourante) || 0);
+
+            const peutSaboter =
+              (machsIci.length > 0 || (etape === 2 && machProbable !== null)) &&
+              (etat.variante.effetSaboter !== 'alliance_requise' ||
+                nbAlliesIci >= 2 ||
+                besoinAlliance);
+
+            if (peutSaboter && (idxPion % 2 === 1 || etape === 1)) {
+              seq.push({
+                pionId: pion.id,
+                etape,
+                type: 'saboter',
+                caseCible: null,
+                machineCible: machProbable,
+                explicationBot: `Sabotage tactique sur ${etat.cases[posCourante]?.nom}.`,
+              });
+            } else if (
+              etat.variante.actionReplanterActive &&
+              etape === 1 &&
+              machsIci.length === 0 &&
+              (etat.forets[posCourante] || 0) <
+                (etat.cases[posCourante]?.foretsMax || 4)
+            ) {
+              seq.push({
+                pionId: pion.id,
+                etape,
+                type: 'replanter',
+                caseCible: null,
+                machineCible: null,
+                explicationBot: `Replantation préventive sur ${etat.cases[posCourante]?.nom}.`,
+              });
+            } else {
+              seq.push({
+                pionId: pion.id,
+                etape,
+                type: 'proteger',
+                caseCible: null,
+                machineCible: null,
+                explicationBot: `Bouclier de protection sur ${etat.cases[posCourante]?.nom}.`,
+              });
+            }
+          }
+        }
+        seqs.push(seq);
+
+        // Ajouter une variante "Protéger + Saboter combinés" sur la case cible si on s'y trouve
+        if (etapesACalculer.length === 2 && objCase === caseDepart) {
+          seqs.push([
+            {
               pionId: pion.id,
-              etape,
+              etape: 1,
               type: 'proteger',
               caseCible: null,
               machineCible: null,
-              explicationBot: `Bouclier de protection sur ${etat.cases[posCourante]?.nom}.`,
-            });
-          }
+              explicationBot: `Verrouillage Bouclier Étape I sur ${etat.cases[caseDepart]?.nom}.`,
+            },
+            {
+              pionId: pion.id,
+              etape: 2,
+              type: 'saboter',
+              caseCible: null,
+              machineCible: ciblesProbablesMachines.get(caseDepart) ?? null,
+              explicationBot: `Sabotage Étape II sur ${etat.cases[caseDepart]?.nom}.`,
+            },
+          ]);
         }
       }
-      seqs.push(seq);
 
-      // Ajouter une variante "Protéger + Saboter combinés" sur la case cible si on s'y trouve
-      if (etapesACalculer.length === 2 && objCase === caseDepart) {
-        seqs.push([
-          {
-            pionId: pion.id,
-            etape: 1,
-            type: 'proteger',
-            caseCible: null,
-            machineCible: null,
-            explicationBot: `Verrouillage Bouclier Étape I sur ${etat.cases[caseDepart]?.nom}.`,
-          },
-          {
-            pionId: pion.id,
-            etape: 2,
-            type: 'saboter',
-            caseCible: null,
-            machineCible: ciblesProbablesMachines.get(caseDepart) ?? null,
-            explicationBot: `Sabotage Étape II sur ${etat.cases[caseDepart]?.nom}.`,
-          },
-        ]);
-      }
+      return seqs;
     }
-
-    return seqs;
-  });
+  );
 
   // Produit cartésien des séquences des pions du joueur (limité à 12 plans conjoints)
   if (sequencesParPion.length === 0) return [[...actionsExistantes]];
@@ -516,14 +707,14 @@ function genererPortefeuillePlansCandidats(
 
   for (let i = 0; i < seqsP0.length; i++) {
     for (let j = 0; j < seqsP1.length; j++) {
-      // Éviter que deux pions du même joueur protègent exactement la même case si l'alliance n'est pas requise
+      // En V0.4, 2 pions du MÊME joueur sur la même case ne suffisent pas à former une Coalition (il faut 2 Peuples distincts !)
       const c0 =
         seqsP0[i].find((a) => a.type === 'deplacer')?.caseCible ??
         pionsJoueur[0].caseId;
       const c1 =
         seqsP1[j].find((a) => a.type === 'deplacer')?.caseCible ??
         pionsJoueur[1].caseId;
-      if (!besoinAlliance && c0 === c1 && i !== 0 && j !== 0) continue;
+      if ((estV04 || !besoinAlliance) && c0 === c1 && i !== 0 && j !== 0) continue;
 
       const plan = [
         ...actionsExistantes,
@@ -546,7 +737,7 @@ function genererPortefeuillePlansCandidats(
  * Évalue la qualité multi-tours d'un état de jeu après résolution d'un tour :
  * - Forêts préservées (%)
  * - Intégrité du Cœur Central
- * - Sabotages et parades réussis
+ * - Sabotages, Barrages et Coalitions réussis
  * - Contrôle de l'apprentissage du Méchant (pénalise si Percée ou Cupidité occupent les cases 6, 7, 8)
  */
 function evaluerEtatHorizonMultiTours(etat: EtatJeuV01): number {
@@ -558,8 +749,23 @@ function evaluerEtatHorizonMultiTours(etat: EtatJeuV01): number {
   let penalitePiste = 0;
   for (const casePic of [6, 7, 8]) {
     const tac = etat.pisteTactique[casePic];
-    if (tac === 'percee' || tac === 'cupidite') {
+    if (tac === 'percee' || tac === 'cupidite' || tac === 'acharnement') {
       penalitePiste += casePic === 7 ? 2.4 : 1.4;
+    }
+  }
+
+  // Bonus de couverture spatiale en V0.4 (pions répartis sur des cases boisées distinctes ou en coalition sur une Machine)
+  let bonusPlacementV04 = 0;
+  if (estVariantePlacementV04(etat.variante)) {
+    for (const c of etat.cases) {
+      if ((etat.forets[c.id] || 0) === 0) continue;
+      const nbPeuples = compterPeuplesDistinctsSurCase(etat, c.id);
+      const aMachine = etat.machines.some((m) => m.caseId === c.id);
+      if (aMachine && nbPeuples >= 2) {
+        bonusPlacementV04 += 2.2;
+      } else if (!aMachine && nbPeuples >= 1) {
+        bonusPlacementV04 += 0.6;
+      }
     }
   }
 
@@ -567,8 +773,9 @@ function evaluerEtatHorizonMultiTours(etat: EtatJeuV01): number {
     pctForet * 1.2 +
     foretsCoeur * 1.5 +
     machinesAuChantier * 2.8 +
-    etat.stats.coupesEviteesParProtection * 1.6 +
-    etat.stats.machinesSabotees * 2.5 -
+    etat.stats.coupesEviteesParProtection * 1.8 +
+    etat.stats.machinesSabotees * 2.5 +
+    bonusPlacementV04 -
     penalitePiste
   );
 }
@@ -642,6 +849,7 @@ function calculerProgrammationBotClassique(
   etapeUniquement?: 1 | 2
 ): { actions: ActionProgrammee[]; nextRngState: number } {
   let rng = etat.etatRng + joueur * 97 + etat.tourActuel * 31;
+  const estV04 = estVariantePlacementV04(etat.variante);
   const pionsJoueur = etat.defenseurs.filter((d) => d.joueur === joueur);
   const etapesACalculer: (1 | 2)[] = etapeUniquement
     ? [etapeUniquement]
@@ -676,12 +884,27 @@ function calculerProgrammationBotClassique(
           type: 'attendre',
           caseCible: null,
           machineCible: null,
-          explicationBot: 'Inerte : reste immobile sans agir.',
+          explicationBot: 'Inerte : reste immobile sans se déplacer.',
         });
         continue;
       }
 
       if (profil === 'boucle') {
+        if (estV04) {
+          // En V0.4, la boucle aveugle fait un va-et-vient mécanique vers le 1er voisin sans lire les pistes
+          const voisins = etat.cases[caseSimulee]?.voisins || [];
+          const cibleBoucle = voisins[(etat.tourActuel + etape) % Math.max(1, voisins.length)] ?? caseSimulee;
+          caseSimulee = cibleBoucle;
+          nouvellesActions.push({
+            pionId: pion.id,
+            etape,
+            type: 'deplacer',
+            caseCible: cibleBoucle,
+            machineCible: null,
+            explicationBot: `Boucle fixe : va-et-vient mécanique vers ${etat.cases[cibleBoucle]?.nom} sans lire ni dés ni plateau.`,
+          });
+          continue;
+        }
         const typeBoucle: ActionDefenseurType =
           etat.variante.actionReplanterActive && etape === 1
             ? 'replanter'
@@ -700,6 +923,31 @@ function calculerProgrammationBotClassique(
       if (profil === 'hasard') {
         const r = nextRng(rng);
         rng = r.nextState;
+        if (estV04) {
+          const acc = casesAccessiblesDefenseur(etat, caseSimulee);
+          const cibleCase = acc[Math.floor(r.val * acc.length)] ?? caseSimulee;
+          if (cibleCase !== caseSimulee) {
+            caseSimulee = cibleCase;
+            nouvellesActions.push({
+              pionId: pion.id,
+              etape,
+              type: 'deplacer',
+              caseCible: cibleCase,
+              machineCible: null,
+              explicationBot: 'Hasard : déplacement tiré aléatoirement.',
+            });
+          } else {
+            nouvellesActions.push({
+              pionId: pion.id,
+              etape,
+              type: 'attendre',
+              caseCible: null,
+              machineCible: null,
+              explicationBot: 'Hasard : reste sur place aléatoirement.',
+            });
+          }
+          continue;
+        }
         const poolTypes: ActionDefenseurType[] = [
           'deplacer',
           'proteger',
@@ -730,6 +978,47 @@ function calculerProgrammationBotClassique(
       }
 
       if (profil === 'reflexe') {
+        if (estV04) {
+          const machinesSurMaCase = etat.machines.filter(
+            (m) => m.caseId === caseSimulee && !m.neutraliseeCeTour
+          );
+          if (machinesSurMaCase.length > 0) {
+            nouvellesActions.push({
+              pionId: pion.id,
+              etape,
+              type: 'attendre',
+              caseCible: null,
+              machineCible: null,
+              explicationBot: `Réflexe : reste sur ${etat.cases[caseSimulee]?.nom} où se trouve une Machine visible.`,
+            });
+          } else {
+            const acc = casesAccessiblesDefenseur(etat, caseSimulee);
+            const voisineAvecMachine = acc.find((cid) =>
+              etat.machines.some((m) => m.caseId === cid && !m.neutraliseeCeTour)
+            );
+            if (voisineAvecMachine !== undefined) {
+              caseSimulee = voisineAvecMachine;
+              nouvellesActions.push({
+                pionId: pion.id,
+                etape,
+                type: 'deplacer',
+                caseCible: voisineAvecMachine,
+                machineCible: null,
+                explicationBot: `Réflexe : rejoint ${etat.cases[voisineAvecMachine]?.nom} où se trouve une Machine visible.`,
+              });
+            } else {
+              nouvellesActions.push({
+                pionId: pion.id,
+                etape,
+                type: 'attendre',
+                caseCible: null,
+                machineCible: null,
+                explicationBot: `Réflexe : aucune Machine voisine visible, reste sur ${etat.cases[caseSimulee]?.nom}.`,
+              });
+            }
+          }
+          continue;
+        }
         const machinesSurMaCase = etat.machines.filter(
           (m) => m.caseId === caseSimulee && !m.neutraliseeCeTour
         );
@@ -777,6 +1066,96 @@ function calculerProgrammationBotClassique(
 
       // 5. BOT GLOUTON & 6. BOT DÉDUCTIF
       const estDeductif = profil === 'deductif';
+
+      if (estV04) {
+        // Logique V0.4 (Pur Placement & Coalition) :
+        // Étape 1 : Barrage préventif sur la cible prédite par les dés 2D6 (1 seul Défenseur suffit à bloquer l'entrée)
+        // Étape 2 : Coalition Inter-Peuples (2 Peuples distincts requis) sur les cases où une Machine est présente ou arrive
+        const evaluerCasePlacementV04 = (cid: number): number => {
+          let score = 0;
+          const foretsRestantes = etat.forets[cid] || 0;
+          if (foretsRestantes === 0) return -10;
+
+          const machinesIci = etat.machines.filter(
+            (m) =>
+              (m.caseId === cid || m.cibleDeclaree === cid) &&
+              !m.neutraliseeCeTour
+          );
+
+          if (etape === 1) {
+            // En Étape 1, priorité au Barrage sur la case visée par mon gobelet 2D6 (si aucune Machine n'y est déjà)
+            if (maPrediction && maPrediction.caseCible === cid) {
+              score += machinesIci.length === 0 ? 6.2 : 4.5;
+            }
+            score += (menacesPistes[cid] || 0) * 3.8;
+            score += machinesIci.length * 2.5;
+          } else {
+            // En Étape 2, le ciblage Machine a déjà eu lieu (ou va se résoudre) : priorité aux Coalitions sur les Machines présentes !
+            score += machinesIci.length * 5.2;
+            if (maPrediction && maPrediction.caseCible === cid) {
+              score += 3.5;
+            }
+            score += (menacesPistes[cid] || 0) * 2.4;
+          }
+
+          if (cid === 0) score += 0.8;
+
+          if (estDeductif) {
+            if (analyseAllies.casesAttendantAlliance.has(cid)) {
+              score += 7.5; // Rejoindre un allié d'un autre Peuple pour former une Coalition !
+            } else if (analyseAllies.casesDejaCouvertes.has(cid)) {
+              score -= 4.8; // Déjà barrée ou déjà en coalition : ne pas gaspiller un pion !
+            }
+          }
+
+          // En V0.4, envoyer ses 2 propres pions du MÊME Peuple sur la même case est inutile (ne crée pas de Coalition !)
+          if (casesPrisesParMesPions.has(cid)) {
+            score -= 5.0;
+          }
+
+          return score;
+        };
+
+        const accessibles = casesAccessiblesDefenseur(etat, caseSimulee);
+        let meilleureCase = caseSimulee;
+        let meilleurScore = evaluerCasePlacementV04(caseSimulee);
+
+        for (const c of etat.cases) {
+          const sc = evaluerCasePlacementV04(c.id);
+          const penaliteDist = accessibles.includes(c.id) ? 0.08 : 0.85;
+          if (sc - penaliteDist > meilleurScore) {
+            meilleurScore = sc - penaliteDist;
+            meilleureCase = c.id;
+          }
+        }
+
+        if (meilleureCase !== caseSimulee) {
+          const pas = choisirPasVersCible(etat, caseSimulee, meilleureCase);
+          caseSimulee = pas;
+          casesPrisesParMesPions.add(caseSimulee);
+          nouvellesActions.push({
+            pionId: pion.id,
+            etape,
+            type: 'deplacer',
+            caseCible: pas,
+            machineCible: null,
+            explicationBot: estDeductif
+              ? `Déductif (V0.4) : se déplace vers ${etat.cases[pas]?.nom} (${etape === 1 ? 'Barrage anti-entrée' : 'Coalition Inter-Peuples'}).`
+              : `Glouton (V0.4) : se déplace vers ${etat.cases[pas]?.nom} pour contrer son dé (${maPrediction?.tactique}).`,
+          });
+        } else {
+          casesPrisesParMesPions.add(caseSimulee);
+          nouvellesActions.push({
+            pionId: pion.id,
+            etape,
+            type: 'attendre',
+            caseCible: null,
+            machineCible: null,
+            explicationBot: `${estDeductif ? 'Déductif' : 'Glouton'} (V0.4) : maintient sa position sur ${etat.cases[caseSimulee]?.nom} (${etape === 1 ? 'Barrage' : 'Coalition'}).`,
+          });
+        }
+        continue;
+      }
 
       const evaluerCaseObjectif = (cid: number): number => {
         let score = 0;

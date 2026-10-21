@@ -220,9 +220,46 @@ export const IDEES_INITIALES_LABO: LabIdea[] = [
     dateCreation: '2026-10-16',
     dateMaj: '2026-10-19',
   },
+  {
+    id: 'idea-asymetrie-6-peuples-4-secteurs',
+    titre: 'Matrice d’Asymétrie : 6 Peuples & 4 Secteurs (36 pts / 15 Avantages gradués de 1 à 5)',
+    cible: 'Jeu',
+    versionCible: '0.4',
+    categorie: 'Différé (Rêve / Peuples)',
+    description:
+      'Modèle mathématique d’asymétrie pour 3 à 5 joueurs : 6 Peuples cumulant chacun 6 pts de puissance répartis sur 2 ou 3 des 4 Secteurs (9 pts par Secteur). Famille A Spécialistes (5-1, 4-2, 3-3) et Famille B Polyvalents (4-1-1, 3-2-1, 2-2-2). Garantit 95% de couverture des 4 Secteurs à 3J et 100% à 4J–5J.',
+    auteur: 'Auteur',
+    priorite: 'Haute',
+    maturite: 'Prête à tester',
+    interet: 10,
+    dateCreation: '2026-10-21',
+    dateMaj: '2026-10-21',
+  },
 ];
 
 export const CAMPAGNES_VM_INITIALES: ScheduledCampaignVM[] = [
+  {
+    id: 'vm-cron-v04-exploration-placement',
+    nom: 'Campagne Exploratoire V0.4 — Pur Placement, 6 Topologies, Options Contrariées & Banc 3–6J',
+    cibleExecution: 'vm_oracle_cloud',
+    cronExpression: '0 1 * * *',
+    actif: true,
+    nbVariantesAGenerer: 4,
+    nbPartiesViabilite: 12,
+    nbPartiesInteret: 16,
+    eliminerNonViablesAuto: true,
+    autoCommitGithub: true,
+    versionsCibles: ['0.4'],
+    inclureBotsPointe: true,
+    testerEquilibre36J: true,
+    statut: 'planifiee',
+    derniereExecution: '2026-10-21T01:00:00Z',
+    prochaineExecutionEstimee: 'Tous les jours à 01h00 UTC (VM Oracle Cloud)',
+    journalVM: [
+      '[VM Oracle Cloud] Campagne V0.4 dédiée au Pur Placement (6 topologies, 1 à 3 Défenseurs/J, Options 1, 2 et 4 de Mouvement Contrarié).',
+      '[Métriques V0.4] Mesure du Gain de Planification (IS-MCTS vs Réflexe), de la Tension des Choix et du Taux de Mouvements Contrariés.',
+    ],
+  },
   {
     id: 'vm-cron-multi-versions-v01-v03',
     nom: 'Campagne Intensive VM Oracle Cloud — Comparatif V0.1, V0.2 & V0.3 (Banc 3 à 6 Joueurs)',

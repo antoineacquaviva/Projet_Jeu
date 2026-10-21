@@ -34,12 +34,12 @@ export const App: React.FC = () => {
   const [versions, setVersions] = useState<GameVersionSpec[]>(
     VERSIONS_JEU_INITIALES
   );
-  const [versionActiveId, setVersionActiveId] = useState<GameVersionId>('0.3');
+  const [versionActiveId, setVersionActiveId] = useState<GameVersionId>('0.4');
   const [variantes, setVariantes] = useState<VariantV01[]>(
     VARIANTES_INITIALES_V01
   );
   const [varianteActiveId, setVarianteActiveId] = useState<string>(
-    'v03_double_plateau_reference'
+    'v04_placement_coalition_reference'
   );
   const [rapportsViabilite, setRapportsViabilite] = useState<
     RapportViabilite31[]
@@ -71,37 +71,103 @@ export const App: React.FC = () => {
           const data = await resp.json();
           if (!ignore && data) {
             if (Array.isArray(data.versions) && data.versions.length > 0) {
+              const initParId = new Map(
+                VERSIONS_JEU_INITIALES.map((v) => [v.id, v])
+              );
+              const versionsMaj = data.versions.map((v: GameVersionSpec) =>
+                initParId.has(v.id) ? initParId.get(v.id)! : v
+              );
               const existVerIds = new Set(
-                data.versions.map((v: GameVersionSpec) => v.id)
+                versionsMaj.map((v: GameVersionSpec) => v.id)
               );
               const verManquantes = VERSIONS_JEU_INITIALES.filter(
                 (v) => !existVerIds.has(v.id)
               );
-              setVersions([...data.versions, ...verManquantes]);
+              setVersions([...versionsMaj, ...verManquantes]);
             }
             if (Array.isArray(data.variantes) && data.variantes.length > 0) {
-              const existIds = new Set(
-                data.variantes.map((v: VariantV01) => v.id)
+              const initVarParId = new Map(
+                VARIANTES_INITIALES_V01.map((v) => [v.id, v])
               );
+              const varMaj = data.variantes.map((v: VariantV01) =>
+                initVarParId.has(v.id) ? initVarParId.get(v.id)! : v
+              );
+              const existIds = new Set(varMaj.map((v: VariantV01) => v.id));
               const manquantes = VARIANTES_INITIALES_V01.filter(
                 (v) => !existIds.has(v.id)
               );
-              setVariantes([...data.variantes, ...manquantes]);
+              setVariantes([...manquantes, ...varMaj]);
             }
-            if (Array.isArray(data.rapportsViabilite)) {
-              setRapportsViabilite(data.rapportsViabilite);
-            }
-            if (Array.isArray(data.rapportsInteret)) {
-              setRapportsInteret(data.rapportsInteret);
-            }
-            if (Array.isArray(data.campagnesSelection)) {
-              setCampagnesSelection(data.campagnesSelection);
+            const toutesVarsChargees =
+              Array.isArray(data.variantes) && data.variantes.length > 0
+                ? [
+                    ...VARIANTES_INITIALES_V01.filter(
+                      (v) => !data.variantes.some((dv: VariantV01) => dv.id === v.id)
+                    ),
+                    ...data.variantes,
+                  ]
+                : VARIANTES_INITIALES_V01;
+
+            const campagnesExistantes: CampagneSelection33[] = Array.isArray(
+              data.campagnesSelection
+            )
+              ? data.campagnesSelection
+              : [];
+            const analysesExistantes: AnalyseGeminiCampagne[] = Array.isArray(
+              data.analysesGemini
+            )
+              ? data.analysesGemini
+              : [];
+
+            const aCampV04 = campagnesExistantes.some((c) =>
+              (c.versionsCibles || []).includes('0.4')
+            );
+
+            if (!aCampV04) {
+              const ciblesV04 = toutesVarsChargees.filter(
+                (v: VariantV01) =>
+                  v.version === '0.4' && v.statutViabilite !== 'eliminee'
+              );
+              const { campagne: campV04 } = executerCampagneSelection33(
+                ciblesV04,
+                'Campagne de Référence V0.4 — Pur Placement, 6 Topologies, Options 1·2·4 Contrariées & Banc 3–6J',
+                5,
+                5,
+                ['0.4']
+              );
+              const anaV04 = construireAnalyseCampagneStructurer(campV04);
+              setRapportsViabilite([
+                ...campV04.rapportsViabilite,
+                ...(Array.isArray(data.rapportsViabilite)
+                  ? data.rapportsViabilite
+                  : []),
+              ]);
+              setRapportsInteret([
+                ...campV04.rapportsInteret,
+                ...(Array.isArray(data.rapportsInteret)
+                  ? data.rapportsInteret
+                  : []),
+              ]);
+              setCampagnesSelection([campV04, ...campagnesExistantes]);
+              setAnalysesGemini([anaV04, ...analysesExistantes]);
+            } else {
+              if (Array.isArray(data.rapportsViabilite)) {
+                setRapportsViabilite(data.rapportsViabilite);
+              }
+              if (Array.isArray(data.rapportsInteret)) {
+                setRapportsInteret(data.rapportsInteret);
+              }
+              setCampagnesSelection(campagnesExistantes);
+              setAnalysesGemini(analysesExistantes);
             }
             if (Array.isArray(data.campagnesPlanifieesVM)) {
-              setCampagnesVM(data.campagnesPlanifieesVM);
-            }
-            if (Array.isArray(data.analysesGemini)) {
-              setAnalysesGemini(data.analysesGemini);
+              const existVmIds = new Set(
+                data.campagnesPlanifieesVM.map((c: ScheduledCampaignVM) => c.id)
+              );
+              const vmManquantes = CAMPAGNES_VM_INITIALES.filter(
+                (c) => !existVmIds.has(c.id)
+              );
+              setCampagnesVM([...vmManquantes, ...data.campagnesPlanifieesVM]);
             }
             if (Array.isArray(data.ideesLabo) && data.ideesLabo.length > 0) {
               const existIdeaIds = new Set(
@@ -120,14 +186,14 @@ export const App: React.FC = () => {
       }
       if (!ignore) {
         const cibles = VARIANTES_INITIALES_V01.filter(
-          (v) => v.statutViabilite !== 'eliminee'
+          (v) => v.version === '0.4' && v.statutViabilite !== 'eliminee'
         );
         const { campagne } = executerCampagneSelection33(
           cibles,
-          'Campagne Initiale V0.1 · V0.2 · V0.3 (9 Bots + Banc 3–6J)',
+          'Campagne de Référence V0.4 — Pur Placement & Coalition (9 Bots + Banc 3–6J)',
           5,
           5,
-          ['0.1', '0.2', '0.3']
+          ['0.4']
         );
         setRapportsViabilite(campagne.rapportsViabilite);
         setRapportsInteret(campagne.rapportsInteret);
@@ -141,27 +207,36 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // Variante recommandée par les campagnes de tests (meilleur score d'intérêt parmi les variantes viables)
+  // Variante recommandée par les campagnes de tests (meilleur score d'intérêt parmi les variantes viables de la version active V0.4)
   const varianteRecommandee = useMemo(() => {
-    const viables = variantes.filter((v) => v.statutViabilite === 'viable');
-    if (viables.length === 0) return variantes[0];
+    const viablesV04 = variantes.filter(
+      (v) => v.statutViabilite === 'viable' && v.version === '0.4'
+    );
+    const pool =
+      viablesV04.length > 0
+        ? viablesV04
+        : variantes.filter((v) => v.statutViabilite === 'viable');
+    if (pool.length === 0) return variantes[0];
 
     const premiereCampagneId = campagnesSelection[0]?.meilleureVarianteId;
-    return [...viables].sort((a, b) => {
+    return [...pool].sort((a, b) => {
       const scoreA =
         (a.scoreInteretDernierTest ?? 0) +
         (a.id === premiereCampagneId ? 3 : 0) +
-        (a.version === '0.3' ? 1 : 0);
+        (a.version === '0.4' ? 5 : 0);
       const scoreB =
         (b.scoreInteretDernierTest ?? 0) +
         (b.id === premiereCampagneId ? 3 : 0) +
-        (b.version === '0.3' ? 1 : 0);
+        (b.version === '0.4' ? 5 : 0);
       return scoreB - scoreA;
     })[0];
   }, [variantes, campagnesSelection]);
 
   const versionActive = useMemo(
-    () => versions.find((v) => v.id === versionActiveId) || versions[0],
+    () =>
+      versions.find((v) => v.id === versionActiveId) ||
+      versions.find((v) => v.id === '0.4') ||
+      versions[0],
     [versions, versionActiveId]
   );
 
@@ -183,7 +258,7 @@ export const App: React.FC = () => {
 
   const handleSelectVersion = (nouvelleVersionId: GameVersionId) => {
     setVersionActiveId(nouvelleVersionId);
-    if ((varianteRecommandee?.version || '0.3') === nouvelleVersionId) {
+    if ((varianteRecommandee?.version || '0.4') === nouvelleVersionId) {
       setVarianteActiveId(varianteRecommandee.id);
       return;
     }
@@ -200,7 +275,7 @@ export const App: React.FC = () => {
     versionId?: GameVersionId
   ) => {
     const ver =
-      versionId || variantes.find((v) => v.id === id)?.version || '0.3';
+      versionId || variantes.find((v) => v.id === id)?.version || '0.4';
     if (ver !== versionActiveId) {
       setVersionActiveId(ver);
     }
@@ -400,12 +475,27 @@ export const App: React.FC = () => {
             onChange={(e) => handleSelectVersion(e.target.value)}
             className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-[#1E3528] bg-[#1E3528] text-white"
           >
-            {versions.map((ver) => (
-              <option key={ver.id} value={ver.id}>
-                Jeu V{ver.id}
-                {varianteRecommandee?.version === ver.id ? ' ★' : ''}
-              </option>
-            ))}
+            <optgroup label="Version Active">
+              {versions
+                .filter((ver) => ver.statut !== 'archivee')
+                .map((ver) => (
+                  <option key={ver.id} value={ver.id}>
+                    Jeu V{ver.id} — Pur Placement
+                    {varianteRecommandee?.version === ver.id ? ' ★' : ''}
+                  </option>
+                ))}
+            </optgroup>
+            {versions.some((ver) => ver.statut === 'archivee') && (
+              <optgroup label="Archives (V0.1 – V0.3)">
+                {versions
+                  .filter((ver) => ver.statut === 'archivee')
+                  .map((ver) => (
+                    <option key={ver.id} value={ver.id}>
+                      [Archive] Jeu V{ver.id}
+                    </option>
+                  ))}
+              </optgroup>
+            )}
           </select>
 
           <select

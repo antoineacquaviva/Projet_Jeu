@@ -98,22 +98,31 @@ export function formaterNomSiege(
   };
 }
 
+export function estVariantePlacementV04(variante: VariantV01): boolean {
+  return Boolean(
+    variante.placementUniquementV04 || variante.version === '0.4'
+  );
+}
+
 export const NOMS_TACTIQUES: Record<TactiqueType, string> = {
   cupidite: 'Cupidité (Plus boisée)',
   percee: 'Percée (Vers le Cœur)',
-  opportunisme: 'Opportunisme (Sans Défenseur)',
+  opportunisme: 'Opportunisme (Moins gardée)',
   represailles: 'Représailles (Plus défendue)',
+  acharnement: 'Acharnement (Coupe rase)',
 };
 
 export const DESCRIPTIONS_PHYSIQUES_TACTIQUES: Record<TactiqueType, string> = {
   cupidite:
-    'La Machine cible la tuile accessible portant le plus grand nombre de pions Forêt en bois.',
+    'La Machine cible la case accessible portant le plus grand nombre de pions Forêt en bois.',
   percee:
-    'La Machine avance d’une tuile en direction de la Tuile Cœur Central (ou reste sur le Cœur si elle y est déjà).',
+    'La Machine avance d’une case en direction du Cœur Central (ou reste sur le Cœur si elle y est déjà).',
   opportunisme:
-    'La Machine cible la tuile boisée accessible où ne se trouve aucun pion Défenseur (à défaut, la moins défendue).',
+    'La Machine cible la case boisée accessible la plus isolée des Défenseurs (moins de Défenseurs sur la case et ses voisines).',
   represailles:
-    'La Machine cible la tuile boisée accessible comptant le plus de pions Défenseurs présents.',
+    'La Machine cible la case boisée accessible comptant le plus de pions Défenseurs (en V0.4 optionnelle, peut forcer 1 Défenseur isolé).',
+  acharnement:
+    'Nouvelle tactique V0.4 : la Machine cible la case boisée ayant le MOINS d’arbres restants (> 0) afin d’achever et de raser complètement une clairière entamée.',
 };
 
 export const NOMS_PEUPLES_V01 = [
@@ -148,6 +157,56 @@ export const PISTE_TACTIQUE_INITIALE: Record<number, TactiqueType> = {
   12: 'represailles',
 };
 
+export const PISTE_TACTIQUE_V04_ACHARNEMENT: Record<number, TactiqueType> = {
+  2: 'percee',
+  3: 'acharnement',
+  4: 'percee',
+  5: 'opportunisme',
+  6: 'cupidite',
+  7: 'opportunisme',
+  8: 'cupidite',
+  9: 'acharnement',
+  10: 'percee',
+  11: 'cupidite',
+  12: 'acharnement',
+};
+
+export const PISTE_TACTIQUE_V04_3_TACTIQUES: Record<number, TactiqueType> = {
+  2: 'percee',
+  3: 'cupidite',
+  4: 'percee',
+  5: 'opportunisme',
+  6: 'cupidite',
+  7: 'opportunisme',
+  8: 'cupidite',
+  9: 'percee',
+  10: 'opportunisme',
+  11: 'cupidite',
+  12: 'percee',
+};
+
+export function creerPisteTactiqueInitialePourVariante(
+  variante: VariantV01
+): Record<number, TactiqueType> {
+  if (estVariantePlacementV04(variante)) {
+    const palette =
+      variante.paletteTactiques ??
+      variante.profilTactiquesV04 ??
+      '4_tactiques_acharnement';
+    if (palette === '3_tactiques_sans_represailles') {
+      return { ...PISTE_TACTIQUE_V04_3_TACTIQUES };
+    }
+    if (
+      palette === '4_tactiques_represailles_perce_1' ||
+      palette === '4_tactiques_represailles_contours'
+    ) {
+      return { ...PISTE_TACTIQUE_INITIALE };
+    }
+    return { ...PISTE_TACTIQUE_V04_ACHARNEMENT };
+  }
+  return { ...PISTE_TACTIQUE_INITIALE };
+}
+
 export const PISTE_MACHINE_INITIALE: Record<number, number> = {
   0: 0,
   1: 1,
@@ -158,6 +217,418 @@ export const PISTE_MACHINE_INITIALE: Record<number, number> = {
 };
 
 export const VARIANTES_INITIALES_V01: VariantV01[] = [
+  {
+    id: 'v04_socle_placement_coalition',
+    nom: 'V0.4 Socle — Pur Placement, Barrage Annulation & Coalition Sur Place (4 Tactiques Acharnement)',
+    version: '0.4',
+    description:
+      'Noyau de référence V0.4 sur Plateau Double Face : les Défenseurs peuvent uniquement se déplacer (1 case). Toute case avec ≥ 1 Défenseur annule le déplacement de la Machine qui la cible ; ≥ 2 Défenseurs de Peuples différents sur la case d’une Machine bloquent sa coupe.',
+    origine: 'socle',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 94,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_acharnement',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v04_coalition_chantier',
+    nom: 'V0.4 Coalition Démantelante (Renvoi au Chantier à 2 Peuples) & Double Plateau',
+    version: '0.4',
+    description:
+      'Variante V0.4 où réunir 2 Défenseurs de Peuples différents sur la case d’une Machine non seulement bloque sa coupe, mais démonte la Machine et la renvoie au Chantier.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 92,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'renvoyer_au_chantier',
+    paletteTactiques: '4_tactiques_acharnement',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 5,
+  },
+  {
+    id: 'v04_3_tactiques_epure',
+    nom: 'V0.4 Épurée à 3 Tactiques (Cupidité, Percée, Opportunisme) & Barrage Strict',
+    version: '0.4',
+    description:
+      'Évalue l’option à 3 Tactiques uniquement (sans Représailles ni Acharnement) sur la piste 2–12, combinée au barrage d’annulation stricte et à la coalition sur place.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 90,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '3_tactiques_sans_represailles',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v04_sentiers_cols_report',
+    nom: 'V0.4 Clairières & Sentiers (3 Cols) + Report des Machines sur Cible Libre',
+    version: '0.4',
+    description:
+      'Sur le graphe organique à 3 Cols de Vallée, verrouiller un Col avec 1 Défenseur force la Machine à se reporter sur une autre clairière voisine libre.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 91,
+    bandeSante: 'vert',
+    geometriePlateau: 'clairieres_sentiers',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'report_cible_libre',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_acharnement',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v04_hex19_coalition_chantier',
+    nom: 'V0.4 Grille Hexagonale 19 Cases + Coalition Renvoi au Chantier',
+    version: '0.4',
+    description:
+      'Teste le pur placement sur les 19 hexagones (2 couronnes) : les 6 connexions par hexagone facilitent les coalitions à 2 Peuples pour renvoyer les Machines au Chantier.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 89,
+    bandeSante: 'vert',
+    geometriePlateau: 'hex_couronne_19',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'renvoyer_au_chantier',
+    paletteTactiques: '4_tactiques_acharnement',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v04_reactive_apres_ciblage',
+    nom: 'V0.4 Programmation Réactive (Déplacement I Barrage → Machines → Déplacement II Coalition)',
+    version: '0.4',
+    description:
+      'Les joueurs programment leur Déplacement I sur la foi de leurs 2D6 pour barrer l’entrée aux Machines ; les Machines bougent ; puis les joueurs programment le Déplacement II à vue pour former les coalitions.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 87,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: '2e_apres_ciblage',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'report_cible_libre',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_acharnement',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 5,
+  },
+  {
+    id: 'v04_represailles_perce_barrage',
+    nom: 'V0.4 Représailles Brise-Barrage (Force 1 Défenseur isolé) & Jeton Éclaireur',
+    version: '0.4',
+    description:
+      'Évalue la variante où la tactique Représailles peut entrer sur une case tenue par 1 seul Défenseur isolé (exigeant 2 Défenseurs pour barrer), compensée par le Jeton Éclaireur.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 88,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_represailles_perce_1',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: true,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v04_coalition_graduee_3_peuples',
+    nom: 'V0.4 Coalition Graduée (2 Peuples = Bloque sur place · 3 Peuples = Chantier)',
+    version: '0.4',
+    description:
+      '2 Peuples différents sur la case d’une Machine empêchent sa coupe ; réunir 3 Peuples différents la démonte vers le Chantier. Calibré pour 4 à 6 joueurs.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 90,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'chantier_a_3_peuples',
+    paletteTactiques: '4_tactiques_acharnement',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 5,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 5,
+  },
+  {
+    id: 'v04_sentiers_goulots_contrarie',
+    nom: 'V0.4 Sentiers à Goulots (15 Zones, Cap. 1) & Mouvement Contrarié en Cascade',
+    version: '0.4',
+    description:
+      'Sur le graphe à 15 zones doté de 4 Cols Goulots à capacité unique (1 Défenseur max), un pion qui tente d’entrer dans un goulot déjà occupé voit son 1er mouvement contrarié et son 2e mouvement automatiquement annulé !',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 93,
+    bandeSante: 'vert',
+    geometriePlateau: 'sentiers_goulots_15',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_acharnement',
+    regleMouvementContrarie: 'goulot_sentier_strict',
+    capaciteMaxCase: 2,
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v04_compact_9_saturation',
+    nom: 'V0.4 Micro-Plateau Compact (9 Zones) & Saturation de Clairière (Max 2 Défenseurs)',
+    version: '0.4',
+    description:
+      'Plateau hyper-dense de 9 zones où aucune clairière ne peut accueillir plus de 2 Défenseurs simultanément : génère une tension maximale sur chaque choix de placement et force la coordination.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 91,
+    bandeSante: 'vert',
+    geometriePlateau: 'compact_9_cases',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'renvoyer_au_chantier',
+    paletteTactiques: '4_tactiques_acharnement',
+    regleMouvementContrarie: 'capacite_max_tuile',
+    capaciteMaxCase: 2,
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v04_reseau_etendu_21_6j',
+    nom: 'V0.4 Grand Réseau Étendu (21 Zones · 5–6 Joueurs · 3 Défenseurs/J)',
+    version: '0.4',
+    description:
+      'Grand plateau à 21 clairières et sous-bois médians conçu pour 5 et 6 joueurs avec 3 Défenseurs par joueur : valorise les plans anticipés à plusieurs coups.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 90,
+    bandeSante: 'vert',
+    geometriePlateau: 'reseau_etendu_21',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_acharnement',
+    regleMouvementContrarie: 'capacite_max_tuile',
+    capaciteMaxCase: 3,
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 6,
+    defenseursParJoueur: 3,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 7,
+    nbTours: 5,
+    machinesInitiales: 5,
+  },
+  {
+    id: 'v04_interception_machine',
+    nom: 'V0.4 Interception par Machine Active & Assauts Coordonnés (Option 4)',
+    version: '0.4',
+    description:
+      'Les clairières n’ont aucun plafond arbitraire entre alliés. En revanche, entrer sur une clairière tenue par une Machine active nécessite un assaut coordonné d’au moins deux peuples distincts : tout défenseur solitaire est intercepté et repoussé, brisant son plan de mouvement !',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 94,
+    bandeSante: 'vert',
+    geometriePlateau: 'clairieres_sentiers',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'annulation_stricte',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_acharnement',
+    regleMouvementContrarie: 'interception_machine',
+    effetProteger: 'barrage_entree_et_coupe',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v04_temoin_sous_effectif_1_pion',
+    nom: 'V0.4 Témoin Éliminé — Sous-Effectif à 1 Seul Défenseur par Joueur & 1 Ordre',
+    version: '0.4',
+    description:
+      'Variante de stress-test V0.4 avec 1 seul pion Défenseur par joueur, 1 seul déplacement par tour et 6 Machines à portée globale : impossible de barrer et de former des coalitions simultanément.',
+    origine: 'exploration',
+    statutViabilite: 'eliminee',
+    motifElimination:
+      'Échec Viabilité 3.1 : Sous-effectif critique pour former des coalitions à 2 Peuples différents tout en maintenant des barrages d’entrée face à 6 Machines.',
+    scoreInteretDernierTest: 24,
+    bandeSante: 'rouge',
+    geometriePlateau: 'hex_couronne_19',
+    modeProgrammation: 'un_seul_ordre',
+    modeResolution: 'entrelacee_coupe_fin',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'report_cible_libre',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_represailles_perce_1',
+    effetProteger: 'protection_collective',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'plateau_entier',
+    jetonEclaireurActif: false,
+    nbJoueurs: 3,
+    defenseursParJoueur: 1,
+    foretsParCaseSecteur: 2,
+    foretsCoeur: 3,
+    nbTours: 5,
+    machinesInitiales: 6,
+  },
   {
     id: 'v01_socle_reference',
     nom: 'V0.1 Socle — Séquencement Entrelacé (Référence)',
@@ -768,7 +1239,231 @@ export function construirePlateauV01(variante: VariantV01): CasePlateau[] {
     return cases;
   }
 
-  // 4. ARCHITECTURE HISTORIQUE V0.1/V0.2 : COURONNE MODULABLE (1 Cœur + 2×J cases)
+  // 4. ARCHITECTURE V0.4 : MICRO-PLATEAU COMPACT 9 CASES (1 Cœur + 4 Intérieurs + 4 Lisières)
+  if (geom === 'compact_9_cases') {
+    const cases: CasePlateau[] = [];
+    cases.push({
+      id: 0,
+      nom: 'Cœur Sacré',
+      nomPhysique: 'Micro-Plateau 9 — Cœur Sacré',
+      secteurJoueur: null,
+      anneau: 'coeur',
+      voisins: [1, 2, 3, 4],
+      foretsMax: variante.foretsCoeur,
+      x: 0,
+      y: 0,
+      formeRendu: 'clairiere',
+      rayonRendu: 44,
+    });
+    const dirs = ['Nord', 'Est', 'Sud', 'Ouest'];
+    for (let i = 0; i < 4; i++) {
+      const angle = (i * Math.PI) / 2 - Math.PI / 2;
+      const rInt = 96;
+      const iPrec = 1 + ((i + 3) % 4);
+      const iSuiv = 1 + ((i + 1) % 4);
+      const lisA = 5 + i;
+      const lisB = 5 + ((i + 3) % 4);
+      cases.push({
+        id: 1 + i,
+        nom: `Clairière ${dirs[i]}`,
+        nomPhysique: `Clairière Intérieure ${dirs[i]}`,
+        secteurJoueur: i % J,
+        anneau: 'interieur',
+        voisins: [0, iPrec, iSuiv, lisA, lisB],
+        foretsMax: variante.foretsParCaseSecteur,
+        x: Math.round(Math.cos(angle) * rInt),
+        y: Math.round(Math.sin(angle) * rInt),
+        formeRendu: 'clairiere',
+        rayonRendu: 38,
+      });
+    }
+    const dirsLis = ['Nord-Est', 'Sud-Est', 'Sud-Ouest', 'Nord-Ouest'];
+    for (let l = 0; l < 4; l++) {
+      const angle = (l * Math.PI) / 2 + Math.PI / 4 - Math.PI / 2;
+      const rLis = 190;
+      const intA = 1 + l;
+      const intB = 1 + ((l + 1) % 4);
+      const lPrec = 5 + ((l + 3) % 4);
+      const lSuiv = 5 + ((l + 1) % 4);
+      cases.push({
+        id: 5 + l,
+        nom: `Lisière ${dirsLis[l]}`,
+        nomPhysique: `Lisière Extérieure ${dirsLis[l]}`,
+        secteurJoueur: l % J,
+        anneau: 'lisiere',
+        voisins: [intA, intB, lPrec, lSuiv],
+        foretsMax: Math.max(2, variante.foretsParCaseSecteur - 1),
+        x: Math.round(Math.cos(angle) * rLis),
+        y: Math.round(Math.sin(angle) * rLis),
+        formeRendu: 'clairiere',
+        rayonRendu: 35,
+      });
+    }
+    return cases;
+  }
+
+  // 5. ARCHITECTURE V0.4 : SENTIERS À GOULOTS D'ÉTRANGLEMENT 15 CASES (Capacité 1 sur les cols)
+  if (geom === 'sentiers_goulots_15') {
+    const cases: CasePlateau[] = [];
+    cases.push({
+      id: 0,
+      nom: 'Sanctuaire Cœur',
+      nomPhysique: 'Goulots 15 — Clairière du Cœur',
+      secteurJoueur: null,
+      anneau: 'coeur',
+      voisins: [1, 2, 3, 4],
+      foretsMax: variante.foretsCoeur,
+      x: 0,
+      y: 0,
+      formeRendu: 'clairiere',
+      rayonRendu: 42,
+    });
+    for (let i = 0; i < 4; i++) {
+      const angle = (i * Math.PI) / 2 - Math.PI / 2;
+      const rInt = 86;
+      const goulot = 5 + i;
+      const iPrec = 1 + ((i + 3) % 4);
+      const iSuiv = 1 + ((i + 1) % 4);
+      cases.push({
+        id: 1 + i,
+        nom: `Sous-Bois ${['Nord', 'Est', 'Sud', 'Ouest'][i]}`,
+        nomPhysique: `Sous-Bois Intérieur ${['Nord', 'Est', 'Sud', 'Ouest'][i]}`,
+        secteurJoueur: i % J,
+        anneau: 'interieur',
+        voisins: [0, iPrec, iSuiv, goulot],
+        foretsMax: variante.foretsParCaseSecteur,
+        x: Math.round(Math.cos(angle) * rInt),
+        y: Math.round(Math.sin(angle) * rInt),
+        formeRendu: 'clairiere',
+        rayonRendu: 35,
+      });
+    }
+    for (let g = 0; g < 4; g++) {
+      const angle = (g * Math.PI) / 2 - Math.PI / 2;
+      const rGoulot = 150;
+      const intRelie = 1 + g;
+      const lisA = 9 + g;
+      const lisB = 9 + ((g + 1) % 6);
+      cases.push({
+        id: 5 + g,
+        nom: `Goulot ${['Nord', 'Est', 'Sud', 'Ouest'][g]} (Cap. 1)`,
+        nomPhysique: `Col Étroit ${['Nord', 'Est', 'Sud', 'Ouest'][g]} — Capacité 1`,
+        secteurJoueur: g % J,
+        anneau: 'interieur',
+        voisins: [intRelie, lisA, lisB],
+        foretsMax: Math.max(2, Math.round(variante.foretsParCaseSecteur * 0.75)),
+        x: Math.round(Math.cos(angle) * rGoulot),
+        y: Math.round(Math.sin(angle) * rGoulot),
+        formeRendu: 'clairiere',
+        rayonRendu: 26,
+      });
+    }
+    for (let l = 0; l < 6; l++) {
+      const angle = (l * Math.PI) / 3 - Math.PI / 2;
+      const rLis = 224;
+      const goulotA = 5 + (l % 4);
+      const goulotB = 5 + ((l + 3) % 4);
+      const lPrec = 9 + ((l + 5) % 6);
+      const lSuiv = 9 + ((l + 1) % 6);
+      cases.push({
+        id: 9 + l,
+        nom: `Orée L${l + 1}`,
+        nomPhysique: `Lisière Périphérique L${l + 1}`,
+        secteurJoueur: l % J,
+        anneau: 'lisiere',
+        voisins: [goulotA, goulotB, lPrec, lSuiv],
+        foretsMax: Math.max(2, variante.foretsParCaseSecteur - 1),
+        x: Math.round(Math.cos(angle) * rLis),
+        y: Math.round(Math.sin(angle) * rLis),
+        formeRendu: 'clairiere',
+        rayonRendu: 32,
+      });
+    }
+    return cases;
+  }
+
+  // 6. ARCHITECTURE V0.4 : GRAND RÉSEAU ÉTENDU 21 CASES (Pour 5-6 joueurs)
+  if (geom === 'reseau_etendu_21') {
+    const cases: CasePlateau[] = [];
+    cases.push({
+      id: 0,
+      nom: 'Grand Sanctuaire Cœur',
+      nomPhysique: 'Grand Réseau 21 — Sanctuaire Ancien',
+      secteurJoueur: null,
+      anneau: 'coeur',
+      voisins: [1, 2, 3, 4, 5, 6],
+      foretsMax: variante.foretsCoeur + 1,
+      x: 0,
+      y: 0,
+      formeRendu: 'clairiere',
+      rayonRendu: 45,
+    });
+    for (let i = 0; i < 6; i++) {
+      const angle = (i * Math.PI) / 3 - Math.PI / 2;
+      const rInt = 88;
+      const iPrec = 1 + ((i + 5) % 6);
+      const iSuiv = 1 + ((i + 1) % 6);
+      const sbA = 7 + i;
+      const sbB = 7 + ((i + 5) % 6);
+      cases.push({
+        id: 1 + i,
+        nom: `Clairière C${i + 1}`,
+        nomPhysique: `Clairière Intérieure ${i + 1}`,
+        secteurJoueur: i % J,
+        anneau: 'interieur',
+        voisins: [0, iPrec, iSuiv, sbA, sbB],
+        foretsMax: variante.foretsParCaseSecteur,
+        x: Math.round(Math.cos(angle) * rInt),
+        y: Math.round(Math.sin(angle) * rInt),
+        formeRendu: 'clairiere',
+        rayonRendu: 34,
+      });
+    }
+    for (let s = 0; s < 6; s++) {
+      const angle = (s * Math.PI) / 3 + Math.PI / 6 - Math.PI / 2;
+      const rMed = 156;
+      const cA = 1 + s;
+      const cB = 1 + ((s + 1) % 6);
+      const lisA = 13 + (s % 8);
+      const lisB = 13 + ((s + 1) % 8);
+      cases.push({
+        id: 7 + s,
+        nom: `Sous-Bois M${s + 1}`,
+        nomPhysique: `Sous-Bois Médian ${s + 1}`,
+        secteurJoueur: (s + 2) % J,
+        anneau: 'interieur',
+        voisins: [cA, cB, lisA, lisB],
+        foretsMax: variante.foretsParCaseSecteur,
+        x: Math.round(Math.cos(angle) * rMed),
+        y: Math.round(Math.sin(angle) * rMed),
+        formeRendu: 'clairiere',
+        rayonRendu: 32,
+      });
+    }
+    for (let l = 0; l < 8; l++) {
+      const angle = (l * Math.PI) / 4 - Math.PI / 2;
+      const rLis = 228;
+      const sbAss = 7 + (l % 6);
+      const lPrec = 13 + ((l + 7) % 8);
+      const lSuiv = 13 + ((l + 1) % 8);
+      cases.push({
+        id: 13 + l,
+        nom: `Lisière L${l + 1}`,
+        nomPhysique: `Lisière Profonde L${l + 1}`,
+        secteurJoueur: l % J,
+        anneau: 'lisiere',
+        voisins: [sbAss, lPrec, lSuiv],
+        foretsMax: Math.max(2, variante.foretsParCaseSecteur - 1),
+        x: Math.round(Math.cos(angle) * rLis),
+        y: Math.round(Math.sin(angle) * rLis),
+        formeRendu: 'clairiere',
+        rayonRendu: 30,
+      });
+    }
+    return cases;
+  }
+
+  // 7. ARCHITECTURE HISTORIQUE V0.1/V0.2 : COURONNE MODULABLE (1 Cœur + 2×J cases)
   const cases: CasePlateau[] = [];
   const voisinsCoeur: number[] = [];
   for (let s = 0; s < J; s++) {
@@ -884,119 +1579,128 @@ export function construireGuidePhysique(
   joueurActif: number,
   tourActuel: number
 ): PhysicalStepGuide {
+  const estV04 = estVariantePlacementV04(variante);
   switch (sousPhase) {
     case 'observation_2d6':
       return {
         titreEtape: `Tour ${tourActuel} — 1. Coup d'œil secret sous les Gobelets 2D6`,
         composantsPhysiques: [
           `${variante.nbJoueurs} paires de dés 2D6`,
-          `${variante.nbJoueurs} gobelets ou paravents individuels`,
-          'Plateau « Tête du Méchant » (Piste Tactique 2–12 & Piste Machine 0–5)',
+          `${variante.nbJoueurs} gobelets opaques`,
+          'Plateau « Tête du Méchant » (Piste Tactique 2–12 & Piste Machine 1–2–3–0–4–5)',
         ],
         gesteSurTable:
-          'Chaque joueur lance 2D6 sous son gobelet et regarde secrètement ses dés sans rien dire à voix haute. Repérez du regard sur la Piste Tactique la case correspondant à la SOMME de vos dés (2 à 12) et sur la Piste Machine la case correspondant à leur ÉCART (0 à 5).',
+          'Chaque joueur lance 2D6 sous son gobelet et regarde secrètement ses dés en silence. Repérez sur la Piste Tactique la case de votre SOMME (2 à 12) et sur la Piste Machine (1–2–3–0–4–5) la case de votre ÉCART (0 à 5).',
         regleDeReference:
-          'Règle V0.1 §1 — Information secrète : Aucun joueur ne peut nommer ses chiffres ni pointer une tuile. Vos choix de programmation successifs seront votre seul langage.',
+          'Règle §1 — Information secrète : Aucun joueur ne peut nommer ses chiffres. Vos déplacements publics seront votre seul langage.',
       };
     case 'programmation_1':
       return {
-        titreEtape: `Tour ${tourActuel} — 2. Programmation sur table (Joueur ${joueurActif + 1})`,
-        composantsPhysiques: [
-          'Cartes Action du Peuple',
-          'Emplacements physiques « Action I » et « Action II » devant soi',
-          `Pions Défenseurs du Joueur ${joueurActif + 1}`,
-        ],
-        gesteSurTable:
-          variante.modeProgrammation === 'alternee_1_par_1'
-            ? `Joueur ${joueurActif + 1} : Choisissez 1 carte Action pour chacun de vos ${variante.defenseursParJoueur} Défenseurs et posez-la sur l’emplacement « Action I » en indiquant la tuile visée. Les joueurs suivants observent votre pose avant de choisir la leur.`
-            : variante.modeProgrammation === '2e_apres_ciblage'
-            ? `Joueur ${joueurActif + 1} : Posez uniquement votre carte sur l’emplacement « Action I ». Vous programmerez l’emplacement « Action II » après le déplacement des Machines.`
-            : variante.modeProgrammation === 'un_seul_ordre'
-            ? `Joueur ${joueurActif + 1} : Posez votre unique carte Action du tour devant chacun de vos Défenseurs.`
-            : `Joueur ${joueurActif + 1} : À votre tour de table, posez vos cartes sur les emplacements « Action I » et « Action II » pour chacun de vos ${variante.defenseursParJoueur} Défenseurs. Les coéquipiers suivants observent où vous engagez vos pions pour déduire votre tirage secret.`,
-        regleDeReference:
-          'Règle V0.1 §2 — Programmation séquentielle : La pose s’effectue joueur après joueur dans le sens horaire.',
+        titreEtape: estV04
+          ? `Tour ${tourActuel} — 2. Programmation publique des Déplacements (Joueur ${joueurActif + 1})`
+          : `Tour ${tourActuel} — 2. Programmation sur table (Joueur ${joueurActif + 1})`,
+        composantsPhysiques: estV04
+          ? [
+              `Pions Défenseurs du Joueur ${joueurActif + 1}`,
+              'Emplacements de destination « Déplacement I » et « Déplacement II »',
+            ]
+          : [
+              'Cartes Action du Peuple',
+              'Emplacements physiques « Action I » et « Action II » devant soi',
+              `Pions Défenseurs du Joueur ${joueurActif + 1}`,
+            ],
+        gesteSurTable: estV04
+          ? `Joueur ${joueurActif + 1} : Annoncez publiquement la case adjacente visée par chacun de vos ${variante.defenseursParJoueur} Défenseurs (Déplacement I pour barrer l'entrée aux Machines, Déplacement II pour former une coalition à 2 Peuples).`
+          : variante.modeProgrammation === 'alternee_1_par_1'
+          ? `Joueur ${joueurActif + 1} : Choisissez 1 carte Action pour chacun de vos ${variante.defenseursParJoueur} Défenseurs et posez-la face visible sur l’emplacement « Action I ».`
+          : `Joueur ${joueurActif + 1} : À votre tour de table, posez publiquement vos cartes sur les emplacements « Action I » et « Action II ».`,
+        regleDeReference: estV04
+          ? 'Règle V0.4 §2 — Pur Placement Public : Les Défenseurs ne font que se déplacer (1 case adjacente). Les coéquipiers observent vos choix pour déduire votre gobelet.'
+          : 'Règle V0.1 §2 — Programmation séquentielle publique.',
       };
     case 'programmation_2':
       return {
-        titreEtape: `Tour ${tourActuel} — 2bis. Programmation de la 2e Action (Joueur ${joueurActif + 1})`,
+        titreEtape: `Tour ${tourActuel} — 2bis. Programmation du 2e Déplacement (Joueur ${joueurActif + 1})`,
         composantsPhysiques: [
-          'Cartes Action du Peuple',
-          'Emplacement physique « Action II »',
+          `Pions Défenseurs du Joueur ${joueurActif + 1}`,
+          'Emplacement « Déplacement II »',
         ],
-        gesteSurTable: `Joueur ${joueurActif + 1} : Posez maintenant votre carte sur l’emplacement « Action II » pour chacun de vos Défenseurs, en tenant compte des actions déjà posées ou du ciblage des Machines.`,
+        gesteSurTable: `Joueur ${joueurActif + 1} : Indiquez publiquement le 2e déplacement de vos Défenseurs afin de converger à 2 Peuples différents sur les cases occupées par des Machines.`,
         regleDeReference:
-          'Règle V0.1 §2bis — Second temps de programmation (Variante active).',
+          'Règle §2bis — Second temps de programmation.',
       };
     case 'resolution_actions_1':
       return {
-        titreEtape: `Tour ${tourActuel} — 3. Résolution des 1res Actions des Défenseurs`,
-        composantsPhysiques: [
-          'Cartes de l’emplacement « Action I »',
-          'Pions Défenseurs en bois',
-          'Figurines Machines (si Sabotage)',
-        ],
-        gesteSurTable:
-          'Retournez face visible toutes les cartes de l’emplacement « Action I ». Déplacez les pions Défenseurs sur les tuiles voisines, couchez sur le bouclier ceux qui protègent leur tuile, et retirez vers le Chantier (ou couchez) les Machines sabotées.',
-        regleDeReference:
-          'Règle V0.1 §3 — Premières actions : Exécutées avant que les Machines ne se déplacent.',
+        titreEtape: estV04
+          ? `Tour ${tourActuel} — 3. Exécution du 1er Déplacement (Barrages d'Entrée)`
+          : `Tour ${tourActuel} — 3. Résolution des 1res Actions des Défenseurs`,
+        composantsPhysiques: ['Pions Défenseurs en bois'],
+        gesteSurTable: estV04
+          ? 'Déplacez physiquement les pions Défenseurs selon leur Déplacement I. Rappel V0.4 : toute case contenant désormais au moins 1 Défenseur est BARRÉE et interdite d’entrée aux Machines !'
+          : 'Appliquez les cartes de l’emplacement « Action I » (posées face visible lors de la programmation).',
+        regleDeReference: estV04
+          ? 'Règle V0.4 §3 — Barrage de position : ≥ 1 Défenseur sur une case interdit aux Machines d’y entrer.'
+          : 'Règle V0.1 §3 — Premières actions.',
       };
     case 'resolution_ciblage_machines':
       return {
-        titreEtape: `Tour ${tourActuel} — 4. Révélation des 2D6 & Ciblage des Machines (sans coupe)`,
+        titreEtape: `Tour ${tourActuel} — 4. Révélation des 2D6 & Déplacement des Machines (sans coupe)`,
         composantsPhysiques: [
           'Gobelets 2D6 soulevés',
-          'Piste Tactique (2–12) & Piste Machine (0–5)',
-          '6 Figurines Machines numérotées 0 à 5',
+          'Piste Tactique (2–12) & Piste Machine (1–2–3–0–4–5)',
+          '6 Figurines Machines M0 à M5',
         ],
-        gesteSurTable:
-          variante.modeResolution === 'deux_vagues_completes'
-            ? 'Soulevez les gobelets de la 1re vague : lisez l’Écart (0–5) pour identifier la Machine et la Somme (2–12) pour sa Tactique. Déplacez la figurine Machine vers sa tuile cible : dans cette variante en 2 vagues, elle coupe immédiatement 1 Forêt si la tuile n’est pas protégée.'
-            : 'Soulevez tous les gobelets 2D6 ! Pour chaque paire de dés, lisez l’Écart (0–5) sur la Piste Machine et la Somme (2–12) sur la Piste Tactique. Déplacez chaque figurine Machine désignée sur sa tuile cible (ou faites-la entrer depuis le Chantier), mais NE RETIREZ AUCUN ARBRE POUR L’INSTANT.',
+        gesteSurTable: estV04
+          ? 'Soulevez tous les gobelets 2D6 ! Pour chaque paire de dés, identifiez la Machine (Écart) et sa Tactique (Somme). Si la case visée contient au moins 1 Défenseur, la Machine ne peut pas y entrer (son déplacement est annulé ou reporté selon la variante). Ne retirez aucun arbre maintenant !'
+          : 'Soulevez tous les gobelets 2D6 ! Déplacez chaque figurine Machine désignée sur sa tuile cible, mais NE RETIREZ AUCUN ARBRE POUR L’INSTANT.',
         regleDeReference:
-          'Règle V0.1 §4 — Ciblage au milieu : Les Machines prennent position et annoncent leur menace avant la 2e action des Défenseurs.',
+          'Règle V0.4 §4 — Déplacement des Machines : Interdiction d’entrer sur une case gardée par ≥ 1 Défenseur.',
       };
     case 'resolution_actions_2':
       return {
-        titreEtape: `Tour ${tourActuel} — 5. Résolution des 2es Actions des Défenseurs`,
+        titreEtape: estV04
+          ? `Tour ${tourActuel} — 5. Exécution du 2e Déplacement (Formation des Coalitions)`
+          : `Tour ${tourActuel} — 5. Résolution des 2es Actions des Défenseurs`,
         composantsPhysiques: [
-          'Cartes de l’emplacement « Action II »',
           'Pions Défenseurs',
-          'Figurines Machines sur les tuiles menacées',
+          'Figurines Machines sur les cases menacées',
         ],
-        gesteSurTable:
-          'Retournez toutes les cartes de l’emplacement « Action II ». Déplacez vos pions Défenseurs en renfort, activez les protections de dernière minute ou sabotez les Machines qui viennent d’atterrir sur vos tuiles !',
-        regleDeReference:
-          'Règle V0.1 §5 — Secondes actions : Dernière opportunité d’intercepter ou neutraliser les Machines avant l’abattage.',
+        gesteSurTable: estV04
+          ? 'Déplacez vos pions Défenseurs selon leur Déplacement II pour rejoindre les cases où se trouvent des Machines : il faut au moins 2 Défenseurs de Peuples (couleurs) différents sur la même case qu’une Machine pour bloquer sa coupe !'
+          : 'Appliquez les secondes actions des Défenseurs.',
+        regleDeReference: estV04
+          ? 'Règle V0.4 §5 — Coalition Multi-Peuples : 2 Défenseurs de couleurs différentes sur la case d’une Machine neutralisent sa coupe.'
+          : 'Règle V0.1 §5 — Secondes actions.',
       };
     case 'resolution_coupe_et_apprentissage':
       return {
-        titreEtape: `Tour ${tourActuel} — 6. Coupe des Forêts & Apprentissage du Méchant`,
+        titreEtape: `Tour ${tourActuel} — 6. Coupe des Forêts & Apprentissage Statistique`,
         composantsPhysiques: [
           'Pions Forêt en bois vert',
           'Tuiles de la Piste Tactique (2–12)',
-          'Cartes de la Piste Machine (0–5)',
+          'Tuiles de la Piste Machine (1–2–3–0–4–5)',
         ],
-        gesteSurTable:
-          'Sur chaque tuile où se trouve une Machine active non sabotée et non protégée par un Défenseur, retirez 1 pion Forêt en bois par Machine. Puis faites apprendre le Méchant : si une Machine a coupé, glissez sa tuile Tactique d’un cran vers le 7 et sa carte Machine d’un cran vers le 1 ; si elle a été contrée, éloignez-les d’un cran !',
+        gesteSurTable: estV04
+          ? 'Pour chaque Machine appelée ce tour : si au moins 2 Défenseurs de Peuples différents occupent sa case, sa coupe est BLOQUÉE (et ses tuiles reculent sur les pistes). Sinon, elle abat 1 Forêt et ses tuiles avancent vers le 7 et vers la gauche de la piste 1–2–3–0–4–5 !'
+          : 'Sur chaque tuile où se trouve une Machine non contrée, retirez 1 pion Forêt et permutez les pistes.',
         regleDeReference:
-          'Règle V0.1 §6 — Abattage & Renforcement : Les coupes s’appliquent après les 2es actions, suivies de la permutation physique des tuiles sur les deux pistes.',
+          'Règle V0.4 §6 — Bilan des Coalitions & Apprentissage Statistique.',
       };
     case 'bilan_tour':
       return {
-        titreEtape: `Fin du Tour ${tourActuel} — Remise en main des cartes`,
-        composantsPhysiques: ['Cartes Action', 'Pions Défenseurs redressés'],
+        titreEtape: `Fin du Tour ${tourActuel} — Préparation du tour suivant`,
+        composantsPhysiques: ['Gobelets 2D6'],
         gesteSurTable:
-          'Redressez les pions Défenseurs qui étaient en posture de protection, reprenez vos cartes Action en main et passez au tour suivant.',
-        regleDeReference: 'Règle V0.1 §7 — Entretien de fin de tour.',
+          'Les pions Défenseurs et Machines restent sur leurs cases actuelles. Tous les joueurs secouent leur gobelet 2D6 pour le tour suivant.',
+        regleDeReference: 'Règle §7 — Fin de tour.',
       };
     case 'fin_de_partie':
       return {
-        titreEtape: 'Fin de la Partie — Décompte des Forêts Debout',
-        composantsPhysiques: ['Tous les pions Forêt en bois restants sur les tuiles'],
+        titreEtape: 'Fin de la Partie — Décompte des Forêts Préservées',
+        composantsPhysiques: ['Pions Forêt en bois restants sur le plateau'],
         gesteSurTable:
-          'Comptez le nombre total de pions Forêt en bois encore présents sur la Tuile Cœur et les Tuiles Secteur. Comparez ce total à la forêt initiale pour obtenir votre score de préservation.',
-        regleDeReference: 'Règle V0.1 §8 — Victoire collective et score de préservation.',
+          'Comptez les pions Forêt encore debout sur l’ensemble du plateau et rapportez ce total au nombre initial d’arbres.',
+        regleDeReference: 'Règle §8 — Score coopératif de préservation.',
       };
   }
 }
@@ -1022,7 +1726,7 @@ export function creerEtatInitialV01(
         joueur: j,
         numeroPion: n,
         caseId: caseSecteurInt,
-        postureProtection: false,
+        postureProtection: estVariantePlacementV04(variante),
       });
     }
   }
@@ -1073,7 +1777,7 @@ export function creerEtatInitialV01(
     foretsInitialesTotales,
     defenseurs,
     machines,
-    pisteTactique: { ...PISTE_TACTIQUE_INITIALE },
+    pisteTactique: creerPisteTactiqueInitialePourVariante(variante),
     pisteMachine: { ...PISTE_MACHINE_INITIALE },
     lancersSecretsDuTour: tirage.lancers,
     lancersReveles: variante.modeResolution === 'machines_avant_actions',
@@ -1133,11 +1837,28 @@ export function clonerEtatJeu(etat: EtatJeuV01): EtatJeuV01 {
   };
 }
 
-// Vérifie si une case est protégée contre les Machines selon l'option `effetProteger`
+// Compte le nombre de Peuples (joueurs) distincts présents sur une case
+export function compterPeuplesDistinctsSurCase(
+  etat: EtatJeuV01,
+  caseId: number
+): number {
+  const joueurs = new Set<number>();
+  for (const d of etat.defenseurs) {
+    if (d.caseId === caseId) {
+      joueurs.add(d.joueur);
+    }
+  }
+  return joueurs.size;
+}
+
+// Vérifie si une case est protégée contre la coupe des Machines (Coalition >= 2 Peuples en V0.4, ou posture Bouclier en V0.1-V0.3)
 export function caseEstProtegeeContreCoupe(
   etat: EtatJeuV01,
   caseId: number
 ): boolean {
+  if (estVariantePlacementV04(etat.variante)) {
+    return compterPeuplesDistinctsSurCase(etat, caseId) >= 2;
+  }
   const defenseursEnProtection = etat.defenseurs.filter(
     (d) => d.caseId === caseId && d.postureProtection
   );
@@ -1147,44 +1868,45 @@ export function caseEstProtegeeContreCoupe(
   return defenseursEnProtection.length >= 1;
 }
 
-export function caseEstBarreeEntree(etat: EtatJeuV01, caseId: number): boolean {
+// Vérifie si une case est interdite d'entrée aux Machines (Barrage >= 1 Défenseur en V0.4)
+export function caseEstBarreeEntree(
+  etat: EtatJeuV01,
+  caseId: number,
+  tactique?: TactiqueType
+): boolean {
+  if (estVariantePlacementV04(etat.variante)) {
+    const nbDef = etat.defenseurs.filter((d) => d.caseId === caseId).length;
+    const palette =
+      etat.variante.paletteTactiques ?? etat.variante.profilTactiquesV04;
+    if (
+      tactique === 'represailles' &&
+      palette === '4_tactiques_represailles_perce_1'
+    ) {
+      return nbDef >= 2;
+    }
+    return nbDef >= 1;
+  }
   if (etat.variante.effetProteger !== 'barrage_entree_et_coupe') return false;
   return etat.defenseurs.some((d) => d.caseId === caseId && d.postureProtection);
 }
 
-// Détermine la case cible d'une Machine selon la Tactique active et les options de variante
-export function calculerCibleMachine(
+// Trie une liste de cases candidates selon le critère de la Tactique (Cupidité, Acharnement, Percée, Opportunisme, Représailles)
+function trierCasesSelonTactique(
   etat: EtatJeuV01,
-  machine: PionMachine,
-  tactique: TactiqueType,
-  secteurPreferentiel = 0
-): number {
-  // Si la Machine est en Réserve/Chantier (caseId === null), elle entre par une Lisière extérieure du plateau
-  let candidats: number[] = [];
-  const lisieresIds = etat.cases
-    .filter((c) => c.anneau === 'lisiere')
-    .map((c) => c.id);
-  if (machine.caseId === null) {
-    candidats = lisieresIds.length > 0 ? lisieresIds : etat.cases.map((c) => c.id);
-  } else if (etat.variante.porteeTactiques === 'plateau_entier') {
-    candidats = etat.cases.map((c) => c.id);
-  } else {
-    const cActuelle = etat.cases[machine.caseId];
-    candidats = [machine.caseId, ...(cActuelle ? cActuelle.voisins : [])];
-  }
-
-  // Filtrer les cases barrées à l'entrée (sauf la case où la Machine se trouve déjà)
-  const accessibles = candidats.filter(
-    (cid) => cid === machine.caseId || !caseEstBarreeEntree(etat, cid)
-  );
-  const pool = accessibles.length > 0 ? accessibles : candidats;
-
-  // Privilégier les cases ayant encore au moins 1 Forêt
-  const boisees = pool.filter((cid) => etat.forets[cid] > 0);
-  const cibles = boisees.length > 0 ? boisees : pool;
-
+  cibles: number[],
+  tactique: TactiqueType
+): number[] {
   const nbDefSurCase = (cid: number) =>
     etat.defenseurs.filter((d) => d.caseId === cid).length;
+
+  const nbDefVoisinage = (cid: number) => {
+    const c = etat.cases[cid];
+    if (!c) return nbDefSurCase(cid);
+    return (
+      nbDefSurCase(cid) * 2 +
+      c.voisins.reduce((acc, v) => acc + nbDefSurCase(v), 0)
+    );
+  };
 
   const distAuCoeur = (cid: number) => {
     const anneau = etat.cases[cid]?.anneau;
@@ -1193,11 +1915,20 @@ export function calculerCibleMachine(
     return 2;
   };
 
-  const ciblesTriees = [...cibles].sort((a, b) => {
+  return [...cibles].sort((a, b) => {
     if (tactique === 'cupidite') {
-      // Case ayant le plus de Forêts
+      // Case ayant le PLUS de Forêts
       if (etat.forets[b] !== etat.forets[a]) {
         return etat.forets[b] - etat.forets[a];
+      }
+      return distAuCoeur(a) - distAuCoeur(b);
+    }
+    if (tactique === 'acharnement') {
+      // Nouvelle tactique V0.4 : Case boisée (>0) ayant le MOINS de Forêts restantes pour achever une clairière entamée
+      const fA = etat.forets[a] > 0 ? etat.forets[a] : 99;
+      const fB = etat.forets[b] > 0 ? etat.forets[b] : 99;
+      if (fA !== fB) {
+        return fA - fB;
       }
       return distAuCoeur(a) - distAuCoeur(b);
     }
@@ -1209,9 +1940,12 @@ export function calculerCibleMachine(
       return etat.forets[b] - etat.forets[a];
     }
     if (tactique === 'opportunisme') {
-      // Case avec le moins de Défenseurs, puis le plus de Forêts
+      // Case avec le moins de Défenseurs (et voisinage le moins gardé), puis le plus de Forêts
       if (nbDefSurCase(a) !== nbDefSurCase(b)) {
         return nbDefSurCase(a) - nbDefSurCase(b);
+      }
+      if (nbDefVoisinage(a) !== nbDefVoisinage(b)) {
+        return nbDefVoisinage(a) - nbDefVoisinage(b);
       }
       return etat.forets[b] - etat.forets[a];
     }
@@ -1221,6 +1955,60 @@ export function calculerCibleMachine(
     }
     return etat.forets[b] - etat.forets[a];
   });
+}
+
+// Détermine la case cible d'une Machine selon la Tactique active et les options de variante
+export function calculerCibleMachine(
+  etat: EtatJeuV01,
+  machine: PionMachine,
+  tactique: TactiqueType,
+  secteurPreferentiel = 0,
+  ignorerBarragePourCibleInitiale = false
+): number {
+  let candidats: number[] = [];
+  const lisieresIds = etat.cases
+    .filter((c) => c.anneau === 'lisiere')
+    .map((c) => c.id);
+  if (machine.caseId === null) {
+    candidats = lisieresIds.length > 0 ? lisieresIds : etat.cases.map((c) => c.id);
+  } else if (
+    etat.variante.porteeTactiques === 'plateau_entier' ||
+    etat.variante.porteeTactiques === 'global_plateau'
+  ) {
+    candidats = etat.cases.map((c) => c.id);
+  } else {
+    const cActuelle = etat.cases[machine.caseId];
+    candidats = [machine.caseId, ...(cActuelle ? cActuelle.voisins : [])];
+  }
+
+  const compBarrage =
+    etat.variante.comportementBarrageMachine ??
+    etat.variante.comportementBarrageV04 ??
+    'annulation_stricte';
+
+  // En mode V0.4 'annulation_stricte' lorsque ignorerBarragePourCibleInitiale=true, on calcule la cible théorique avant de vérifier si un Défenseur bloque l'entrée
+  const filtrerBarrage =
+    !ignorerBarragePourCibleInitiale &&
+    (!estVariantePlacementV04(etat.variante) ||
+      compBarrage === 'report_cible_libre');
+
+  const accessibles = filtrerBarrage
+    ? candidats.filter(
+        (cid) =>
+          cid === machine.caseId || !caseEstBarreeEntree(etat, cid, tactique)
+      )
+    : candidats;
+
+  const pool =
+    accessibles.length > 0
+      ? accessibles
+      : machine.caseId !== null
+      ? [machine.caseId]
+      : candidats;
+
+  const boisees = pool.filter((cid) => etat.forets[cid] > 0);
+  const cibles = boisees.length > 0 ? boisees : pool;
+  const ciblesTriees = trierCasesSelonTactique(etat, cibles, tactique);
 
   return (
     ciblesTriees[0] ??
@@ -1235,9 +2023,9 @@ export function executerActionsDefenseursEtape(
   etape: 1 | 2
 ): EtatJeuV01 {
   const etat = clonerEtatJeu(etatOrigine);
+  const estV04 = estVariantePlacementV04(etat.variante);
 
-  // En début d'étape, réinitialiser la posture de protection de l'étape précédente si étape 1
-  if (etape === 1) {
+  if (etape === 1 && !estV04) {
     for (const d of etat.defenseurs) {
       d.postureProtection = false;
     }
@@ -1253,17 +2041,140 @@ export function executerActionsDefenseursEtape(
     }
   }
 
-  // 1. Exécuter d'abord tous les déplacements
+  // 1. Exécuter tous les déplacements
   for (const { joueur, action } of actionsEtape) {
     if (action.type !== 'deplacer') continue;
     const pion = etat.defenseurs.find((d) => d.id === action.pionId);
     if (!pion || action.caseCible === null) continue;
+
+    // A. En Étape 2 : Vérification si le 1er déplacement de ce pion a été contrarié
+    if (etape === 2) {
+      const action1Pion = etat.programmations[joueur]?.find(
+        (a) => a.pionId === action.pionId && a.etape === 1
+      );
+      if (action1Pion?.contrariee) {
+        action.contrariee = true;
+        action.motifContrariete =
+          'Mouvement annulé en cascade : le 1er déplacement ayant été contrarié, le plan de déplacement est rompu.';
+        etat.stats.mouvementsContraries =
+          (etat.stats.mouvementsContraries || 0) + 1;
+        etat.journal.push({
+          id: `dep-contrarie-cascade-${etat.tourActuel}-${etape}-${pion.id}`,
+          tour: etat.tourActuel,
+          sousPhase: 'resolution_actions_2',
+          message: `Plan brisé pour J${joueur + 1} (Défenseur #${pion.numeroPion}) : son 2e déplacement vers ${etat.cases[action.caseCible]?.nom || `Case ${action.caseCible}`} est ANNULÉ suite à la contrariété du 1er mouvement !`,
+          gestePhysique: `Le pion Défenseur #${pion.numeroPion} reste immobile sur la ${etat.cases[pion.caseId]?.nomPhysique} : son plan initial est caduc.`,
+          type: 'defenseur',
+        });
+        continue;
+      }
+    }
+
+    // B. Vérification de saturation & contrariété de mouvement (Règles V0.4 : Option 1, Option 2, Option 4)
+    const nomCaseCible = etat.cases[action.caseCible]?.nom || '';
+    const estColOuGoulot =
+      nomCaseCible.includes('Goulot') || nomCaseCible.includes('Col');
+    const machineSurCible = etat.machines.some(
+      (m) => m.caseId === action.caseCible && !m.neutraliseeCeTour
+    );
+    const regleContrarie = etat.variante.regleMouvementContrarie || 'aucun';
+
+    // 1) Option 4 : Interception par Machine active en l'absence d'assaut coordonné (>= 2 peuples)
+    const appliqueInterception =
+      regleContrarie === 'interception_machine' ||
+      regleContrarie === 'barrage_machine_active' ||
+      regleContrarie === 'goulots_et_interception';
+
+    if (appliqueInterception && machineSurCible && action.caseCible !== pion.caseId) {
+      // Un assaut coordonné exige qu'un autre Peuple soit déjà présent OU converge à cette même étape
+      const allieDejaSurCase = etat.defenseurs.some(
+        (d) => d.caseId === action.caseCible && d.joueur !== joueur
+      );
+      const allieConvergeant = actionsEtape.some(
+        (act) =>
+          act.joueur !== joueur &&
+          act.action.type === 'deplacer' &&
+          act.action.caseCible === action.caseCible &&
+          !act.action.contrariee
+      );
+
+      if (!allieDejaSurCase && !allieConvergeant) {
+        action.contrariee = true;
+        action.motifContrariete =
+          "Interception par Machine active : assaut solitaire repoussé (coalition d'au moins 2 peuples requise).";
+        etat.stats.mouvementsContraries =
+          (etat.stats.mouvementsContraries || 0) + 1;
+        etat.journal.push({
+          id: `dep-intercepte-${etat.tourActuel}-${etape}-${pion.id}`,
+          tour: etat.tourActuel,
+          sousPhase: etape === 1 ? 'resolution_actions_1' : 'resolution_actions_2',
+          message: `Mouvement CONTRARIÉ pour J${joueur + 1} (Défenseur #${pion.numeroPion}) vers ${etat.cases[action.caseCible]?.nom} : INTERCEPTÉ par la Machine active ! Un assaut solitaire est impossible, un renfort allié est requis. Le pion reste sur ${etat.cases[pion.caseId]?.nom}.`,
+          gestePhysique: `Le pion Défenseur #${pion.numeroPion} du Joueur ${joueur + 1} est repoussé par la Machine et reste sur la ${etat.cases[pion.caseId]?.nomPhysique}.`,
+          type: 'defenseur',
+        });
+        continue;
+      }
+    }
+
+    // 2) Option 1 & Option 2 : Capacité maximale et saturation
+    let capMax = 99;
+    if (regleContrarie === 'capacite_max_tuile') {
+      capMax = estColOuGoulot ? 1 : (etat.variante.capaciteMaxCase || 2);
+    } else if (
+      regleContrarie === 'goulots_sentiers_seuls' ||
+      regleContrarie === 'goulot_sentier_strict' ||
+      regleContrarie === 'goulots_et_interception'
+    ) {
+      // Option 2 : Clairières libres, SEULS les cols et goulots de sentiers sont limités à 1 pion
+      capMax = estColOuGoulot ? 1 : 99;
+    } else if (estColOuGoulot && nomCaseCible.includes('Goulot')) {
+      capMax = 1;
+    }
+
+    const nbDefSurCible = etat.defenseurs.filter(
+      (d) => d.caseId === action.caseCible
+    ).length;
+
+    if (nbDefSurCible >= capMax && action.caseCible !== pion.caseId) {
+      action.contrariee = true;
+      action.motifContrariete = `Case saturée : capacité maximale atteinte (${capMax} Défenseur${capMax > 1 ? 's' : ''} max).`;
+      etat.stats.mouvementsContraries =
+        (etat.stats.mouvementsContraries || 0) + 1;
+      etat.journal.push({
+        id: `dep-sature-${etat.tourActuel}-${etape}-${pion.id}`,
+        tour: etat.tourActuel,
+        sousPhase: etape === 1 ? 'resolution_actions_1' : 'resolution_actions_2',
+        message: `Mouvement CONTRARIÉ pour J${joueur + 1} (Défenseur #${pion.numeroPion}) vers ${etat.cases[action.caseCible]?.nom} : clairière saturée (${capMax} max) ! Le pion reste sur ${etat.cases[pion.caseId]?.nom}.`,
+        gestePhysique: `Le pion Défenseur #${pion.numeroPion} du Joueur ${joueur + 1} ne peut pas entrer et reste sur la ${etat.cases[pion.caseId]?.nomPhysique}.`,
+        type: 'defenseur',
+      });
+      continue;
+    }
+
+    // C. Vérification d'accessibilité depuis la case actuelle
     const accessibles = casesAccessiblesDefenseur(etat, pion.caseId);
-    if (accessibles.includes(action.caseCible) && action.caseCible !== pion.caseId) {
+    if (!accessibles.includes(action.caseCible)) {
+      action.contrariee = true;
+      action.motifContrariete = `Case non accessible depuis la position actuelle du pion.`;
+      etat.stats.mouvementsContraries =
+        (etat.stats.mouvementsContraries || 0) + 1;
+      etat.journal.push({
+        id: `dep-inaccessible-${etat.tourActuel}-${etape}-${pion.id}`,
+        tour: etat.tourActuel,
+        sousPhase: etape === 1 ? 'resolution_actions_1' : 'resolution_actions_2',
+        message: `Déplacement impossible pour J${joueur + 1} (Défenseur #${pion.numeroPion}) : la case ${etat.cases[action.caseCible]?.nom} n'est pas adjacente à sa position (${etat.cases[pion.caseId]?.nom}).`,
+        gestePhysique: `Le pion reste sur la ${etat.cases[pion.caseId]?.nomPhysique}.`,
+        type: 'defenseur',
+      });
+      continue;
+    }
+
+    // D. Exécution valide du déplacement
+    if (action.caseCible !== pion.caseId) {
       const ancienneCase = etat.cases[pion.caseId]?.nom || `Case ${pion.caseId}`;
       const nouvelleCase = etat.cases[action.caseCible]?.nom || `Case ${action.caseCible}`;
       pion.caseId = action.caseCible;
-      pion.postureProtection = false;
+      pion.postureProtection = estV04;
       etat.stats.deplacementsEffectues += 1;
       etat.journal.push({
         id: `dep-${etat.tourActuel}-${etape}-${pion.id}`,
@@ -1276,7 +2187,24 @@ export function executerActionsDefenseursEtape(
     }
   }
 
-  // 2. Exécuter les postures Protéger
+  // En V0.4 (Pur Placement), les Défenseurs n'ont que l'action de déplacement : le barrage (≥1 Déf.) et la coalition (≥2 Peuples) découlent automatiquement de leur position !
+  if (estV04) {
+    for (const d of etat.defenseurs) {
+      d.postureProtection = true;
+    }
+    for (const c of etat.cases) {
+      const nbPeuples = compterPeuplesDistinctsSurCase(etat, c.id);
+      const nbDef = etat.defenseurs.filter((d) => d.caseId === c.id).length;
+      if (etape === 1 && nbDef >= 1) {
+        etat.stats.protectionsEffectuees += 1;
+      } else if (etape === 2 && nbPeuples >= 2) {
+        etat.stats.protectionsEffectuees += 1;
+      }
+    }
+    return etat;
+  }
+
+  // 2. Exécuter les postures Protéger (V0.1-V0.3)
   for (const { joueur, action } of actionsEtape) {
     if (action.type !== 'proteger') continue;
     const pion = etat.defenseurs.find((d) => d.id === action.pionId);
@@ -1293,7 +2221,7 @@ export function executerActionsDefenseursEtape(
     });
   }
 
-  // 3. Exécuter les Sabotages
+  // 3. Exécuter les Sabotages (V0.1-V0.3)
   for (const { joueur, action } of actionsEtape) {
     if (action.type !== 'saboter') continue;
     const pion = etat.defenseurs.find((d) => d.id === action.pionId);
@@ -1352,7 +2280,7 @@ export function executerActionsDefenseursEtape(
     }
   }
 
-  // 4. Exécuter Replanter (si activé par la variante)
+  // 4. Exécuter Replanter (V0.1-V0.3)
   if (etat.variante.actionReplanterActive) {
     for (const { joueur, action } of actionsEtape) {
       if (action.type !== 'replanter') continue;
@@ -1463,6 +2391,7 @@ export function executerCiblageMachines(
 ): EtatJeuV01 {
   const etat = clonerEtatJeu(etatOrigine);
   etat.lancersReveles = true;
+  const estV04 = estVariantePlacementV04(etat.variante);
 
   const indices =
     indicesLancers || etat.lancersSecretsDuTour.map((_, idx) => idx);
@@ -1476,7 +2405,6 @@ export function executerCiblageMachines(
     const machine = etat.machines.find((m) => m.id === machineId);
     if (!machine) continue;
 
-    // Si la Machine a été sabotée à la 1re action, le lancer la remet en jeu à la Lisière ou échoue
     if (machine.neutraliseeCeTour && machine.caseId !== null) {
       etat.journal.push({
         id: `m-skip-${etat.tourActuel}-${idx}`,
@@ -1490,16 +2418,72 @@ export function executerCiblageMachines(
     }
 
     machine.neutraliseeCeTour = false;
-    const caseCible = calculerCibleMachine(
-      etat,
-      machine,
-      tactique,
-      lancer.joueurObservateur
-    );
     const provenance =
       machine.caseId === null
         ? 'le Chantier (Réserve)'
         : etat.cases[machine.caseId]?.nom || `Case ${machine.caseId}`;
+
+    // En V0.4 avec 'annulation_stricte' : on regarde d'abord la case cible voulue par la Tactique
+    const compBarrage =
+      etat.variante.comportementBarrageMachine ??
+      etat.variante.comportementBarrageV04 ??
+      'annulation_stricte';
+    if (estV04 && compBarrage === 'annulation_stricte') {
+      const cibleVoulue = calculerCibleMachine(
+        etat,
+        machine,
+        tactique,
+        lancer.joueurObservateur,
+        true
+      );
+      if (
+        cibleVoulue !== machine.caseId &&
+        caseEstBarreeEntree(etat, cibleVoulue, tactique)
+      ) {
+        const nomCibleBarrage =
+          etat.cases[cibleVoulue]?.nom || `Case ${cibleVoulue}`;
+        machine.cibleDeclaree = machine.caseId;
+        machine.tactiqueDeclaree = tactique;
+        etat.stats.protectionsEffectuees += 1;
+        etat.journal.push({
+          id: `m-barrage-${etat.tourActuel}-${idx}`,
+          tour: etat.tourActuel,
+          sousPhase: 'resolution_ciblage_machines',
+          message: `🛡️ BARRAGE sur ${nomCibleBarrage} : Dés J${lancer.joueurObservateur + 1} [${lancer.d1},${lancer.d2}] (${NOMS_TACTIQUES[tactique]}) → ${machine.nom} ne peut pas entrer sur ${nomCibleBarrage} (occupée par ≥ 1 Défenseur) et reste sur ${provenance} !`,
+          gestePhysique: `La case ${nomCibleBarrage} contenant au moins 1 Défenseur, le déplacement de ${machine.nom} est annulé : laissez ${machine.nom} sur ${provenance}.`,
+          type: 'defenseur',
+        });
+        continue;
+      }
+    }
+
+    const caseCible = calculerCibleMachine(
+      etat,
+      machine,
+      tactique,
+      lancer.joueurObservateur,
+      false
+    );
+
+    if (
+      estV04 &&
+      caseCible !== machine.caseId &&
+      caseEstBarreeEntree(etat, caseCible, tactique)
+    ) {
+      const nomCibleBarrage = etat.cases[caseCible]?.nom || `Case ${caseCible}`;
+      machine.cibleDeclaree = machine.caseId;
+      machine.tactiqueDeclaree = tactique;
+      etat.stats.protectionsEffectuees += 1;
+      etat.journal.push({
+        id: `m-barrage-tot-${etat.tourActuel}-${idx}`,
+        tour: etat.tourActuel,
+        sousPhase: 'resolution_ciblage_machines',
+        message: `🛡️ BARRAGE COMPLET : toutes les entrées vers ${nomCibleBarrage} sont gardées par des Défenseurs, ${machine.nom} reste sur ${provenance} !`,
+        gestePhysique: `Toutes les cases accessibles étant gardées, ${machine.nom} ne bouge pas.`,
+        type: 'defenseur',
+      });
+      continue;
+    }
 
     machine.caseId = caseCible;
     machine.cibleDeclaree = caseCible;
@@ -1555,6 +2539,7 @@ export function executerCoupesEtApprentissageFinTour(
 ): EtatJeuV01 {
   const etat = clonerEtatJeu(etatOrigine);
   etat.mouvementsApprentissageTour = [];
+  const estV04 = estVariantePlacementV04(etat.variante);
 
   for (let idx = 0; idx < etat.lancersSecretsDuTour.length; idx++) {
     const lancer = etat.lancersSecretsDuTour[idx];
@@ -1562,13 +2547,12 @@ export function executerCoupesEtApprentissageFinTour(
     const machine = etat.machines.find((m) => m.id === machineId);
 
     if (!machine || machine.caseId === null || machine.neutraliseeCeTour) {
-      // La Machine a été sabotée avant de pouvoir couper -> Échec pour le Méchant, apprentissage négatif
       etat.journal.push({
         id: `coupe-sab-${etat.tourActuel}-${idx}`,
         tour: etat.tourActuel,
         sousPhase: 'resolution_coupe_et_apprentissage',
-        message: `${machine?.nom || 'Machine'} neutralisée avant la coupe : le Méchant recule cette combinaison sur ses pistes.`,
-        gestePhysique: `La Machine désignée au lancer ${idx + 1} ayant été neutralisée, faites reculer sa tuile Tactique (case ${lancer.somme}) et sa carte Machine (case ${lancer.ecart}).`,
+        message: `${machine?.nom || 'Machine'} bloquée hors plateau ou neutralisée avant la coupe : le Méchant recule cette combinaison sur ses pistes.`,
+        gestePhysique: `La Machine désignée au lancer ${idx + 1} n'ayant pu agir, faites reculer sa tuile Tactique (case ${lancer.somme}) et sa carte Machine (case ${lancer.ecart}).`,
         type: 'apprentissage',
       });
       appliquerApprentissagePistes(etat, lancer.somme, lancer.ecart, false);
@@ -1581,14 +2565,45 @@ export function executerCoupesEtApprentissageFinTour(
 
     if (caseEstProtegeeContreCoupe(etat, caseId)) {
       etat.stats.coupesEviteesParProtection += 1;
-      etat.journal.push({
-        id: `coupe-prot-${etat.tourActuel}-${idx}`,
-        tour: etat.tourActuel,
-        sousPhase: 'resolution_coupe_et_apprentissage',
-        message: `Protection sur ${nomCase} : ${machine.nom} est bloquée par les Défenseurs et n'abat aucun arbre !`,
-        gestePhysique: `Les Défenseurs en posture Bouclier sur la ${nomPhys} empêchent ${machine.nom} de couper. Éloignez la tuile Tactique (case ${lancer.somme}) du 7.`,
-        type: 'defenseur',
-      });
+      const nbPeuples = compterPeuplesDistinctsSurCase(etat, caseId);
+      const effetCoal =
+        etat.variante.effetCoalitionSurMachine ??
+        etat.variante.effetCoalitionV04 ??
+        'bloquer_coupe_sur_place';
+      const renvoyerAuChantier =
+        estV04 &&
+        (effetCoal === 'renvoyer_au_chantier' ||
+          effetCoal === 'renvoi_chantier' ||
+          (effetCoal === 'chantier_a_3_peuples' && nbPeuples >= 3));
+
+      if (renvoyerAuChantier) {
+        machine.caseId = null;
+        machine.cibleDeclaree = null;
+        machine.neutraliseeCeTour = true;
+        etat.stats.machinesSabotees += 1;
+        etat.journal.push({
+          id: `coupe-coal-chantier-${etat.tourActuel}-${idx}`,
+          tour: etat.tourActuel,
+          sousPhase: 'resolution_coupe_et_apprentissage',
+          message: `🤝⚡ COALITION (${nbPeuples} Peuples) sur ${nomCase} : ${machine.nom} est bloquée ET démantelée vers le Chantier !`,
+          gestePhysique: `${nbPeuples} Peuples différents entourent ${machine.nom} sur ${nomPhys} : aucun arbre n'est coupé, renvoyez ${machine.nom} au Chantier et reculez ses tuiles sur les pistes.`,
+          type: 'defenseur',
+        });
+      } else {
+        etat.stats.machinesSabotees += estV04 ? 1 : 0;
+        etat.journal.push({
+          id: `coupe-prot-${etat.tourActuel}-${idx}`,
+          tour: etat.tourActuel,
+          sousPhase: 'resolution_coupe_et_apprentissage',
+          message: estV04
+            ? `🤝🛡️ COALITION (${nbPeuples} Peuples différents) sur ${nomCase} : ${machine.nom} est neutralisée et n'abat aucun arbre !`
+            : `Protection sur ${nomCase} : ${machine.nom} est bloquée par les Défenseurs et n'abat aucun arbre !`,
+          gestePhysique: estV04
+            ? `Les ${nbPeuples} Défenseurs de couleurs différentes sur ${nomPhys} empêchent ${machine.nom} de couper. Reculez sa tuile Tactique (case ${lancer.somme}) et sa carte Machine (case ${lancer.ecart}).`
+            : `Les Défenseurs en posture Bouclier sur la ${nomPhys} empêchent ${machine.nom} de couper. Éloignez la tuile Tactique (case ${lancer.somme}) du 7.`,
+          type: 'defenseur',
+        });
+      }
       appliquerApprentissagePistes(etat, lancer.somme, lancer.ecart, false);
     } else if (etat.forets[caseId] > 0) {
       etat.forets[caseId] -= 1;
@@ -1598,7 +2613,7 @@ export function executerCoupesEtApprentissageFinTour(
         tour: etat.tourActuel,
         sousPhase: 'resolution_coupe_et_apprentissage',
         message: `${machine.nom} coupe 1 Forêt sur ${nomCase} (reste ${etat.forets[caseId]} Forêts).`,
-        gestePhysique: `Retirez 1 pion Forêt en bois de la ${nomPhys}. Le Méchant apprend : rapprochez sa tuile Tactique (case ${lancer.somme}) du 7 et sa carte Machine (case ${lancer.ecart}) du 1.`,
+        gestePhysique: `Retirez 1 pion Forêt en bois de la ${nomPhys}. Le Méchant apprend : rapprochez sa tuile Tactique (case ${lancer.somme}) du 7 et sa carte Machine (case ${lancer.ecart}) de la gauche (case 1).`,
         type: 'coupe',
       });
       appliquerApprentissagePistes(etat, lancer.somme, lancer.ecart, true);
@@ -1629,8 +2644,9 @@ export function passerAuTourSuivant(etatOrigine: EtatJeuV01): EtatJeuV01 {
 
   etat.tourActuel += 1;
   etat.joueurActifProgrammation = 0;
+  const estV04 = estVariantePlacementV04(etat.variante);
   for (const d of etat.defenseurs) {
-    d.postureProtection = false;
+    d.postureProtection = estV04;
   }
   for (const m of etat.machines) {
     m.cibleDeclaree = null;

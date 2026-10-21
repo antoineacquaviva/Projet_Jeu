@@ -6,18 +6,26 @@ export type AtelierComponentId =
   | 'tests'
   | 'labo';
 
-export type GameVersionId = string; // ex. '0.1', '0.2', '0.3'
+export type GameVersionId = string; // ex. '0.1', '0.2', '0.3', '0.4'
 
-export type TactiqueType = 'cupidite' | 'percee' | 'opportunisme' | 'represailles';
+export type TactiqueType =
+  | 'cupidite'
+  | 'percee'
+  | 'opportunisme'
+  | 'represailles'
+  | 'acharnement';
 
 export type ActionDefenseurType = 'deplacer' | 'proteger' | 'saboter' | 'replanter' | 'attendre';
 
-// Nouvelles architectures géométriques de plateau (introduites en V0.3, rétrocompatibles V0.1/V0.2)
+// Architectures géométriques et dimensions de plateau explorées
 export type GeometriePlateau =
   | 'modulaire_secteurs'   // Socle V0.1/V0.2 : 1 Tuile Cœur + 2 tuiles par joueur assemblées en couronne
-  | 'double_plateau_34_56' // V0.3 : Plateau fixe Recto (3-4 joueurs, 9 zones) / Verso (5-6 joueurs, 13 zones)
-  | 'hex_couronne_19'      // V0.3 : Grille hexagonale fixe à 19 hexagones (1 Cœur + 6 Intérieurs + 12 Lisières)
-  | 'clairieres_sentiers'; // V0.3 : Réseau de 13 clairières et sentiers à embranchements (3 cols stratégiques)
+  | 'double_plateau_34_56' // V0.3/V0.4 : Plateau fixe Recto (3-4 joueurs, 9 zones) / Verso (5-6 joueurs, 13 zones)
+  | 'hex_couronne_19'      // V0.3/V0.4 : Grille hexagonale fixe à 19 hexagones (1 Cœur + 6 Intérieurs + 12 Lisières)
+  | 'clairieres_sentiers'  // V0.3/V0.4 : Réseau de 13 clairières et sentiers à embranchements (3 cols stratégiques)
+  | 'compact_9_cases'      // V0.4 Micro-dimension : 9 clairières hyper-denses (fortes collisions et blocages rapides)
+  | 'sentiers_goulots_15'  // V0.4 Goulots : 15 zones avec 4 sentiers étroits à sens critique
+  | 'reseau_etendu_21';    // V0.4 Macro-dimension : 21 clairières étendues pour 5-6 joueurs avec sous-bois profonds
 
 // Options de séquencement de la programmation
 export type ModeProgrammation =
@@ -32,7 +40,7 @@ export type ModeResolution =
   | 'deux_vagues_completes'  // Vague I (1res actions + moitié des Machines ciblent et coupent) -> Vague II (2es actions + reste des Machines)
   | 'machines_avant_actions'; // Les Machines ciblent et se déplacent en premier -> 1res et 2es actions Défenseurs -> Coupe des Forêts
 
-// Options sur les actions
+// Options sur les actions (V0.1–V0.3)
 export type EffetProteger =
   | 'coupe_seule'             // Référence : empêche la coupe de Forêt sur la case ce tour
   | 'barrage_entree_et_coupe' // Empêche aussi une Machine d'entrer sur la case ET bloque la coupe
@@ -43,6 +51,36 @@ export type EffetSaboter =
   | 'alliance_requise'        // Exige au moins 2 Défenseurs présents sur la case pour renvoyer la Machine au Chantier
   | 'immobiliser_sur_place';  // La Machine reste sur la case mais est couchée (ne coupe pas ce tour)
 
+// Options V0.4 — Pur Placement & Coalition
+export type ComportementBarrageV04 =
+  | 'annulation_stricte'  // Référence V0.4 : si la case ciblée contient >= 1 Défenseur, le déplacement de la Machine est annulé (elle reste sur place)
+  | 'report_cible_libre'; // Variante V0.4 : la Machine se reporte sur la meilleure case voisine libre de tout Défenseur
+
+export type EffetCoalitionV04 =
+  | 'blocage_coupe_seul'      // >= 2 Défenseurs de Peuples différents empêchent la coupe (Machine reste sur place)
+  | 'renvoi_chantier'         // >= 2 Défenseurs de Peuples différents empêchent la coupe ET renvoient la Machine au Chantier
+  | 'bloquer_coupe_sur_place' // Alias sémantique identique à blocage_coupe_seul
+  | 'renvoyer_au_chantier'    // Alias sémantique identique à renvoi_chantier
+  | 'chantier_a_3_peuples';   // 2 Peuples bloquent sur place, 3 Peuples renvoient au Chantier
+
+export type PaletteTactiquesV04 =
+  | '4_tactiques_acharnement'          // Référence V0.4 : Cupidité, Acharnement (Coupe rase), Percée, Opportunisme
+  | '3_tactiques_sans_represailles'    // Variante V0.4 : 3 Tactiques épurées (sans Représailles)
+  | '4_tactiques_represailles_contours' // Représailles privilégie lisières et contournements
+  | '4_tactiques_represailles_perce_1'; // Représailles brise-barrage (peut entrer sur 1 seul Défenseur isolé)
+
+export type ProfilTactiquesV04 = PaletteTactiquesV04;
+
+// Règles de Mouvement Contrarié (V0.4)
+export type RegleMouvementContrarie =
+  | 'aucun'                  // Option 3 : Déplacement libre sans contrariété
+  | 'capacite_max_tuile'     // Option 1 : Plafond physique global (max 2 défenseurs par clairière)
+  | 'goulots_sentiers_seuls' // Option 2 : Clairières libres, seuls les cols et sentiers étroits ont une capacité de 1
+  | 'goulot_sentier_strict'  // Alias pour Option 2
+  | 'interception_machine'   // Option 4 : Interception par Machine active si assaut non coordonné (< 2 peuples)
+  | 'barrage_machine_active' // Alias pour Option 4
+  | 'goulots_et_interception'; // Combinaison : Goulots à 1 ET Interception par Machine active
+
 export type RythmeApprentissage =
   | 'chaque_machine'          // La piste Tactique et la piste Machine apprennent dès le verdict de chaque Machine
   | 'fin_de_tour'             // Apprentissage groupé en toute fin de résolution du tour
@@ -50,14 +88,15 @@ export type RythmeApprentissage =
 
 export type PorteeTactiques =
   | 'voisinage'               // La Machine choisit parmi sa case actuelle et ses cases adjacentes
-  | 'plateau_entier';         // La Machine peut bondir sur n'importe quelle case du plateau répondant au critère
+  | 'plateau_entier'          // La Machine peut bondir sur n'importe quelle case du plateau
+  | 'global_plateau';         // Alias pour plateau_entier
 
 export type StatutViabilite = 'non_teste' | 'viable' | 'eliminee';
 
 export interface VariantV01 {
   id: string;
   nom: string;
-  version: GameVersionId; // '0.1', '0.2', '0.3', etc.
+  version: GameVersionId; // '0.1', '0.2', '0.3', '0.4'
   description: string;
   origine: 'socle' | 'exploration' | 'utilisateur' | 'hybride_gemini';
   statutViabilite: StatutViabilite;
@@ -65,18 +104,31 @@ export interface VariantV01 {
   scoreInteretDernierTest?: number;
   bandeSante?: 'vert' | 'orange' | 'rouge';
 
-  // Architecture géométrique du plateau (V0.3+, défaut 'modulaire_secteurs' pour V0.1/V0.2)
+  // Architecture géométrique du plateau
   geometriePlateau?: GeometriePlateau;
 
   // Règles de séquencement
   modeProgrammation: ModeProgrammation;
   modeResolution: ModeResolution;
 
-  // Règles d'actions
+  // Règles d'actions (V0.1-V0.3)
   effetProteger: EffetProteger;
   effetSaboter: EffetSaboter;
   actionReplanterActive: boolean;
   deplacementDoubleActif: boolean;
+
+  // Règles V0.4 — Pur Placement & Coalition
+  placementUniquementV04?: boolean;
+  comportementBarrageMachine?: ComportementBarrageV04;
+  comportementBarrageV04?: ComportementBarrageV04;
+  effetCoalitionSurMachine?: EffetCoalitionV04;
+  effetCoalitionV04?: EffetCoalitionV04;
+  paletteTactiques?: PaletteTactiquesV04;
+  profilTactiquesV04?: ProfilTactiquesV04;
+
+  // Mécanique de contrariété de mouvement & saturation
+  regleMouvementContrarie?: RegleMouvementContrarie;
+  capaciteMaxCase?: number; // Ex: 2 Défenseurs max par case (ou 1 sur goulot)
 
   // Règles du Méchant
   rythmeApprentissage: RythmeApprentissage;
@@ -215,6 +267,8 @@ export interface ActionProgrammee {
   caseCible: number | null; // pour 'deplacer'
   machineCible: number | null; // pour 'saboter'
   explicationBot?: string;
+  contrariee?: boolean; // V0.4 : Indique si le mouvement a été contrarié (capacité saturée, interception)
+  motifContrariete?: string; // Motif physique de l'annulation ou du blocage
 }
 
 export interface LancerSecret2D6 {
@@ -300,6 +354,7 @@ export interface EtatJeuV01 {
     machinesSabotees: number;
     foretsReplantees: number;
     deplacementsEffectues: number;
+    mouvementsContraries?: number;
     apprentissagesPositifs: number;
     apprentissagesNegatifs: number;
   };
@@ -401,9 +456,20 @@ export interface RapportInteret32 {
     gainBotsPointeSurDeductif?: number;   // score(ismcts) - score(deductif)
     impactApprentissageMechant: number;   // écart avec/sans apprentissage
     equilibreActionsPct: number;          // entropie / équilibre entre déplacer, protéger, saboter
+    // Métriques spécifiques V0.4 (Placement & Anticipation)
+    gainPlanificationPct?: number;        // Écart entre prévision multi-coups et jeu réflexe (intérêt d'anticiper)
+    tensionDecisionsPct?: number;         // Équilibre et dilemme entre les options de déplacement candidates (absence de coup trivial)
+    tauxMouvementsContrariesPct?: number; // % des déplacements programmés annulés suite à un blocage ou saturation
   };
   equilibreParJoueurs?: Record<3 | 4 | 5 | 6, BilanJoueurs36>;
   troisAxesPrioritaires?: TroisAxesPrioritaires;
+  metriquesPlacementV04?: {
+    gainPlanificationPct: number;
+    tensionDecisionsPct: number;
+    tauxMouvementsContrariesPct: number;
+    tauxCoalitionsReussiesPct: number;
+    tauxBarragesEfficacesPct: number;
+  };
   scoreInteretGlobal: number; // 0 à 100
   bandeSante: 'vert' | 'orange' | 'rouge';
   syntheseAnalytique: string[];

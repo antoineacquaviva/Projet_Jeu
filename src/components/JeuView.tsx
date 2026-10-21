@@ -57,6 +57,10 @@ export const JeuView: React.FC<JeuViewProps> = ({
     'idea-machines-differenciees-v02',
   ]);
 
+  const [afficherArchives, setAfficherArchives] = useState<boolean>(false);
+  const versionsActives = versions.filter((v) => v.statut !== 'archivee');
+  const versionsArchivees = versions.filter((v) => v.statut === 'archivee');
+
   const ideesDuJeu = ideesLabo.filter((i) => i.cible === 'Jeu');
 
   const toggleIdeePourVersion = (id: string) => {
@@ -219,16 +223,30 @@ export const JeuView: React.FC<JeuViewProps> = ({
           </div>
         </div>
 
-        {/* Cartes de sélection de la Version du Jeu (V0.1, V0.2, V0.x...) */}
-        <div className="pt-4">
-          <div className="text-xs font-semibold text-[#55645B] uppercase tracking-wider mb-2.5">
-            Versions du Jeu hébergées dans l’Atelier ({versions.length}) — Cliquez pour changer de version :
+        {/* Cartes de sélection de la Version Active (V0.4) + Tiroir optionnel des Archives (V0.1–V0.3) */}
+        <div className="pt-4 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="text-xs font-semibold text-[#55645B] uppercase tracking-wider">
+              Version Active de l’Atelier ({versionsActives.length}) :
+            </div>
+            {versionsArchivees.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setAfficherArchives(!afficherArchives)}
+                className="px-3 py-1 rounded-lg text-xs font-semibold border border-[#D8DFD5] bg-[#F4F5F0] text-[#55645B] hover:text-[#16211B] hover:bg-stone-200/70 transition-colors"
+              >
+                {afficherArchives
+                  ? `Masquer les versions archivées (${versionsArchivees.map((v) => `V${v.id}`).join(', ')}) ▲`
+                  : `📦 Voir les versions archivées (${versionsArchivees.map((v) => `V${v.id}`).join(', ')}) ▼`}
+              </button>
+            )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {versions.map((ver) => {
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {versionsActives.map((ver) => {
               const estActive = ver.id === versionActive.id;
               const contientRecommandee =
-                (varianteRecommandee?.version || '0.3') === ver.id;
+                (varianteRecommandee?.version || '0.4') === ver.id;
               return (
                 <button
                   key={ver.id}
@@ -242,7 +260,7 @@ export const JeuView: React.FC<JeuViewProps> = ({
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5">
                       <span className="font-mono-tabular text-xs font-bold uppercase px-2 py-0.5 rounded bg-black/15">
-                        Version {ver.id}
+                        Version {ver.id} (Active)
                       </span>
                       {contientRecommandee && (
                         <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-[#16211B]">
@@ -273,6 +291,42 @@ export const JeuView: React.FC<JeuViewProps> = ({
               );
             })}
           </div>
+
+          {afficherArchives && versionsArchivees.length > 0 && (
+            <div className="pt-2 border-t border-dashed border-[#D8DFD5]">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2">
+                📦 Versions Archivées (V0.1, V0.2, V0.3 — consultables pour historique) :
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 opacity-85">
+                {versionsArchivees.map((ver) => {
+                  const estActive = ver.id === versionActive.id;
+                  return (
+                    <button
+                      key={ver.id}
+                      onClick={() => onSelectVersion(ver.id)}
+                      className={`text-left p-3.5 rounded-xl border transition-all ${
+                        estActive
+                          ? 'bg-stone-800 text-white border-stone-800 shadow-xs'
+                          : 'bg-stone-100 text-stone-700 border-stone-300 hover:bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-mono-tabular text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-stone-500/20">
+                          [Archive] V{ver.id}
+                        </span>
+                        <span className="text-[10px] opacity-75">
+                          {ver.optionsRegles.length} options
+                        </span>
+                      </div>
+                      <div className="font-display font-semibold text-xs mt-1.5">
+                        {ver.titreVersion}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

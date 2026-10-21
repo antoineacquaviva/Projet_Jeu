@@ -286,6 +286,57 @@ export function chargerEtatAtelier(): AtelierPersistedState {
           modified = true;
         }
 
+        const aCampagneV04 =
+          Array.isArray(parsed.campagnesSelection) &&
+          parsed.campagnesSelection.some((c) =>
+            (c.versionsCibles || []).includes('0.4')
+          );
+
+        if (!aCampagneV04) {
+          const ciblesV04 = parsed.variantes.filter(
+            (v) => v.version === '0.4' && v.statutViabilite !== 'eliminee'
+          );
+          const { campagne: campV04, variantesMisesAJour: varsV04 } =
+            executerCampagneSelection33(
+              ciblesV04,
+              'Campagne de Référence V0.4 — Pur Placement, 6 Topologies, Options 1·2·4 Contrariées & Banc 3–6J',
+              6,
+              6,
+              ['0.4']
+            );
+          const mapMajV04 = new Map(varsV04.map((v) => [v.id, v]));
+          parsed.variantes = parsed.variantes.map(
+            (v) => mapMajV04.get(v.id) || v
+          );
+          for (const rv of campV04.rapportsViabilite) {
+            parsed.rapportsViabilite = [
+              rv,
+              ...(parsed.rapportsViabilite || []).filter(
+                (r) => r.varianteId !== rv.varianteId
+              ),
+            ];
+          }
+          for (const ri of campV04.rapportsInteret) {
+            parsed.rapportsInteret = [
+              ri,
+              ...(parsed.rapportsInteret || []).filter(
+                (r) => r.varianteId !== ri.varianteId
+              ),
+            ];
+          }
+          parsed.campagnesSelection = [
+            campV04,
+            ...(parsed.campagnesSelection || []),
+          ];
+          const analyseV04 = construireAnalyseCampagneStructurer(campV04);
+          parsed.analysesGemini = [
+            analyseV04,
+            ...(parsed.analysesGemini || []),
+          ];
+          sauvegarderRapportMarkdownGemini(analyseV04);
+          modified = true;
+        }
+
         if (modified) {
           sauvegarderEtatAtelier(parsed);
         }
@@ -297,25 +348,25 @@ export function chargerEtatAtelier(): AtelierPersistedState {
   }
 
   const variantesInit = [...VARIANTES_INITIALES_V01];
-  const { campagne, variantesMisesAJour } = executerCampagneSelection33(
+  const { campagne: campV04Init, variantesMisesAJour } = executerCampagneSelection33(
     variantesInit.filter((v) => v.statutViabilite !== 'eliminee'),
-    'Campagne Comparative Initiale V0.1 · V0.2 · V0.3 (9 Bots + Banc 3–6J)',
+    'Campagne de Référence V0.4 — Pur Placement, 6 Topologies, Options 1·2·4 Contrariées & Banc 3–6J',
     6,
     6,
-    ['0.1', '0.2', '0.3']
+    ['0.4']
   );
   const mapMaj = new Map(variantesMisesAJour.map((v) => [v.id, v]));
   const variantesFinales = variantesInit.map((v) => mapMaj.get(v.id) || v);
-  const analyseInitiale = construireAnalyseCampagneStructurer(campagne);
+  const analyseInitiale = construireAnalyseCampagneStructurer(campV04Init);
   sauvegarderRapportMarkdownGemini(analyseInitiale);
 
   const etatInitial: AtelierPersistedState = {
     derniereSauvegarde: new Date().toISOString(),
     versions: [...VERSIONS_JEU_INITIALES],
     variantes: variantesFinales,
-    rapportsViabilite: campagne.rapportsViabilite,
-    rapportsInteret: campagne.rapportsInteret,
-    campagnesSelection: [campagne],
+    rapportsViabilite: campV04Init.rapportsViabilite,
+    rapportsInteret: campV04Init.rapportsInteret,
+    campagnesSelection: [campV04Init],
     campagnesPlanifieesVM: [...CAMPAGNES_VM_INITIALES],
     analysesGemini: [analyseInitiale],
     ideesLabo: [...IDEES_INITIALES_LABO],
@@ -499,21 +550,33 @@ async function startServer() {
     res.json({ rapport, state });
   });
 
-  // POST Test 3.3 : Campagne complète de criblage et sélection de variantes (Mono ou Multi-Versions V0.1/V0.2/V0.3)
+  // POST Test 3.3 : Campagne complète de criblage et sélection de variantes (V0.4 par défaut, avec génération exploratoire intégrée)
   app.post('/api/atelier/tests/selection', async (req, res) => {
     const {
-      nomCampagne = `Campagne Multi-Versions V0.1·V0.2·V0.3 (${new Date().toLocaleTimeString('fr-FR')})`,
+      nomCampagne = `Campagne d'Exploration V0.4 (${new Date().toLocaleTimeString('fr-FR')})`,
       nbPartiesViabilite = 12,
       nbPartiesInteret = 14,
       inclureDejaEliminees = false,
-      versionsCibles = ['0.1', '0.2', '0.3'],
+      versionsCibles = ['0.4'],
+      nbNouvellesExplorationsV04 = 0,
       lancerAnalyseGemini = true,
     } = req.body || {};
 
     const versionsList =
       Array.isArray(versionsCibles) && versionsCibles.length > 0
         ? (versionsCibles as GameVersionId[])
-        : (['0.1', '0.2', '0.3'] as GameVersionId[]);
+        : (['0.4'] as GameVersionId[]);
+
+    // Si demandé, générer un lot de variantes exploratoires V0.4 avant de lancer la campagne
+    const nbExplo = Math.min(8, Math.max(0, Number(nbNouvellesExplorationsV04) || 0));
+    if (nbExplo > 0 && versionsList.includes('0.4')) {
+      const nouvellesV04 = genererVariantesExploratoiresV01(
+        nbExplo,
+        state.variantes.length + 1,
+        '0.4'
+      );
+      state.variantes = [...nouvellesV04, ...state.variantes];
+    }
 
     const cibles = inclureDejaEliminees
       ? state.variantes

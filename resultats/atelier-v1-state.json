@@ -39,7 +39,7 @@
               "label": "Séquentielle (Action I + II d’affilée par joueur)",
               "estReference": true,
               "description": "Chaque joueur programme à son tour les 2 actions de ses Défenseurs, puis passe la main au joueur suivant.",
-              "impactPhysique": "Posez vos 2 cartes face cachée devant chaque pion Défenseur avant que le voisin de gauche ne joue."
+              "impactPhysique": "Posez vos 2 cartes face visible devant chaque pion Défenseur afin que vos coéquipiers puissent déduire vos intentions avant de jouer à leur tour."
             },
             {
               "valeur": "alternee_1_par_1",

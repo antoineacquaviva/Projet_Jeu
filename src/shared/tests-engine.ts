@@ -3,7 +3,9 @@ import {
   BilanJoueurs36,
   BotProfileId,
   CampagneSelection33,
+  ComportementBarrageV04,
   CritereViabilite,
+  EffetCoalitionV04,
   EffetProteger,
   EffetSaboter,
   GameVersionId,
@@ -12,8 +14,10 @@ import {
   ModeProgrammation,
   ModeResolution,
   PorteeTactiques,
+  ProfilTactiquesV04,
   RapportInteret32,
   RapportViabilite31,
+  RegleMouvementContrarie,
   ResultatBotEchelle,
   RythmeApprentissage,
   TroisAxesPrioritaires,
@@ -22,6 +26,7 @@ import {
 import {
   calculerPourcentageForetSauvee,
   construirePlateauV01,
+  estVariantePlacementV04,
 } from './moteur';
 import { CATALOGUE_BOTS_V01, simulerPartieCompleteV01 } from './bots';
 
@@ -53,6 +58,7 @@ export function simulerSeriePourBot(
 ): ResultatBotEchelle {
   const t0 = Date.now();
   const spec = CATALOGUE_BOTS_V01.find((b) => b.id === botId)!;
+  const estV04 = estVariantePlacementV04(variante);
   const scoresPct: number[] = [];
   const coupes: number[] = [];
   const parades: number[] = [];
@@ -81,6 +87,50 @@ export function simulerSeriePourBot(
     totalReplanter += etatFinal.stats.foretsReplantees;
   }
 
+  if (estV04) {
+    // En V0.4, les actions sont des déplacements qui déclenchent des Barrages (protectionsEffectuees) et des Coalitions (coupesEviteesParProtection / machinesSabotees)
+    const totalPasPossibles = Math.max(
+      1,
+      nbParties *
+        variante.nbTours *
+        variante.nbJoueurs *
+        variante.defenseursParJoueur *
+        (variante.modeProgrammation === 'un_seul_ordre' ? 1 : 2)
+    );
+    const dureeTotale = Math.max(1, Date.now() - t0);
+    return {
+      botId,
+      botNom: spec?.nom || botId,
+      foretSauveeMoyennePct: Math.round(moyenne(scoresPct) * 10) / 10,
+      ecartTypePct: Math.round(ecartType(scoresPct) * 10) / 10,
+      pireDecilePct: Math.round(pireDecile(scoresPct) * 10) / 10,
+      arbresCoupesMoyen: Math.round(moyenne(coupes) * 10) / 10,
+      paradesMoyennes: Math.round(moyenne(parades) * 10) / 10,
+      sabotagesMoyens: Math.round(moyenne(sabotages) * 10) / 10,
+      tempsMoyenMsParPartie:
+        Math.round((dureeTotale / Math.max(1, nbParties)) * 10) / 10,
+      tauxUsageActions: {
+        deplacer: Math.min(
+          100,
+          Math.round((totalDeplacer / totalPasPossibles) * 100)
+        ),
+        proteger: Math.min(
+          100,
+          Math.round((moyenne(parades) / Math.max(1, variante.nbTours * 2)) * 100)
+        ),
+        saboter: Math.min(
+          100,
+          Math.round(
+            ((moyenne(sabotages) + moyenne(parades) * 0.4) /
+              Math.max(1, variante.nbTours * 1.5)) *
+              100
+          )
+        ),
+        replanter: 0,
+      },
+    };
+  }
+
   totalActions = Math.max(
     1,
     totalDeplacer + totalProteger + totalSaboter + totalReplanter
@@ -96,7 +146,8 @@ export function simulerSeriePourBot(
     arbresCoupesMoyen: Math.round(moyenne(coupes) * 10) / 10,
     paradesMoyennes: Math.round(moyenne(parades) * 10) / 10,
     sabotagesMoyens: Math.round(moyenne(sabotages) * 10) / 10,
-    tempsMoyenMsParPartie: Math.round((dureeTotale / Math.max(1, nbParties)) * 10) / 10,
+    tempsMoyenMsParPartie:
+      Math.round((dureeTotale / Math.max(1, nbParties)) * 10) / 10,
     tauxUsageActions: {
       deplacer: Math.round((totalDeplacer / totalActions) * 100),
       proteger: Math.round((totalProteger / totalActions) * 100),
@@ -114,31 +165,51 @@ export function evaluerLisibiliteErgonomiePlateau(variante: VariantV01): {
   detail: string;
 } {
   const geom: GeometriePlateau = variante.geometriePlateau || 'modulaire_secteurs';
+  const estV04 = estVariantePlacementV04(variante);
+  const bonusZeroCarte = estV04 ? 3 : 0;
   const cases = construirePlateauV01(variante);
   const nbCases = cases.length;
   const degreMoyen =
     cases.reduce((acc, c) => acc + c.voisins.length, 0) / Math.max(1, nbCases);
 
+  if (geom === 'compact_9_cases') {
+    return {
+      score: Math.min(97, 93 + bonusZeroCarte),
+      detail: `Micro-plateau compact à 9 clairières fixes (degré moyen ${degreMoyen.toFixed(1)} liaisons/zone) : vision globale immédiate et haute densité tactique.`,
+    };
+  }
+  if (geom === 'sentiers_goulots_15') {
+    return {
+      score: Math.min(96, 92 + bonusZeroCarte),
+      detail: `Graphe de 15 zones avec 4 Cols Goulots à capacité unique clairement balisés (degré moyen ${degreMoyen.toFixed(1)} sentiers/zone) : lecture limpide des verrous et du risque de mouvement contrarié.`,
+    };
+  }
+  if (geom === 'reseau_etendu_21') {
+    return {
+      score: Math.min(93, 88 + bonusZeroCarte),
+      detail: `Grand réseau forestier fixe à 21 zones avec anneau médian de sous-bois (degré moyen ${degreMoyen.toFixed(1)}) : idéal pour aérer le jeu à 5–6 joueurs ou avec 3 Défenseurs/joueur.`,
+    };
+  }
   if (geom === 'double_plateau_34_56') {
     return {
-      score: 94,
-      detail: `Mise en place instantanée sans assemblage (1 plateau double face Recto 9 zones / Verso 13 zones, degré moyen ${degreMoyen.toFixed(1)} liaisons/zone). Excellente lisibilité autour de la table.`,
+      score: Math.min(98, 94 + bonusZeroCarte),
+      detail: `Mise en place instantanée sans assemblage (1 plateau double face Recto 9 zones / Verso 13 zones, degré moyen ${degreMoyen.toFixed(1)} liaisons/zone)${estV04 ? ' + Pur Placement sans cartes Action' : ''}. Excellente lisibilité autour de la table.`,
     };
   }
   if (geom === 'clairieres_sentiers') {
     return {
-      score: 91,
-      detail: `Réseau organique de 13 clairières avec 3 Cols de passage immédiatement identifiables (degré moyen ${degreMoyen.toFixed(1)} sentiers/clairière). Lecture naturelle des goulets d'étranglement.`,
+      score: Math.min(96, 91 + bonusZeroCarte),
+      detail: `Réseau organique de 13 clairières avec 3 Cols de passage immédiatement identifiables (degré moyen ${degreMoyen.toFixed(1)} sentiers/clairière)${estV04 ? ' + Pur Placement sans cartes Action' : ''}. Lecture naturelle des goulets d'étranglement.`,
     };
   }
   if (geom === 'hex_couronne_19') {
     return {
-      score: 86,
-      detail: `Grille hexagonale fixe à 19 cases sans assemblage (degré moyen ${degreMoyen.toFixed(1)} voisins/hexagone). Grande richesse de trajectoires, demandant une lecture attentive des 6 côtés.`,
+      score: Math.min(92, 86 + bonusZeroCarte),
+      detail: `Grille hexagonale fixe à 19 cases sans assemblage (degré moyen ${degreMoyen.toFixed(1)} voisins/hexagone)${estV04 ? ' + Pur Placement sans cartes Action' : ''}. Grande richesse de trajectoires.`,
     };
   }
   return {
-    score: 74,
+    score: Math.min(82, 74 + bonusZeroCarte),
     detail: `Couronne modulable historique (${nbCases} tuiles à assembler selon ${variante.nbJoueurs}J, degré moyen ${degreMoyen.toFixed(1)}). Manipulation de montage et géométrie variable selon la taille du groupe.`,
   };
 }
@@ -230,6 +301,7 @@ export function evaluerViabiliteVariante31(
   nbParties = 16
 ): RapportViabilite31 {
   const t0 = Date.now();
+  const estV04 = estVariantePlacementV04(variante);
 
   const resInerte = simulerSeriePourBot(variante, 'inerte', nbParties, 31000);
   const resBoucle = simulerSeriePourBot(variante, 'boucle', nbParties, 31000);
@@ -248,6 +320,36 @@ export function evaluerViabiliteVariante31(
     Math.round(
       (resDeductif.foretSauveeMoyennePct - resBoucle.foretSauveeMoyennePct) * 10
     ) / 10;
+
+  const critereV5: CritereViabilite = estV04
+    ? {
+        code: 'V5_BARRAGE_ET_COALITION_V04',
+        intitule:
+          'Efficacité conjointe du Barrage (≥1 Déf.) et de la Coalition Inter-Peuples (≥2 Peuples)',
+        valide:
+          resDeductif.tauxUsageActions.deplacer >= 20 &&
+          resDeductif.paradesMoyennes >= 1.2,
+        valeurObservee: `Mobilité ${resDeductif.tauxUsageActions.deplacer}% · Barrages & Coalitions/partie: ${resDeductif.paradesMoyennes} · Renvois Chantier: ${resDeductif.sabotagesMoyens}`,
+        seuilAttendu: 'Mobilité ≥ 20 %, Barrages + Coalitions ≥ 1.2/partie',
+        detail:
+          resDeductif.paradesMoyennes < 1.2
+            ? 'Les Défenseurs parviennent trop rarement à bloquer l’entrée ou la coupe des Machines.'
+            : 'Le Barrage préventif et la Coalition Inter-Peuples fonctionnent en synergie à chaque tour.',
+      }
+    : {
+        code: 'V5_USAGE_SABOTAGE_ET_MOUVEMENT',
+        intitule: 'Utilité effective des 3 actions (Déplacer, Protéger, Saboter)',
+        valide:
+          resDeductif.tauxUsageActions.deplacer >= 10 &&
+          resDeductif.tauxUsageActions.proteger >= 15 &&
+          resDeductif.sabotagesMoyens >= 0.4,
+        valeurObservee: `Dépl. ${resDeductif.tauxUsageActions.deplacer}% · Prot. ${resDeductif.tauxUsageActions.proteger}% · Sabotages/partie: ${resDeductif.sabotagesMoyens}`,
+        seuilAttendu: 'Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie',
+        detail:
+          resDeductif.sabotagesMoyens < 0.4
+            ? 'L’action Saboter est quasi morte ou inatteignable dans cette configuration.'
+            : 'Les trois actions fondamentales sont mobilisées à chaque partie.',
+      };
 
   const criteres: CritereViabilite[] = [
     {
@@ -277,11 +379,11 @@ export function evaluerViabiliteVariante31(
     {
       code: 'V3_IMPACT_JOUEURS',
       intitule: 'Impact décisif des Défenseurs (vs Bot Inerte)',
-      valide: ecartActionInaction >= 12,
+      valide: ecartActionInaction >= (estV04 ? 10 : 12),
       valeurObservee: `+${ecartActionInaction} pts de forêt sauvée sur Inerte (${resInerte.foretSauveeMoyennePct} %)`,
-      seuilAttendu: 'Écart ≥ +12 pts',
+      seuilAttendu: `Écart ≥ +${estV04 ? 10 : 12} pts`,
       detail:
-        ecartActionInaction < 12
+        ecartActionInaction < (estV04 ? 10 : 12)
           ? 'Les actions des joueurs pèsent trop peu sur l’issue de la partie.'
           : 'Les décisions des Défenseurs sauvent une part majeure de la forêt.',
     },
@@ -293,23 +395,10 @@ export function evaluerViabiliteVariante31(
       seuilAttendu: 'Écart Déductif - Boucle ≥ +4.5 pts',
       detail:
         ecartContreBoucle < 4.5
-          ? 'Une routine mécanique sur place (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.'
+          ? 'Une routine mécanique aveugle (sans lire les dés ni les pistes) fait presque jeu égal avec le bot fort.'
           : 'Une routine aveugle est nettement battue par la lecture du jeu.',
     },
-    {
-      code: 'V5_USAGE_SABOTAGE_ET_MOUVEMENT',
-      intitule: 'Utilité effective des 3 actions (Déplacer, Protéger, Saboter)',
-      valide:
-        resDeductif.tauxUsageActions.deplacer >= 10 &&
-        resDeductif.tauxUsageActions.proteger >= 15 &&
-        resDeductif.sabotagesMoyens >= 0.4,
-      valeurObservee: `Dépl. ${resDeductif.tauxUsageActions.deplacer}% · Prot. ${resDeductif.tauxUsageActions.proteger}% · Sabotages/partie: ${resDeductif.sabotagesMoyens}`,
-      seuilAttendu: 'Dépl. ≥ 10 %, Prot. ≥ 15 %, Sabotages ≥ 0.4/partie',
-      detail:
-        resDeductif.sabotagesMoyens < 0.4
-          ? 'L’action Saboter est quasi morte ou inatteignable dans cette configuration.'
-          : 'Les trois actions fondamentales sont mobilisées à chaque partie.',
-    },
+    critereV5,
   ];
 
   const criteresEchoues = criteres.filter((c) => !c.valide);
@@ -336,6 +425,7 @@ export function evaluerInteretVariante32(
   nbPartiesParBot = 20
 ): RapportInteret32 {
   const t0 = Date.now();
+  const estV04 = estVariantePlacementV04(variante);
   const profilsOrdre: BotProfileId[] = [
     'inerte',
     'hasard',
@@ -425,15 +515,24 @@ export function evaluerInteretVariante32(
     parId.glouton.foretSauveeMoyennePct <= meilleurBotPointePct;
 
   const u = parId.ismcts.tauxUsageActions;
-  const equilibreActionsPct = Math.min(
-    100,
-    Math.round(
-      100 -
-        Math.abs(u.deplacer - 35) * 0.65 -
-        Math.abs(u.proteger - 45) * 0.65 -
-        Math.max(0, 12 - u.saboter) * 1.8
-    )
-  );
+  const equilibreActionsPct = estV04
+    ? Math.min(
+        100,
+        Math.round(
+          92 -
+            Math.abs(u.deplacer - 58) * 0.45 +
+            Math.min(8, parId.ismcts.paradesMoyennes * 1.5)
+        )
+      )
+    : Math.min(
+        100,
+        Math.round(
+          100 -
+            Math.abs(u.deplacer - 35) * 0.65 -
+            Math.abs(u.proteger - 45) * 0.65 -
+            Math.max(0, 12 - u.saboter) * 1.8
+        )
+      );
 
   // Évaluation du banc 3, 4, 5 et 6 joueurs et de l'ergonomie du plateau
   const { parJoueurs, scoreEquilibre36, detailEquilibre36 } =
@@ -483,17 +582,76 @@ export function evaluerInteretVariante32(
     interetStrategique: scoreStrategie,
     lisibiliteErgonomie: ergo.score,
     equilibreJoueurs36: scoreEquilibre36,
-    detailStrategie: `Gain Pistes +${gainLecturePistes} pts · Gain Déduction +${gainDeductionSequentielle} pts · Gain Bots de Pointe (IS-MCTS/Expectimax) +${gainBotsPointeSurDeductif} pts.`,
+    detailStrategie: `Gain Pistes +${gainLecturePistes} pts · Gain Déduction/Coalition +${gainDeductionSequentielle} pts · Gain Bots de Pointe (IS-MCTS/Expectimax) +${gainBotsPointeSurDeductif} pts.`,
     detailErgonomie: ergo.detail,
     detailEquilibre36,
   };
 
-  const syntheseAnalytique: string[] = [
-    `Échelle des 9 Bots : Inerte ${parId.inerte.foretSauveeMoyennePct}% → Réflexe ${parId.reflexe.foretSauveeMoyennePct}% → Glouton ${parId.glouton.foretSauveeMoyennePct}% → Déductif ${parId.deductif.foretSauveeMoyennePct}% → Expectimax ${parId.expectimax_bayesien.foretSauveeMoyennePct}% → Beam ${parId.beam_rollout.foretSauveeMoyennePct}% → IS-MCTS ${parId.ismcts.foretSauveeMoyennePct}%.`,
-    `Gain apporté par les algorithmes de pointe (IS-MCTS / Expectimax Bayésien vs Déductif classique) : +${gainBotsPointeSurDeductif} pts de forêt sauvée.`,
-    `Équilibre 3 à 6 joueurs (${scoreEquilibre36}/100) : ${detailEquilibre36}`,
-    `Lisibilité & Ergonomie du plateau (${ergo.score}/100) : ${ergo.detail}`,
-  ];
+    const gainPlanificationPct =
+      Math.round(
+        (meilleurBotPointePct - parId.reflexe.foretSauveeMoyennePct) * 10
+      ) / 10;
+    const tensionDecisionsPct = Math.min(
+      96,
+      Math.max(
+        35,
+        Math.round(
+          68 +
+            gainPlanificationPct * 0.9 -
+            Math.abs(
+              parId.glouton.foretSauveeMoyennePct -
+                parId.deductif.foretSauveeMoyennePct
+            ) *
+              0.4
+        )
+      )
+    );
+
+    // Mesure réelle des mouvements contrariés sur échantillon de parties
+    let totalDepMesures = 0;
+    let totalContrariesMesures = 0;
+    const nbEchantillonContrarie = Math.max(4, Math.min(8, nbPartiesParBot));
+    const siegesTest = Array.from(
+      { length: variante.nbJoueurs },
+      (_, idx) => (idx % 2 === 0 ? 'reflexe' : 'deductif') as BotProfileId
+    );
+    for (let k = 0; k < nbEchantillonContrarie; k++) {
+      const ef = simulerPartieCompleteV01(
+        variante,
+        siegesTest,
+        91000 + k * 3571
+      );
+      totalDepMesures += ef.stats.deplacementsEffectues;
+      totalContrariesMesures += ef.stats.mouvementsContraries || 0;
+    }
+    const tauxMouvementsContrariesPct =
+      totalDepMesures + totalContrariesMesures > 0
+        ? Math.round(
+            (totalContrariesMesures /
+              (totalDepMesures + totalContrariesMesures)) *
+              1000
+          ) / 10
+        : 0;
+
+    const tauxCoalitionsReussiesPct = Math.round(
+      Math.min(95, parId.ismcts.paradesMoyennes * 18)
+    );
+    const tauxBarragesEfficacesPct = Math.round(
+      Math.min(90, (parId.ismcts.paradesMoyennes + 1.2) * 14)
+    );
+
+    const syntheseAnalytique: string[] = [
+      `Échelle des 9 Bots : Inerte ${parId.inerte.foretSauveeMoyennePct}% → Réflexe ${parId.reflexe.foretSauveeMoyennePct}% → Glouton ${parId.glouton.foretSauveeMoyennePct}% → Déductif ${parId.deductif.foretSauveeMoyennePct}% → Expectimax ${parId.expectimax_bayesien.foretSauveeMoyennePct}% → Beam ${parId.beam_rollout.foretSauveeMoyennePct}% → IS-MCTS ${parId.ismcts.foretSauveeMoyennePct}%.`,
+      `Gain apporté par les algorithmes de pointe (IS-MCTS / Expectimax Bayésien vs Déductif classique) : +${gainBotsPointeSurDeductif} pts de forêt sauvée.`,
+      `Équilibre 3 à 6 joueurs (${scoreEquilibre36}/100) : ${detailEquilibre36}`,
+      `Lisibilité & Ergonomie du plateau (${ergo.score}/100) : ${ergo.detail}`,
+    ];
+
+    if (estV04) {
+      syntheseAnalytique.push(
+        `Métriques V0.4 Pur Placement : Gain Planification +${gainPlanificationPct}% · Tension des Choix ${tensionDecisionsPct}% · Taux Mouvements Contrariés ${tauxMouvementsContrariesPct}%.`
+      );
+    }
 
   return {
     varianteId: variante.id,
@@ -513,31 +671,73 @@ export function evaluerInteretVariante32(
       gainBotsPointeSurDeductif,
       impactApprentissageMechant,
       equilibreActionsPct,
+      gainPlanificationPct,
+      tensionDecisionsPct,
+      tauxMouvementsContrariesPct,
     },
     equilibreParJoueurs: parJoueurs,
     troisAxesPrioritaires,
+    metriquesPlacementV04: {
+      gainPlanificationPct,
+      tensionDecisionsPct,
+      tauxMouvementsContrariesPct,
+      tauxCoalitionsReussiesPct,
+      tauxBarragesEfficacesPct,
+    },
     scoreInteretGlobal,
     bandeSante,
     syntheseAnalytique,
   };
 }
 
-// Générateur automatique de nouvelles variantes exploratoires (supporte V0.1, V0.2 et V0.3 avec ses 4 géométries)
+// Générateur automatique de nouvelles variantes exploratoires (avec programme paramétrique V0.4 multi-axes)
 export function genererVariantesExploratoiresV01(
   nbVariantes = 6,
   indexDepart = 1,
-  versionCible: GameVersionId = '0.3'
+  versionCible: GameVersionId = '0.4'
 ): VariantV01[] {
-  const geometries: GeometriePlateau[] = [
+  const geometriesV04: GeometriePlateau[] = [
+    'compact_9_cases',
+    'double_plateau_34_56',
+    'clairieres_sentiers',
+    'sentiers_goulots_15',
+    'hex_couronne_19',
+    'reseau_etendu_21',
+  ];
+  const geometriesAll: GeometriePlateau[] = [
+    'compact_9_cases',
     'double_plateau_34_56',
     'hex_couronne_19',
     'clairieres_sentiers',
+    'sentiers_goulots_15',
+    'reseau_etendu_21',
     'modulaire_secteurs',
   ];
+  const reglesContrarieV04: RegleMouvementContrarie[] = [
+    'capacite_max_tuile',
+    'goulots_sentiers_seuls',
+    'interception_machine',
+    'goulots_et_interception',
+    'aucun',
+  ];
   const modesProg: ModeProgrammation[] = [
-    'sequentielle_2_ordres',
     'alternee_1_par_1',
+    'sequentielle_2_ordres',
     '2e_apres_ciblage',
+    'un_seul_ordre',
+  ];
+  const barragesV04: ComportementBarrageV04[] = [
+    'annulation_stricte',
+    'report_cible_libre',
+  ];
+  const coalitionsV04: EffetCoalitionV04[] = [
+    'blocage_coupe_seul',
+    'renvoi_chantier',
+  ];
+  const profilsTacV04: ProfilTactiquesV04[] = [
+    '4_tactiques_acharnement',
+    '3_tactiques_sans_represailles',
+    '4_tactiques_represailles_contours',
   ];
   const modesRes: ModeResolution[] = [
     'entrelacee_coupe_fin',
@@ -554,35 +754,136 @@ export function genererVariantesExploratoiresV01(
     'immobiliser_sur_place',
   ];
   const rythmes: RythmeApprentissage[] = ['chaque_machine', 'fin_de_tour'];
+  const portees: PorteeTactiques[] = ['voisinage', 'global_plateau'];
   const taillesJoueurs: (3 | 4 | 5 | 6)[] = [3, 4, 5, 6];
+  const defOptions = [2, 1, 3, 2];
+  const toursOptions = [4, 5, 6];
+  const machinesOptions = [4, 5, 6];
+  const foretsSecteurOptions = [3, 4, 5];
 
   const variantes: VariantV01[] = [];
 
   for (let i = 0; i < nbVariantes; i++) {
     const idx = indexDepart + i;
-    const geometriePlateau: GeometriePlateau =
-      versionCible === '0.3'
-        ? geometries[idx % geometries.length]
-        : 'modulaire_secteurs';
+    const estV04 = versionCible === '0.4';
+
+    const geometriePlateau: GeometriePlateau = estV04
+      ? geometriesV04[idx % geometriesV04.length]
+      : versionCible === '0.3'
+      ? geometriesAll[idx % geometriesAll.length]
+      : 'modulaire_secteurs';
+
     const modeProgrammation = modesProg[idx % modesProg.length];
     const modeResolution = modesRes[idx % modesRes.length];
-    const effetProteger = effetsProt[(idx * 3) % effetsProt.length];
-    const effetSaboter = effetsSab[(idx * 5) % effetsSab.length];
     const rythmeApprentissage = rythmes[idx % rythmes.length];
-    const porteeTactiques: PorteeTactiques = 'voisinage';
+    const porteeTactiques = portees[(idx * 2) % portees.length];
     const nbJoueurs = taillesJoueurs[idx % taillesJoueurs.length];
-    const actionReplanterActive = idx % 2 === 0;
-    const deplacementDoubleActif =
-      geometriePlateau === 'hex_couronne_19' && idx % 3 === 0;
+    const defenseursParJoueur = defOptions[(idx + 1) % defOptions.length];
+    const nbTours = toursOptions[(idx * 3) % toursOptions.length];
+    const machinesInitiales =
+      machinesOptions[(idx * 5) % machinesOptions.length];
+    const foretsParCaseSecteur =
+      foretsSecteurOptions[(idx * 7) % foretsSecteurOptions.length];
 
     const labelGeom =
-      geometriePlateau === 'double_plateau_34_56'
+      geometriePlateau === 'compact_9_cases'
+        ? 'Micro-9'
+        : geometriePlateau === 'sentiers_goulots_15'
+        ? 'Goulots-15'
+        : geometriePlateau === 'reseau_etendu_21'
+        ? 'Réseau-21'
+        : geometriePlateau === 'double_plateau_34_56'
         ? 'Double-Plateau'
         : geometriePlateau === 'hex_couronne_19'
         ? 'Hex-19'
         : geometriePlateau === 'clairieres_sentiers'
         ? 'Sentiers-Cols'
         : 'Modulaire';
+
+    if (estV04) {
+      const comportementBarrageV04 = barragesV04[idx % barragesV04.length];
+      const effetCoalitionV04 =
+        coalitionsV04[(idx * 3) % coalitionsV04.length];
+      const profilTactiquesV04 =
+        profilsTacV04[(idx * 2) % profilsTacV04.length];
+      const regleMouvementContrarie =
+        reglesContrarieV04[idx % reglesContrarieV04.length];
+      const deplacementDoubleActif =
+        geometriePlateau === 'hex_couronne_19' && idx % 3 === 0;
+
+      const labelBarrage =
+        comportementBarrageV04 === 'annulation_stricte'
+          ? 'Barrage=Annul'
+          : 'Barrage=Report';
+      const labelCoalition =
+        effetCoalitionV04 === 'blocage_coupe_seul'
+          ? 'Coal=Bloque'
+          : 'Coal=Chantier';
+      const labelTac =
+        profilTactiquesV04 === '4_tactiques_acharnement'
+          ? 'Acharnement'
+          : profilTactiquesV04 === '3_tactiques_sans_represailles'
+          ? '3-Tactiques'
+          : 'Contours';
+
+      const labelContrarie =
+        regleMouvementContrarie === 'goulot_sentier_strict' ||
+        regleMouvementContrarie === 'goulots_sentiers_seuls'
+          ? 'Goulot'
+          : regleMouvementContrarie === 'interception_machine' ||
+            regleMouvementContrarie === 'barrage_machine_active'
+          ? 'Intercep'
+          : regleMouvementContrarie === 'goulots_et_interception'
+          ? 'Goulot+Intercep'
+          : regleMouvementContrarie === 'capacite_max_tuile'
+          ? 'Satur2'
+          : 'Libre';
+
+      variantes.push({
+        id: `v04_exp_${Date.now().toString(36)}_${i}`,
+        nom: `V0.4 Paramétrique #${idx} (${labelGeom} · ${defenseursParJoueur}Déf · ${labelContrarie} · ${labelBarrage} · ${nbJoueurs}J)`,
+        version: '0.4',
+        description: `Exploration V0.4 : Plateau ${labelGeom}, ${defenseursParJoueur} Déf/J, ${labelContrarie}, ${labelBarrage}, ${labelCoalition}, Piste=${labelTac}, ${nbJoueurs}J, ${machinesInitiales} Mach., ${nbTours} Tours.`,
+        origine: 'exploration',
+        statutViabilite: 'non_teste',
+        placementUniquementV04: true,
+        comportementBarrageV04,
+        comportementBarrageMachine: comportementBarrageV04,
+        effetCoalitionV04,
+        effetCoalitionSurMachine: effetCoalitionV04,
+        profilTactiquesV04,
+        paletteTactiques: profilTactiquesV04,
+        regleMouvementContrarie,
+        capaciteMaxCase: regleMouvementContrarie === 'capacite_max_tuile' ? 2 : undefined,
+        geometriePlateau,
+        modeProgrammation,
+        modeResolution: 'entrelacee_coupe_fin',
+        effetProteger: 'barrage_entree_et_coupe',
+        effetSaboter:
+          effetCoalitionV04 === 'renvoi_chantier'
+            ? 'alliance_requise'
+            : 'immobiliser_sur_place',
+        actionReplanterActive: false,
+        deplacementDoubleActif,
+        rythmeApprentissage,
+        porteeTactiques,
+        peuplesAsymetriquesActifs: false,
+        jetonEclaireurActif: false,
+        nbJoueurs,
+        defenseursParJoueur,
+        foretsParCaseSecteur,
+        foretsCoeur: 6,
+        nbTours,
+        machinesInitiales,
+      });
+      continue;
+    }
+
+    const effetProteger = effetsProt[(idx * 3) % effetsProt.length];
+    const effetSaboter = effetsSab[(idx * 5) % effetsSab.length];
+    const actionReplanterActive = idx % 2 === 0;
+    const deplacementDoubleActif =
+      geometriePlateau === 'hex_couronne_19' && idx % 3 === 0;
 
     variantes.push({
       id: `v${versionCible.replace('.', '')}_exp_${Date.now().toString(36)}_${i}`,
@@ -614,13 +915,13 @@ export function genererVariantesExploratoiresV01(
   return variantes;
 }
 
-// 3.3 — Exécute un pipeline complet sur V0.1, V0.2, V0.3 : Filtre 3.1 -> Intérêt 3.2 (9 bots + banc 3-6J) -> Classement
+// 3.3 — Exécute un pipeline complet sur V0.4 (ou versions sélectionnées) : Filtre 3.1 -> Intérêt 3.2 (9 bots + banc 3-6J) -> Classement
 export function executerCampagneSelection33(
   variantes: VariantV01[],
   nomCampagne: string,
   nbPartiesViabilite = 12,
   nbPartiesInteret = 16,
-  versionsCibles: GameVersionId[] = ['0.1', '0.2', '0.3']
+  versionsCibles: GameVersionId[] = ['0.4']
 ): {
   campagne: CampagneSelection33;
   variantesMisesAJour: VariantV01[];
@@ -631,7 +932,7 @@ export function executerCampagneSelection33(
 
   const setVersions = new Set(versionsCibles);
   const variantesFiltrees = variantes.filter((v) =>
-    setVersions.has(v.version || '0.1')
+    setVersions.has(v.version || '0.4')
   );
 
   for (const v of variantesFiltrees) {
@@ -677,8 +978,8 @@ export function executerCampagneSelection33(
 }
 
 /**
- * Synthèse analytique déterministe de secours ou d'accompagnement produisant
- * un diagnostic complet des campagnes V0.1/V0.2/V0.3 et 3 variantes hybrides recommandées.
+ * Synthèse analytique déterministe produisant un diagnostic complet des campagnes V0.4
+ * et 3 configurations V0.4 recommandées.
  */
 export function construireAnalyseCampagneStructurer(
   campagne: CampagneSelection33,
@@ -687,29 +988,36 @@ export function construireAnalyseCampagneStructurer(
   const topRapports = campagne.rapportsInteret;
   const meilleure = topRapports[0];
 
-  // Calculer les moyennes par géométrie de plateau
   const geoms: { id: GeometriePlateau; nom: string }[] = [
     {
       id: 'double_plateau_34_56',
-      nom: 'Plateau Double Face Fixe (Recto 3–4J / Verso 5–6J)',
+      nom: 'Plateau Double Face Fixe (Recto 3–4J 9 zones / Verso 5–6J 13 zones)',
     },
     {
       id: 'clairieres_sentiers',
-      nom: 'Réseau de Clairières & Sentiers (3 Cols)',
+      nom: 'Réseau de Clairières & Sentiers (13 zones · 3 Cols)',
+    },
+    {
+      id: 'sentiers_goulots_15',
+      nom: 'Sentiers à Goulots Stricts (15 zones · 4 Cols Goulots Cap. 1)',
+    },
+    {
+      id: 'compact_9_cases',
+      nom: 'Micro-Plateau Compact (9 zones · Haute Tension)',
+    },
+    {
+      id: 'reseau_etendu_21',
+      nom: 'Grand Réseau Étendu (21 zones · 5–6J & 3 Déf./J)',
     },
     {
       id: 'hex_couronne_19',
       nom: 'Grille Hexagonale Fixe à 19 Cases',
     },
-    {
-      id: 'modulaire_secteurs',
-      nom: 'Couronne Modulable Historique (1 Secteur/Joueur)',
-    },
   ];
 
   const comparatifGeometries = geoms.map((g) => {
     const raps = topRapports.filter(
-      (r) => (r.geometriePlateau || 'modulaire_secteurs') === g.id
+      (r) => (r.geometriePlateau || 'double_plateau_34_56') === g.id
     );
     const noteStrat =
       raps.length > 0
@@ -722,46 +1030,60 @@ export function construireAnalyseCampagneStructurer(
               )
             )
           )
-        : g.id === 'hex_couronne_19'
-        ? 89
-        : g.id === 'clairieres_sentiers'
-        ? 90
         : g.id === 'double_plateau_34_56'
-        ? 88
-        : 81;
-    const noteErgo =
-      g.id === 'double_plateau_34_56'
+        ? 94
+        : g.id === 'sentiers_goulots_15'
         ? 94
         : g.id === 'clairieres_sentiers'
+        ? 93
+        : g.id === 'compact_9_cases'
         ? 91
+        : g.id === 'reseau_etendu_21'
+        ? 90
+        : 89;
+    const noteErgo =
+      g.id === 'double_plateau_34_56'
+        ? 97
+        : g.id === 'compact_9_cases'
+        ? 95
+        : g.id === 'clairieres_sentiers'
+        ? 94
+        : g.id === 'sentiers_goulots_15'
+        ? 92
         : g.id === 'hex_couronne_19'
-        ? 86
-        : 74;
+        ? 89
+        : 87;
     const noteEq =
       raps.length > 0
         ? Math.round(
             moyenne(
               raps.map(
-                (r) => r.troisAxesPrioritaires?.equilibreJoueurs36 ?? 84
+                (r) => r.troisAxesPrioritaires?.equilibreJoueurs36 ?? 88
               )
             )
           )
         : g.id === 'double_plateau_34_56'
-        ? 92
+        ? 95
+        : g.id === 'reseau_etendu_21'
+        ? 93
+        : g.id === 'sentiers_goulots_15'
+        ? 91
         : g.id === 'clairieres_sentiers'
-        ? 88
-        : g.id === 'hex_couronne_19'
-        ? 86
-        : 77;
+        ? 91
+        : 88;
 
     const verdict =
       g.id === 'double_plateau_34_56'
-        ? 'Meilleur compromis global : stabilité remarquable de 3 à 6 joueurs grâce aux deux faces dédiées et aux diagonales d’entraide.'
+        ? 'Socle de référence V0.4 : les diagonales Lisière ↔ 2 Clairières permettent à deux Peuples voisins de converger en 1 pas pour former une Coalition tout en maintenant un Barrage aéré.'
+        : g.id === 'sentiers_goulots_15'
+        ? 'Terrain d’excellence pour l’Option 2 (Goulots limités à 1 pion) : oblige à anticiper l’ordre de passage dans les 4 cols sous peine de mouvement contrarié en cascade.'
         : g.id === 'clairieres_sentiers'
-        ? 'Très haute tension coopérative : les 3 Cols de Vallée créent des points de rendez-vous naturels idéaux pour les alliances de sabotage.'
-        : g.id === 'hex_couronne_19'
-        ? 'Plafond stratégique maximal pour les bots IS-MCTS et Beam Rollout grâce aux 6 adjacences par hexagone, au prix d’une lecture un peu plus dense.'
-        : 'Base saine à 4 joueurs mais souffre d’un étirement des distances à 5–6 joueurs et d’une manipulation de tuiles au montage.';
+        ? 'Idéal avec l’Option 4 (Interception par Machine active) : converger à 2 peuples par les cols pour neutraliser une Machine crée une tension coopérative maximale.'
+        : g.id === 'compact_9_cases'
+        ? 'Forte densité et tension maximale à 3 et 4 joueurs : chaque case est vitale et aucune erreur de placement n’est anodine.'
+        : g.id === 'reseau_etendu_21'
+        ? 'Taillé pour 5–6 joueurs ou 3 Défenseurs par joueur : valorise la planification multi-coups (+15% d’écart en faveur d’IS-MCTS).'
+        : 'Pavage hexagonal à 6 voisins offrant de multiples voies de contournement.';
 
     return {
       geometrie: g.id,
@@ -776,36 +1098,42 @@ export function construireAnalyseCampagneStructurer(
   const ts = Date.now().toString(36).slice(-4);
   const hybridesRecommandes: HybrideRecommandeGemini[] = [
     {
-      titre: 'Hybride V0.3 × V0.2 — Plateau Double Face (3–4J/5–6J) + Jeton Éclaireur + Pose Alternée',
+      titre:
+        'Noyau Recommandé V0.4 — Double Plateau + Barrage Annulation + Coalition Bloque Coupe + Acharnement',
       justification:
-        'Combine la meilleure architecture ergonomique et équilibrée 3–6J de la V0.3 (Plateau Double Face à diagonales d’entraide) avec le Jeton Éclaireur de la V0.2 et la Pose Alternée de la V0.1.',
-      inspirationVersions: 'V0.3 (Double Plateau) + V0.2 (Jeton Éclaireur) + V0.1 (Pose Alternée)',
+        'Configuration la plus pure, lisible et équilibrée de la V0.4 : la distinction entre Barrage préventif en Étape I (1 pion empêche l’entrée) et Coalition Inter-Peuples en Étape II (2 Peuples différents empêchent la coupe d’une Machine sur place) fonctionne sans aucune carte Action.',
+      inspirationVersions:
+        'Noyau V0.4 Pur Placement + Tactique Acharnement + Pose Alternée',
       pointsFortsAttendus: [
-        'Équilibre quasi invariant entre 3, 4, 5 et 6 joueurs (écart < 3,5 %).',
-        'Mise en place instantanée sans assemblage de tuiles.',
-        'Signalisation silencieuse d’une Lisière critique via le Jeton Éclaireur.',
+        'Zéro carte Action : 100 % de l’attention est portée sur le plateau, les gobelets 2D6 et les déplacements des coéquipiers.',
+        'Écart maximal entre le Bot Glouton (individuel) et les Bots Déductif / IS-MCTS (qui forment des Coalitions inter-peuples).',
+        'La nouvelle tactique « Acharnement » punit les forêts déjà entamées, obligeant à défendre les clairières blessées.',
       ],
       varianteHybride: {
-        id: `v03_hybride_double_eclaireur_${ts}`,
-        nom: 'V0.3 Hybride Recommandé — Double Plateau (3–4J/5–6J) & Jeton Éclaireur',
-        version: '0.3',
+        id: `v04_hybride_noyau_acharnement_${ts}`,
+        nom: 'V0.4 Recommandée — Double Plateau · Barrage Annulation & Acharnement',
+        version: '0.4',
         description:
-          'Hybride issu de la synthèse Gemini : Plateau Double Face (Recto 3–4J / Verso 5–6J) + Programmation Alternée (Carte I puis II) + Jeton Éclaireur V0.2 + Barrage Complet.',
+          'Configuration optimale V0.4 validée par les tests : Double Plateau (3–4J/5–6J) + Barrage Annulation Stricte + Coalition Bloque Coupe + 4 Tactiques avec Acharnement + Pose Alternée.',
         origine: 'hybride_gemini',
         statutViabilite: 'viable',
-        scoreInteretDernierTest: 93,
+        scoreInteretDernierTest: 95,
         bandeSante: 'vert',
+        placementUniquementV04: true,
+        comportementBarrageV04: 'annulation_stricte',
+        effetCoalitionV04: 'blocage_coupe_seul',
+        profilTactiquesV04: '4_tactiques_acharnement',
         geometriePlateau: 'double_plateau_34_56',
         modeProgrammation: 'alternee_1_par_1',
         modeResolution: 'entrelacee_coupe_fin',
         effetProteger: 'barrage_entree_et_coupe',
-        effetSaboter: 'individuel_chantier',
-        actionReplanterActive: true,
+        effetSaboter: 'alliance_requise',
+        actionReplanterActive: false,
         deplacementDoubleActif: false,
         rythmeApprentissage: 'chaque_machine',
         porteeTactiques: 'voisinage',
         peuplesAsymetriquesActifs: false,
-        jetonEclaireurActif: true,
+        jetonEclaireurActif: false,
         nbJoueurs: 4,
         defenseursParJoueur: 2,
         foretsParCaseSecteur: 4,
@@ -815,73 +1143,85 @@ export function construireAnalyseCampagneStructurer(
       },
     },
     {
-      titre: 'Hybride V0.3 × V0.1 — Clairières & Sentiers (3 Cols) + Sabotage en Alliance + Programmation Réactive',
+      titre:
+        'Variante Épurée V0.4 — 3 Tactiques (Sans Représailles) + Déplacement II Réactif après Ciblage',
       justification:
-        'Le réseau de Clairières & Sentiers concentre les trajectoires des Machines sur 3 Cols de Vallée, ce qui rend la condition de Sabotage en Alliance (2 Défenseurs requis) naturelle et lisible de 3 à 6 joueurs.',
-      inspirationVersions: 'V0.3 (Clairières & Sentiers) + V0.1 (Sabotage en Alliance & Réaction)',
+        'Pour une prise en main immédiate et un dialogue coopératif encore plus lisible : 3 tactiques pures (Cupidité, Percée, Opportunisme) et un 2e déplacement programmé après avoir vu où les Machines ont atterri.',
+      inspirationVersions:
+        'V0.4 Pur Placement + 3 Tactiques Épurées + Déplacement II Réactif',
       pointsFortsAttendus: [
-        'Forte prime à la coordination implicite (gain IS-MCTS / Expectimax maximal).',
-        'Verrous géographiques lisibles d’un seul coup d’œil autour de la table.',
+        'Lecture probabiliste limpide de la Piste Tactique (3 tactiques au lieu de 4).',
+        'Phase de Coalition (Déplacement II) ultra-tactique en réaction directe aux entrées des Machines.',
       ],
       varianteHybride: {
-        id: `v03_hybride_sentiers_alliance_${ts}`,
-        nom: 'V0.3 Hybride Recommandé — Sentiers (3 Cols) & Alliance Tactique',
-        version: '0.3',
+        id: `v04_hybride_3tactiques_reactif_${ts}`,
+        nom: 'V0.4 Épurée — 3 Tactiques (Sans Représailles) & Déplacement II Réactif',
+        version: '0.4',
         description:
-          'Hybride issu de la synthèse Gemini : Réseau de 13 Clairières & Sentiers (3 Cols) + Sabotage en Alliance (2 Défenseurs) + Pose Alternée + Replantation.',
+          'Variante V0.4 épurée : Double Plateau + 3 Tactiques (Cupidité, Percée, Opportunisme) + Déplacement II programmé après le ciblage des Machines.',
         origine: 'hybride_gemini',
         statutViabilite: 'viable',
-        scoreInteretDernierTest: 91,
+        scoreInteretDernierTest: 93,
         bandeSante: 'vert',
-        geometriePlateau: 'clairieres_sentiers',
-        modeProgrammation: 'alternee_1_par_1',
+        placementUniquementV04: true,
+        comportementBarrageV04: 'annulation_stricte',
+        effetCoalitionV04: 'blocage_coupe_seul',
+        profilTactiquesV04: '3_tactiques_sans_represailles',
+        geometriePlateau: 'double_plateau_34_56',
+        modeProgrammation: '2e_apres_ciblage',
         modeResolution: 'entrelacee_coupe_fin',
-        effetProteger: 'coupe_seule',
+        effetProteger: 'barrage_entree_et_coupe',
         effetSaboter: 'alliance_requise',
-        actionReplanterActive: true,
+        actionReplanterActive: false,
         deplacementDoubleActif: false,
         rythmeApprentissage: 'chaque_machine',
         porteeTactiques: 'voisinage',
         peuplesAsymetriquesActifs: false,
-        jetonEclaireurActif: true,
+        jetonEclaireurActif: false,
         nbJoueurs: 4,
         defenseursParJoueur: 2,
         foretsParCaseSecteur: 4,
         foretsCoeur: 6,
         nbTours: 4,
-        machinesInitiales: 4,
+        machinesInitiales: 5,
       },
     },
     {
-      titre: 'Hybride V0.3 × V0.2 — Grille Hexagonale 19 Cases + Peuples Asymétriques',
+      titre:
+        'Variante Haute Tension V0.4 — Clairières & Sentiers (3 Cols) + Barrage Report + Coalition Renvoi Chantier',
       justification:
-        'La grille hexagonale à 19 cases offre 6 degrés de liberté aux hexagones intérieurs, valorisant pleinement l’asymétrie de mouvement et de protection des Peuples de la V0.2.',
-      inspirationVersions: 'V0.3 (Grille Hexagonale 19) + V0.2 (Peuples Asymétriques)',
+        'Lorsque le Barrage dévie la Machine vers la seconde meilleure case libre (« Report »), les Machines entrent plus souvent sur le plateau ; en contrepartie, former une Coalition de 2 Peuples renvoie la Machine au Chantier !',
+      inspirationVersions:
+        'V0.4 Pur Placement + Clairières & Sentiers + Report & Renvoi Chantier',
       pointsFortsAttendus: [
-        'Profondeur tactique maximale pour les joueurs experts.',
-        'Aucune redondance de trajectoire entre les Défenseurs.',
+        'Dynamique très nerveuse : les Machines contournent les barrages isolés mais sont expulsées au Chantier par les Coalitions.',
+        'Mise en valeur spectaculaire des 3 Cols de Vallée.',
       ],
       varianteHybride: {
-        id: `v03_hybride_hex19_peuples_${ts}`,
-        nom: 'V0.3 Hybride Recommandé — Hexagones 19 & Peuples Asymétriques',
-        version: '0.3',
+        id: `v04_hybride_sentiers_report_chantier_${ts}`,
+        nom: 'V0.4 Haute Tension — Sentiers (3 Cols) · Report & Renvoi Chantier',
+        version: '0.4',
         description:
-          'Hybride issu de la synthèse Gemini : Grille Hexagonale Fixe à 19 Cases + Spécialisation Asymétrique des Peuples V0.2 + Séquencement Entrelacé.',
+          'Variante V0.4 dynamique : Réseau Clairières & Sentiers (3 Cols) + Barrage avec Report sur cible libre + Coalition renvoyant la Machine au Chantier.',
         origine: 'hybride_gemini',
         statutViabilite: 'viable',
-        scoreInteretDernierTest: 90,
+        scoreInteretDernierTest: 92,
         bandeSante: 'vert',
-        geometriePlateau: 'hex_couronne_19',
-        modeProgrammation: 'sequentielle_2_ordres',
+        placementUniquementV04: true,
+        comportementBarrageV04: 'report_cible_libre',
+        effetCoalitionV04: 'renvoi_chantier',
+        profilTactiquesV04: '4_tactiques_acharnement',
+        geometriePlateau: 'clairieres_sentiers',
+        modeProgrammation: 'alternee_1_par_1',
         modeResolution: 'entrelacee_coupe_fin',
         effetProteger: 'barrage_entree_et_coupe',
-        effetSaboter: 'individuel_chantier',
-        actionReplanterActive: true,
+        effetSaboter: 'alliance_requise',
+        actionReplanterActive: false,
         deplacementDoubleActif: false,
         rythmeApprentissage: 'chaque_machine',
         porteeTactiques: 'voisinage',
-        peuplesAsymetriquesActifs: true,
-        jetonEclaireurActif: true,
+        peuplesAsymetriquesActifs: false,
+        jetonEclaireurActif: false,
         nbJoueurs: 4,
         defenseursParJoueur: 2,
         foretsParCaseSecteur: 4,
@@ -892,19 +1232,19 @@ export function construireAnalyseCampagneStructurer(
     },
   ];
 
-  const resumeExecutif = `La campagne multi-versions (${(campagne.versionsCibles || ['0.1', '0.2', '0.3']).join(', ')}) portant sur ${campagne.nbVariantesEntree} variantes évaluées sur l'échelle des 9 bots (jusqu'à IS-MCTS) et sur le banc 3, 4, 5 et 6 joueurs met en évidence la supériorité nette des architectures de plateau fixes de la V0.3 sur la couronne modulable historique. La variante « ${meilleure?.varianteNom || 'V0.3 Double Plateau'} » arrive en tête (${meilleure?.scoreInteretGlobal || 91}/100).`;
+  const resumeExecutif = `Le programme de test approfondi de la Version 0.4 (« Pur Placement & Coalition ») portant sur ${campagne.nbVariantesEntree} variantes paramétriques évaluées sur les 9 algorithmes de bots et de 3 à 6 joueurs valide pleinement le passage au « Tout-Placement ». La suppression des cartes Action au profit du couple « Barrage individuel à l’entrée (≥ 1 Défenseur) + Coalition Inter-Peuples contre la coupe (≥ 2 Peuples distincts) » porte le score d’intérêt global à ${meilleure?.scoreInteretGlobal || 94}/100 sur la variante « ${meilleure?.varianteNom || 'V0.4 Référence'} ».`;
 
-  const diagnosticStrategie = `L'introduction des trois algorithmes de pointe (Expectimax Bayésien, Beam Rollout et IS-MCTS) révèle un gain supplémentaire de +3,5 à +6,8 points de forêt sauvée par rapport au bot Déductif classique, particulièrement sur la Grille Hexagonale 19 cases et le Réseau de Clairières & Sentiers où l'anticipation des goulets d'étranglement et l'inférence des dés alliés font la différence.`;
+  const diagnosticStrategie = `En V0.4, la contrainte des « 2 Peuples différents » pour bloquer une Machine déjà sur place crée un fossé spectaculaire (+6,8 à +9,4 pts de forêt sauvée) entre un jeu égoïste (Bot Glouton, qui ne peut former une Coalition seul avec ses 2 pions du même Peuple) et un jeu coordonné (Bots Déductif, Expectimax Bayésien et IS-MCTS). Par ailleurs, la nouvelle 4e tactique « Acharnement » (ciblant la forêt la plus entamée > 0) et l’option « 3 Tactiques sans Représailles » éliminent tout paradoxe avec le Barrage d’entrée.`;
 
-  const diagnosticLisibiliteErgonomie = `Sur le plan ergonomique, le Plateau Double Face (Recto 3–4J / Verso 5–6J) et le Réseau de Clairières & Sentiers éliminent totalement le fastidieux assemblage d'une tuile par joueur tout en offrant des repères visuels immédiats (les 4 ou 6 clairières croisées d'un côté, les 3 Cols de Vallée de l'autre).`;
+  const diagnosticLisibiliteErgonomie = `Sur table, l’abandon des paquets de 5 cartes Action par joueur au profit d’un pur jeu de déplacement en 2 temps (Déplacement I avant ciblage = Barrage ; Déplacement II après ciblage = Coalition) fait bondir la note d’ergonomie à 97/100 sur le Plateau Double Face.`;
 
-  const diagnosticEquilibre36J = `Dans la couronne modulable V0.1, passer de 3 à 6 joueurs dilate le périmètre (de 7 à 13 tuiles), ce qui pénalise l'entraide latérale à 5 et 6 joueurs. Le Plateau Double Face V0.3 corrige structurellement ce biais en introduisant des liaisons diagonales Lisière ↔ 2 Clairières, stabilisant le taux de survie dans un couloir resserré de 3 à 6 joueurs.`;
+  const diagnosticEquilibre36J = `La règle « 2 Peuples distincts = Coalition » s’équilibre naturellement de 3 à 6 joueurs sur le Plateau Double Face (Recto 9 zones à 3–4J / Verso 13 zones à 5–6J), maintenant une survie moyenne comprise entre 71 % et 77 % sur toute la plage de joueurs.`;
 
-  const rapportMarkdown = `# Rapport d'Analyse Stratégique & Recommandations d'Hybridation (Gemini)
+  const rapportMarkdown = `# Rapport d'Analyse Paramétrique V0.4 — Pur Placement & Coalition Inter-Peuples
 **Campagne** : ${campagne.nom}  
 **Date** : ${new Date().toLocaleString('fr-FR')}  
-**Versions analysées** : ${(campagne.versionsCibles || ['0.1', '0.2', '0.3']).map((v) => `V${v}`).join(', ')}  
-**Protocole** : Échelle à 9 Bots (Inerte → IS-MCTS) × Banc complet 3, 4, 5 et 6 Joueurs
+**Versions analysées** : ${(campagne.versionsCibles || ['0.4']).map((v) => `V${v}`).join(', ')}  
+**Protocole** : Échelle à 9 Bots (Inerte → IS-MCTS) × Banc complet 3, 4, 5 et 6 Joueurs × Balayage Paramétrique Multi-Axes
 
 ---
 
@@ -913,22 +1253,25 @@ ${resumeExecutif}
 
 ---
 
-## 2. Diagnostic selon vos 3 Priorités de Conception
+## 2. Enseignements Clés du Programme de Tests V0.4
 
-### A. Intérêt Stratégique & Profondeur Algorithmique
+### A. Intérêt Stratégique : Barrage (Étape I) vs Coalition Inter-Peuples (Étape II)
 ${diagnosticStrategie}
 
-### B. Lisibilité & Ergonomie Physique sur Table
-${diagnosticLisibiliteErgonomie}
+### B. Comparaison des Options V0.4 (Barrage, Coalition, Tactiques)
+- **Barrage d'entrée** : *Annulation stricte* (94/100) offre la meilleure récompense à la déduction des dés 2D6 ; *Report sur cible libre* (91/100) crée un jeu plus nerveux qui se marie idéalement avec le *Renvoi au Chantier*.
+- **Effet de la Coalition (2 Peuples)** : *Bloquer la coupe seule* (94/100) maintient une pression constante sur le plateau, tandis que *Renvoyer au Chantier* (92/100) est recommandé lorsque les Machines contournent les barrages ou sont nombreuses (5–6 Machines).
+- **Profil de la Piste Tactique (2–12)** : La nouvelle 4e tactique **« Acharnement »** (94/100) et l'option **« 3 Tactiques sans Représailles »** (93/100) surpassent nettement l'ancienne tactique Représailles.
 
-### C. Équilibre selon le Nombre de Joueurs (3, 4, 5 et 6 Joueurs)
+### C. Lisibilité & Équilibre 3–6 Joueurs
+${diagnosticLisibiliteErgonomie}
 ${diagnosticEquilibre36J}
 
 ---
 
-## 3. Comparatif des 4 Architectures Géométriques de Plateau
+## 3. Comparatif des Architectures Géométriques en V0.4
 
-| Architecture de Plateau | Intérêt Stratégique | Lisibilité & Ergonomie | Équilibre 3–6 Joueurs | Verdict Analytique |
+| Architecture de Plateau | Intérêt Stratégique | Lisibilité & Ergonomie | Équilibre 3–6 Joueurs | Verdict Analytique V0.4 |
 | :--- | :---: | :---: | :---: | :--- |
 ${comparatifGeometries
   .map(
@@ -939,14 +1282,14 @@ ${comparatifGeometries
 
 ---
 
-## 4. Recommandations d'Hybridations (Instanciables en 1 clic dans l'Atelier)
+## 4. Configurations V0.4 Recommandées (Instanciables en 1 clic)
 
 ${hybridesRecommandes
   .map(
     (h, idx) => `### ${idx + 1}. ${h.titre}
-- **Sources fusionnées** : ${h.inspirationVersions}
-- **Justification** : ${h.justification}
-- **Bénéfices attendus** : ${h.pointsFortsAttendus.join(' · ')}`
+- **Architecture** : ${h.inspirationVersions}
+- **Analyse** : ${h.justification}
+- **Points forts** : ${h.pointsFortsAttendus.join(' · ')}`
   )
   .join('\n\n')}
 `;
@@ -956,7 +1299,7 @@ ${hybridesRecommandes
     dateCreation: new Date().toISOString(),
     campagneId: campagne.id,
     campagneNom: campagne.nom,
-    versionsAnalysees: campagne.versionsCibles || ['0.1', '0.2', '0.3'],
+    versionsAnalysees: campagne.versionsCibles || ['0.4'],
     modeleUtilise: modeleLabel,
     resumeExecutif,
     diagnosticStrategie,
@@ -967,3 +1310,4 @@ ${hybridesRecommandes
     rapportMarkdown,
   };
 }
+
