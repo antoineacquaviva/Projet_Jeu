@@ -541,7 +541,7 @@ export const TestsView: React.FC<TestsViewProps> = ({
               Version soumise au banc d’essai
             </label>
             <div className="flex items-center gap-2">
-              {(['0.4', '0.3', '0.2', '0.1'] as GameVersionId[]).map((ver) => (
+              {(['0.5', '0.4', '0.3', '0.2', '0.1'] as GameVersionId[]).map((ver) => (
                 <button
                   key={ver}
                   type="button"
@@ -553,7 +553,7 @@ export const TestsView: React.FC<TestsViewProps> = ({
                   }`}
                 >
                   V{ver}
-                  {ver === '0.4' ? ' (Active)' : ''}
+                  {ver === '0.5' ? ' (Active)' : ''}
                 </button>
               ))}
             </div>

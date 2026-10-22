@@ -89,22 +89,38 @@ export const App: React.FC = () => {
               const initVarParId = new Map(
                 VARIANTES_INITIALES_V01.map((v) => [v.id, v])
               );
-              const varMaj = data.variantes.map((v: VariantV01) =>
+              const varFiltrees = data.variantes.filter(
+                (v: VariantV01) => !v.id.startsWith('v05_comb_')
+              );
+              const varMaj = varFiltrees.map((v: VariantV01) =>
                 initVarParId.has(v.id) ? initVarParId.get(v.id)! : v
               );
               const existIds = new Set(varMaj.map((v: VariantV01) => v.id));
               const manquantes = VARIANTES_INITIALES_V01.filter(
                 (v) => !existIds.has(v.id)
               );
-              setVariantes([...manquantes, ...varMaj]);
+              // Placer les variantes officielles V0.5 en tête de liste
+              const v05Officielles = VARIANTES_INITIALES_V01.filter(
+                (v) => v.version === '0.5'
+              );
+              const v05OffIds = new Set(v05Officielles.map((v) => v.id));
+              const reste = [...manquantes, ...varMaj].filter(
+                (v) => !v05OffIds.has(v.id)
+              );
+              setVariantes([...v05Officielles, ...reste]);
             }
             const toutesVarsChargees =
               Array.isArray(data.variantes) && data.variantes.length > 0
                 ? [
                     ...VARIANTES_INITIALES_V01.filter(
-                      (v) => !data.variantes.some((dv: VariantV01) => dv.id === v.id)
+                      (v) =>
+                        !data.variantes.some(
+                          (dv: VariantV01) => dv.id === v.id
+                        )
                     ),
-                    ...data.variantes,
+                    ...data.variantes.filter(
+                      (dv: VariantV01) => !dv.id.startsWith('v05_comb_')
+                    ),
                   ]
                 : VARIANTES_INITIALES_V01;
 
@@ -130,7 +146,7 @@ export const App: React.FC = () => {
               );
               const { campagne: campV05 } = executerCampagneSelection33(
                 ciblesV05,
-                'Campagne Comparative V0.5 — Cœur Épuré sans Barrage d’Entrée : Option 2C Linéaire vs 2B Seuil Pur vs 2A Coalition (Poids fort Simplicité)',
+                'Campagne Comparative V0.5 — Cœur Unifié sans Barrage d’Entrée : Option 2C Linéaire vs 2B Seuil Pur vs 2A Coalition (Poids fort Simplicité)',
                 5,
                 5,
                 ['0.5']
@@ -190,7 +206,7 @@ export const App: React.FC = () => {
         );
         const { campagne } = executerCampagneSelection33(
           cibles,
-          'Campagne Comparative V0.5 — Cœur Épuré sans Barrage d’Entrée : Option 2C Linéaire vs 2B vs 2A',
+          'Campagne Comparative V0.5 — Cœur Unifié sans Barrage d’Entrée : Option 2C Linéaire vs 2B vs 2A',
           5,
           5,
           ['0.5']
@@ -210,13 +226,21 @@ export const App: React.FC = () => {
   // Variante recommandée par les campagnes de tests (meilleur score d'intérêt parmi les variantes viables de la version active V0.5)
   const varianteRecommandee = useMemo(() => {
     const viablesV05 = variantes.filter(
-      (v) => v.statutViabilite === 'viable' && v.version === '0.5'
+      (v) =>
+        v.statutViabilite === 'viable' &&
+        v.version === '0.5' &&
+        !v.id.startsWith('v05_comb_')
     );
     const pool =
       viablesV05.length > 0
         ? viablesV05
         : variantes.filter((v) => v.statutViabilite === 'viable');
     if (pool.length === 0) return variantes[0];
+
+    const socleRef = pool.find(
+      (v) => v.id === 'v05_2c_lineaire_1def_surplace'
+    );
+    if (socleRef) return socleRef;
 
     const premiereCampagneId = campagnesSelection[0]?.meilleureVarianteId;
     return [...pool].sort((a, b) => {
@@ -258,7 +282,7 @@ export const App: React.FC = () => {
 
   const handleSelectVersion = (nouvelleVersionId: GameVersionId) => {
     setVersionActiveId(nouvelleVersionId);
-    if ((varianteRecommandee?.version || '0.4') === nouvelleVersionId) {
+    if ((varianteRecommandee?.version || '0.5') === nouvelleVersionId) {
       setVarianteActiveId(varianteRecommandee.id);
       return;
     }
@@ -275,7 +299,7 @@ export const App: React.FC = () => {
     versionId?: GameVersionId
   ) => {
     const ver =
-      versionId || variantes.find((v) => v.id === id)?.version || '0.4';
+      versionId || variantes.find((v) => v.id === id)?.version || '0.5';
     if (ver !== versionActiveId) {
       setVersionActiveId(ver);
     }

@@ -4,10 +4,13 @@ import {
   GeometriePlateau,
   SousPhaseTour,
   TactiqueType,
+  VariantV01,
 } from '../shared/types';
 import {
   caseEstProtegeeContreCoupe,
   COULEURS_PEUPLES_V01,
+  estVarianteEpureeV05,
+  estVariantePlacementV04,
   formaterNomSiege,
   ORDRE_PISTE_MACHINE,
   PROBA_ECART_2D6,
@@ -18,13 +21,21 @@ export interface TurnPhaseStepperProps {
   sousPhase: SousPhaseTour;
   tourActuel: number;
   nbTours: number;
+  variante?: VariantV01;
   indexEtapeForce?: number;
   onSelectEtape?: (index: number) => void;
   nomJoueurActif?: string;
   estTourHumain?: boolean;
 }
 
-export const ETAPES_TOUR_VISUELLES = [
+export interface EtapeVisuelleTour {
+  numero: number;
+  code: string;
+  titreCourt: string;
+  detail: string;
+}
+
+export const ETAPES_TOUR_VISUELLES: EtapeVisuelleTour[] = [
   {
     numero: 1,
     code: 'observation_2d6',
@@ -63,7 +74,163 @@ export const ETAPES_TOUR_VISUELLES = [
   },
 ];
 
-export function determinerIndexEtapeTour(sousPhase: SousPhaseTour): number {
+export function construireEtapesVisuellesTour(
+  variante?: VariantV01
+): EtapeVisuelleTour[] {
+  if (!variante) return ETAPES_TOUR_VISUELLES;
+  const estV05 = estVarianteEpureeV05(variante);
+  const estV04 = estVariantePlacementV04(variante);
+
+  if (estV05 && variante.modeResolution === 'lineaire_2c_fin') {
+    return [
+      {
+        numero: 1,
+        code: 'observation_2d6',
+        titreCourt: '1. Dés secrets',
+        detail: '2D6 sous gobelet',
+      },
+      {
+        numero: 2,
+        code: 'programmation_1',
+        titreCourt: '2. Programmation',
+        detail: 'Déplacements I & II (Pur)',
+      },
+      {
+        numero: 3,
+        code: 'resolution_actions_1',
+        titreCourt: '3. Déplacement I',
+        detail: 'Mouvement libre (0 ou 1)',
+      },
+      {
+        numero: 4,
+        code: 'resolution_actions_2',
+        titreCourt: '4. Déplacement II',
+        detail: 'Positionnement final',
+      },
+      {
+        numero: 5,
+        code: 'resolution_coupe_et_apprentissage',
+        titreCourt: '5. Révélation 2D6 & Coupe',
+        detail: 'Gobelet par gobelet + Pistes',
+      },
+    ];
+  }
+
+  if (estV05) {
+    return [
+      {
+        numero: 1,
+        code: 'observation_2d6',
+        titreCourt: '1. Dés secrets',
+        detail: '2D6 sous gobelet',
+      },
+      {
+        numero: 2,
+        code: 'programmation_1',
+        titreCourt: '2. Programmation',
+        detail: 'Déplacements I & II (Pur)',
+      },
+      {
+        numero: 3,
+        code: 'resolution_actions_1',
+        titreCourt: '3. Déplacement I',
+        detail: 'Mouvement libre (0 ou 1)',
+      },
+      {
+        numero: 4,
+        code: 'resolution_ciblage_machines',
+        titreCourt: '4. Entrée Machines',
+        detail: 'Révélation 2D6 (sans barrage)',
+      },
+      {
+        numero: 5,
+        code: 'resolution_actions_2',
+        titreCourt: '5. Déplacement II',
+        detail: 'Convergence & Parade',
+      },
+      {
+        numero: 6,
+        code: 'resolution_coupe_et_apprentissage',
+        titreCourt: '6. Verdict Coupe & Pistes',
+        detail: 'Parade C2/C3 & Apprentissage',
+      },
+    ];
+  }
+
+  if (estV04) {
+    return [
+      {
+        numero: 1,
+        code: 'observation_2d6',
+        titreCourt: '1. Dés secrets',
+        detail: '2D6 sous gobelet',
+      },
+      {
+        numero: 2,
+        code: 'programmation_1',
+        titreCourt: '2. Programmation',
+        detail: 'Déplacements I & II (V0.4)',
+      },
+      {
+        numero: 3,
+        code: 'resolution_actions_1',
+        titreCourt: '3. Déplacement I',
+        detail: 'Formation des Barrages 🛑',
+      },
+      {
+        numero: 4,
+        code: 'resolution_ciblage_machines',
+        titreCourt: '4. Ciblage Machines',
+        detail: 'Révélation 2D6 & Barrages',
+      },
+      {
+        numero: 5,
+        code: 'resolution_actions_2',
+        titreCourt: '5. Déplacement II',
+        detail: 'Formation des Coalitions',
+      },
+      {
+        numero: 6,
+        code: 'resolution_coupe_et_apprentissage',
+        titreCourt: '6. Coupe & Pistes',
+        detail: 'Coalition ≥2J & Pistes',
+      },
+    ];
+  }
+
+  return ETAPES_TOUR_VISUELLES;
+}
+
+export function determinerIndexEtapeTour(
+  sousPhase: SousPhaseTour,
+  variante?: VariantV01
+): number {
+  const estV05Lineaire =
+    variante &&
+    estVarianteEpureeV05(variante) &&
+    variante.modeResolution === 'lineaire_2c_fin';
+
+  if (estV05Lineaire) {
+    switch (sousPhase) {
+      case 'observation_2d6':
+        return 0;
+      case 'programmation_1':
+        return 1;
+      case 'resolution_actions_1':
+        return 2;
+      case 'programmation_2':
+      case 'resolution_actions_2':
+        return 3;
+      case 'resolution_ciblage_machines':
+      case 'resolution_coupe_et_apprentissage':
+      case 'bilan_tour':
+      case 'fin_de_partie':
+        return 4;
+      default:
+        return 1;
+    }
+  }
+
   switch (sousPhase) {
     case 'observation_2d6':
       return 0;
@@ -89,15 +256,23 @@ export const TurnPhaseStepper: React.FC<TurnPhaseStepperProps> = ({
   sousPhase,
   tourActuel,
   nbTours,
+  variante,
   indexEtapeForce,
   onSelectEtape,
   nomJoueurActif,
   estTourHumain,
 }) => {
-  const indexActif =
+  const etapesVisuelles = useMemo(
+    () => construireEtapesVisuellesTour(variante),
+    [variante]
+  );
+  const nbTotalEtapes = etapesVisuelles.length;
+  const indexActif = Math.min(
+    nbTotalEtapes - 1,
     indexEtapeForce !== undefined
       ? indexEtapeForce
-      : determinerIndexEtapeTour(sousPhase);
+      : determinerIndexEtapeTour(sousPhase, variante)
+  );
 
   return (
     <div className="bg-white rounded-xl p-3.5 border border-[#D8DFD5] shadow-2xs">
@@ -110,8 +285,8 @@ export const TurnPhaseStepper: React.FC<TurnPhaseStepperProps> = ({
             Progression dans le tour :
           </span>
           <span className="text-xs font-extrabold text-[#256B45]">
-            Étape {indexActif + 1} sur 6 —{' '}
-            {ETAPES_TOUR_VISUELLES[indexActif]?.titreCourt.replace(/^\d+\.\s*/, '')}
+            Étape {indexActif + 1} sur {nbTotalEtapes} —{' '}
+            {etapesVisuelles[indexActif]?.titreCourt.replace(/^\d+\.\s*/, '')}
           </span>
         </div>
 
@@ -138,8 +313,12 @@ export const TurnPhaseStepper: React.FC<TurnPhaseStepperProps> = ({
           )}
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-        {ETAPES_TOUR_VISUELLES.map((etape, idx) => {
+      <div
+        className={`grid grid-cols-2 sm:grid-cols-3 ${
+          nbTotalEtapes === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-6'
+        } gap-2`}
+      >
+        {etapesVisuelles.map((etape, idx) => {
           const estCourante = idx === indexActif;
           const estPassee = idx < indexActif;
           const cliquable = Boolean(onSelectEtape);
@@ -173,7 +352,11 @@ export const TurnPhaseStepper: React.FC<TurnPhaseStepperProps> = ({
                       : 'bg-stone-200 text-[#55645B]'
                   }`}
                 >
-                  {estCourante ? 'ACTIF' : estPassee ? '✓' : `${idx + 1}/6`}
+                  {estCourante
+                    ? 'ACTIF'
+                    : estPassee
+                    ? '✓'
+                    : `${idx + 1}/${nbTotalEtapes}`}
                 </span>
               </div>
               <div

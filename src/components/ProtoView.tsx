@@ -14,9 +14,10 @@ import {
   construireGuidePhysique,
   COULEURS_PEUPLES_V01,
   creerEtatInitialV01,
+  estVarianteEpureeV05,
+  estVariantePlacementV04,
   formaterNomSiege,
   genererLivretPhysiqueVariante,
-  NOMS_TACTIQUES,
 } from '../shared/moteur';
 import {
   calculerProgrammationBot,
@@ -52,39 +53,80 @@ function construireSiegesDefaut(
   );
 }
 
-function libelleActionResolution(sousPhase: SousPhaseTour, tourActuel: number, nbTours: number): {
+function libelleActionResolution(
+  sousPhase: SousPhaseTour,
+  tourActuel: number,
+  nbTours: number,
+  variante: VariantV01
+): {
   badge: string;
   consigne: string;
   bouton: string;
 } {
+  const estV05 = estVarianteEpureeV05(variante);
+  const estV04 = estVariantePlacementV04(variante);
+  const estV05Lineaire =
+    estV05 && variante.modeResolution === 'lineaire_2c_fin';
+  const nbTotalEtapes = estV05Lineaire ? 5 : 6;
+
   switch (sousPhase) {
     case 'resolution_actions_1':
       return {
-        badge: 'ÉTAPE 3/6 — 1res ACTIONS DES DÉFENSEURS',
-        consigne:
-          'Toutes les cartes sont posées. Cliquez à droite pour déplacer les Défenseurs et activer les 1res actions (Action I) sur le plateau.',
-        bouton: 'Exécuter les 1res Actions (Action I) →',
+        badge: estV05
+          ? `ÉTAPE 3/${nbTotalEtapes} — DÉPLACEMENT I DES DÉFENSEURS (MOUVEMENT LIBRE)`
+          : estV04
+          ? 'ÉTAPE 3/6 — DÉPLACEMENT I DES DÉFENSEURS (BARRAGES 🛑)'
+          : 'ÉTAPE 3/6 — 1res ACTIONS DES DÉFENSEURS',
+        consigne: estV05
+          ? 'Tous les ordres sont programmés. Cliquez à droite pour exécuter le Déplacement I (mouvement 100 % libre vers une case voisine ou maintien sur place).'
+          : estV04
+          ? 'Tous les ordres sont programmés. Cliquez à droite pour déplacer les Défenseurs (Étape I) et former les Barrages d’entrée.'
+          : 'Toutes les cartes sont posées. Cliquez à droite pour déplacer les Défenseurs et activer les 1res actions (Action I) sur le plateau.',
+        bouton: estV04
+          ? 'Exécuter le Déplacement I →'
+          : 'Exécuter les 1res Actions (Action I) →',
       };
     case 'resolution_ciblage_machines':
       return {
-        badge: 'ÉTAPE 4/6 — RÉVÉLATION 2D6 & CIBLAGE MACHINES',
-        consigne:
-          'On soulève tous les gobelets 2D6 ! Les Machines se déplacent vers leurs cibles selon les pistes (sans couper d’arbre pour l’instant).',
+        badge: estV05
+          ? 'ÉTAPE 4/6 — RÉVÉLATION 2D6 & ENTRÉE LIBRE DES MACHINES (SANS BARRAGE)'
+          : 'ÉTAPE 4/6 — RÉVÉLATION 2D6 & CIBLAGE MACHINES',
+        consigne: estV05
+          ? 'On soulève tous les gobelets 2D6 ! Les Machines se déplacent librement vers leurs cibles selon les pistes (aucun Barrage d’Entrée en V0.5, et pas encore de coupe).'
+          : 'On soulève tous les gobelets 2D6 ! Les Machines se déplacent vers leurs cibles selon les pistes (sans couper d’arbre pour l’instant).',
         bouton: 'Révéler les 2D6 & Déplacer les Machines →',
       };
     case 'resolution_actions_2':
       return {
-        badge: 'ÉTAPE 5/6 — 2es ACTIONS DES DÉFENSEURS',
-        consigne:
-          'Dernière ligne de défense avant la coupe : exécutez les cartes Action II (Boucliers 🛡️ et Sabotages ⚡).',
-        bouton: 'Exécuter les 2es Actions (Action II) →',
+        badge: estV05Lineaire
+          ? 'ÉTAPE 4/5 — DÉPLACEMENT II DES DÉFENSEURS (POSITION FINALE AVANT RÉVÉLATION)'
+          : estV05
+          ? 'ÉTAPE 5/6 — DÉPLACEMENT II DES DÉFENSEURS (CONVERGENCE & PARADE)'
+          : estV04
+          ? 'ÉTAPE 5/6 — DÉPLACEMENT II DES DÉFENSEURS (COALITIONS 🤝)'
+          : 'ÉTAPE 5/6 — 2es ACTIONS DES DÉFENSEURS',
+        consigne: estV05Lineaire
+          ? 'Exécutez immédiatement le Déplacement II de vos Défenseurs pour prendre vos positions finales de Parade avant la révélation des gobelets 2D6 !'
+          : estV05
+          ? 'Exécutez le Déplacement II pour converger sur les cases occupées par les Machines et atteindre le seuil de Parade.'
+          : estV04
+          ? 'Exécutez le Déplacement II pour réunir au moins 2 Peuples différents sur les cases menacées.'
+          : 'Dernière ligne de défense avant la coupe : exécutez les cartes Action II (Boucliers 🛡️ et Sabotages ⚡).',
+        bouton: estV04
+          ? 'Exécuter le Déplacement II →'
+          : 'Exécuter les 2es Actions (Action II) →',
       };
     case 'resolution_coupe_et_apprentissage':
       return {
-        badge: 'ÉTAPE 6/6 — COUPE DES FORÊTS & APPRENTISSAGE',
-        consigne:
-          'Toute Machine non contrée abat 1 Forêt 🪓, puis le Méchant permute ses pistes vers 7 (Tactique) et 1 (Machine).',
-        bouton: 'Résoudre la Coupe & l’Apprentissage →',
+        badge: estV05Lineaire
+          ? 'ÉTAPE 5/5 — RÉVÉLATION 2D6 GOBELET PAR GOBELET : MACHINES, COUPE & PISTES'
+          : `ÉTAPE ${nbTotalEtapes}/${nbTotalEtapes} — COUPE DES FORÊTS & APPRENTISSAGE`,
+        consigne: estV05Lineaire
+          ? 'On soulève les gobelets 2D6 un par un : chaque Machine rejoint librement sa cible, on vérifie immédiatement le Seuil de Parade (Curseur 2) et le Sort de la Machine (Curseur 3), puis la Tête du Méchant permute ses pistes.'
+          : 'Toute Machine non parée abat 1 Forêt 🪓, puis le Méchant permute ses pistes vers 7 (Tactique) et 1 (Machine).',
+        bouton: estV05Lineaire
+          ? 'Révéler les 2D6, Déplacer les Machines & Résoudre la Coupe →'
+          : 'Résoudre la Coupe & l’Apprentissage →',
       };
     case 'bilan_tour':
       return {
@@ -133,6 +175,9 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
   const [gobeletSouleve, setGobeletSouleve] = useState<boolean>(true);
   const [pionSelectionneId, setPionSelectionneId] = useState<number | null>(0);
   const [etapeEdition, setEtapeEdition] = useState<1 | 2>(1);
+
+  const estV05 = estVarianteEpureeV05(etat.variante);
+  const estV04 = estVariantePlacementV04(etat.variante);
 
   // Panneaux complémentaires optionnels (fermés par défaut pour simplifier l'interface)
   const [afficherReglageSieges, setAfficherReglageSieges] =
@@ -220,7 +265,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
     setEtapeEdition(1);
   };
 
-  // Enregistrer une carte Action sur l'emplacement I ou II d'un Défenseur
+  // Enregistrer un ordre sur l'emplacement I ou II d'un Défenseur
   const definirActionPion = (
     pionId: number,
     etape: 1 | 2,
@@ -260,7 +305,12 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
       etat.sousPhase === 'programmation_2' ? 2 : etapeEdition;
 
     if (caseId === caseDepartPourEtape) {
-      definirActionPion(pionCourant.id, etapeCible, 'proteger', null);
+      definirActionPion(
+        pionCourant.id,
+        etapeCible,
+        estV04 ? 'attendre' : 'proteger',
+        null
+      );
     } else if (casesAccessiblesPion.includes(caseId)) {
       definirActionPion(pionCourant.id, etapeCible, 'deplacer', caseId);
     }
@@ -290,13 +340,14 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
       } else {
         const etapesRequises: (1 | 2)[] = etapeForc ? [etapeForc] : [1, 2];
         const existantes = next.programmations[j] || [];
+        const estPurPlacement = estVariantePlacementV04(next.variante);
         for (const p of next.defenseurs.filter((d) => d.joueur === j)) {
           for (const et of etapesRequises) {
             if (!existantes.some((a) => a.pionId === p.id && a.etape === et)) {
               existantes.push({
                 pionId: p.id,
                 etape: et,
-                type: 'proteger',
+                type: estPurPlacement ? 'attendre' : 'proteger',
                 caseCible: null,
                 machineCible: null,
               });
@@ -361,7 +412,8 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
   const infoRes = libelleActionResolution(
     etat.sousPhase,
     etat.tourActuel,
-    variante.nbTours
+    variante.nbTours,
+    etat.variante
   );
 
   return (
@@ -371,7 +423,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           <div>
             <h2 className="font-display text-base font-bold text-[#16211B]">
-              Proto — « {variante.nom} »
+              Proto — « {variante.nom} » (V{variante.version})
             </h2>
             <p className="text-xs text-[#55645B]">
               Forêt préservée :{' '}
@@ -515,11 +567,12 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
         </div>
       )}
 
-      {/* 2. FRISE VISUELLE DES 6 ÉTAPES DU TOUR */}
+      {/* 2. FRISE VISUELLE DES ÉTAPES DU TOUR */}
       <TurnPhaseStepper
         sousPhase={etat.sousPhase}
         tourActuel={etat.tourActuel}
         nbTours={variante.nbTours}
+        variante={etat.variante}
         nomJoueurActif={infoSiegeActif.nomCourt}
         estTourHumain={infoSiegeActif.estHumain}
       />
@@ -535,13 +588,26 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
                 </span>
                 <span className="text-xs font-mono-tabular text-emerald-100">
                   {etat.sousPhase === 'programmation_2'
-                    ? 'Programmation de la 2e Action (Action II)'
+                    ? estV04
+                      ? 'Programmation du 2e Déplacement (Étape II)'
+                      : 'Programmation de la 2e Action (Action II)'
+                    : estV04
+                    ? `Programmation Pur Placement V${etat.variante.version} (Déplacements I & II)`
                     : 'Programmation de vos Défenseurs'}
                 </span>
               </div>
               <p className="text-sm font-medium text-white leading-snug">
-                1) Consultez votre gobelet 2D6 ci-dessous · 2) Choisissez les cartes Action pour{' '}
-                <strong>MOI #1</strong> et <strong>MOI #2</strong> (ou cliquez sur une zone verte du plateau) · 3) Validez votre tour.
+                {estV04 ? (
+                  <>
+                    1) Consultez votre gobelet 2D6 ci-dessous · 2) Choisissez les Déplacements I et II pour{' '}
+                    <strong>MOI #1</strong> et <strong>MOI #2</strong> (0 ou 1 case voisine, ou cliquez sur le plateau) · 3) Validez votre tour.
+                  </>
+                ) : (
+                  <>
+                    1) Consultez votre gobelet 2D6 ci-dessous · 2) Choisissez les cartes Action pour{' '}
+                    <strong>MOI #1</strong> et <strong>MOI #2</strong> (ou cliquez sur une zone verte du plateau) · 3) Validez votre tour.
+                  </>
+                )}
               </p>
             </div>
 
@@ -558,7 +624,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
                 onClick={() => validerTourDeTableJoueurActif()}
                 className="px-5 py-2 text-xs font-extrabold rounded-lg bg-amber-400 text-[#16211B] hover:bg-amber-300 shadow-xs transition-colors whitespace-nowrap"
               >
-                Valider mes actions ({infoSiegeActif.nomCourt}) →
+                Valider mes ordres ({infoSiegeActif.nomCourt}) →
               </button>
             </div>
           </div>
@@ -575,7 +641,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
               </div>
               <p className="text-sm text-indigo-100">
                 {modeBotsAuto
-                  ? `${infoSiegeActif.nomCourt} analyse les pistes et pose ses cartes automatiquement...`
+                  ? `${infoSiegeActif.nomCourt} analyse les pistes et programme ses déplacements automatiquement...`
                   : `Mode Pas-à-pas actif : cliquez à droite pour faire jouer ${infoSiegeActif.nomCourt} et observer ses flèches sur le plateau.`}
               </p>
             </div>
@@ -658,7 +724,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
         }
       />
 
-      {/* 5. POSTE DE COMMANDE COMPACT : MON GOBELET 2D6 & MES CARTES D'ACTION (OU BILAN DE RÉSOLUTION) */}
+      {/* 5. POSTE DE COMMANDE COMPACT : MON GOBELET 2D6 & MES ORDRES DE DÉPLACEMENT (OU BILAN DE RÉSOLUTION) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Colonne Gauche (8 cols) : Contrôles directs de programmation de MOI (ou du siège actif) */}
         <div className="lg:col-span-8 bg-white rounded-xl p-4 border border-[#D8DFD5]">
@@ -713,7 +779,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
                 </div>
               )}
 
-              {/* Cartes Action des Défenseurs du siège actif */}
+              {/* Ordres de déplacement / Cartes Action des Défenseurs du siège actif */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {pionsDuJoueurActif.map((pion) => {
                   const progJ = etat.programmations[joueurActif] || [];
@@ -776,7 +842,9 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
                       <div className="space-y-2">
                         {etapesAffichees.map((numEtape) => {
                           const actCourante = numEtape === 1 ? act1 : act2;
-                          const typeActuel = actCourante?.type || 'proteger';
+                          const typeActuel =
+                            actCourante?.type ||
+                            (estV04 ? 'attendre' : 'proteger');
                           const caseDep =
                             numEtape === 2 &&
                             act1?.type === 'deplacer' &&
@@ -787,6 +855,36 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
                             etat,
                             caseDep
                           ).filter((cid) => cid !== caseDep);
+
+                          const boutonsActions: {
+                            id: ActionDefenseurType;
+                            label: string;
+                          }[] = estV04
+                            ? [
+                                {
+                                  id: 'deplacer',
+                                  label: '➔ Se déplacer (case voisine)',
+                                },
+                                {
+                                  id: 'attendre',
+                                  label: estV05
+                                    ? '⏸ Rester sur place (Parade)'
+                                    : '🛑 Rester sur place (Barrage / Coalition)',
+                                },
+                              ]
+                            : [
+                                { id: 'deplacer', label: '➔ Déplacer' },
+                                { id: 'proteger', label: '🛡️ Protéger' },
+                                { id: 'saboter', label: '⚡ Saboter' },
+                                ...(variante.actionReplanterActive
+                                  ? [
+                                      {
+                                        id: 'replanter' as ActionDefenseurType,
+                                        label: '🌱 Replanter',
+                                      },
+                                    ]
+                                  : []),
+                              ];
 
                           return (
                             <div
@@ -803,26 +901,18 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
                               }`}
                             >
                               <div className="flex items-center justify-between text-[11px] font-mono-tabular font-bold text-[#55645B] mb-1.5">
-                                <span>ACTION {numEtape === 1 ? 'I' : 'II'}</span>
+                                <span>
+                                  {estV04
+                                    ? `DÉPLACEMENT ${numEtape === 1 ? 'I' : 'II'}`
+                                    : `ACTION ${numEtape === 1 ? 'I' : 'II'}`}
+                                </span>
                                 <span className="text-[#16211B]">
                                   Départ : {etat.cases[caseDep]?.nom}
                                 </span>
                               </div>
 
                               <div className="flex flex-wrap gap-1">
-                                {(
-                                  [
-                                    { id: 'deplacer', label: '➔ Déplacer' },
-                                    { id: 'proteger', label: '🛡️ Protéger' },
-                                    { id: 'saboter', label: '⚡ Saboter' },
-                                    ...(variante.actionReplanterActive
-                                      ? [{ id: 'replanter', label: '🌱 Replanter' }]
-                                      : []),
-                                  ] as {
-                                    id: ActionDefenseurType;
-                                    label: string;
-                                  }[]
-                                ).map((btn) => (
+                                {boutonsActions.map((btn) => (
                                   <button
                                     key={btn.id}
                                     type="button"
@@ -886,7 +976,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
           ) : (
             <div className="space-y-3">
               <div className="text-xs font-bold uppercase tracking-wider text-[#55645B]">
-                Récapitulatif des actions programmées autour de la table (Tour {etat.tourActuel}) :
+                Récapitulatif des ordres programmés autour de la table (Tour {etat.tourActuel}) :
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {Array.from({ length: variante.nbJoueurs }, (_, j) => {
@@ -916,9 +1006,14 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
                           );
                           return (
                             <li key={idx}>
-                              • #{pion?.numeroPion} (Act. {a.etape === 1 ? 'I' : 'II'}) :{' '}
+                              • #{pion?.numeroPion} ({estV04 ? 'Dépl.' : 'Act.'}{' '}
+                              {a.etape === 1 ? 'I' : 'II'}) :{' '}
                               <strong className="text-[#16211B]">
-                                {a.type}
+                                {a.type === 'attendre'
+                                  ? 'sur place'
+                                  : a.type === 'deplacer'
+                                  ? 'déplacer'
+                                  : a.type}
                               </strong>
                               {a.caseCible !== null
                                 ? ` → ${etat.cases[a.caseCible]?.nom}`

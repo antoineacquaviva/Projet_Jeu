@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ActionDefenseurType,
   ActionProgrammee,
@@ -13,6 +13,7 @@ import {
   COULEURS_PEUPLES_V01,
   creerEtatInitialV01,
   DESCRIPTIONS_PHYSIQUES_TACTIQUES,
+  estVarianteEpureeV05,
   estVariantePlacementV04,
   formaterNomSiege,
   NOMS_TACTIQUES,
@@ -28,7 +29,11 @@ interface DemoViewProps {
 
 type DemoSubTab = 'tour_guide' | 'mise_en_place' | 'boite';
 
-function styleCarteAction(type: ActionDefenseurType, estV04 = false): {
+function styleCarteAction(
+  type: ActionDefenseurType,
+  estV04 = false,
+  estV05 = false
+): {
   icone: string;
   titre: string;
   bg: string;
@@ -39,15 +44,19 @@ function styleCarteAction(type: ActionDefenseurType, estV04 = false): {
     case 'deplacer':
       return {
         icone: '➔',
-        titre: 'Se déplacer',
+        titre: 'Se déplacer (1 case voisine)',
         bg: 'bg-emerald-50',
         border: 'border-emerald-400',
         badgeBg: 'bg-[#256B45] text-white',
       };
     case 'attendre':
       return {
-        icone: estV04 ? '🛑' : '⏸',
-        titre: estV04 ? 'Rester sur place (Barrage / Coalition)' : 'Rester sur place',
+        icone: estV05 ? '⏸' : estV04 ? '🛑' : '⏸',
+        titre: estV05
+          ? 'Rester sur place (Position de Parade)'
+          : estV04
+          ? 'Rester sur place (Barrage / Coalition)'
+          : 'Rester sur place',
         bg: 'bg-sky-50',
         border: 'border-sky-400',
         badgeBg: 'bg-sky-700 text-white',
@@ -92,9 +101,30 @@ export const DemoView: React.FC<DemoViewProps> = ({
   const [afficherDetailsPedagogiques, setAfficherDetailsPedagogiques] =
     useState<boolean>(false);
 
+  const estV05 = estVarianteEpureeV05(variante);
   const estV04 = estVariantePlacementV04(variante);
+  const estV05Lineaire =
+    estV05 && variante.modeResolution === 'lineaire_2c_fin';
 
-  // Construire les 6 états successifs d'un tour de démonstration complet
+  const seuilParadeLabelCourt =
+    variante.seuilParadeV05 === '2_peuples'
+      ? 'Coalition ≥ 2 Peuples différents'
+      : variante.seuilParadeV05 === 'gradue_1_bloque_2_chantier'
+      ? 'Seuil Gradué (1 Déf. bloque / 2 Peuples → Chantier)'
+      : '1 Défenseur suffit (Parade autonome)';
+
+  const effetParadeLabelCourt =
+    variante.seuilParadeV05 === 'gradue_1_bloque_2_chantier'
+      ? 'Gradué : Sur place à 1 Déf., Chantier à ≥ 2 Peuples'
+      : variante.effetParadeV05 === 'renvoyer_chantier'
+      ? 'Machine parée renvoyée au Chantier'
+      : 'Machine parée reste sur place en forêt';
+
+  useEffect(() => {
+    setIndexEtapeTour(0);
+  }, [variante.id, variante.modeResolution]);
+
+  // Construire les étapes successives d'un tour de démonstration complet (5 étapes en V0.5 Linéaire 2C, 6 étapes sinon)
   const etapesTourDemo = useMemo(() => {
     const etats: {
       titre: string;
@@ -105,7 +135,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
       etatPrecedent: EtatJeuV01 | null;
     }[] = [];
 
-    // Étape 0 : Début du tour — Tirages secrets 2D6 sous les gobelets
+    // Étape 1 : Début du tour — Tirages secrets 2D6 sous les gobelets
     const e0 = creerEtatInitialV01(variante, 20261019);
     const e0Obs = clonerEtatJeu(e0);
     e0Obs.sousPhase = 'observation_2d6';
@@ -119,7 +149,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
       etatPrecedent: null,
     });
 
-    // Étape 1 : Programmation publique séquentielle
+    // Étape 2 : Programmation publique séquentielle
     const e1 = clonerEtatJeu(e0);
     for (let j = 0; j < variante.nbJoueurs; j++) {
       const prog = calculerProgrammationBot(e1, j, 'deductif');
@@ -141,9 +171,14 @@ export const DemoView: React.FC<DemoViewProps> = ({
         );
         const cibleDeplacement =
           pIdx === 0
-            ? (estV04 ? caseLibre ?? voisines[0] : caseAvecMachine ?? voisines[0]) ??
-              pion.caseId
-            : (estV04 ? caseAvecMachine ?? caseCoeur : caseCoeur ?? voisines[1]) ??
+            ? (estV05
+                ? caseAvecMachine ?? caseCoeur ?? voisines[0]
+                : estV04
+                ? caseLibre ?? voisines[0]
+                : caseAvecMachine ?? voisines[0]) ?? pion.caseId
+            : (estV04
+                ? caseAvecMachine ?? caseCoeur
+                : caseCoeur ?? voisines[1]) ??
               voisines[0] ??
               pion.caseId;
 
@@ -165,7 +200,9 @@ export const DemoView: React.FC<DemoViewProps> = ({
             type: 'deplacer',
             caseCible: cibleDeplacement,
             machineCible: null,
-            explicationBot: estV04
+            explicationBot: estV05
+              ? `Déplacement I : mouvement libre vers ${e1.cases[cibleDeplacement]?.nom} pour couvrir la trajectoire anticipée de son gobelet 2D6.`
+              : estV04
               ? `Déplacement I : rejoint ${e1.cases[cibleDeplacement]?.nom} pour former un Barrage d'entrée.`
               : `Se déplace vers ${e1.cases[cibleDeplacement]?.nom} pour intercepter la menace.`,
           };
@@ -178,7 +215,19 @@ export const DemoView: React.FC<DemoViewProps> = ({
           const idx2 = actionsEnrichies.findIndex(
             (a) => a.pionId === pion.id && a.etape === 2
           );
-          const act2Demo: ActionProgrammee = estV04
+          const act2Demo: ActionProgrammee = estV05
+            ? {
+                pionId: pion.id,
+                etape: 2,
+                type: 'attendre',
+                caseCible: null,
+                machineCible: null,
+                explicationBot:
+                  variante.seuilParadeV05 === '2_peuples'
+                    ? `Déplacement II : reste sur ${e1.cases[cibleDeplacement]?.nom} pour former une Coalition (≥ 2 Peuples différents) et parer la coupe.`
+                    : `Déplacement II : maintien sur ${e1.cases[cibleDeplacement]?.nom} pour parer la coupe (${seuilParadeLabelCourt}).`,
+              }
+            : estV04
             ? {
                 pionId: pion.id,
                 etape: 2,
@@ -212,13 +261,19 @@ export const DemoView: React.FC<DemoViewProps> = ({
     }
     e1.sousPhase = 'programmation_1';
     etats.push({
-      titre: estV04
+      titre: estV05
+        ? '2. Programmation publique des Déplacements (I & II) — Pur Placement V0.5'
+        : estV04
         ? '2. Programmation publique des Déplacements (I & II) — Pur Placement V0.4'
         : '2. Programmation publique des Cartes Action (I & II) pour chaque Défenseur',
-      resumeEssentiel: estV04
+      resumeEssentiel: estV05
+        ? `Chacun à son tour, vous annoncez publiquement les 2 déplacements (0 ou 1 case adjacente) de vos ${variante.defenseursParJoueur} Défenseurs. Zéro carte Action, zéro blocage de mouvement : la trajectoire choisie est votre seul signal de déduction !`
+        : estV04
         ? 'Chacun à son tour, vous annoncez publiquement la destination de vos 2 Défenseurs (Déplacement I avant les Machines = Barrage ; Déplacement II après les Machines = Coalition). Aucune carte Action requise !'
         : 'Chacun à son tour, vous posez publiquement (face visible) vos cartes Action I et II devant chaque Défenseur pour permettre à vos coéquipiers de déduire votre gobelet 2D6.',
-      descriptionPedagogique: estV04
+      descriptionPedagogique: estV05
+        ? `Dans le Cœur Unifié V0.5, les Défenseurs ont pour unique action de se déplacer d’une case adjacente ou de rester sur place (Étape I puis Étape II). Aucun Mouvement Contrarié ni Barrage d’Entrée ne vient polluer vos intentions : en observant où vos alliés positionnent leurs pions, vous déduisez les menaces cachées sous leurs gobelets (${seuilParadeLabelCourt}).`
+        : estV04
         ? 'En V0.4 (« Pur Placement & Coalition »), les Défenseurs ont pour unique action de se déplacer (ou rester sur place). En observant vers quelles cases vos coéquipiers dirigent leurs pions en Étape I (pour barrer l’entrée d’une Machine) et en Étape II (pour former une Coalition de 2 Peuples différents contre une Machine présente), vous déduisez les menaces cachées sous leurs gobelets !'
         : 'Chaque pion Défenseur (MOI 1, MOI 2...) possède sa propre ligne avec deux emplacements : « Carte Action I » et « Carte Action II ». Les cartes sont posées face visible à tour de rôle.',
       gestePhysique: estV04
@@ -228,47 +283,95 @@ export const DemoView: React.FC<DemoViewProps> = ({
       etatPrecedent: clonerEtatJeu(e0Obs),
     });
 
-    // Étape 2 : Résolution des 1res actions des Défenseurs
+    // Étape 3 : Résolution des 1res actions des Défenseurs
     const e1Pret = clonerEtatJeu(e1);
     e1Pret.sousPhase = 'resolution_actions_1';
     const e2 = avancerSousPhaseResolution(e1Pret);
     etats.push({
-      titre: estV04
+      titre: estV05
+        ? '3. Exécution du Déplacement I des Défenseurs (Mouvement 100 % libre)'
+        : estV04
         ? '3. Exécution du Déplacement I des Défenseurs (Formation des Barrages 🛑)'
         : '3. Exécution des 1res actions des Défenseurs (Cartes Action I)',
-      resumeEssentiel: estV04
+      resumeEssentiel: estV05
+        ? 'Tous les Défenseurs exécutent leur Déplacement I librement le long des flèches vertes : aucune limite de capacité ni Mouvement Contrarié en V0.5 !'
+        : estV04
         ? 'Vos Défenseurs effectuent leur 1er déplacement ! Toute case occupée par au moins 1 Défenseur devient un BARRAGE 🛑 : aucune Machine ne pourra y entrer à l’étape suivante.'
         : 'On applique la « Carte Action I » de chaque Défenseur : les pions se déplacent le long des flèches pleines vers leurs nouvelles zones !',
-      descriptionPedagogique: estV04
+      descriptionPedagogique: estV05
+        ? 'En V0.5, le Mouvement Contrarié (type Colt Express) est intégralement supprimé du cœur de règles : chaque Défenseur rejoint librement sa case voisine programmée en Étape I, ce qui prépare sa portée pour le Déplacement II.'
+        : estV04
         ? 'C’est le 1er pilier de la V0.4 : il suffit d’UN SEUL Défenseur sur une case pour interdire à toute Machine d’y entrer lors du ciblage (Étape 4). Un joueur qui a lu son gobelet 2D6 peut donc bloquer seul l’arrivée de sa Machine en se plaçant sur sa case cible dès le Déplacement I !'
         : 'Toutes les cartes posées publiquement sur l’emplacement « Action I » s’activent : les flèches pleines sur le plateau montrent les déplacements réalisés.',
-      gestePhysique: estV04
+      gestePhysique: estV05
+        ? 'Déplacez physiquement tous les pions Défenseurs sur le plateau selon leur Déplacement I.'
+        : estV04
         ? 'Déplacez physiquement les pions Défenseurs sur le plateau selon leur Déplacement I. Chaque case occupée par au moins 1 Défenseur fait désormais barrage aux Machines.'
         : 'Appliquez la carte « Action I » de chacun de vos Défenseurs et déplacez physiquement les pions en bois sur le plateau.',
       etat: clonerEtatJeu(e2),
       etatPrecedent: clonerEtatJeu(e1),
     });
 
-    // Étape 3 : Révélation des gobelets 2D6 & Ciblage des Machines au milieu (sans coupe !)
+    // CAS A : V0.5 CURSEUR 1 CHOIX B — LINÉAIRE 2C (5 ÉTAPES AU TOTAL)
+    if (estV05Lineaire) {
+      // Étape 4 (sur 5) : Exécution immédiate du Déplacement II avant toute révélation des gobelets !
+      const e3Lin = avancerSousPhaseResolution(e2);
+      etats.push({
+        titre:
+          '4. Exécution du Déplacement II (Positionnement final avant Révélation 2D6)',
+        resumeEssentiel: `Vos Défenseurs effectuent immédiatement leur 2e déplacement et prennent leur position finale de Parade (${seuilParadeLabelCourt}) avant que les gobelets 2D6 ne soient soulevés !`,
+        descriptionPedagogique:
+          'En V0.5 Curseur 1 Choix B (Option 2C Linéaire), les deux étapes de déplacement des Défenseurs s’enchaînent fluidement avant l’activation des Machines. Toute la tension repose sur l’anticipation de la case finale où atterrira chaque Machine lors de la levée des gobelets.',
+        gestePhysique:
+          'Déplacez physiquement tous les pions Défenseurs selon leur Déplacement II. Les positions des Défenseurs sur le plateau sont désormais définitives pour ce tour.',
+        etat: clonerEtatJeu(e3Lin),
+        etatPrecedent: clonerEtatJeu(e2),
+      });
+
+      // Étape 5 (sur 5) : Révélation Gobelet par Gobelet (Déplacement Machine + Verdict Coupe + Apprentissage)
+      const e4Lin = avancerSousPhaseResolution(e3Lin);
+      etats.push({
+        titre:
+          '5. Révélation 2D6 Gobelet par Gobelet : Déplacement Machine, Verdict Coupe & Pistes',
+        resumeEssentiel: `On soulève les gobelets 2D6 un par un : chaque Machine rejoint librement sa cible (sans barrage d’entrée). Si le seuil (${seuilParadeLabelCourt}) est atteint sur la case, la coupe est parée (${effetParadeLabelCourt}) ; sinon 1 Forêt est abattue 🪓 !`,
+        descriptionPedagogique: `En Option 2C Linéaire, la fin de tour se résout gobelet par gobelet dans l’ordre du tour : (1) on lit la Somme (Tactique) et l’Écart (Machine), (2) la Machine se déplace librement vers sa case cible, (3) on vérifie immédiatement le Seuil de Parade (${seuilParadeLabelCourt}) et le Sort de la Machine (${effetParadeLabelCourt}), puis (4) la Tête du Méchant permute ses pistes d’apprentissage.`,
+        gestePhysique:
+          'Soulevez chaque gobelet 2D6 l’un après l’autre : déplacez la Machine désignée vers sa cible, appliquez immédiatement la Parade ou retirez 1 pion Forêt en bois, puis mettez à jour la Piste Tactique (vers 7 ou vers 2/12) et la Piste Machine (vers 1 ou vers 5).',
+        etat: clonerEtatJeu(e4Lin),
+        etatPrecedent: clonerEtatJeu(e3Lin),
+      });
+
+      return etats;
+    }
+
+    // CAS B : SÉQUENCEMENT ENTRELACÉ EN 6 ÉTAPES (V0.5 Option 2A/2B, V0.4, ou V0.1–V0.3)
     const e3 = avancerSousPhaseResolution(e2);
     etats.push({
-      titre: estV04
+      titre: estV05
+        ? '4. Révélation 2D6 & Entrée libre des Machines (Sans Barrage d’Entrée en V0.5)'
+        : estV04
         ? '4. Révélation 2D6 & Déplacement des Machines (Bloquées par vos Barrages 🛑)'
         : '4. Ciblage & Déplacement des Machines (sans couper d’arbre)',
-      resumeEssentiel: estV04
+      resumeEssentiel: estV05
+        ? 'Les gobelets 2D6 sont levés ! En V0.5 Épurée, il n’y a AUCUN Barrage d’Entrée : les Machines entrent librement sur leur case cible (sans couper d’arbre pour l’instant).'
+        : estV04
         ? 'Les gobelets 2D6 sont levés ! Les Machines tentent de rejoindre leur cible, mais toute case occupée par au moins 1 Défenseur leur est interdite (déplacement annulé ou dévié selon la variante).'
         : 'Les gobelets 2D6 sont levés ! Les flèches oranges 🎯 montrent le déplacement des Machines vers leurs cibles selon les pistes (elles ne coupent pas encore).',
-      descriptionPedagogique: estV04
+      descriptionPedagogique: estV05
+        ? 'En V0.5 Curseur 1 Choix A (Entrelacé 2A/2B), la règle de Barrage d’Entrée de la V0.4 est supprimée : même si un Défenseur se trouve déjà sur la case, la Machine désignée par l’Écart applique sa Tactique et entre librement sur sa case cible. La confrontation aura lieu à l’Étape 6 après le Déplacement II !'
+        : estV04
         ? 'Tous les gobelets 2D6 sont soulevés. Pour chaque paire de dés, la Machine désignée par l’Écart applique la Tactique désignée par la Somme. Si sa case cible contient au moins 1 Défenseur (Barrage 🛑), la Machine ne peut pas y entrer ! Si la case cible est libre, la Machine s’y déplace (sans couper d’arbre pour l’instant).'
         : 'Tous les gobelets 2D6 sont soulevés ! Pour chaque paire de dés, la Machine désignée par l’Écart applique la Tactique désignée par la Somme et se déplace sur sa zone cible.',
-      gestePhysique: estV04
+      gestePhysique: estV05
+        ? 'Soulevez tous les gobelets 2D6 et déplacez librement chaque Machine activée vers la case désignée par sa Tactique (aucune coupe n’a lieu à cette étape).'
+        : estV04
         ? 'Soulevez les gobelets 2D6. Pour chaque lancer, vérifiez si la case cible est libre de tout Défenseur : si oui, déplacez-y la Machine ; si au moins 1 Défenseur s’y trouve, son entrée est bloquée !'
         : 'Soulevez les gobelets 2D6. Déplacez chaque figurine Machine (M0 à M5) vers la zone désignée par sa carte Tactique.',
       etat: clonerEtatJeu(e3),
       etatPrecedent: clonerEtatJeu(e2),
     });
 
-    // Étape 4 : Résolution des 2es actions des Défenseurs
+    // Étape 5 : Résolution des 2es actions des Défenseurs
     let e4 = clonerEtatJeu(e3);
     if (e4.sousPhase === 'programmation_2') {
       for (let j = 0; j < variante.nbJoueurs; j++) {
@@ -281,36 +384,52 @@ export const DemoView: React.FC<DemoViewProps> = ({
       e4 = avancerSousPhaseResolution(e4);
     }
     etats.push({
-      titre: estV04
+      titre: estV05
+        ? `5. Exécution du Déplacement II (Convergence pour atteindre le Seuil : ${seuilParadeLabelCourt})`
+        : estV04
         ? '5. Exécution du Déplacement II (Formation des Coalitions Inter-Peuples 🤝)'
         : '5. Exécution des 2es actions des Défenseurs (Cartes Action II)',
-      resumeEssentiel: estV04
+      resumeEssentiel: estV05
+        ? `Vos Défenseurs exécutent leur 2e déplacement libre pour converger sur les cases occupées par les Machines et atteindre le seuil de Parade (${seuilParadeLabelCourt}).`
+        : estV04
         ? 'Vos Défenseurs effectuent leur 2e déplacement ! Pour empêcher une Machine présente sur une case de couper une forêt, il faut réunir au moins 2 Défenseurs de PEUPLES DIFFÉRENTS 🤝 sur sa case.'
         : 'On applique la « Carte Action II » de chaque Défenseur : MOI 1 sabote ⚡ la Machine M0 et MOI 2 lève son bouclier 🛡️ PROTÉGÉ sur le Cœur !',
-      descriptionPedagogique: estV04
+      descriptionPedagogique: estV05
+        ? `Grâce au Déplacement I effectué à l’Étape 3, vos Défenseurs sont à portée pour rejoindre en Étape II les zones où les Machines viennent d’entrer. Selon le Curseur 2 actif (${seuilParadeLabelCourt}), votre présence finale sur la case permettra de parer la coupe à l’Étape 6.`
+        : estV04
         ? 'C’est le 2e pilier de la V0.4 : une fois qu’une Machine est sur une case (parce qu’elle y était déjà ou vient d’entrer sur une case libre), un joueur seul ne peut pas l’arrêter (même avec ses 2 pions du même Peuple). Il faut impérativement une COALITION d’au moins 2 Défenseurs de Peuples (joueurs) différents sur la case !'
         : 'Les cartes de l’emplacement « Action II » s’activent : les Défenseurs activent leur posture Bouclier (🛡️ PROTÉGÉ) ou sabotent (⚡) les Machines présentes sur leur zone.',
-      gestePhysique: estV04
+      gestePhysique: estV05
+        ? `Effectuez librement le Déplacement II de chaque pion Défenseur pour couvrir les cases où se trouvent les Machines (${seuilParadeLabelCourt}).`
+        : estV04
         ? 'Effectuez le Déplacement II des pions Défenseurs afin de converger à deux Peuples différents sur les cases occupées par des Machines.'
         : 'Appliquez toutes les cartes « Action II », couchez en posture Bouclier les Défenseurs qui protègent, et renvoyez au Chantier les Machines sabotées.',
       etat: clonerEtatJeu(e4),
       etatPrecedent: clonerEtatJeu(e3),
     });
 
-    // Étape 5 : Coupe des Forêts après les 2es actions & Apprentissage sur les 2 pistes
+    // Étape 6 : Coupe des Forêts après les 2es actions & Apprentissage sur les 2 pistes
     let e5 = clonerEtatJeu(e4);
     if (e5.sousPhase === 'resolution_coupe_et_apprentissage') {
       e5 = avancerSousPhaseResolution(e5);
     }
     etats.push({
-      titre: '6. Coupe des Forêts & Apprentissage statistique du Méchant',
-      resumeEssentiel: estV04
+      titre: estV05
+        ? '6. Verdict de Coupe (Curseurs 2 & 3) & Apprentissage statistique du Méchant'
+        : '6. Coupe des Forêts & Apprentissage statistique du Méchant',
+      resumeEssentiel: estV05
+        ? `Verdict sur chaque case occupée par une Machine : si le seuil (${seuilParadeLabelCourt}) est atteint, la coupe est parée (${effetParadeLabelCourt}) ! Sinon, 1 Forêt est abattue 🪓 et la Tête du Méchant apprend.`
+        : estV04
         ? 'Toute Machine sur une case contenant 2 Défenseurs de Peuples différents 🤝 est bloquée ! Les autres abattent 1 Forêt 🪓, puis le Méchant apprend sur ses 2 pistes.'
         : 'Chaque Machine non contrée abat 1 Forêt 🪓. Puis le Méchant apprend : succès → glisse vers 7 (Tactique) et vers 1 (Piste Machine 1–2–3–0–4–5).',
-      descriptionPedagogique: estV04
+      descriptionPedagogique: estV05
+        ? `Pour chaque Machine sur le plateau : si la condition du Curseur 2 (${seuilParadeLabelCourt}) est remplie, la coupe est bloquée, on applique le Curseur 3 (${effetParadeLabelCourt}), et la Machine recule vers l’Écart 5 sur la Piste Machine. Sinon, elle abat 1 pion Forêt en bois et progresse vers la Somme 7 et l’Écart 1.`
+        : estV04
         ? 'Pour chaque Machine sur le plateau : si au moins 2 Défenseurs de Peuples différents occupent sa case (Coalition 🤝), la coupe est bloquée (et la Machine recule sur la Piste Machine vers 5). Sinon, elle abat 1 pion Forêt en bois et progresse vers les tirages les plus probables (Somme 7 et Écart 1).'
         : 'Toute Machine non sabotée se trouvant sur une zone non protégée abat 1 pion Forêt en bois. Ensuite, le Méchant apprend sur ses deux pistes publiques.',
-      gestePhysique: estV04
+      gestePhysique: estV05
+        ? `Vérifiez chaque Machine selon le Curseur 2 (${seuilParadeLabelCourt}) : si la case est parée, appliquez le Curseur 3 (${effetParadeLabelCourt}) ; sinon, retirez 1 pion Forêt en bois. Mettez ensuite à jour les deux pistes du Méchant.`
+        : estV04
         ? 'Vérifiez chaque Machine : s’il y a 2 Défenseurs de couleurs différentes sur sa case, la forêt est sauvée ! Sinon, retirez 1 pion Forêt en bois. Mettez ensuite à jour les deux pistes du Méchant.'
         : 'Retirez 1 pion Forêt en bois pour chaque Machine non contrée. Puis permutez d’un cran sur la Piste Tactique et sur la Piste Machine.',
       etat: clonerEtatJeu(e5),
@@ -318,7 +437,14 @@ export const DemoView: React.FC<DemoViewProps> = ({
     });
 
     return etats;
-  }, [variante, estV04]);
+  }, [
+    variante,
+    estV04,
+    estV05,
+    estV05Lineaire,
+    seuilParadeLabelCourt,
+    effetParadeLabelCourt,
+  ]);
 
   const totalForetsBoite =
     variante.foretsCoeur +
@@ -327,7 +453,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
   const etapeCourante =
     etapesTourDemo[Math.min(indexEtapeTour, etapesTourDemo.length - 1)];
 
-  // État des programmations à afficher sur les plateaux individuels (à partir de l'étape 2, on affiche les cartes de e1)
+  // État des programmations à afficher sur les plateaux individuels (à partir de l'étape 2, on affiche les ordres de e1)
   const programmationsDemo = useMemo(() => {
     return etapesTourDemo[1]?.etat.programmations || {};
   }, [etapesTourDemo]);
@@ -342,7 +468,6 @@ export const DemoView: React.FC<DemoViewProps> = ({
 
   const casesSurligneesDemo = useMemo(() => {
     if (!pionSelectionneObj) return [];
-    // Si on est à l'étape 2 (Programmation), surligner la destination programmée de ce pion
     const actsJ = programmationsDemo[pionSelectionneObj.joueur] || [];
     const cibles = actsJ
       .filter((a) => a.pionId === pionSelectionneObj.id && a.caseCible !== null)
@@ -378,7 +503,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
                   : 'text-[#16211B] hover:bg-white'
               }`}
             >
-              ▶ Tour guidé en 6 étapes
+              ▶ Tour guidé en {etapesTourDemo.length} étapes
             </button>
             <button
               onClick={() => setSubTab('mise_en_place')}
@@ -398,7 +523,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
                   : 'text-[#16211B] hover:bg-white'
               }`}
             >
-              Matériel & Cartes Action
+              {estV04 ? `Matériel & Boîte V${variante.version}` : 'Matériel & Cartes Action'}
             </button>
           </div>
 
@@ -414,11 +539,12 @@ export const DemoView: React.FC<DemoViewProps> = ({
       {/* VOLET PRINCIPAL : DÉMONSTRATION PAS-À-PAS D'UN TOUR COMPLET */}
       {subTab === 'tour_guide' && (
         <div className="space-y-4">
-          {/* Frise visuelle interactive des 6 étapes du tour */}
+          {/* Frise visuelle interactive des étapes du tour */}
           <TurnPhaseStepper
             sousPhase={etapeCourante.etat.sousPhase}
             tourActuel={1}
             nbTours={variante.nbTours}
+            variante={variante}
             indexEtapeForce={indexEtapeTour}
             onSelectEtape={(idx) => setIndexEtapeTour(idx)}
           />
@@ -429,7 +555,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
               <div className="space-y-0.5 max-w-3xl">
                 <div className="flex items-center gap-2">
                   <span className="px-2 py-0.5 text-[11px] font-mono-tabular font-bold rounded bg-emerald-100 text-[#165B36]">
-                    ÉTAPE {indexEtapeTour + 1} / 6
+                    ÉTAPE {indexEtapeTour + 1} / {etapesTourDemo.length}
                   </span>
                   <h3 className="font-display text-base font-bold text-[#16211B]">
                     {etapeCourante.titre}
@@ -494,15 +620,86 @@ export const DemoView: React.FC<DemoViewProps> = ({
             )}
           </div>
 
-          {/* Encart spécifique V0.4 : Les 3 Règles d'Or du Pur Placement & Résolution */}
-          {estV04 && (
+          {/* Encart spécifique V0.5 : Cœur Unifié Pur Placement sans Barrage d'Entrée & 3 Curseurs */}
+          {estV05 ? (
+            <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-amber-50/60 rounded-xl p-3.5 border-2 border-[#256B45] shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#165B36] flex items-center gap-1.5">
+                  <span>✨</span> Cœur Unifié V0.5 — Pur Placement Épuré (Zéro Barrage d’Entrée · Zéro Mouvement Contrarié) & 3 Curseurs Actifs
+                </span>
+                <span className="text-[11px] font-mono-tabular font-bold px-2.5 py-0.5 rounded bg-[#1E3528] text-white">
+                  RÈGLES OFFICIELLES V0.5
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+                <div className="p-2.5 rounded-lg bg-white/95 border border-emerald-300">
+                  <div className="font-bold text-[#16211B] flex items-center justify-between gap-1">
+                    <span>🎯 Curseur 1 — Timing Machines</span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 text-[#165B36]">
+                      {estV05Lineaire ? 'Choix B (2C Linéaire)' : 'Choix A (Entrelacé)'}
+                    </span>
+                  </div>
+                  <p className="text-[#55645B] mt-1 leading-snug">
+                    {estV05Lineaire ? (
+                      <>
+                        <strong className="text-[#16211B]">Fin de tour (5 étapes) :</strong>{' '}
+                        Dépl. I → Dépl. II → Révélation 2D6 gobelet par gobelet (Dépl. Machine + Verdict Coupe + Pistes).
+                      </>
+                    ) : (
+                      <>
+                        <strong className="text-[#16211B]">Entrelacé mi-tour (6 étapes) :</strong>{' '}
+                        Dépl. I → Entrée libre des Machines (sans barrage) → Dépl. II → Verdict Coupe & Pistes.
+                      </>
+                    )}
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-white/95 border border-teal-300">
+                  <div className="font-bold text-[#16211B] flex items-center justify-between gap-1">
+                    <span>🛡️ Curseur 2 — Seuil de Parade</span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-teal-100 text-teal-900">
+                      {variante.seuilParadeV05 === '2_peuples'
+                        ? 'Choix B (≥ 2 Peuples)'
+                        : variante.seuilParadeV05 === 'gradue_1_bloque_2_chantier'
+                        ? 'Choix C (Gradué 1/2)'
+                        : 'Choix A (≥ 1 Défenseur)'}
+                    </span>
+                  </div>
+                  <p className="text-[#55645B] mt-1 leading-snug">
+                    <strong className="text-[#16211B]">{seuilParadeLabelCourt} :</strong>{' '}
+                    {variante.seuilParadeV05 === '2_peuples'
+                      ? 'Exige au moins 2 Défenseurs de Peuples (joueurs) différents sur la case de la Machine pour bloquer la coupe.'
+                      : variante.seuilParadeV05 === 'gradue_1_bloque_2_chantier'
+                      ? '1 Défenseur suffit à bloquer la coupe (Machine sur place) ; ≥ 2 Peuples différents la renvoient au Chantier.'
+                      : 'La présence d’au moins 1 Défenseur sur la case de la Machine au moment de la coupe suffit à protéger la Forêt.'}
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-white/95 border border-amber-300">
+                  <div className="font-bold text-[#16211B] flex items-center justify-between gap-1">
+                    <span>⚙️ Curseur 3 — Sort de la Machine</span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-100 text-amber-900">
+                      {variante.seuilParadeV05 === 'gradue_1_bloque_2_chantier'
+                        ? 'Couplé au Curseur 2'
+                        : variante.effetParadeV05 === 'renvoyer_chantier'
+                        ? 'Choix B (Chantier)'
+                        : 'Choix A (Sur place)'}
+                    </span>
+                  </div>
+                  <p className="text-[#55645B] mt-1 leading-snug">
+                    <strong className="text-[#16211B]">{effetParadeLabelCourt} :</strong>{' '}
+                    dans tous les cas, une Machine dont la coupe est parée recule d’un cran vers l’Écart 5 (2/36) sur la Piste Machine.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : estV04 ? (
+            /* Encart spécifique V0.4 : Les 3 Règles d'Or du Pur Placement & Résolution V0.4 */
             <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 rounded-xl p-3.5 border border-emerald-300 shadow-xs">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#165B36] flex items-center gap-1.5">
-                  <span>🌲</span> Noyau V0.4 — Règles de Résolution Spatiale & Risque Opérationnel
+                  <span>🌲</span> Noyau V0.4 (Archive) — Règles de Résolution Spatiale & Risque Opérationnel
                 </span>
                 <span className="text-[11px] font-mono-tabular font-bold px-2 py-0.5 rounded bg-emerald-200/80 text-[#165B36]">
-                  RÈGLES OFFICIELLES V0.4
+                  RÈGLES ARCHIVE V0.4
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
@@ -532,9 +729,9 @@ export const DemoView: React.FC<DemoViewProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
 
-          {/* Plateau de jeu agrandi avec flèches d'intentions (Étape 2) et flèches de mouvements réalisés (Étapes 3 et 4) */}
+          {/* Plateau de jeu agrandi avec flèches d'intentions (Étape 2) et flèches de mouvements réalisés */}
           <PhysicalBoardV01
             etat={etapeCourante.etat}
             etatPrecedent={etapeCourante.etatPrecedent}
@@ -552,20 +749,36 @@ export const DemoView: React.FC<DemoViewProps> = ({
             }
           />
 
-          {/* PLATEAUX INDIVIDUELS & CARTES ACTION ASSOCIÉES À CHAQUE DÉFENSEUR (Visible dans la Démo !) */}
+          {/* PLATEAUX INDIVIDUELS & PROGRAMMATION ASSOCIÉE À CHAQUE DÉFENSEUR */}
           <div className="bg-white rounded-xl p-4 border-2 border-[#D8DFD5] space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#D8DFD5] pb-3">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="px-2 py-0.5 rounded bg-[#1E3528] text-white text-xs font-bold">
-                    CARTES ACTION & ASSOCIATION AUX DÉFENSEURS
+                    {estV04
+                      ? `PUR PLACEMENT V${variante.version} — DÉPLACEMENTS I & II`
+                      : 'CARTES ACTION & ASSOCIATION AUX DÉFENSEURS'}
                   </span>
                   <h3 className="font-display text-base font-bold text-[#16211B]">
-                    Comment les Cartes Action sont associées à chaque Pion Défenseur
+                    {estV04
+                      ? 'Comment les 2 Déplacements (Étape I & Étape II) sont programmés pour chaque Pion Défenseur'
+                      : 'Comment les Cartes Action sont associées à chaque Pion Défenseur'}
                   </h3>
                 </div>
                 <p className="text-xs text-[#55645B] mt-1">
-                  Chaque joueur possède <strong>{variante.defenseursParJoueur} pions Défenseurs numérotés</strong> (ex. <strong>MOI 1</strong> et <strong>MOI 2</strong>). Sur son plateau individuel, <strong>chaque Défenseur a sa propre ligne</strong> comportant 2 emplacements : <strong>Carte Action I</strong> (exécutée à l’Étape 3) et <strong>Carte Action II</strong> (exécutée à l’Étape 5). Cliquez sur un pion ci-dessous pour le mettre en focus sur le plateau !
+                  {estV05 ? (
+                    <>
+                      Chaque joueur possède <strong>{variante.defenseursParJoueur} pions Défenseurs numérotés</strong> (ex. <strong>MOI 1</strong> et <strong>MOI 2</strong>) et programme publiquement 2 étapes de déplacement (0 ou 1 case adjacente) : <strong>Déplacement I</strong> (exécuté à l’Étape 3) et <strong>Déplacement II</strong> (exécuté à l’Étape {estV05Lineaire ? '4' : '5'}). Aucune carte Action n’est utilisée ! Cliquez sur un pion ci-dessous pour le mettre en focus sur le plateau.
+                    </>
+                  ) : estV04 ? (
+                    <>
+                      Chaque joueur possède <strong>{variante.defenseursParJoueur} pions Défenseurs numérotés</strong> (ex. <strong>MOI 1</strong> et <strong>MOI 2</strong>) et programme publiquement <strong>Déplacement I</strong> (exécuté à l’Étape 3 pour former un Barrage) et <strong>Déplacement II</strong> (exécuté à l’Étape 5 pour former une Coalition). Cliquez sur un pion ci-dessous pour le mettre en focus sur le plateau !
+                    </>
+                  ) : (
+                    <>
+                      Chaque joueur possède <strong>{variante.defenseursParJoueur} pions Défenseurs numérotés</strong> (ex. <strong>MOI 1</strong> et <strong>MOI 2</strong>). Sur son plateau individuel, <strong>chaque Défenseur a sa propre ligne</strong> comportant 2 emplacements : <strong>Carte Action I</strong> (exécutée à l’Étape 3) et <strong>Carte Action II</strong> (exécutée à l’Étape 5). Cliquez sur un pion ci-dessous pour le mettre en focus sur le plateau !
+                    </>
+                  )}
                 </p>
               </div>
             </div>
@@ -585,11 +798,19 @@ export const DemoView: React.FC<DemoViewProps> = ({
                   </div>
                   <span className="text-[11px] font-semibold text-[#256B45]">
                     {indexEtapeTour === 0
-                      ? 'Cartes encore en main'
+                      ? estV04
+                        ? 'Ordres à annoncer (Étape 2)'
+                        : 'Cartes encore en main'
                       : indexEtapeTour === 1
-                      ? 'Cartes posées (Étape 2)'
-                      : indexEtapeTour === 2 || indexEtapeTour === 3
-                      ? 'Action I exécutée ✓'
+                      ? estV04
+                        ? 'Déplacements I & II programmés'
+                        : 'Cartes posées (Étape 2)'
+                      : indexEtapeTour === 2 || (!estV05Lineaire && indexEtapeTour === 3)
+                      ? estV04
+                        ? 'Déplacement I exécuté ✓'
+                        : 'Action I exécutée ✓'
+                      : estV04
+                      ? 'Déplacements I & II exécutés ✓'
                       : 'Actions I & II exécutées ✓'}
                   </span>
                 </div>
@@ -650,10 +871,18 @@ export const DemoView: React.FC<DemoViewProps> = ({
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             {[
                               { num: 1, act: act1, etapeExec: 2 },
-                              { num: 2, act: act2, etapeExec: 4 },
+                              {
+                                num: 2,
+                                act: act2,
+                                etapeExec: estV05Lineaire ? 3 : 4,
+                              },
                             ].map(({ num, act, etapeExec }) => {
                               if (!act) return null;
-                              const st = styleCarteAction(act.type);
+                              const st = styleCarteAction(
+                                act.type,
+                                estV04,
+                                estV05
+                              );
                               const dejaExecutee = indexEtapeTour >= etapeExec;
                               const enCoursExec = indexEtapeTour === etapeExec;
                               const pasEncorePosee = indexEtapeTour === 0;
@@ -671,7 +900,9 @@ export const DemoView: React.FC<DemoViewProps> = ({
                                 >
                                   <div className="flex items-center justify-between gap-1 mb-1">
                                     <span className="text-[10px] font-mono-tabular font-extrabold uppercase text-[#55645B]">
-                                      EMPLACEMENT CARTE {num === 1 ? 'I' : 'II'}
+                                      {estV04
+                                        ? `ORDRE DE DÉPLACEMENT ${num === 1 ? 'I' : 'II'}`
+                                        : `EMPLACEMENT CARTE ${num === 1 ? 'I' : 'II'}`}
                                     </span>
                                     <span
                                       className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${
@@ -685,12 +916,12 @@ export const DemoView: React.FC<DemoViewProps> = ({
                                       }`}
                                     >
                                       {pasEncorePosee
-                                        ? 'À poser (Étape 2)'
+                                        ? 'À programmer (Étape 2)'
                                         : enCoursExec
-                                        ? '⚡ EXÉCUTÉE ICI'
+                                        ? '⚡ EXÉCUTÉ ICI'
                                         : dejaExecutee
-                                        ? '✓ Résolue'
-                                        : 'Posée (Étape 2)'}
+                                        ? '✓ Résolu'
+                                        : 'Programmé (Étape 2)'}
                                     </span>
                                   </div>
 
@@ -731,7 +962,9 @@ export const DemoView: React.FC<DemoViewProps> = ({
               <div className="lg:col-span-6 rounded-xl border border-[#D8DFD5] bg-[#F4F5F0] p-3.5 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-extrabold uppercase tracking-wider text-[#16211B]">
-                    Cartes Action posées par les Bots alliés (Déduction autour de la table)
+                    {estV04
+                      ? 'Déplacements I & II programmés par les Bots alliés (Déduction autour de la table)'
+                      : 'Cartes Action posées par les Bots alliés (Déduction autour de la table)'}
                   </span>
                   <span className="text-[11px] text-[#55645B]">
                     Cliquez sur un allié pour voir ses pions sur le plateau
@@ -765,7 +998,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
                               {info.nomCourt}
                             </span>
                             <span className="text-[11px] text-[#55645B] font-mono-tabular">
-                              {indexEtapeTour >= 3
+                              {indexEtapeTour >= (estV05Lineaire ? 4 : 3)
                                 ? `Dés révélés : [${etapesTourDemo[0].etat.lancersSecretsDuTour[j]?.d1}, ${etapesTourDemo[0].etat.lancersSecretsDuTour[j]?.d2}]`
                                 : 'Gobelet 2D6 secret'}
                             </span>
@@ -803,11 +1036,18 @@ export const DemoView: React.FC<DemoViewProps> = ({
                                 <div className="space-y-0.5 text-[11px]">
                                   <div>
                                     <span className="font-mono-tabular font-bold text-[#55645B]">
-                                      Carte I :
+                                      {estV04 ? 'Dépl. I :' : 'Carte I :'}
                                     </span>{' '}
                                     <strong className="text-[#16211B]">
-                                      {a1 ? styleCarteAction(a1.type).icone : ''}{' '}
-                                      {a1?.type || 'proteger'}
+                                      {a1
+                                        ? styleCarteAction(a1.type, estV04, estV05)
+                                            .icone
+                                        : ''}{' '}
+                                      {a1?.type === 'attendre'
+                                        ? 'Sur place'
+                                        : a1?.type === 'deplacer'
+                                        ? 'Déplacer'
+                                        : a1?.type || 'Sur place'}
                                     </strong>
                                     {a1?.caseCible !== null &&
                                     a1?.caseCible !== undefined
@@ -816,11 +1056,18 @@ export const DemoView: React.FC<DemoViewProps> = ({
                                   </div>
                                   <div>
                                     <span className="font-mono-tabular font-bold text-[#55645B]">
-                                      Carte II :
+                                      {estV04 ? 'Dépl. II :' : 'Carte II :'}
                                     </span>{' '}
                                     <strong className="text-[#16211B]">
-                                      {a2 ? styleCarteAction(a2.type).icone : ''}{' '}
-                                      {a2?.type || 'proteger'}
+                                      {a2
+                                        ? styleCarteAction(a2.type, estV04, estV05)
+                                            .icone
+                                        : ''}{' '}
+                                      {a2?.type === 'attendre'
+                                        ? 'Sur place'
+                                        : a2?.type === 'deplacer'
+                                        ? 'Déplacer'
+                                        : a2?.type || 'Sur place'}
                                     </strong>
                                     {a2?.caseCible !== null &&
                                     a2?.caseCible !== undefined
@@ -888,11 +1135,14 @@ export const DemoView: React.FC<DemoViewProps> = ({
                     'Alignez les 11 tuiles Tactiques sur les cases 2 à 12 et les 6 cartes Machines sur la Piste Machine ordonnée 1, 2, 3, 0, 4, 5.',
                 },
                 {
-                  titre: '4. Distribuer Cartes & Gobelets 2D6',
-                  texte:
-                    'Remettez à chaque joueur son Plateau Individuel (Lignes Défenseur #1 et #2), ses Cartes Action (Se déplacer, Protéger, Saboter' +
-                    (variante.actionReplanterActive ? ', Replanter' : '') +
-                    ') et 1 gobelet 2D6.',
+                  titre: estV04
+                    ? '4. Distribuer Pions Défenseurs & Gobelets 2D6'
+                    : '4. Distribuer Cartes & Gobelets 2D6',
+                  texte: estV04
+                    ? `Remettez à chaque joueur ses ${variante.defenseursParJoueur} pions Défenseurs à sa couleur, son aide-mémoire Pur Placement (Déplacements I & II sans Cartes Action) et 1 gobelet opaque avec 2D6.`
+                    : 'Remettez à chaque joueur son Plateau Individuel (Lignes Défenseur #1 et #2), ses Cartes Action (Se déplacer, Protéger, Saboter' +
+                      (variante.actionReplanterActive ? ', Replanter' : '') +
+                      ') et 1 gobelet 2D6.',
                 },
               ].map((item, idx) => (
                 <div
@@ -943,19 +1193,31 @@ export const DemoView: React.FC<DemoViewProps> = ({
                 Pions Forêt ({variante.foretsCoeur} au Cœur, {variante.foretsParCaseSecteur}/case)
               </h3>
               <p className="text-xs text-[#55645B] leading-relaxed">
-                Retirés un par un lorsqu’une Machine active n’est ni sabotée ni bloquée par un Bouclier en fin de tour.
+                Retirés un par un lorsqu’une Machine active n’est pas parée sur sa case au moment du verdict de coupe.
               </p>
             </div>
 
             <div className="bg-white rounded-xl p-4 border-2 border-[#256B45] bg-emerald-50/40">
               <div className="text-xs font-mono-tabular text-[#256B45] font-bold mb-1">
-                DÉFENSEURS & CARTES ACTION ({variante.nbJoueurs * variante.defenseursParJoueur} PIONS)
+                {estV04
+                  ? `DÉFENSEURS PUR PLACEMENT (${variante.nbJoueurs * variante.defenseursParJoueur} PIONS — ZÉRO CARTE ACTION)`
+                  : `DÉFENSEURS & CARTES ACTION (${variante.nbJoueurs * variante.defenseursParJoueur} PIONS)`}
               </div>
               <h3 className="font-display text-sm font-bold text-[#16211B] mb-1">
-                Plateau Individuel à 2 Lignes & Cartes Action I / II
+                {estV04
+                  ? 'Pions Défenseurs & Réglette Individuelle Déplacement I / II'
+                  : 'Plateau Individuel à 2 Lignes & Cartes Action I / II'}
               </h3>
               <p className="text-xs text-[#16211B] leading-relaxed">
-                Chaque joueur dispose de <strong>{variante.defenseursParJoueur} pions numérotés (#1 et #2)</strong> et d’un plateau personnel divisé en <strong>2 lignes</strong> (Ligne Défenseur #1 et Ligne Défenseur #2), chacune dotée de 2 emplacements : <strong>Action I</strong> et <strong>Action II</strong>.
+                {estV04 ? (
+                  <>
+                    Chaque joueur dispose de <strong>{variante.defenseursParJoueur} pions numérotés (#1 et #2)</strong> qui agissent exclusivement par leur positionnement sur le plateau (Déplacement I puis Déplacement II de 0 ou 1 case adjacente), sans aucune carte Action.
+                  </>
+                ) : (
+                  <>
+                    Chaque joueur dispose de <strong>{variante.defenseursParJoueur} pions numérotés (#1 et #2)</strong> et d’un plateau personnel divisé en <strong>2 lignes</strong> (Ligne Défenseur #1 et Ligne Défenseur #2), chacune dotée de 2 emplacements : <strong>Action I</strong> et <strong>Action II</strong>.
+                  </>
+                )}
               </p>
             </div>
 
@@ -967,7 +1229,9 @@ export const DemoView: React.FC<DemoViewProps> = ({
                 Les 6 Machines ({variante.machinesInitiales} en Lisière, {6 - variante.machinesInitiales} au Chantier)
               </h3>
               <p className="text-xs text-[#55645B] leading-relaxed">
-                Se déplacent au milieu du tour (Étape 4) et abattent les Forêts non protégées à l’Étape 6.
+                {estV05Lineaire
+                  ? 'S’activent gobelet par gobelet en fin de tour (Étape 5) : déplacement libre vers la cible puis verdict immédiat de coupe.'
+                  : 'Se déplacent au milieu du tour (Étape 4) et abattent les Forêts non parées à l’Étape 6.'}
               </p>
             </div>
 

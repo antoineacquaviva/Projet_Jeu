@@ -285,10 +285,19 @@ export function chargerEtatAtelier(): AtelierPersistedState {
           }
         }
 
+        // Purger les anciennes variantes combinatoires obsolètes (v05_comb_*)
+        parsed.variantes = parsed.variantes.filter(
+          (v) => !v.id.startsWith('v05_comb_')
+        );
+
         for (const varInit of VARIANTES_INITIALES_V01) {
           const idx = parsed.variantes.findIndex((v) => v.id === varInit.id);
           if (idx === -1) {
-            parsed.variantes.push(varInit);
+            if (varInit.version === '0.5') {
+              parsed.variantes.unshift(varInit);
+            } else {
+              parsed.variantes.push(varInit);
+            }
             modified = true;
           } else if (varInit.version === '0.5') {
             parsed.variantes[idx] = {
@@ -302,6 +311,20 @@ export function chargerEtatAtelier(): AtelierPersistedState {
             modified = true;
           }
         }
+
+        // S'assurer que la variante socle V0.5 (v05_2c_lineaire_1def_surplace) est en tête des variantes V0.5
+        const v05OfficiellesIds = new Set(
+          VARIANTES_INITIALES_V01.filter((v) => v.version === '0.5').map(
+            (v) => v.id
+          )
+        );
+        const v05Officielles = parsed.variantes.filter((v) =>
+          v05OfficiellesIds.has(v.id)
+        );
+        const autresVars = parsed.variantes.filter(
+          (v) => !v05OfficiellesIds.has(v.id)
+        );
+        parsed.variantes = [...v05Officielles, ...autresVars];
 
         if (!Array.isArray(parsed.ideesLabo)) {
           parsed.ideesLabo = [...IDEES_INITIALES_LABO];
