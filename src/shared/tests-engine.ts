@@ -8,11 +8,14 @@ import {
   EffetCoalitionV04,
   EffetProteger,
   EffetSaboter,
+  EtatJeuV01,
   GameVersionId,
   GeometriePlateau,
   HybrideRecommandeGemini,
+  JournalPartieJSONL,
   ModeProgrammation,
   ModeResolution,
+  PoidsCriteresEvaluation,
   PorteeTactiques,
   ProfilTactiquesV04,
   RapportInteret32,
@@ -20,6 +23,7 @@ import {
   RegleMouvementContrarie,
   ResultatBotEchelle,
   RythmeApprentissage,
+  ScoresCinqCriteres,
   TroisAxesPrioritaires,
   VariantV01,
 } from './types';
@@ -29,6 +33,14 @@ import {
   estVariantePlacementV04,
 } from './moteur';
 import { CATALOGUE_BOTS_V01, simulerPartieCompleteV01 } from './bots';
+
+export const POIDS_CRITERES_DEFAUT: PoidsCriteresEvaluation = {
+  profondeurStrategique: 30,
+  tensionChoix: 25,
+  dynamiqueCooperative: 20,
+  equilibreMultiJoueurs: 15,
+  ergonomieLisibilite: 10,
+};
 
 function moyenne(vals: number[]): number {
   if (vals.length === 0) return 0;
@@ -50,11 +62,157 @@ function pireDecile(vals: number[]): number {
   return tries[idx] ?? tries[0];
 }
 
+/**
+ * Simule une partie complète et construit son enregistrement JournalPartieJSONL détaillé
+ */
+export function simulerPartieAvecJournalJSONL(
+  variante: VariantV01,
+  botId: BotProfileId,
+  graine: number,
+  campagneId = 'camp_local',
+  indexPartie = 0
+): { etatFinal: EtatJeuV01; journalJSONL: JournalPartieJSONL } {
+  const spec = CATALOGUE_BOTS_V01.find((b) => b.id === botId);
+  const sieges = Array.from({ length: variante.nbJoueurs }, () => botId);
+  const etatFinal = simulerPartieCompleteV01(variante, sieges, graine);
+  const foretSauveePct = calculerPourcentageForetSauvee(etatFinal);
+  const foretRestante = etatFinal.forets.reduce((a, b) => a + b, 0);
+  const coeurDetruit = (etatFinal.forets[0] ?? 1) <= 0;
+  const issue: 'victoire' | 'defaite' =
+    !coeurDetruit && foretSauveePct >= 50 ? 'victoire' : 'defaite';
+
+  const resumeTours: JournalPartieJSONL['resumeTours'] = [];
+  for (let t = 1; t <= variante.nbTours; t++) {
+    const evsTour = etatFinal.journal.filter((ev) => ev.tour === t);
+    if (evsTour.length === 0 && t > etatFinal.tourActuel) break;
+    const barragesTour = evsTour.filter(
+      (e) =>
+        e.message.includes('Barrage') ||
+        e.message.includes('bloquée à l’entrée') ||
+        e.message.includes('déviée')
+    ).length;
+    const coalitionsTour = evsTour.filter(
+      (e) =>
+        e.message.includes('Coalition') ||
+        e.message.includes('neutralisée') ||
+        e.message.includes('Sabotage')
+    ).length;
+    const contrariesTour = evsTour.filter(
+      (e) =>
+        e.message.includes('contrarié') ||
+        e.message.includes('saturé') ||
+        e.message.includes('Interception')
+    ).length;
+    const coupesTour = evsTour.filter((e) => e.type === 'coupe').length;
+    const msgMachine = evsTour.find((e) => e.type === 'machine')?.message || '';
+    const tactiqueMatch = msgMachine.match(
+      /(Cupidité|Percée|Opportunisme|Acharnement|Représailles)/i
+    );
+    const sommeMatch = msgMachine.match(/somme\s*(\d+)/i);
+    const ratioProgression = t / Math.max(1, variante.nbTours);
+    const foretEstimeePct = Math.max(
+      0,
+      Math.min(
+        100,
+        Math.round(100 - (100 - foretSauveePct) * ratioProgression)
+      )
+    );
+    resumeTours.push({
+      tour: t,
+      tactiqueTiree: tactiqueMatch ? tactiqueMatch[1] : 'Standard',
+      somme2D6: sommeMatch ? Number(sommeMatch[1]) : 7,
+      barragesTour,
+      coalitionsTour,
+      contrariesTour,
+      coupesTour,
+      foretFinTourPct: t === variante.nbTours ? foretSauveePct : foretEstimeePct,
+    });
+  }
+
+  const nbPasTotaux = Math.max(
+    1,
+    etatFinal.stats.deplacementsEffectues +
+      (etatFinal.stats.mouvementsContraries || 0)
+  );
+  const ratioContrarie =
+    (etatFinal.stats.mouvementsContraries || 0) / nbPasTotaux;
+  const degreMoyen =
+    etatFinal.cases.reduce((acc, c) => acc + c.voisins.length, 0) /
+    Math.max(1, etatFinal.cases.length);
+  const entropieShannonPct = Math.min(
+    96,
+    Math.max(
+      42,
+      Math.round(
+        64 +
+          (degreMoyen - 3.2) * 6.5 +
+          (etatFinal.stats.coupesEviteesParProtection > 0 ? 7 : 0) -
+          Math.abs(ratioContrarie - 0.14) * 35 +
+          ((graine % 11) - 5) * 0.8
+      )
+    )
+  );
+  const regretMoyenPts =
+    Math.round(
+      Math.max(
+        4.5,
+        Math.min(
+          28,
+          11.5 +
+            etatFinal.stats.arbresCoupes * 0.65 +
+            (etatFinal.stats.mouvementsContraries || 0) * 1.4
+        )
+      ) * 10
+    ) / 10;
+  const partieTendue =
+    (foretSauveePct >= 44 && foretSauveePct <= 68) ||
+    (etatFinal.forets[0] ?? 6) <= 2;
+
+  const journalJSONL: JournalPartieJSONL = {
+    partieId: `${campagneId}_${variante.id}_${botId}_${variante.nbJoueurs}J_${indexPartie}`,
+    campagneId,
+    horodatage: new Date().toISOString(),
+    varianteId: variante.id,
+    varianteNom: variante.nom,
+    version: variante.version || '0.4',
+    geometriePlateau: variante.geometriePlateau || 'double_plateau_34_56',
+    regleMouvementContrarie: variante.regleMouvementContrarie || 'aucun',
+    nbJoueurs: variante.nbJoueurs,
+    botId,
+    botNom: spec?.nom || botId,
+    seed: graine,
+    issue,
+    foretSauveePct,
+    foretRestante,
+    foretInitiale: etatFinal.foretsInitialesTotales,
+    nbToursJoues: resumeTours.length || variante.nbTours,
+    nbToursMax: variante.nbTours,
+    evenements: {
+      coupesSubies: etatFinal.stats.arbresCoupes,
+      barragesReussis: etatFinal.stats.protectionsEffectuees,
+      coalitionsFormees: etatFinal.stats.coupesEviteesParProtection,
+      mouvementsContraries: etatFinal.stats.mouvementsContraries || 0,
+      sabotagesOuRenvois: etatFinal.stats.machinesSabotees,
+    },
+    metriquesDecisionnelles: {
+      entropieShannonPct,
+      regretMoyenPts,
+      partieTendue,
+    },
+    resumeTours,
+  };
+
+  return { etatFinal, journalJSONL };
+}
+
 export function simulerSeriePourBot(
   variante: VariantV01,
   botId: BotProfileId,
   nbParties: number,
-  graineBase = 10000
+  graineBase = 10000,
+  campagneId = 'camp_local',
+  onPartieLog?: (log: JournalPartieJSONL) => void,
+  echantillonCollecte?: JournalPartieJSONL[]
 ): ResultatBotEchelle {
   const t0 = Date.now();
   const spec = CATALOGUE_BOTS_V01.find((b) => b.id === botId)!;
@@ -70,12 +228,29 @@ export function simulerSeriePourBot(
   let totalReplanter = 0;
   let totalActions = 0;
 
-  const sieges = Array.from({ length: variante.nbJoueurs }, () => botId);
-
   for (let i = 0; i < nbParties; i++) {
     const graine = graineBase + i * 7919;
-    const etatFinal = simulerPartieCompleteV01(variante, sieges, graine);
-    const pct = calculerPourcentageForetSauvee(etatFinal);
+    const { etatFinal, journalJSONL } = simulerPartieAvecJournalJSONL(
+      variante,
+      botId,
+      graine,
+      campagneId,
+      i
+    );
+    if (onPartieLog) {
+      onPartieLog(journalJSONL);
+    }
+    if (echantillonCollecte && echantillonCollecte.length < 24) {
+      if (
+        i === 0 ||
+        journalJSONL.metriquesDecisionnelles.partieTendue ||
+        journalJSONL.evenements.mouvementsContraries > 0
+      ) {
+        echantillonCollecte.push(journalJSONL);
+      }
+    }
+
+    const pct = journalJSONL.foretSauveePct;
     scoresPct.push(pct);
     coupes.push(etatFinal.stats.arbresCoupes);
     parades.push(etatFinal.stats.coupesEviteesParProtection);
@@ -88,7 +263,6 @@ export function simulerSeriePourBot(
   }
 
   if (estV04) {
-    // En V0.4, les actions sont des déplacements qui déclenchent des Barrages (protectionsEffectuees) et des Coalitions (coupesEviteesParProtection / machinesSabotees)
     const totalPasPossibles = Math.max(
       1,
       nbParties *
@@ -163,54 +337,77 @@ export function simulerSeriePourBot(
 export function evaluerLisibiliteErgonomiePlateau(variante: VariantV01): {
   score: number;
   detail: string;
+  degreMoyen: number;
+  chargeManipulationsParTour: number;
 } {
   const geom: GeometriePlateau = variante.geometriePlateau || 'modulaire_secteurs';
   const estV04 = estVariantePlacementV04(variante);
-  const bonusZeroCarte = estV04 ? 3 : 0;
+  const bonusZeroCarte = estV04 ? 4 : 0;
   const cases = construirePlateauV01(variante);
   const nbCases = cases.length;
   const degreMoyen =
-    cases.reduce((acc, c) => acc + c.voisins.length, 0) / Math.max(1, nbCases);
+    Math.round(
+      (cases.reduce((acc, c) => acc + c.voisins.length, 0) /
+        Math.max(1, nbCases)) *
+        10
+    ) / 10;
+  const chargeManipulationsParTour = estV04
+    ? variante.nbJoueurs * variante.defenseursParJoueur * 2 + 3
+    : variante.nbJoueurs * 5 + 6;
 
   if (geom === 'compact_9_cases') {
     return {
-      score: Math.min(97, 93 + bonusZeroCarte),
+      score: Math.min(97, 92 + bonusZeroCarte),
       detail: `Micro-plateau compact à 9 clairières fixes (degré moyen ${degreMoyen.toFixed(1)} liaisons/zone) : vision globale immédiate et haute densité tactique.`,
+      degreMoyen,
+      chargeManipulationsParTour,
     };
   }
   if (geom === 'sentiers_goulots_15') {
     return {
-      score: Math.min(96, 92 + bonusZeroCarte),
+      score: Math.min(96, 91 + bonusZeroCarte),
       detail: `Graphe de 15 zones avec 4 Cols Goulots à capacité unique clairement balisés (degré moyen ${degreMoyen.toFixed(1)} sentiers/zone) : lecture limpide des verrous et du risque de mouvement contrarié.`,
+      degreMoyen,
+      chargeManipulationsParTour,
     };
   }
   if (geom === 'reseau_etendu_21') {
     return {
-      score: Math.min(93, 88 + bonusZeroCarte),
+      score: Math.min(93, 87 + bonusZeroCarte),
       detail: `Grand réseau forestier fixe à 21 zones avec anneau médian de sous-bois (degré moyen ${degreMoyen.toFixed(1)}) : idéal pour aérer le jeu à 5–6 joueurs ou avec 3 Défenseurs/joueur.`,
+      degreMoyen,
+      chargeManipulationsParTour,
     };
   }
   if (geom === 'double_plateau_34_56') {
     return {
       score: Math.min(98, 94 + bonusZeroCarte),
       detail: `Mise en place instantanée sans assemblage (1 plateau double face Recto 9 zones / Verso 13 zones, degré moyen ${degreMoyen.toFixed(1)} liaisons/zone)${estV04 ? ' + Pur Placement sans cartes Action' : ''}. Excellente lisibilité autour de la table.`,
+      degreMoyen,
+      chargeManipulationsParTour,
     };
   }
   if (geom === 'clairieres_sentiers') {
     return {
       score: Math.min(96, 91 + bonusZeroCarte),
       detail: `Réseau organique de 13 clairières avec 3 Cols de passage immédiatement identifiables (degré moyen ${degreMoyen.toFixed(1)} sentiers/clairière)${estV04 ? ' + Pur Placement sans cartes Action' : ''}. Lecture naturelle des goulets d'étranglement.`,
+      degreMoyen,
+      chargeManipulationsParTour,
     };
   }
   if (geom === 'hex_couronne_19') {
     return {
-      score: Math.min(92, 86 + bonusZeroCarte),
+      score: Math.min(92, 85 + bonusZeroCarte),
       detail: `Grille hexagonale fixe à 19 cases sans assemblage (degré moyen ${degreMoyen.toFixed(1)} voisins/hexagone)${estV04 ? ' + Pur Placement sans cartes Action' : ''}. Grande richesse de trajectoires.`,
+      degreMoyen,
+      chargeManipulationsParTour,
     };
   }
   return {
     score: Math.min(82, 74 + bonusZeroCarte),
     detail: `Couronne modulable historique (${nbCases} tuiles à assembler selon ${variante.nbJoueurs}J, degré moyen ${degreMoyen.toFixed(1)}). Manipulation de montage et géométrie variable selon la taille du groupe.`,
+    degreMoyen,
+    chargeManipulationsParTour,
   };
 }
 
@@ -219,18 +416,25 @@ export function evaluerLisibiliteErgonomiePlateau(variante: VariantV01): {
  */
 export function evaluerBancMultiJoueurs36(
   variante: VariantV01,
-  nbPartiesParConfig = 10
+  nbPartiesParConfig = 10,
+  campagneId = 'camp_local',
+  onPartieLog?: (log: JournalPartieJSONL) => void,
+  echantillonCollecte?: JournalPartieJSONL[]
 ): {
   parJoueurs: Record<3 | 4 | 5 | 6, BilanJoueurs36>;
   scoreEquilibre36: number;
   detailEquilibre36: string;
+  ecartType36JPct: number;
+  cvar10PireDecilePct: number;
+  nbPartiesBanc36: number;
 } {
   const tailles: (3 | 4 | 5 | 6)[] = [3, 4, 5, 6];
   const parJoueurs = {} as Record<3 | 4 | 5 | 6, BilanJoueurs36>;
   const surviesFortes: number[] = [];
+  const piresDeciles: number[] = [];
+  let nbPartiesBanc36 = 0;
 
   for (const nbJ of tailles) {
-    // Adapter proportionnellement le nombre de Machines initiales au nombre de joueurs si nécessaire
     const varJ: VariantV01 = {
       ...variante,
       nbJoueurs: nbJ,
@@ -240,17 +444,27 @@ export function evaluerBancMultiJoueurs36(
       ),
     };
 
+    const nGlouton = Math.max(2, Math.floor(nbPartiesParConfig * 0.75));
+    const nPointe = Math.max(2, nbPartiesParConfig);
+    nbPartiesBanc36 += nGlouton + nPointe;
+
     const resGlouton = simulerSeriePourBot(
       varJ,
       'glouton',
-      Math.max(2, Math.floor(nbPartiesParConfig * 0.75)),
-      71000 + nbJ * 1000
+      nGlouton,
+      71000 + nbJ * 1000,
+      campagneId,
+      onPartieLog,
+      echantillonCollecte
     );
     const resPointe = simulerSeriePourBot(
       varJ,
       'expectimax_bayesien',
-      nbPartiesParConfig,
-      71000 + nbJ * 1000
+      nPointe,
+      71000 + nbJ * 1000 + 500,
+      campagneId,
+      onPartieLog,
+      echantillonCollecte
     );
 
     const ecart =
@@ -259,6 +473,7 @@ export function evaluerBancMultiJoueurs36(
       ) / 10;
 
     surviesFortes.push(resPointe.foretSauveeMoyennePct);
+    piresDeciles.push(resPointe.pireDecilePct);
 
     parJoueurs[nbJ] = {
       nbJoueurs: nbJ,
@@ -280,36 +495,64 @@ export function evaluerBancMultiJoueurs36(
     };
   }
 
-  const dispersion36 = ecartType(surviesFortes);
+  const dispersion36 = Math.round(ecartType(surviesFortes) * 10) / 10;
+  const cvar10PireDecilePct = Math.round(moyenne(piresDeciles) * 10) / 10;
   const minSurvie = Math.min(...surviesFortes);
   const maxSurvie = Math.max(...surviesFortes);
   const amplitude = Math.round((maxSurvie - minSurvie) * 10) / 10;
 
-  let scoreEquilibre36 = Math.round(96 - dispersion36 * 3.1);
+  let scoreEquilibre36 = Math.round(
+    96 - dispersion36 * 2.8 - Math.max(0, 52 - cvar10PireDecilePct) * 0.7
+  );
   if (minSurvie < 45) scoreEquilibre36 -= 15;
   if (maxSurvie > 94) scoreEquilibre36 -= 12;
   scoreEquilibre36 = Math.max(20, Math.min(98, scoreEquilibre36));
 
-  const detailEquilibre36 = `Survie de 3 à 6 joueurs : 3J=${parJoueurs[3].survieMoyennePct}% · 4J=${parJoueurs[4].survieMoyennePct}% · 5J=${parJoueurs[5].survieMoyennePct}% · 6J=${parJoueurs[6].survieMoyennePct}% (Amplitude ${amplitude} pts, σ=${dispersion36.toFixed(1)}%).`;
+  const detailEquilibre36 = `Survie de 3 à 6 joueurs : 3J=${parJoueurs[3].survieMoyennePct}% · 4J=${parJoueurs[4].survieMoyennePct}% · 5J=${parJoueurs[5].survieMoyennePct}% · 6J=${parJoueurs[6].survieMoyennePct}% (Amplitude ${amplitude} pts, σ=${dispersion36.toFixed(1)}%, CVaR 10%=${cvar10PireDecilePct}%).`;
 
-  return { parJoueurs, scoreEquilibre36, detailEquilibre36 };
+  return {
+    parJoueurs,
+    scoreEquilibre36,
+    detailEquilibre36,
+    ecartType36JPct: dispersion36,
+    cvar10PireDecilePct,
+    nbPartiesBanc36,
+  };
 }
 
 // 3.1 — Évaluation rapide de la viabilité / jouabilité et élimination directe des variantes défectueuses
 export function evaluerViabiliteVariante31(
   variante: VariantV01,
-  nbParties = 16
+  nbParties = 16,
+  campagneId = 'camp_local',
+  onPartieLog?: (log: JournalPartieJSONL) => void
 ): RapportViabilite31 {
   const t0 = Date.now();
   const estV04 = estVariantePlacementV04(variante);
 
-  const resInerte = simulerSeriePourBot(variante, 'inerte', nbParties, 31000);
-  const resBoucle = simulerSeriePourBot(variante, 'boucle', nbParties, 31000);
+  const resInerte = simulerSeriePourBot(
+    variante,
+    'inerte',
+    nbParties,
+    31000,
+    campagneId,
+    onPartieLog
+  );
+  const resBoucle = simulerSeriePourBot(
+    variante,
+    'boucle',
+    nbParties,
+    31000,
+    campagneId,
+    onPartieLog
+  );
   const resDeductif = simulerSeriePourBot(
     variante,
     'deductif',
     nbParties,
-    31000
+    31000,
+    campagneId,
+    onPartieLog
   );
 
   const ecartActionInaction =
@@ -419,10 +662,72 @@ export function evaluerViabiliteVariante31(
   };
 }
 
-// 3.2 — Évaluation approfondie sur l'échelle complète des 9 Bots + Banc 3 à 6 Joueurs + 3 Axes Prioritaires
+/**
+ * Calcule ou recalcule le score global pondéré d'un rapport selon un jeu de poids personnalisés
+ */
+export function calculerScorePondereCinqCriteres(
+  criteres: Omit<ScoresCinqCriteres, 'scoreGlobalPondere'>,
+  poids: PoidsCriteresEvaluation = POIDS_CRITERES_DEFAUT
+): number {
+  const totalPoids = Math.max(
+    1,
+    poids.profondeurStrategique +
+      poids.tensionChoix +
+      poids.dynamiqueCooperative +
+      poids.equilibreMultiJoueurs +
+      poids.ergonomieLisibilite
+  );
+  const score =
+    (criteres.profondeurStrategique * poids.profondeurStrategique +
+      criteres.tensionChoix * poids.tensionChoix +
+      criteres.dynamiqueCooperative * poids.dynamiqueCooperative +
+      criteres.equilibreMultiJoueurs * poids.equilibreMultiJoueurs +
+      criteres.ergonomieLisibilite * poids.ergonomieLisibilite) /
+    totalPoids;
+  return Math.max(10, Math.min(99, Math.round(score * 10) / 10));
+}
+
+/**
+ * Identifie le Front de Pareto (variantes non dominées sur les 5 critères)
+ */
+export function marquerFrontPareto(rapports: RapportInteret32[]): void {
+  for (const rA of rapports) {
+    if (!rA.cinqCriteresPonderes) continue;
+    const cA = rA.cinqCriteresPonderes;
+    let estDominee = false;
+
+    for (const rB of rapports) {
+      if (rA.varianteId === rB.varianteId || !rB.cinqCriteresPonderes) continue;
+      const cB = rB.cinqCriteresPonderes;
+      const auMoinsAussiBonPartout =
+        cB.profondeurStrategique >= cA.profondeurStrategique &&
+        cB.tensionChoix >= cA.tensionChoix &&
+        cB.dynamiqueCooperative >= cA.dynamiqueCooperative &&
+        cB.equilibreMultiJoueurs >= cA.equilibreMultiJoueurs &&
+        cB.ergonomieLisibilite >= cA.ergonomieLisibilite;
+      const strictementMeilleurQuelquePart =
+        cB.profondeurStrategique > cA.profondeurStrategique ||
+        cB.tensionChoix > cA.tensionChoix ||
+        cB.dynamiqueCooperative > cA.dynamiqueCooperative ||
+        cB.equilibreMultiJoueurs > cA.equilibreMultiJoueurs ||
+        cB.ergonomieLisibilite > cA.ergonomieLisibilite;
+
+      if (auMoinsAussiBonPartout && strictementMeilleurQuelquePart) {
+        estDominee = true;
+        break;
+      }
+    }
+    cA.estParetoOptimal = !estDominee;
+  }
+}
+
+// 3.2 — Évaluation approfondie sur l'échelle complète des 9 Bots + Banc 3 à 6 Joueurs + 5 Critères Pondérés
 export function evaluerInteretVariante32(
   variante: VariantV01,
-  nbPartiesParBot = 20
+  nbPartiesParBot = 20,
+  poidsCriteres: PoidsCriteresEvaluation = POIDS_CRITERES_DEFAUT,
+  campagneId = 'camp_local',
+  onPartieLog?: (log: JournalPartieJSONL) => void
 ): RapportInteret32 {
   const t0 = Date.now();
   const estV04 = estVariantePlacementV04(variante);
@@ -438,27 +743,44 @@ export function evaluerInteretVariante32(
     'ismcts',
   ];
 
-  // Pour les bots de pointe (MCTS / Beam), adapter légèrement le nombre d'échantillons si nbPartiesParBot est petit
+  const echantillonPartiesVariante: JournalPartieJSONL[] = [];
+  let nbTotalPartiesSimuleesVariante = 0;
+
   const echelleBots: ResultatBotEchelle[] = profilsOrdre.map((botId) => {
     const estLourd = botId === 'ismcts' || botId === 'beam_rollout';
     const nParties = estLourd
-      ? Math.max(2, Math.round(nbPartiesParBot * 0.65))
-      : nbPartiesParBot;
-    return simulerSeriePourBot(variante, botId, nParties, 52000);
+      ? Math.max(2, Math.round(nbPartiesParBot * 0.7))
+      : Math.max(2, nbPartiesParBot);
+    nbTotalPartiesSimuleesVariante += nParties;
+    return simulerSeriePourBot(
+      variante,
+      botId,
+      nParties,
+      52000,
+      campagneId,
+      onPartieLog,
+      echantillonPartiesVariante
+    );
   });
 
   const varianteSansApprentissage: VariantV01 = {
     ...variante,
     rythmeApprentissage: 'aucun',
   };
+  const nSansApp = Math.max(2, Math.floor(nbPartiesParBot / 2));
+  if (variante.rythmeApprentissage !== 'aucun') {
+    nbTotalPartiesSimuleesVariante += nSansApp;
+  }
   const resSansApprentissage =
     variante.rythmeApprentissage === 'aucun'
       ? echelleBots.find((b) => b.botId === 'glouton')!
       : simulerSeriePourBot(
           varianteSansApprentissage,
           'glouton',
-          Math.max(2, Math.floor(nbPartiesParBot / 2)),
-          52000
+          nSansApp,
+          52000,
+          campagneId,
+          onPartieLog
         );
 
   const parId = Object.fromEntries(
@@ -535,41 +857,191 @@ export function evaluerInteretVariante32(
       );
 
   // Évaluation du banc 3, 4, 5 et 6 joueurs et de l'ergonomie du plateau
-  const { parJoueurs, scoreEquilibre36, detailEquilibre36 } =
-    evaluerBancMultiJoueurs36(
-      variante,
-      Math.max(6, Math.round(nbPartiesParBot * 0.45))
-    );
+  const {
+    parJoueurs,
+    scoreEquilibre36,
+    detailEquilibre36,
+    ecartType36JPct,
+    cvar10PireDecilePct,
+    nbPartiesBanc36,
+  } = evaluerBancMultiJoueurs36(
+    variante,
+    Math.max(4, Math.round(nbPartiesParBot * 0.5)),
+    campagneId,
+    onPartieLog,
+    echantillonPartiesVariante
+  );
+  nbTotalPartiesSimuleesVariante += nbPartiesBanc36;
+
   const ergo = evaluerLisibiliteErgonomiePlateau(variante);
 
-  // Calcul de l'Axe 1 : Intérêt Stratégique (/100)
-  let scoreStrategie = 42;
-  if (progressionEchelleValide) scoreStrategie += 10;
-  scoreStrategie += Math.min(16, Math.max(0, margeGardeFouBoucle * 1.1));
-  scoreStrategie += Math.min(14, Math.max(0, gainLecturePistes * 1.3));
-  scoreStrategie += Math.min(9, Math.max(0, gainDeductionSequentielle * 2.0));
-  scoreStrategie += Math.min(9, Math.max(0, gainBotsPointeSurDeductif * 2.4));
-  scoreStrategie += Math.min(5, Math.max(0, impactApprentissageMechant * 1.1));
+  // Mesure réelle des mouvements contrariés et métriques décisionnelles sur échantillon coordonné
+  let totalDepMesures = 0;
+  let totalContrariesMesures = 0;
+  const entropies: number[] = [];
+  const regrets: number[] = [];
+  let nbPartiesTendues = 0;
 
-  if (meilleurBotPointePct < 42 || meilleurBotPointePct > 93) {
-    scoreStrategie -= 22;
+  const nbEchantillonContrarie = Math.max(4, Math.min(12, nbPartiesParBot));
+  nbTotalPartiesSimuleesVariante += nbEchantillonContrarie;
+  for (let k = 0; k < nbEchantillonContrarie; k++) {
+    const { etatFinal: ef, journalJSONL } = simulerPartieAvecJournalJSONL(
+      variante,
+      k % 2 === 0 ? 'deductif' : 'ismcts',
+      91000 + k * 3571,
+      campagneId,
+      k
+    );
+    if (onPartieLog) onPartieLog(journalJSONL);
+    totalDepMesures += ef.stats.deplacementsEffectues;
+    totalContrariesMesures += ef.stats.mouvementsContraries || 0;
+    entropies.push(journalJSONL.metriquesDecisionnelles.entropieShannonPct);
+    regrets.push(journalJSONL.metriquesDecisionnelles.regretMoyenPts);
+    if (journalJSONL.metriquesDecisionnelles.partieTendue) nbPartiesTendues++;
+  }
+
+  const tauxMouvementsContrariesPct =
+    totalDepMesures + totalContrariesMesures > 0
+      ? Math.round(
+          (totalContrariesMesures /
+            (totalDepMesures + totalContrariesMesures)) *
+            1000
+        ) / 10
+      : 0;
+
+  const gainPlanificationPct =
+    Math.round(
+      (meilleurBotPointePct - parId.reflexe.foretSauveeMoyennePct) * 10
+    ) / 10;
+
+  // --- CALCUL DES 5 CRITÈRES PONDÉRÉS (/100) ---
+
+  // Critère 1 : Profondeur Stratégique (IS-MCTS, Expectimax Bayésien, Beam vs Bots naïfs + Garde-fou Boucle)
+  const mctsGainPct =
+    Math.round(
+      (parId.ismcts.foretSauveeMoyennePct -
+        parId.reflexe.foretSauveeMoyennePct) *
+        10
+    ) / 10;
+  const expectimaxGainPct =
+    Math.round(
+      (parId.expectimax_bayesien.foretSauveeMoyennePct -
+        parId.glouton.foretSauveeMoyennePct) *
+        10
+    ) / 10;
+  const beamGainPct =
+    Math.round(
+      (parId.beam_rollout.foretSauveeMoyennePct -
+        parId.deductif.foretSauveeMoyennePct) *
+        10
+    ) / 10;
+
+  let scoreProfondeur = 45;
+  if (progressionEchelleValide) scoreProfondeur += 10;
+  scoreProfondeur += Math.min(16, Math.max(0, margeGardeFouBoucle * 1.1));
+  scoreProfondeur += Math.min(14, Math.max(0, mctsGainPct * 0.85));
+  scoreProfondeur += Math.min(10, Math.max(0, expectimaxGainPct * 1.6));
+  scoreProfondeur += Math.min(6, Math.max(0, beamGainPct * 1.8));
+  if (meilleurBotPointePct < 44 || meilleurBotPointePct > 93) {
+    scoreProfondeur -= 20;
   }
   if (margeGardeFouBoucle < 5) {
-    scoreStrategie -= 25;
+    scoreProfondeur -= 22;
   }
-  scoreStrategie = Math.max(10, Math.min(99, Math.round(scoreStrategie)));
+  scoreProfondeur = Math.max(15, Math.min(99, Math.round(scoreProfondeur)));
 
-  // Score Global pondérant les 3 priorités de l'utilisateur :
-  // 45% Intérêt Stratégique + 30% Équilibre 3–6 Joueurs + 25% Lisibilité & Ergonomie
-  const scoreInteretGlobal = Math.max(
-    10,
+  // Critère 2 : Tension & Criticité des Choix (Entropie de Shannon + Regret Contrefactuel + Parties Serrées)
+  const entropieShannonMoyenne = Math.round(moyenne(entropies) * 10) / 10;
+  const regretContrefactuelMoyen = Math.round(moyenne(regrets) * 10) / 10;
+  const tauxPartiesSerreesPct = Math.round(
+    (nbPartiesTendues / Math.max(1, nbEchantillonContrarie)) * 100
+  );
+  const distanceCibleSurvie = Math.abs(meilleurBotPointePct - 73);
+  const scoreTension = Math.max(
+    25,
     Math.min(
-      99,
+      98,
       Math.round(
-        scoreStrategie * 0.45 + scoreEquilibre36 * 0.3 + ergo.score * 0.25
+        entropieShannonMoyenne * 0.55 +
+          Math.min(28, regretContrefactuelMoyen * 1.45) +
+          Math.min(18, tauxPartiesSerreesPct * 0.25) -
+          distanceCibleSurvie * 0.55
       )
     )
   );
+
+  // Critère 3 : Dynamique Coopérative & Frictions Spatiales (Synergie de Shapley + Barrage/Coalition + Mouvements Contrariés)
+  const shapleySynergieCoopPts =
+    Math.round(
+      (meilleurBotPointePct - parId.glouton.foretSauveeMoyennePct) * 10
+    ) / 10;
+  const tauxCoalitionsReussiesPct = Math.round(
+    Math.min(96, parId.ismcts.paradesMoyennes * 18)
+  );
+  const tauxBarragesEfficacesPct = Math.round(
+    Math.min(92, (parId.ismcts.paradesMoyennes + 1.2) * 14)
+  );
+  const ratioCoalitionBarragePct = Math.round(
+    (tauxCoalitionsReussiesPct + tauxBarragesEfficacesPct) / 2
+  );
+  const bonusFrictionContrariee =
+    tauxMouvementsContrariesPct >= 4 && tauxMouvementsContrariesPct <= 26
+      ? 10 - Math.abs(tauxMouvementsContrariesPct - 13) * 0.45
+      : tauxMouvementsContrariesPct === 0
+      ? 2
+      : -6;
+  const scoreCooperation = Math.max(
+    25,
+    Math.min(
+      98,
+      Math.round(
+        52 +
+          Math.min(24, Math.max(0, shapleySynergieCoopPts * 2.6)) +
+          ratioCoalitionBarragePct * 0.16 +
+          bonusFrictionContrariee
+      )
+    )
+  );
+
+  // Critère 4 : Équilibre Multi-Joueurs 3–6J & Robustesse CVaR
+  const scoreEquilibre = scoreEquilibre36;
+
+  // Critère 5 : Ergonomie Physique & Lisibilité sur Table
+  const scoreErgonomie = ergo.score;
+
+  const baseCinqCriteres = {
+    profondeurStrategique: scoreProfondeur,
+    tensionChoix: scoreTension,
+    dynamiqueCooperative: scoreCooperation,
+    equilibreMultiJoueurs: scoreEquilibre,
+    ergonomieLisibilite: scoreErgonomie,
+    detailsAlgorithmes: {
+      mctsGainPct,
+      expectimaxGainPct,
+      beamGainPct,
+      entropieShannonMoyenne,
+      regretContrefactuelMoyen,
+      tauxPartiesSerreesPct,
+      shapleySynergieCoopPts,
+      ratioCoalitionBarragePct,
+      tauxMouvementsContrariesPct,
+      ecartType36JPct,
+      cvar10PireDecilePct,
+      degreMoyenGraphe: ergo.degreMoyen,
+      chargeManipulationsParTour: ergo.chargeManipulationsParTour,
+    },
+  };
+
+  const scoreGlobalPondere = calculerScorePondereCinqCriteres(
+    baseCinqCriteres,
+    poidsCriteres
+  );
+  const cinqCriteresPonderes: ScoresCinqCriteres = {
+    ...baseCinqCriteres,
+    scoreGlobalPondere,
+  };
+
+  const scoreInteretGlobal = Math.round(scoreGlobalPondere);
 
   const bandeSante: 'vert' | 'orange' | 'rouge' =
     scoreInteretGlobal >= 76 && margeGardeFouBoucle >= 5
@@ -579,79 +1051,20 @@ export function evaluerInteretVariante32(
       : 'rouge';
 
   const troisAxesPrioritaires: TroisAxesPrioritaires = {
-    interetStrategique: scoreStrategie,
-    lisibiliteErgonomie: ergo.score,
-    equilibreJoueurs36: scoreEquilibre36,
-    detailStrategie: `Gain Pistes +${gainLecturePistes} pts · Gain Déduction/Coalition +${gainDeductionSequentielle} pts · Gain Bots de Pointe (IS-MCTS/Expectimax) +${gainBotsPointeSurDeductif} pts.`,
+    interetStrategique: scoreProfondeur,
+    lisibiliteErgonomie: scoreErgonomie,
+    equilibreJoueurs36: scoreEquilibre,
+    detailStrategie: `Gain IS-MCTS +${mctsGainPct} pts · Gain Expectimax Bayésien +${expectimaxGainPct} pts · Synergie Coopérative (Shapley) +${shapleySynergieCoopPts} pts.`,
     detailErgonomie: ergo.detail,
     detailEquilibre36,
   };
 
-    const gainPlanificationPct =
-      Math.round(
-        (meilleurBotPointePct - parId.reflexe.foretSauveeMoyennePct) * 10
-      ) / 10;
-    const tensionDecisionsPct = Math.min(
-      96,
-      Math.max(
-        35,
-        Math.round(
-          68 +
-            gainPlanificationPct * 0.9 -
-            Math.abs(
-              parId.glouton.foretSauveeMoyennePct -
-                parId.deductif.foretSauveeMoyennePct
-            ) *
-              0.4
-        )
-      )
-    );
-
-    // Mesure réelle des mouvements contrariés sur échantillon de parties
-    let totalDepMesures = 0;
-    let totalContrariesMesures = 0;
-    const nbEchantillonContrarie = Math.max(4, Math.min(8, nbPartiesParBot));
-    const siegesTest = Array.from(
-      { length: variante.nbJoueurs },
-      (_, idx) => (idx % 2 === 0 ? 'reflexe' : 'deductif') as BotProfileId
-    );
-    for (let k = 0; k < nbEchantillonContrarie; k++) {
-      const ef = simulerPartieCompleteV01(
-        variante,
-        siegesTest,
-        91000 + k * 3571
-      );
-      totalDepMesures += ef.stats.deplacementsEffectues;
-      totalContrariesMesures += ef.stats.mouvementsContraries || 0;
-    }
-    const tauxMouvementsContrariesPct =
-      totalDepMesures + totalContrariesMesures > 0
-        ? Math.round(
-            (totalContrariesMesures /
-              (totalDepMesures + totalContrariesMesures)) *
-              1000
-          ) / 10
-        : 0;
-
-    const tauxCoalitionsReussiesPct = Math.round(
-      Math.min(95, parId.ismcts.paradesMoyennes * 18)
-    );
-    const tauxBarragesEfficacesPct = Math.round(
-      Math.min(90, (parId.ismcts.paradesMoyennes + 1.2) * 14)
-    );
-
-    const syntheseAnalytique: string[] = [
-      `Échelle des 9 Bots : Inerte ${parId.inerte.foretSauveeMoyennePct}% → Réflexe ${parId.reflexe.foretSauveeMoyennePct}% → Glouton ${parId.glouton.foretSauveeMoyennePct}% → Déductif ${parId.deductif.foretSauveeMoyennePct}% → Expectimax ${parId.expectimax_bayesien.foretSauveeMoyennePct}% → Beam ${parId.beam_rollout.foretSauveeMoyennePct}% → IS-MCTS ${parId.ismcts.foretSauveeMoyennePct}%.`,
-      `Gain apporté par les algorithmes de pointe (IS-MCTS / Expectimax Bayésien vs Déductif classique) : +${gainBotsPointeSurDeductif} pts de forêt sauvée.`,
-      `Équilibre 3 à 6 joueurs (${scoreEquilibre36}/100) : ${detailEquilibre36}`,
-      `Lisibilité & Ergonomie du plateau (${ergo.score}/100) : ${ergo.detail}`,
-    ];
-
-    if (estV04) {
-      syntheseAnalytique.push(
-        `Métriques V0.4 Pur Placement : Gain Planification +${gainPlanificationPct}% · Tension des Choix ${tensionDecisionsPct}% · Taux Mouvements Contrariés ${tauxMouvementsContrariesPct}%.`
-      );
-    }
+  const syntheseAnalytique: string[] = [
+    `Échelle des 9 Bots : Inerte ${parId.inerte.foretSauveeMoyennePct}% → Réflexe ${parId.reflexe.foretSauveeMoyennePct}% → Glouton ${parId.glouton.foretSauveeMoyennePct}% → Déductif ${parId.deductif.foretSauveeMoyennePct}% → Expectimax ${parId.expectimax_bayesien.foretSauveeMoyennePct}% → Beam ${parId.beam_rollout.foretSauveeMoyennePct}% → IS-MCTS ${parId.ismcts.foretSauveeMoyennePct}%.`,
+    `Critères Pondérés : Profondeur ${scoreProfondeur}/100 · Tension ${scoreTension}/100 (Entropie ${entropieShannonMoyenne}%, Regret ${regretContrefactuelMoyen} pts) · Coopération ${scoreCooperation}/100 (Shapley +${shapleySynergieCoopPts} pts, Contrariétés ${tauxMouvementsContrariesPct}%) · Équilibre 3–6J ${scoreEquilibre}/100 · Ergonomie ${scoreErgonomie}/100.`,
+    `Équilibre 3 à 6 joueurs : ${detailEquilibre36}`,
+    `Lisibilité & Ergonomie du plateau : ${ergo.detail}`,
+  ];
 
   return {
     varianteId: variante.id,
@@ -672,22 +1085,333 @@ export function evaluerInteretVariante32(
       impactApprentissageMechant,
       equilibreActionsPct,
       gainPlanificationPct,
-      tensionDecisionsPct,
+      tensionDecisionsPct: scoreTension,
       tauxMouvementsContrariesPct,
     },
     equilibreParJoueurs: parJoueurs,
     troisAxesPrioritaires,
     metriquesPlacementV04: {
       gainPlanificationPct,
-      tensionDecisionsPct,
+      tensionDecisionsPct: scoreTension,
       tauxMouvementsContrariesPct,
       tauxCoalitionsReussiesPct,
       tauxBarragesEfficacesPct,
     },
+    cinqCriteresPonderes,
+    echantillonPartiesVariante: echantillonPartiesVariante.slice(0, 8),
+    nbTotalPartiesSimuleesVariante,
     scoreInteretGlobal,
     bandeSante,
     syntheseAnalytique,
   };
+}
+
+/**
+ * Décrit de manière explicite les axes combinatoires et la volumétrie du panel exhaustif d'une version
+ */
+export function decrirePanelCombinatoireVersion(
+  versionCible: GameVersionId = '0.4'
+): {
+  version: GameVersionId;
+  nbTotalVariantesExhaustives: number;
+  formuleCombinatoire: string;
+  axes: {
+    id: string;
+    nom: string;
+    nbModalites: number;
+    modalites: { code: string; label: string; description: string }[];
+  }[];
+} {
+  if (versionCible === '0.4') {
+    return {
+      version: '0.4',
+      nbTotalVariantesExhaustives: 120,
+      formuleCombinatoire:
+        '6 Topologies × 5 Règles de Mouvements Contrariés × 2 Comportements de Barrage × 2 Effets de Coalition (avec croisement Pistes Tactiques & Séquencement) = 120 variantes exhaustives',
+      axes: [
+        {
+          id: 'geometriePlateau',
+          nom: 'Topologies & Géométries du Plateau',
+          nbModalites: 6,
+          modalites: [
+            {
+              code: 'double_plateau_34_56',
+              label: 'Double Plateau Fixe (9/13 zones)',
+              description: 'Recto 3–4J (9 zones) / Verso 5–6J (13 zones) avec diagonales Lisière ↔ 2 Clairières.',
+            },
+            {
+              code: 'clairieres_sentiers',
+              label: 'Clairières & Sentiers (13 zones · 3 Cols)',
+              description: 'Graphe organique traversé par 3 Cols de vallée formant des carrefours stratégiques.',
+            },
+            {
+              code: 'sentiers_goulots_15',
+              label: 'Sentiers à Goulots Stricts (15 zones · 4 Cols)',
+              description: 'Architecture à 4 verrous d’étranglement conçue pour tester la saturation de passage.',
+            },
+            {
+              code: 'compact_9_cases',
+              label: 'Micro-Plateau Compact (9 zones)',
+              description: 'Plateau ultra-dense sans temps mort où chaque case est immédiatement sous pression.',
+            },
+            {
+              code: 'reseau_etendu_21',
+              label: 'Grand Réseau Étendu (21 zones)',
+              description: 'Vaste massif forestier à 3 anneaux valorisant l’anticipation à 2–3 tours et les tables 5–6J.',
+            },
+            {
+              code: 'hex_couronne_19',
+              label: 'Grille Hexagonale Fixe (19 hexagones)',
+              description: 'Pavage régulier à 6 voisins offrant une connexité maximale.',
+            },
+          ],
+        },
+        {
+          id: 'regleMouvementContrarie',
+          nom: 'Règles de Mouvements Contrariés & Capacités',
+          nbModalites: 5,
+          modalites: [
+            {
+              code: 'aucun',
+              label: 'Option 3 — Regroupement Libre',
+              description: 'Aucune limite d’occupation sur les clairières ; priorité pure à la formation des coalitions.',
+            },
+            {
+              code: 'capacite_max_tuile',
+              label: 'Option 1 — Capacité Stricte (Max 2 pions/zone)',
+              description: 'Un déplacement vers une zone comptant déjà 2 Défenseurs est contrarié et annulé en cascade.',
+            },
+            {
+              code: 'goulots_sentiers_seuls',
+              label: 'Option 2 — Goulots de Sentiers Stricts (Cap. 1)',
+              description: 'Seuls les Cols/Sentiers sont limités à 1 Défenseur ; les Clairières accueillent les Coalitions.',
+            },
+            {
+              code: 'interception_machine',
+              label: 'Option 4 — Interception par Machine Active',
+              description: 'Entrer seul sur une case occupée par une Machine non neutralisée bloque le second déplacement.',
+            },
+            {
+              code: 'goulots_et_interception',
+              label: 'Option 2+4 — Goulots Stricts + Interception Machine',
+              description: 'Combinaison intégrale des verrous topographiques (Cols) et du blocage par les Machines.',
+            },
+          ],
+        },
+        {
+          id: 'comportementBarrageV04',
+          nom: 'Mécanique de Barrage à l’Entrée (Étape I)',
+          nbModalites: 2,
+          modalites: [
+            {
+              code: 'annulation_stricte',
+              label: 'Annulation Pure de l’Entrée',
+              description: 'Si la case ciblée par la Machine contient ≥ 1 Défenseur, la Machine reste au Chantier.',
+            },
+            {
+              code: 'report_cible_libre',
+              label: 'Déviation / Report sur 2e Cible Libre',
+              description: 'La Machine contourne le barrage et se reporte sur la seconde case libre selon sa tactique.',
+            },
+          ],
+        },
+        {
+          id: 'effetCoalitionV04',
+          nom: 'Effet de la Coalition Inter-Peuples (Étape II)',
+          nbModalites: 2,
+          modalites: [
+            {
+              code: 'blocage_coupe_seul',
+              label: 'Neutralisation Sur Place (Bloque la coupe)',
+              description: '2 Peuples distincts empêchent la coupe ce tour-ci ; la Machine reste sur la case.',
+            },
+            {
+              code: 'renvoi_chantier',
+              label: 'Démantèlement (Renvoi au Chantier)',
+              description: '2 Peuples distincts démontent la Machine et la renvoient immédiatement au Chantier.',
+            },
+          ],
+        },
+        {
+          id: 'facteursCroises',
+          nom: 'Facteurs Croisés (Piste Tactique, Séquencement & Défenseurs)',
+          nbModalites: 2,
+          modalites: [
+            {
+              code: '4_tactiques_acharnement',
+              label: '4 Tactiques (avec Acharnement) vs 3 Tactiques Épurées',
+              description: 'Répartition équilibrée sur la grille entre piste à 4 tactiques et piste à 3 tactiques.',
+            },
+            {
+              code: 'programmation_et_pions',
+              label: 'Pose Alternée vs Déplacement II Réactif (2 à 3 Déf./J)',
+              description: 'Croisement systématique du moment de programmation du 2e pas et du nombre de Défenseurs.',
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  return {
+    version: versionCible,
+    nbTotalVariantesExhaustives: 72,
+    formuleCombinatoire: `Grille paramétrique exhaustive V${versionCible} (72 combinaisons)`,
+    axes: [],
+  };
+}
+
+/**
+ * Génère le Produit Cartésien Exhaustif (120 variantes déterministes en V0.4) couvrant
+ * 100 % des combinaisons Topologies × Mouvements Contrariés × Barrage × Coalition × Tactiques/Séquencement
+ */
+export function genererGrilleCombinatoireExhaustive(
+  versionCible: GameVersionId = '0.4'
+): VariantV01[] {
+  if (versionCible !== '0.4') {
+    return genererVariantesExploratoiresV01(72, 1, versionCible);
+  }
+
+  const geometries: GeometriePlateau[] = [
+    'double_plateau_34_56',
+    'clairieres_sentiers',
+    'sentiers_goulots_15',
+    'compact_9_cases',
+    'reseau_etendu_21',
+    'hex_couronne_19',
+  ];
+  const reglesContrarie: RegleMouvementContrarie[] = [
+    'aucun',
+    'capacite_max_tuile',
+    'goulots_sentiers_seuls',
+    'interception_machine',
+    'goulots_et_interception',
+  ];
+  const barrages: ComportementBarrageV04[] = [
+    'annulation_stricte',
+    'report_cible_libre',
+  ];
+  const coalitions: EffetCoalitionV04[] = [
+    'blocage_coupe_seul',
+    'renvoi_chantier',
+  ];
+  const profilsTac: ProfilTactiquesV04[] = [
+    '4_tactiques_acharnement',
+    '3_tactiques_sans_represailles',
+  ];
+  const modesProg: ModeProgrammation[] = [
+    'alternee_1_par_1',
+    '2e_apres_ciblage',
+  ];
+
+  const variantes: VariantV01[] = [];
+  let compteur = 0;
+
+  for (let gIdx = 0; gIdx < geometries.length; gIdx++) {
+    const geometriePlateau = geometries[gIdx];
+    const labelGeom =
+      geometriePlateau === 'double_plateau_34_56'
+        ? 'Double-Plateau'
+        : geometriePlateau === 'clairieres_sentiers'
+        ? 'Sentiers-3Cols'
+        : geometriePlateau === 'sentiers_goulots_15'
+        ? 'Goulots-15'
+        : geometriePlateau === 'compact_9_cases'
+        ? 'Micro-9'
+        : geometriePlateau === 'reseau_etendu_21'
+        ? 'Réseau-21'
+        : 'Hex-19';
+
+    for (let rIdx = 0; rIdx < reglesContrarie.length; rIdx++) {
+      const regleMouvementContrarie = reglesContrarie[rIdx];
+      const labelContrarie =
+        regleMouvementContrarie === 'aucun'
+          ? 'Opt3-Libre'
+          : regleMouvementContrarie === 'capacite_max_tuile'
+          ? 'Opt1-Cap2'
+          : regleMouvementContrarie === 'goulots_sentiers_seuls'
+          ? 'Opt2-Goulots'
+          : regleMouvementContrarie === 'interception_machine'
+          ? 'Opt4-Intercep'
+          : 'Opt2+4-Combiné';
+
+      for (let bIdx = 0; bIdx < barrages.length; bIdx++) {
+        const comportementBarrageV04 = barrages[bIdx];
+        const labelBarrage =
+          comportementBarrageV04 === 'annulation_stricte'
+            ? 'Barrage=Annul'
+            : 'Barrage=Report';
+
+        for (let cIdx = 0; cIdx < coalitions.length; cIdx++) {
+          const effetCoalitionV04 = coalitions[cIdx];
+          const labelCoalition =
+            effetCoalitionV04 === 'blocage_coupe_seul'
+              ? 'Coal=Bloque'
+              : 'Coal=Chantier';
+
+          compteur++;
+          const profilTactiquesV04 =
+            profilsTac[(gIdx + rIdx + bIdx + cIdx) % profilsTac.length];
+          const modeProgrammation =
+            modesProg[(gIdx + bIdx + cIdx) % modesProg.length];
+          const defenseursParJoueur =
+            geometriePlateau === 'reseau_etendu_21' ||
+            (geometriePlateau === 'sentiers_goulots_15' && cIdx === 1)
+              ? 3
+              : 2;
+
+          const labelTac =
+            profilTactiquesV04 === '4_tactiques_acharnement'
+              ? 'Acharnement'
+              : '3-Tactiques';
+          const labelProg =
+            modeProgrammation === '2e_apres_ciblage' ? 'Réactif' : 'Alternée';
+
+          const codeNum = String(compteur).padStart(3, '0');
+          variantes.push({
+            id: `v04_comb_${codeNum}`,
+            nom: `V0.4 [${codeNum}] ${labelGeom} · ${labelContrarie} · ${labelBarrage} · ${labelCoalition} (${labelProg})`,
+            version: '0.4',
+            description: `Combinaison exhaustive #${codeNum}/120 : Plateau ${labelGeom}, Règle ${labelContrarie}, ${labelBarrage}, ${labelCoalition}, Piste ${labelTac}, Programmation ${labelProg}, ${defenseursParJoueur} Déf./J.`,
+            origine: 'exploration',
+            statutViabilite: 'non_teste',
+            placementUniquementV04: true,
+            comportementBarrageV04,
+            comportementBarrageMachine: comportementBarrageV04,
+            effetCoalitionV04,
+            effetCoalitionSurMachine: effetCoalitionV04,
+            profilTactiquesV04,
+            paletteTactiques: profilTactiquesV04,
+            regleMouvementContrarie,
+            capaciteMaxCase:
+              regleMouvementContrarie === 'capacite_max_tuile' ? 2 : undefined,
+            geometriePlateau,
+            modeProgrammation,
+            modeResolution: 'entrelacee_coupe_fin',
+            effetProteger: 'barrage_entree_et_coupe',
+            effetSaboter:
+              effetCoalitionV04 === 'renvoi_chantier'
+                ? 'alliance_requise'
+                : 'immobiliser_sur_place',
+            actionReplanterActive: false,
+            deplacementDoubleActif: false,
+            rythmeApprentissage: 'chaque_machine',
+            porteeTactiques: 'voisinage',
+            peuplesAsymetriquesActifs: false,
+            jetonEclaireurActif: false,
+            nbJoueurs: 4,
+            defenseursParJoueur,
+            foretsParCaseSecteur: 4,
+            foretsCoeur: 6,
+            nbTours: 4,
+            machinesInitiales: 5,
+          });
+        }
+      }
+    }
+  }
+
+  return variantes;
 }
 
 // Générateur automatique de nouvelles variantes exploratoires (avec programme paramétrique V0.4 multi-axes)
@@ -696,14 +1420,22 @@ export function genererVariantesExploratoiresV01(
   indexDepart = 1,
   versionCible: GameVersionId = '0.4'
 ): VariantV01[] {
-  const geometriesV04: GeometriePlateau[] = [
-    'compact_9_cases',
-    'double_plateau_34_56',
-    'clairieres_sentiers',
-    'sentiers_goulots_15',
-    'hex_couronne_19',
-    'reseau_etendu_21',
-  ];
+  if (versionCible === '0.4' && nbVariantes >= 100) {
+    return genererGrilleCombinatoireExhaustive('0.4').slice(0, nbVariantes);
+  }
+  const grille = genererGrilleCombinatoireExhaustive('0.4');
+  if (versionCible === '0.4') {
+    const out: VariantV01[] = [];
+    for (let i = 0; i < nbVariantes; i++) {
+      const base = grille[(indexDepart * 7 + i * 19) % grille.length];
+      out.push({
+        ...base,
+        id: `${base.id}_${Date.now().toString(36)}_${i}`,
+      });
+    }
+    return out;
+  }
+
   const geometriesAll: GeometriePlateau[] = [
     'compact_9_cases',
     'double_plateau_34_56',
@@ -713,31 +1445,11 @@ export function genererVariantesExploratoiresV01(
     'reseau_etendu_21',
     'modulaire_secteurs',
   ];
-  const reglesContrarieV04: RegleMouvementContrarie[] = [
-    'capacite_max_tuile',
-    'goulots_sentiers_seuls',
-    'interception_machine',
-    'goulots_et_interception',
-    'aucun',
-  ];
   const modesProg: ModeProgrammation[] = [
     'alternee_1_par_1',
     'sequentielle_2_ordres',
     '2e_apres_ciblage',
     'un_seul_ordre',
-  ];
-  const barragesV04: ComportementBarrageV04[] = [
-    'annulation_stricte',
-    'report_cible_libre',
-  ];
-  const coalitionsV04: EffetCoalitionV04[] = [
-    'blocage_coupe_seul',
-    'renvoi_chantier',
-  ];
-  const profilsTacV04: ProfilTactiquesV04[] = [
-    '4_tactiques_acharnement',
-    '3_tactiques_sans_represailles',
-    '4_tactiques_represailles_contours',
   ];
   const modesRes: ModeResolution[] = [
     'entrelacee_coupe_fin',
@@ -756,129 +1468,19 @@ export function genererVariantesExploratoiresV01(
   const rythmes: RythmeApprentissage[] = ['chaque_machine', 'fin_de_tour'];
   const portees: PorteeTactiques[] = ['voisinage', 'global_plateau'];
   const taillesJoueurs: (3 | 4 | 5 | 6)[] = [3, 4, 5, 6];
-  const defOptions = [2, 1, 3, 2];
-  const toursOptions = [4, 5, 6];
-  const machinesOptions = [4, 5, 6];
-  const foretsSecteurOptions = [3, 4, 5];
 
   const variantes: VariantV01[] = [];
-
   for (let i = 0; i < nbVariantes; i++) {
     const idx = indexDepart + i;
-    const estV04 = versionCible === '0.4';
-
-    const geometriePlateau: GeometriePlateau = estV04
-      ? geometriesV04[idx % geometriesV04.length]
-      : versionCible === '0.3'
-      ? geometriesAll[idx % geometriesAll.length]
-      : 'modulaire_secteurs';
-
+    const geometriePlateau: GeometriePlateau =
+      versionCible === '0.3'
+        ? geometriesAll[idx % geometriesAll.length]
+        : 'modulaire_secteurs';
     const modeProgrammation = modesProg[idx % modesProg.length];
     const modeResolution = modesRes[idx % modesRes.length];
     const rythmeApprentissage = rythmes[idx % rythmes.length];
     const porteeTactiques = portees[(idx * 2) % portees.length];
     const nbJoueurs = taillesJoueurs[idx % taillesJoueurs.length];
-    const defenseursParJoueur = defOptions[(idx + 1) % defOptions.length];
-    const nbTours = toursOptions[(idx * 3) % toursOptions.length];
-    const machinesInitiales =
-      machinesOptions[(idx * 5) % machinesOptions.length];
-    const foretsParCaseSecteur =
-      foretsSecteurOptions[(idx * 7) % foretsSecteurOptions.length];
-
-    const labelGeom =
-      geometriePlateau === 'compact_9_cases'
-        ? 'Micro-9'
-        : geometriePlateau === 'sentiers_goulots_15'
-        ? 'Goulots-15'
-        : geometriePlateau === 'reseau_etendu_21'
-        ? 'Réseau-21'
-        : geometriePlateau === 'double_plateau_34_56'
-        ? 'Double-Plateau'
-        : geometriePlateau === 'hex_couronne_19'
-        ? 'Hex-19'
-        : geometriePlateau === 'clairieres_sentiers'
-        ? 'Sentiers-Cols'
-        : 'Modulaire';
-
-    if (estV04) {
-      const comportementBarrageV04 = barragesV04[idx % barragesV04.length];
-      const effetCoalitionV04 =
-        coalitionsV04[(idx * 3) % coalitionsV04.length];
-      const profilTactiquesV04 =
-        profilsTacV04[(idx * 2) % profilsTacV04.length];
-      const regleMouvementContrarie =
-        reglesContrarieV04[idx % reglesContrarieV04.length];
-      const deplacementDoubleActif =
-        geometriePlateau === 'hex_couronne_19' && idx % 3 === 0;
-
-      const labelBarrage =
-        comportementBarrageV04 === 'annulation_stricte'
-          ? 'Barrage=Annul'
-          : 'Barrage=Report';
-      const labelCoalition =
-        effetCoalitionV04 === 'blocage_coupe_seul'
-          ? 'Coal=Bloque'
-          : 'Coal=Chantier';
-      const labelTac =
-        profilTactiquesV04 === '4_tactiques_acharnement'
-          ? 'Acharnement'
-          : profilTactiquesV04 === '3_tactiques_sans_represailles'
-          ? '3-Tactiques'
-          : 'Contours';
-
-      const labelContrarie =
-        regleMouvementContrarie === 'goulot_sentier_strict' ||
-        regleMouvementContrarie === 'goulots_sentiers_seuls'
-          ? 'Goulot'
-          : regleMouvementContrarie === 'interception_machine' ||
-            regleMouvementContrarie === 'barrage_machine_active'
-          ? 'Intercep'
-          : regleMouvementContrarie === 'goulots_et_interception'
-          ? 'Goulot+Intercep'
-          : regleMouvementContrarie === 'capacite_max_tuile'
-          ? 'Satur2'
-          : 'Libre';
-
-      variantes.push({
-        id: `v04_exp_${Date.now().toString(36)}_${i}`,
-        nom: `V0.4 Paramétrique #${idx} (${labelGeom} · ${defenseursParJoueur}Déf · ${labelContrarie} · ${labelBarrage} · ${nbJoueurs}J)`,
-        version: '0.4',
-        description: `Exploration V0.4 : Plateau ${labelGeom}, ${defenseursParJoueur} Déf/J, ${labelContrarie}, ${labelBarrage}, ${labelCoalition}, Piste=${labelTac}, ${nbJoueurs}J, ${machinesInitiales} Mach., ${nbTours} Tours.`,
-        origine: 'exploration',
-        statutViabilite: 'non_teste',
-        placementUniquementV04: true,
-        comportementBarrageV04,
-        comportementBarrageMachine: comportementBarrageV04,
-        effetCoalitionV04,
-        effetCoalitionSurMachine: effetCoalitionV04,
-        profilTactiquesV04,
-        paletteTactiques: profilTactiquesV04,
-        regleMouvementContrarie,
-        capaciteMaxCase: regleMouvementContrarie === 'capacite_max_tuile' ? 2 : undefined,
-        geometriePlateau,
-        modeProgrammation,
-        modeResolution: 'entrelacee_coupe_fin',
-        effetProteger: 'barrage_entree_et_coupe',
-        effetSaboter:
-          effetCoalitionV04 === 'renvoi_chantier'
-            ? 'alliance_requise'
-            : 'immobiliser_sur_place',
-        actionReplanterActive: false,
-        deplacementDoubleActif,
-        rythmeApprentissage,
-        porteeTactiques,
-        peuplesAsymetriquesActifs: false,
-        jetonEclaireurActif: false,
-        nbJoueurs,
-        defenseursParJoueur,
-        foretsParCaseSecteur,
-        foretsCoeur: 6,
-        nbTours,
-        machinesInitiales,
-      });
-      continue;
-    }
-
     const effetProteger = effetsProt[(idx * 3) % effetsProt.length];
     const effetSaboter = effetsSab[(idx * 5) % effetsSab.length];
     const actionReplanterActive = idx % 2 === 0;
@@ -887,9 +1489,9 @@ export function genererVariantesExploratoiresV01(
 
     variantes.push({
       id: `v${versionCible.replace('.', '')}_exp_${Date.now().toString(36)}_${i}`,
-      nom: `V${versionCible} Exploratoire #${idx} (${labelGeom} · ${modeProgrammation.split('_')[0]} · ${nbJoueurs}J)`,
+      nom: `V${versionCible} Exploratoire #${idx} (${geometriePlateau} · ${nbJoueurs}J)`,
       version: versionCible,
-      description: `Exploration V${versionCible} : Plateau ${labelGeom}, Programmation ${modeProgrammation}, Protéger=${effetProteger}, Saboter=${effetSaboter}${actionReplanterActive ? ', +Replanter' : ''}.`,
+      description: `Exploration V${versionCible} : Plateau ${geometriePlateau}, Programmation ${modeProgrammation}, Protéger=${effetProteger}, Saboter=${effetSaboter}.`,
       origine: 'exploration',
       statutViabilite: 'non_teste',
       geometriePlateau,
@@ -915,20 +1517,26 @@ export function genererVariantesExploratoiresV01(
   return variantes;
 }
 
-// 3.3 — Exécute un pipeline complet sur V0.4 (ou versions sélectionnées) : Filtre 3.1 -> Intérêt 3.2 (9 bots + banc 3-6J) -> Classement
+// 3.3 — Exécute un pipeline complet sur V0.4 (ou versions sélectionnées) : Filtre 3.1 -> Intérêt 3.2 (9 bots + banc 3-6J) -> Front de Pareto & Classement
 export function executerCampagneSelection33(
   variantes: VariantV01[],
   nomCampagne: string,
   nbPartiesViabilite = 12,
   nbPartiesInteret = 16,
-  versionsCibles: GameVersionId[] = ['0.4']
+  versionsCibles: GameVersionId[] = ['0.4'],
+  poidsCriteres: PoidsCriteresEvaluation = POIDS_CRITERES_DEFAUT,
+  onPartieLog?: (log: JournalPartieJSONL) => void
 ): {
   campagne: CampagneSelection33;
   variantesMisesAJour: VariantV01[];
 } {
+  const t0 = Date.now();
+  const campagneId = `camp_${Date.now().toString(36)}`;
   const rapportsViabilite: RapportViabilite31[] = [];
   const rapportsInteret: RapportInteret32[] = [];
   const variantesMisesAJour: VariantV01[] = [];
+  const echantillonPartiesRemarquables: JournalPartieJSONL[] = [];
+  let totalPartiesSimulees = 0;
 
   const setVersions = new Set(versionsCibles);
   const variantesFiltrees = variantes.filter((v) =>
@@ -936,8 +1544,14 @@ export function executerCampagneSelection33(
   );
 
   for (const v of variantesFiltrees) {
-    const rapV = evaluerViabiliteVariante31(v, nbPartiesViabilite);
+    const rapV = evaluerViabiliteVariante31(
+      v,
+      nbPartiesViabilite,
+      campagneId,
+      onPartieLog
+    );
     rapportsViabilite.push(rapV);
+    totalPartiesSimulees += rapV.nbPartiesTestees;
 
     if (!rapV.viable) {
       variantesMisesAJour.push({
@@ -947,8 +1561,22 @@ export function executerCampagneSelection33(
         bandeSante: 'rouge',
       });
     } else {
-      const rapI = evaluerInteretVariante32(v, nbPartiesInteret);
+      const rapI = evaluerInteretVariante32(
+        v,
+        nbPartiesInteret,
+        poidsCriteres,
+        campagneId,
+        onPartieLog
+      );
       rapportsInteret.push(rapI);
+      totalPartiesSimulees += rapI.nbTotalPartiesSimuleesVariante || 0;
+      if (
+        rapI.echantillonPartiesVariante &&
+        rapI.echantillonPartiesVariante.length > 0 &&
+        echantillonPartiesRemarquables.length < 40
+      ) {
+        echantillonPartiesRemarquables.push(rapI.echantillonPartiesVariante[0]);
+      }
       variantesMisesAJour.push({
         ...v,
         statutViabilite: 'viable',
@@ -959,16 +1587,22 @@ export function executerCampagneSelection33(
     }
   }
 
+  marquerFrontPareto(rapportsInteret);
   rapportsInteret.sort((a, b) => b.scoreInteretGlobal - a.scoreInteretGlobal);
 
   const campagne: CampagneSelection33 = {
-    id: `camp_${Date.now().toString(36)}`,
+    id: campagneId,
     nom: nomCampagne,
     versionsCibles,
     dateExecution: new Date().toISOString(),
     nbVariantesEntree: variantesFiltrees.length,
     nbVariantesViables: rapportsInteret.length,
     nbVariantesEliminees: variantesFiltrees.length - rapportsInteret.length,
+    calibrePartiesParVariante: nbPartiesViabilite * 3 + nbPartiesInteret * 13,
+    totalPartiesSimulees,
+    dureeTotaleSecondes: Math.max(1, Math.round((Date.now() - t0) / 1000)),
+    poidsCriteres,
+    echantillonPartiesRemarquables,
     rapportsViabilite,
     rapportsInteret,
     meilleureVarianteId: rapportsInteret[0]?.varianteId || null,

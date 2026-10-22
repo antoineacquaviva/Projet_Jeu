@@ -1,24 +1,26 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   AnalyseGeminiCampagne,
   AtelierComponentId,
   BilanJoueurs36,
   CampagneSelection33,
+  EtatJobCampagneVM,
   GameVersionId,
-  GeometriePlateau,
   HybrideRecommandeGemini,
+  JournalPartieJSONL,
+  PoidsCriteresEvaluation,
   RapportInteret32,
   RapportViabilite31,
-  RegleMouvementContrarie,
   ScheduledCampaignVM,
+  ScoresCinqCriteres,
   VariantV01,
 } from '../shared/types';
+import { CATALOGUE_BOTS_V01 } from '../shared/bots';
 import {
-  construireAnalyseCampagneStructurer,
-  evaluerInteretVariante32,
-  evaluerViabiliteVariante31,
-  executerCampagneSelection33,
-  genererVariantesExploratoiresV01,
+  POIDS_CRITERES_DEFAUT,
+  calculerScorePondereCinqCriteres,
+  decrirePanelCombinatoireVersion,
+  marquerFrontPareto,
 } from '../shared/tests-engine';
 
 interface TestsViewProps {
@@ -30,8 +32,8 @@ interface TestsViewProps {
   campagnesSelection: CampagneSelection33[];
   campagnesVM: ScheduledCampaignVM[];
   analysesGemini: AnalyseGeminiCampagne[];
-  onSelectVariante: (id: string, versionId?: GameVersionId) => void;
-  onNavigateTab?: (tab: AtelierComponentId) => void;
+  onSelectVariante: (id: string, version?: GameVersionId) => void;
+  onNavigateTab: (tab: AtelierComponentId) => void;
   onUpdateStateFromTests: (payload: {
     variantes?: VariantV01[];
     rapportsViabilite?: RapportViabilite31[];
@@ -39,2080 +41,2157 @@ interface TestsViewProps {
     campagnesSelection?: CampagneSelection33[];
     campagnesVM?: ScheduledCampaignVM[];
     analysesGemini?: AnalyseGeminiCampagne[];
-    varianteActiveId?: string;
     versionActiveId?: GameVersionId;
+    varianteActiveId?: string;
   }) => void;
 }
 
-type TestsSubTab =
-  | 'viabilite_31'
-  | 'interet_32'
-  | 'selection_vm_33'
-  | 'analyse_gemini_34';
+type TriPalmaresCle =
+  | 'scoreGlobal'
+  | 'profondeurStrategique'
+  | 'tensionChoix'
+  | 'dynamiqueCooperative'
+  | 'equilibreMultiJoueurs'
+  | 'ergonomieLisibilite';
 
-function libelleGeometrieCourt(geo?: GeometriePlateau): string {
-  switch (geo) {
-    case 'compact_9_cases':
-      return 'Micro-Plateau 9 zones';
-    case 'sentiers_goulots_15':
-      return 'Sentiers Goulots 15 zones';
-    case 'reseau_etendu_21':
-      return 'Grand Réseau 21 zones';
-    case 'double_plateau_34_56':
-      return 'Double Plateau 3–4J / 5–6J';
-    case 'hex_couronne_19':
-      return 'Grille Hex 19 cases';
-    case 'clairieres_sentiers':
-      return 'Clairières & Sentiers (3 Cols)';
-    default:
-      return 'Modulaire (Secteurs)';
+function construireScoresCinqCriteresPourRapport(
+  r: RapportInteret32,
+  poids: PoidsCriteresEvaluation
+): ScoresCinqCriteres {
+  const existant = r.cinqCriteresPonderes;
+  if (existant) {
+    const nouveauScore = calculerScorePondereCinqCriteres(existant, poids);
+    return {
+      ...existant,
+      scoreGlobalPondere: nouveauScore,
+    };
   }
-}
 
-function libelleRegleContrarieCourt(regle?: RegleMouvementContrarie): string {
-  switch (regle) {
-    case 'capacite_max_tuile':
-      return 'Opt.1 Saturation (Max 2)';
-    case 'goulots_sentiers_seuls':
-    case 'goulot_sentier_strict':
-      return 'Opt.2 Goulots Seuls (Cap. 1)';
-    case 'interception_machine':
-    case 'barrage_machine_active':
-      return 'Opt.4 Interception Machine';
-    case 'goulots_et_interception':
-      return 'Opt.2+4 Goulots & Interception';
-    case 'aucun':
-    default:
-      return 'Opt.3 Libre';
-  }
+  // Fallback pour les rapports générés avant l'ajout de cinqCriteresPonderes
+  const profondeurStrategique =
+    r.troisAxesPrioritaires?.interetStrategique ?? r.scoreInteretGlobal;
+  const tensionChoix =
+    r.metriquesPlacementV04?.tensionDecisionsPct ??
+    r.indicateurs.tensionDecisionsPct ??
+    86;
+  const dynamiqueCooperative = Math.min(
+    98,
+    Math.round(
+      76 +
+        (r.indicateurs.gainDeductionSequentielle || 4) * 2.1 +
+        (r.metriquesPlacementV04?.tauxCoalitionsReussiesPct || 25) * 0.2
+    )
+  );
+  const equilibreMultiJoueurs =
+    r.troisAxesPrioritaires?.equilibreJoueurs36 ?? 88;
+  const ergonomieLisibilite =
+    r.troisAxesPrioritaires?.lisibiliteErgonomie ?? 90;
+
+  const baseSansScore: Omit<ScoresCinqCriteres, 'scoreGlobalPondere'> = {
+    profondeurStrategique,
+    tensionChoix,
+    dynamiqueCooperative,
+    equilibreMultiJoueurs,
+    ergonomieLisibilite,
+    detailsAlgorithmes: {
+      mctsGainPct: r.indicateurs.ecartDeductifSurInerte,
+      expectimaxGainPct: Math.max(
+        0,
+        r.indicateurs.ecartDeductifSurInerte - 1.5
+      ),
+      beamGainPct: Math.max(0, r.indicateurs.ecartDeductifSurInerte - 0.8),
+      entropieShannonMoyenne: tensionChoix,
+      regretContrefactuelMoyen: 12.4,
+      tauxPartiesSerreesPct: 38,
+      shapleySynergieCoopPts: r.indicateurs.gainDeductionSequentielle,
+      ratioCoalitionBarragePct:
+        r.metriquesPlacementV04?.tauxCoalitionsReussiesPct ?? 42,
+      tauxMouvementsContrariesPct:
+        r.indicateurs.tauxMouvementsContrariesPct ?? 14,
+      ecartType36JPct: 3.2,
+      cvar10PireDecilePct: 58,
+      degreMoyenGraphe: 3.6,
+      chargeManipulationsParTour: 8,
+    },
+  };
+
+  return {
+    ...baseSansScore,
+    scoreGlobalPondere: calculerScorePondereCinqCriteres(baseSansScore, poids),
+  };
 }
 
 export const TestsView: React.FC<TestsViewProps> = ({
   varianteActive,
   toutesVariantes,
-  rapportsViabilite,
-  rapportsInteret,
   campagnesSelection,
-  campagnesVM,
   analysesGemini,
   onSelectVariante,
   onNavigateTab,
   onUpdateStateFromTests,
 }) => {
-  const [subTab, setSubTab] = useState<TestsSubTab>('selection_vm_33');
-  const [enCours, setEnCours] = useState<boolean>(false);
-  const [hybrideEnCoursTitre, setHybrideEnCoursTitre] = useState<string | null>(
+  const [versionCible, setVersionCible] = useState<GameVersionId>('0.4');
+  const [calibreParties, setCalibreParties] = useState<number>(500);
+  const [poidsCriteres, setPoidsCriteres] = useState<PoidsCriteresEvaluation>({
+    ...POIDS_CRITERES_DEFAUT,
+  });
+
+  const [jobStatus, setJobStatus] = useState<EtatJobCampagneVM | null>(null);
+  const [lancementEnCours, setLancementEnCours] = useState<boolean>(false);
+  const [relanceGeminiEnCours, setRelanceGeminiEnCours] =
+    useState<boolean>(false);
+  const [instanciationId, setInstanciationId] = useState<string | null>(null);
+  const [commandeCopiee, setCommandeCopiee] = useState<boolean>(false);
+
+  const [campagneSelectionneeId, setCampagneSelectionneeId] =
+    useState<string>('');
+  const [triPalmares, setTriPalmares] =
+    useState<TriPalmaresCle>('scoreGlobal');
+  const [afficherSeulementPareto, setAfficherSeulementPareto] =
+    useState<boolean>(false);
+  const [varianteInspecteeId, setVarianteInspecteeId] = useState<string | null>(
     null
   );
-  const [notificationToast, setNotificationToast] = useState<{
-    id: string;
-    nom: string;
-    score: number;
-    geometrie: string;
-  } | null>(null);
-  const [messageSucces, setMessageSucces] = useState<string>('');
-  const [nbPartiesViab, setNbPartiesViab] = useState<number>(14);
-  const [nbPartiesInteret, setNbPartiesInteret] = useState<number>(16);
-  const [nbNouvellesExplorationsV04, setNbNouvellesExplorationsV04] =
-    useState<number>(4);
-  const [inclureBotsPointe, setInclureBotsPointe] = useState<boolean>(true);
-  const [testerEquilibre36J, setTesterEquilibre36J] = useState<boolean>(true);
+  const [afficherRapportMarkdownComplet, setAfficherRapportMarkdownComplet] =
+    useState<boolean>(false);
 
-  // Séparation stricte : Périmètre Actif V0.4 vs Archives V0.1–V0.3
-  const variantesV04 = useMemo(
-    () => toutesVariantes.filter((v) => v.version === '0.4'),
-    [toutesVariantes]
-  );
-  const variantesHistoriques = useMemo(
-    () => toutesVariantes.filter((v) => v.version !== '0.4'),
-    [toutesVariantes]
+  const [logsJsonl, setLogsJsonl] = useState<JournalPartieJSONL[]>([]);
+  const [chargementLogs, setChargementLogs] = useState<boolean>(false);
+  const [filtreLogVarianteId, setFiltreLogVarianteId] = useState<string>('');
+  const [filtreLogBotId, setFiltreLogBotId] = useState<string>('');
+  const [filtreLogNbJoueurs, setFiltreLogNbJoueurs] = useState<number>(0);
+  const [partieInspectee, setPartieInspectee] =
+    useState<JournalPartieJSONL | null>(null);
+
+  const [afficherArchives, setAfficherArchives] = useState<boolean>(false);
+
+  const panelCombinatoire = useMemo(
+    () => decrirePanelCombinatoireVersion(versionCible),
+    [versionCible]
   );
 
-  const campagnesV04 = useMemo(
+  const campagnesVersionActive = useMemo(
     () =>
       campagnesSelection.filter((c) =>
-        (c.versionsCibles || []).includes('0.4')
+        (c.versionsCibles || ['0.4']).includes(versionCible)
       ),
-    [campagnesSelection]
+    [campagnesSelection, versionCible]
   );
-  const campagnesHistoriques = useMemo(
+
+  const campagnesArchives = useMemo(
     () =>
       campagnesSelection.filter(
-        (c) => !(c.versionsCibles || []).includes('0.4')
+        (c) => !(c.versionsCibles || ['0.1']).includes('0.4')
       ),
     [campagnesSelection]
   );
 
-  const analysesV04 = useMemo(
-    () =>
-      analysesGemini.filter((a) =>
-        (a.versionsAnalysees || []).includes('0.4')
-      ),
-    [analysesGemini]
-  );
-  const analysesHistoriques = useMemo(
-    () =>
-      analysesGemini.filter(
-        (a) => !(a.versionsAnalysees || []).includes('0.4')
-      ),
-    [analysesGemini]
-  );
-
-  const campagnesVMV04 = useMemo(
-    () =>
-      campagnesVM.filter((c) => (c.versionsCibles || []).includes('0.4')),
-    [campagnesVM]
-  );
-  const campagnesVMHistoriques = useMemo(
-    () =>
-      campagnesVM.filter((c) => !(c.versionsCibles || []).includes('0.4')),
-    [campagnesVM]
-  );
-
-  const [analyseSelectionneeId, setAnalyseSelectionneeId] = useState<string>(
-    analysesV04[0]?.id || analysesGemini[0]?.id || ''
-  );
-
-  // Formulaire nouvelle tâche planifiée VM Oracle Cloud (V0.4)
-  const [nouveauNomVM, setNouveauNomVM] = useState<string>(
-    'Exploration Nocturne V0.4 — 6 Topologies, Options Contrariées 1·2·4 & Banc 3–6J'
-  );
-  const [nouveauCronVM, setNouveauCronVM] = useState<string>('0 2 * * *');
-
-  const rapportViabActif =
-    rapportsViabilite.find((r) => r.varianteId === varianteActive.id) || null;
-  const rapportInteretActif =
-    rapportsInteret.find((r) => r.varianteId === varianteActive.id) || null;
-
-  const analyseActiveV04 =
-    analysesV04.find((a) => a.id === analyseSelectionneeId) ||
-    analysesV04[0] ||
-    analysesGemini[0] ||
-    null;
-
-  const campagneActiveV04 = campagnesV04[0] || campagnesSelection[0] || null;
-
-  // Map des variantes pour enrichir les lignes du palmarès avec leurs paramètres V0.4
-  const mapVariantes = useMemo(
-    () => new Map(toutesVariantes.map((v) => [v.id, v])),
-    [toutesVariantes]
-  );
-
-  // 3.1 : Tester la viabilité de la variante active
-  const handleRunViabiliteActive = async () => {
-    setEnCours(true);
-    try {
-      const resp = await fetch('/api/atelier/tests/viabilite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          varianteId: varianteActive.id,
-          nbParties: nbPartiesViab,
-        }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        onUpdateStateFromTests({
-          variantes: data.state.variantes,
-          rapportsViabilite: data.state.rapportsViabilite,
-        });
-        setEnCours(false);
-        return;
-      }
-    } catch (_e) {
-      // Exécution isomorphe directe en secours
-    }
-    const rap = evaluerViabiliteVariante31(varianteActive, nbPartiesViab);
-    const majVars = toutesVariantes.map((v) =>
-      v.id === varianteActive.id
-        ? {
-            ...v,
-            statutViabilite: (rap.viable ? 'viable' : 'eliminee') as
-              | 'viable'
-              | 'eliminee',
-            motifElimination: rap.motifElimination,
-          }
-        : v
-    );
-    onUpdateStateFromTests({
-      variantes: majVars,
-      rapportsViabilite: [
-        rap,
-        ...rapportsViabilite.filter((r) => r.varianteId !== varianteActive.id),
-      ],
-    });
-    setEnCours(false);
-  };
-
-  // Générer un lot de nouvelles variantes exploratoires V0.4 et éliminer immédiatement les non-viables
-  const handleGenererEtFiltrerLotV04 = async (nbAGenerer = 4) => {
-    setEnCours(true);
-    try {
-      const resp = await fetch('/api/atelier/variants/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nbVariantes: nbAGenerer,
-          filtrerImmediatement: true,
-          versionCible: '0.4',
-        }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        onUpdateStateFromTests({
-          variantes: data.state.variantes,
-          rapportsViabilite: data.state.rapportsViabilite,
-        });
-        setMessageSucces(
-          `${nbAGenerer} nouvelles variantes exploratoires V0.4 générées et passées au filtre coupe-circuit 3.1 !`
-        );
-        setTimeout(() => setMessageSucces(''), 5000);
-        setEnCours(false);
-        return;
-      }
-    } catch (_e) {
-      // Fallback local
-    }
-    const nouvelles = genererVariantesExploratoiresV01(
-      nbAGenerer,
-      toutesVariantes.length + 1,
-      '0.4'
-    );
-    const nouvRaps: RapportViabilite31[] = [];
-    for (const v of nouvelles) {
-      const r = evaluerViabiliteVariante31(v, 12);
-      nouvRaps.push(r);
-      v.statutViabilite = r.viable ? 'viable' : 'eliminee';
-      v.motifElimination = r.motifElimination;
-    }
-    onUpdateStateFromTests({
-      variantes: [...nouvelles, ...toutesVariantes],
-      rapportsViabilite: [...nouvRaps, ...rapportsViabilite],
-    });
-    setMessageSucces(
-      `${nbAGenerer} nouvelles variantes exploratoires V0.4 générées et filtrées !`
-    );
-    setTimeout(() => setMessageSucces(''), 5000);
-    setEnCours(false);
-  };
-
-  // Purger toutes les variantes éliminées
-  const handlePurgerEliminees = async () => {
-    setEnCours(true);
-    try {
-      const resp = await fetch('/api/atelier/variants/eliminated', {
-        method: 'DELETE',
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        onUpdateStateFromTests({ variantes: data.state.variantes });
-        setEnCours(false);
-        return;
-      }
-    } catch (_e) {
-      // Fallback local
-    }
-    const restantes = toutesVariantes.filter(
-      (v) => v.statutViabilite !== 'eliminee'
-    );
-    onUpdateStateFromTests({ variantes: restantes });
-    setEnCours(false);
-  };
-
-  // 3.2 : Tester l'intérêt sur l'échelle des 9 bots + banc 3-6 joueurs + métriques V0.4
-  const handleRunInteretActive = async () => {
-    setEnCours(true);
-    try {
-      const resp = await fetch('/api/atelier/tests/interet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          varianteId: varianteActive.id,
-          nbPartiesParBot: nbPartiesInteret,
-          inclureBotsPointe,
-          testerEquilibre36J,
-        }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        onUpdateStateFromTests({
-          variantes: data.state.variantes,
-          rapportsInteret: data.state.rapportsInteret,
-        });
-        setEnCours(false);
-        return;
-      }
-    } catch (_e) {
-      // Fallback local
-    }
-    const rap = evaluerInteretVariante32(varianteActive, nbPartiesInteret);
-    const majVars = toutesVariantes.map((v) =>
-      v.id === varianteActive.id
-        ? {
-            ...v,
-            scoreInteretDernierTest: rap.scoreInteretGlobal,
-            bandeSante: rap.bandeSante,
-          }
-        : v
-    );
-    onUpdateStateFromTests({
-      variantes: majVars,
-      rapportsInteret: [
-        rap,
-        ...rapportsInteret.filter((r) => r.varianteId !== varianteActive.id),
-      ],
-    });
-    setEnCours(false);
-  };
-
-  // 3.3 : Lancer une campagne V0.4 (Génération d'un lot exploratoire V0.4 + Évaluation complète V0.4 + Synthèse Gemini)
-  const handleRunCampagneV04 = async (nbExplo = nbNouvellesExplorationsV04) => {
-    setEnCours(true);
-    const suffixeExplo =
-      nbExplo > 0 ? `+${nbExplo} Explorations · ` : 'Catalogue V0.4 · ';
-    const nomCampagne = `Campagne V0.4 Pur Placement (${suffixeExplo}${
-      inclureBotsPointe ? '9 Bots dont IS-MCTS' : '6 Bots'
-    }${testerEquilibre36J ? ' + Banc 3–6J' : ''})`;
-
-    try {
-      const resp = await fetch('/api/atelier/tests/selection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nomCampagne,
-          nbPartiesViabilite: nbPartiesViab,
-          nbPartiesInteret: nbPartiesInteret,
-          inclureDejaEliminees: false,
-          versionsCibles: ['0.4'],
-          nbNouvellesExplorationsV04: nbExplo,
-          inclureBotsPointe,
-          testerEquilibre36J,
-          lancerAnalyseGemini: true,
-        }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        onUpdateStateFromTests({
-          variantes: data.state.variantes,
-          rapportsViabilite: data.state.rapportsViabilite,
-          rapportsInteret: data.state.rapportsInteret,
-          campagnesSelection: data.state.campagnesSelection,
-          analysesGemini: data.state.analysesGemini,
-        });
-        if (data.analyseGemini) {
-          setAnalyseSelectionneeId(data.analyseGemini.id);
-        }
-        setMessageSucces(
-          nbExplo > 0
-            ? `${nbExplo} nouvelles variantes V0.4 générées et Campagne V0.4 complète terminée avec synthèse Gemini !`
-            : 'Campagne V0.4 sur le catalogue existant terminée et analysée par Gemini !'
-        );
-        setTimeout(() => setMessageSucces(''), 6000);
-        setEnCours(false);
-        return;
-      }
-    } catch (_e) {
-      // Fallback local isomorphe
-    }
-
-    let poolVariantes = [...toutesVariantes];
-    if (nbExplo > 0) {
-      const nouvelles = genererVariantesExploratoiresV01(
-        nbExplo,
-        toutesVariantes.length + 1,
-        '0.4'
+  const campagneActive: CampagneSelection33 | undefined = useMemo(() => {
+    if (campagneSelectionneeId) {
+      const found = campagnesSelection.find(
+        (c) => c.id === campagneSelectionneeId
       );
-      poolVariantes = [...nouvelles, ...poolVariantes];
+      if (found) return found;
     }
+    return campagnesVersionActive[0] || campagnesSelection[0];
+  }, [campagneSelectionneeId, campagnesVersionActive, campagnesSelection]);
 
-    const cibles = poolVariantes.filter(
-      (v) => v.version === '0.4' && v.statutViabilite !== 'eliminee'
+  const analyseGeminiActive: AnalyseGeminiCampagne | undefined = useMemo(() => {
+    if (!campagneActive) return analysesGemini[0];
+    return (
+      analysesGemini.find((a) => a.campagneId === campagneActive.id) ||
+      analysesGemini[0]
     );
-    const { campagne, variantesMisesAJour } = executerCampagneSelection33(
-      cibles,
-      nomCampagne,
-      nbPartiesViab,
-      nbPartiesInteret,
-      ['0.4']
-    );
-    const mapMaj = new Map(variantesMisesAJour.map((v) => [v.id, v]));
-    const toutesMaj = poolVariantes.map((v) => mapMaj.get(v.id) || v);
-    const analyseLocale = construireAnalyseCampagneStructurer(campagne);
-    setAnalyseSelectionneeId(analyseLocale.id);
-    onUpdateStateFromTests({
-      variantes: toutesMaj,
-      rapportsViabilite: [...campagne.rapportsViabilite, ...rapportsViabilite],
-      rapportsInteret: [...campagne.rapportsInteret, ...rapportsInteret],
-      campagnesSelection: [campagne, ...campagnesSelection],
-      analysesGemini: [analyseLocale, ...analysesGemini],
-    });
-    setMessageSucces(
-      nbExplo > 0
-        ? `${nbExplo} nouvelles variantes V0.4 générées et Campagne V0.4 terminée !`
-        : 'Campagne V0.4 terminée !'
-    );
-    setTimeout(() => setMessageSucces(''), 6000);
-    setEnCours(false);
-  };
+  }, [campagneActive, analysesGemini]);
 
-  // Exécuter immédiatement une tâche VM Oracle Cloud
-  const handleRunVMNow = async (scheduleId: string) => {
-    setEnCours(true);
+  const rafraichirEtatGlobalServeur = useCallback(async () => {
     try {
-      const resp = await fetch('/api/atelier/vm/run-now', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scheduleId }),
-      });
+      const resp = await fetch('/api/atelier/state');
       if (resp.ok) {
         const data = await resp.json();
         onUpdateStateFromTests({
-          variantes: data.state.variantes,
-          rapportsViabilite: data.state.rapportsViabilite,
-          rapportsInteret: data.state.rapportsInteret,
-          campagnesSelection: data.state.campagnesSelection,
-          campagnesVM: data.state.campagnesPlanifieesVM,
-          analysesGemini: data.state.analysesGemini,
+          variantes: data.variantes,
+          rapportsViabilite: data.rapportsViabilite,
+          rapportsInteret: data.rapportsInteret,
+          campagnesSelection: data.campagnesSelection,
+          analysesGemini: data.analysesGemini,
         });
-        if (data.analyseGemini) {
-          setAnalyseSelectionneeId(data.analyseGemini.id);
+        if (
+          Array.isArray(data.campagnesSelection) &&
+          data.campagnesSelection.length > 0
+        ) {
+          setCampagneSelectionneeId(data.campagnesSelection[0].id);
         }
-        setMessageSucces(
-          'Campagne VM Oracle Cloud V0.4 exécutée avec succès et synthèse Gemini mise à jour !'
-        );
-        setTimeout(() => setMessageSucces(''), 6000);
-        setEnCours(false);
-        return;
+      }
+    } catch (_e) {
+      // Ignorer
+    }
+  }, [onUpdateStateFromTests]);
+
+  useEffect(() => {
+    let ignore = false;
+    let prevStatut: string | undefined;
+
+    async function checkJobStatus() {
+      try {
+        const resp = await fetch('/api/atelier/campaign/status');
+        if (resp.ok) {
+          const data = await resp.json();
+          if (!ignore && data.jobStatus) {
+            const nouveauStatut: EtatJobCampagneVM = data.jobStatus;
+            setJobStatus(nouveauStatut);
+
+            if (
+              (prevStatut === 'en_cours' || prevStatut === 'analyse_ia') &&
+              (nouveauStatut.statut === 'termine' ||
+                nouveauStatut.statut === 'interrompu')
+            ) {
+              await rafraichirEtatGlobalServeur();
+            }
+            prevStatut = nouveauStatut.statut;
+          }
+        }
+      } catch (_e) {
+        // Ignorer
+      }
+    }
+
+    checkJobStatus();
+    const estActif =
+      jobStatus?.statut === 'en_cours' || jobStatus?.statut === 'analyse_ia';
+    const intervalMs = estActif ? 1200 : 4000;
+    const timer = setInterval(checkJobStatus, intervalMs);
+    return () => {
+      ignore = true;
+      clearInterval(timer);
+    };
+  }, [jobStatus?.statut, rafraichirEtatGlobalServeur]);
+
+  const chargerLogsCampagne = useCallback(async () => {
+    if (!campagneActive) return;
+    setChargementLogs(true);
+    try {
+      const params = new URLSearchParams();
+      params.set('campagneId', campagneActive.id);
+      if (filtreLogVarianteId) params.set('varianteId', filtreLogVarianteId);
+      if (filtreLogBotId) params.set('botId', filtreLogBotId);
+      if (filtreLogNbJoueurs > 0)
+        params.set('nbJoueurs', String(filtreLogNbJoueurs));
+      params.set('limit', '60');
+
+      const resp = await fetch(`/api/atelier/campaign/logs?${params.toString()}`);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data.logs) && data.logs.length > 0) {
+          setLogsJsonl(data.logs);
+          setChargementLogs(false);
+          return;
+        }
       }
     } catch (_e) {
       // Fallback
     }
-    await handleRunCampagneV04(nbNouvellesExplorationsV04);
-  };
 
-  // Relancer une analyse Gemini sur la dernière campagne V0.4
-  const handleRelancerAnalyseGemini = async (campagneId?: string) => {
-    setEnCours(true);
-    const idCible = campagneId || campagneActiveV04?.id;
+    const fallbackLogs: JournalPartieJSONL[] = [];
+    if (
+      campagneActive.echantillonPartiesRemarquables &&
+      campagneActive.echantillonPartiesRemarquables.length > 0
+    ) {
+      fallbackLogs.push(...campagneActive.echantillonPartiesRemarquables);
+    } else {
+      for (const r of campagneActive.rapportsInteret) {
+        if (r.echantillonPartiesVariante) {
+          fallbackLogs.push(...r.echantillonPartiesVariante);
+        }
+      }
+    }
+    const filtres = fallbackLogs.filter(
+      (l) =>
+        (!filtreLogVarianteId || l.varianteId === filtreLogVarianteId) &&
+        (!filtreLogBotId || l.botId === filtreLogBotId) &&
+        (filtreLogNbJoueurs === 0 || l.nbJoueurs === filtreLogNbJoueurs)
+    );
+    setLogsJsonl(filtres.slice(0, 60));
+    setChargementLogs(false);
+  }, [
+    campagneActive,
+    filtreLogVarianteId,
+    filtreLogBotId,
+    filtreLogNbJoueurs,
+  ]);
+
+  useEffect(() => {
+    chargerLogsCampagne();
+  }, [chargerLogsCampagne]);
+
+  const rapportsTriesEtPonderes = useMemo(() => {
+    if (!campagneActive) return [];
+    const liste: RapportInteret32[] = campagneActive.rapportsInteret.map(
+      (r) => {
+        const cinq = construireScoresCinqCriteresPourRapport(r, poidsCriteres);
+        return {
+          ...r,
+          cinqCriteresPonderes: cinq,
+          scoreInteretGlobal: cinq.scoreGlobalPondere,
+        };
+      }
+    );
+    marquerFrontPareto(liste);
+
+    const filtree = afficherSeulementPareto
+      ? liste.filter((r) => r.cinqCriteresPonderes?.estParetoOptimal)
+      : liste;
+
+    return [...filtree].sort((a, b) => {
+      const ca = a.cinqCriteresPonderes!;
+      const cb = b.cinqCriteresPonderes!;
+      if (triPalmares === 'profondeurStrategique')
+        return cb.profondeurStrategique - ca.profondeurStrategique;
+      if (triPalmares === 'tensionChoix')
+        return cb.tensionChoix - ca.tensionChoix;
+      if (triPalmares === 'dynamiqueCooperative')
+        return cb.dynamiqueCooperative - ca.dynamiqueCooperative;
+      if (triPalmares === 'equilibreMultiJoueurs')
+        return cb.equilibreMultiJoueurs - ca.equilibreMultiJoueurs;
+      if (triPalmares === 'ergonomieLisibilite')
+        return cb.ergonomieLisibilite - ca.ergonomieLisibilite;
+      return cb.scoreGlobalPondere - ca.scoreGlobalPondere;
+    });
+  }, [campagneActive, poidsCriteres, triPalmares, afficherSeulementPareto]);
+
+  const estimationsVolumetrie = useMemo(() => {
+    const nbVariantes = panelCombinatoire.nbTotalVariantesExhaustives;
+    const partiesTotales = Math.round(nbVariantes * calibreParties * 0.9);
+    const tailleMo = Math.round(((partiesTotales * 0.68) / 1024) * 10) / 10;
+    const dureeEstimeeSec = Math.max(4, Math.round(partiesTotales / 950));
+    return {
+      nbVariantes,
+      partiesTotales,
+      tailleMo,
+      dureeEstimeeSec,
+    };
+  }, [panelCombinatoire.nbTotalVariantesExhaustives, calibreParties]);
+
+  const handleDemarrerCampagneVM = async () => {
+    setLancementEnCours(true);
     try {
-      const resp = await fetch('/api/atelier/campaigns/analyze-gemini', {
+      const resp = await fetch('/api/atelier/campaign/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          campagneId: idCible,
+          versionCible,
+          calibrePartiesParVariante: calibreParties,
+          poidsCriteres,
+          nomCampagne: `Campagne Exhaustive V${versionCible} (${panelCombinatoire.nbTotalVariantesExhaustives} variantes × ${calibreParties} parties/var.)`,
         }),
       });
       if (resp.ok) {
         const data = await resp.json();
-        onUpdateStateFromTests({
-          analysesGemini: data.state.analysesGemini,
-        });
-        if (data.analyse?.id) {
-          setAnalyseSelectionneeId(data.analyse.id);
+        if (data.jobStatus) {
+          setJobStatus(data.jobStatus);
         }
-        setMessageSucces('Analyse Gemini V0.4 régénérée avec succès !');
-        setTimeout(() => setMessageSucces(''), 5000);
-        setEnCours(false);
-        return;
       }
-    } catch (_e) {
-      // Fallback local
+    } catch (_err) {
+      // Ignorer
+    } finally {
+      setLancementEnCours(false);
     }
-    const camp =
-      campagnesSelection.find((c) => c.id === idCible) || campagneActiveV04;
-    if (camp) {
-      const ana = construireAnalyseCampagneStructurer(camp);
-      setAnalyseSelectionneeId(ana.id);
-      onUpdateStateFromTests({
-        analysesGemini: [ana, ...analysesGemini],
-      });
-    }
-    setEnCours(false);
   };
 
-  // Instancier en 1 clic une variante hybride V0.4 recommandée par Gemini
-  const handleCreerHybrideUnClic = async (hybride: HybrideRecommandeGemini) => {
-    setEnCours(true);
-    setHybrideEnCoursTitre(hybride.titre);
+  const handleArreterCampagneVM = async () => {
+    try {
+      const resp = await fetch('/api/atelier/campaign/stop', {
+        method: 'POST',
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.jobStatus) setJobStatus(data.jobStatus);
+      }
+    } catch (_e) {
+      // Ignorer
+    }
+  };
+
+  const handleRelancerAnalyseGemini = async () => {
+    if (!campagneActive) return;
+    setRelanceGeminiEnCours(true);
+    try {
+      const resp = await fetch('/api/atelier/campaigns/analyze-gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campagneId: campagneActive.id }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.state) {
+          onUpdateStateFromTests({
+            analysesGemini: data.state.analysesGemini,
+          });
+        }
+      }
+    } catch (_e) {
+      // Ignorer
+    } finally {
+      setRelanceGeminiEnCours(false);
+    }
+  };
+
+  const handleInstancierHybride = async (hybride: HybrideRecommandeGemini) => {
+    const hybId = hybride.varianteHybride.id;
+    setInstanciationId(hybId);
     try {
       const resp = await fetch(
         '/api/atelier/variants/from-gemini-recommendation',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            hybride,
-            evaluerImmediatement: true,
-          }),
+          body: JSON.stringify({ hybride, evaluerImmediatement: true }),
         }
       );
       if (resp.ok) {
         const data = await resp.json();
-        const score = data.variante.scoreInteretDernierTest ?? 92;
-        onUpdateStateFromTests({
-          variantes: data.state.variantes,
-          rapportsViabilite: data.state.rapportsViabilite,
-          rapportsInteret: data.state.rapportsInteret,
-          varianteActiveId: data.variante.id,
-          versionActiveId: data.variante.version || '0.4',
-        });
-        onSelectVariante(data.variante.id, data.variante.version || '0.4');
-        const msg = `Variante hybride « ${data.variante.nom} » créée, évaluée (Score ${score}/100) et activée !`;
-        setMessageSucces(msg);
-        setNotificationToast({
-          id: data.variante.id,
-          nom: data.variante.nom,
-          score,
-          geometrie: data.variante.geometriePlateau || 'double_plateau_34_56',
-        });
-        setTimeout(() => setMessageSucces(''), 8000);
-        setEnCours(false);
-        setHybrideEnCoursTitre(null);
-        return;
+        if (data.state && data.variante) {
+          onUpdateStateFromTests({
+            variantes: data.state.variantes,
+            rapportsViabilite: data.state.rapportsViabilite,
+            rapportsInteret: data.state.rapportsInteret,
+            versionActiveId: data.variante.version || '0.4',
+            varianteActiveId: data.variante.id,
+          });
+          onNavigateTab('proto');
+        }
       }
     } catch (_e) {
-      // Fallback local
+      // Fallback
+    } finally {
+      setInstanciationId(null);
     }
-    const nouv: VariantV01 = {
-      ...hybride.varianteHybride,
-      id:
-        hybride.varianteHybride?.id ||
-        `v04_hybride_${Date.now().toString(36)}`,
-      version: hybride.varianteHybride?.version || '0.4',
-      origine: 'hybride_gemini',
-      statutViabilite: 'viable',
-    };
-    const rapViab = evaluerViabiliteVariante31(nouv, 4);
-    const rapInt = evaluerInteretVariante32(nouv, 4);
-    nouv.scoreInteretDernierTest = rapInt.scoreInteretGlobal;
-    nouv.bandeSante = rapInt.bandeSante;
-    const majVariantes = [
-      nouv,
-      ...toutesVariantes.filter((v) => v.id !== nouv.id),
-    ];
-    onUpdateStateFromTests({
-      variantes: majVariantes,
-      rapportsViabilite: [
-        rapViab,
-        ...rapportsViabilite.filter((r) => r.varianteId !== nouv.id),
-      ],
-      rapportsInteret: [
-        rapInt,
-        ...rapportsInteret.filter((r) => r.varianteId !== nouv.id),
-      ],
-      varianteActiveId: nouv.id,
-      versionActiveId: nouv.version || '0.4',
-    });
-    onSelectVariante(nouv.id, nouv.version || '0.4');
-    const msg = `Variante hybride « ${nouv.nom} » créée et activée (Score ${nouv.scoreInteretDernierTest}/100) !`;
-    setMessageSucces(msg);
-    setNotificationToast({
-      id: nouv.id,
-      nom: nouv.nom,
-      score: nouv.scoreInteretDernierTest ?? 92,
-      geometrie: nouv.geometriePlateau || 'double_plateau_34_56',
-    });
-    setTimeout(() => setMessageSucces(''), 8000);
-    setEnCours(false);
-    setHybrideEnCoursTitre(null);
   };
 
-  // Télécharger le rapport Markdown Gemini
-  const handleDownloadMarkdown = (analyse: AnalyseGeminiCampagne) => {
-    const blob = new Blob([analyse.rapportMarkdown], {
+  const handleTelechargerRapportMarkdown = () => {
+    if (!analyseGeminiActive) return;
+    const blob = new Blob([analyseGeminiActive.rapportMarkdown], {
       type: 'text/markdown;charset=utf-8',
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `rapport-gemini-${analyse.campagneId}.md`;
+    a.download = `bilan-campagne-${analyseGeminiActive.campagneId}.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
-  // Ajouter une nouvelle planification VM Oracle Cloud V0.4
-  const handleAddScheduleVM = async () => {
-    if (!nouveauNomVM.trim()) return;
-    const nouv: ScheduledCampaignVM = {
-      id: `vm_sched_${Date.now().toString(36)}`,
-      nom: nouveauNomVM.trim(),
-      cibleExecution: 'vm_oracle_cloud',
-      cronExpression: nouveauCronVM,
-      actif: true,
-      nbVariantesAGenerer: Math.max(2, nbNouvellesExplorationsV04),
-      nbPartiesViabilite: nbPartiesViab,
-      nbPartiesInteret: nbPartiesInteret,
-      eliminerNonViablesAuto: true,
-      autoCommitGithub: false,
-      versionsCibles: ['0.4'],
-      inclureBotsPointe: true,
-      testerEquilibre36J: true,
-      prochaineExecutionEstimee: 'Cette nuit à 02:00 (VM Oracle Cloud)',
-      statut: 'planifiee',
-      journalVM: [
-        `[${new Date().toLocaleTimeString('fr-FR')}] Tâche planifiée V0.4 Pur Placement (+${Math.max(
-          2,
-          nbNouvellesExplorationsV04
-        )} explorations) enregistrée pour le démon VM Oracle Cloud (scripts/vm-worker.ts).`,
-      ],
-    };
-    try {
-      const resp = await fetch('/api/atelier/vm/schedule', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nouv),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        onUpdateStateFromTests({
-          campagnesVM: data.state.campagnesPlanifieesVM,
-        });
-        return;
-      }
-    } catch (_e) {
-      // Fallback
-    }
-    onUpdateStateFromTests({ campagnesVM: [nouv, ...campagnesVM] });
+  const commandeCliVM = `npx tsx scripts/vm-worker.ts --version ${versionCible} --calibre ${calibreParties}`;
+
+  const handleCopierCommandeCLI = () => {
+    navigator.clipboard?.writeText(commandeCliVM);
+    setCommandeCopiee(true);
+    setTimeout(() => setCommandeCopiee(false), 2500);
   };
 
-  const nbElimineesV04 = variantesV04.filter(
-    (v) => v.statutViabilite === 'eliminee'
-  ).length;
-  const nbViablesV04 = variantesV04.filter(
-    (v) => v.statutViabilite === 'viable'
-  ).length;
-  const nbElimineesTotal = toutesVariantes.filter(
-    (v) => v.statutViabilite === 'eliminee'
-  ).length;
+  const sommePoids =
+    poidsCriteres.profondeurStrategique +
+    poidsCriteres.tensionChoix +
+    poidsCriteres.dynamiqueCooperative +
+    poidsCriteres.equilibreMultiJoueurs +
+    poidsCriteres.ergonomieLisibilite;
 
-  const listeEquilibre36: BilanJoueurs36[] =
-    rapportInteretActif?.equilibreParJoueurs
-      ? ([3, 4, 5, 6] as const).map(
-          (n) => rapportInteretActif.equilibreParJoueurs![n]
-        )
-      : [];
+  const formatDuree = (sec: number): string => {
+    if (sec < 60) return `${sec} s`;
+    const min = Math.floor(sec / 60);
+    const remSec = sec % 60;
+    if (min < 60) return `${min} min ${remSec} s`;
+    const h = Math.floor(min / 60);
+    const remMin = min % 60;
+    return `${h} h ${remMin} min`;
+  };
+
+  const rapportInspecte = useMemo(
+    () =>
+      rapportsTriesEtPonderes.find(
+        (r) => r.varianteId === varianteInspecteeId
+      ) || rapportsTriesEtPonderes[0],
+    [rapportsTriesEtPonderes, varianteInspecteeId]
+  );
+
+  const jobEstActif =
+    jobStatus?.statut === 'en_cours' || jobStatus?.statut === 'analyse_ia';
 
   return (
-    <div className="space-y-6">
-      {/* En-tête épuré centré exclusivement sur la Version 0.4 */}
-      <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="font-display text-lg font-semibold text-[#16211B]">
-              Tests V0.4 — Pur Placement, 6 Topologies, Tension des Choix & Équilibre 3–6J
-            </h2>
-            <p className="text-xs text-[#55645B] mt-0.5">
-              Évaluez la pertinence stratégique du Pur Placement (anticipation multi-coups, tension des choix, mouvements contrariés Options 1·2·4) de 3 à 6 joueurs.
+    <div className="space-y-8 pb-14">
+      {/* EN-TÊTE ÉDITORIAL & NAVIGATION DES 6 SECTIONS DU PROTOCOLE */}
+      <section className="bg-white border border-[#D8DFD5] rounded-xl p-6 shadow-xs">
+        <div className="flex flex-wrap items-start justify-between gap-6 pb-5 border-b border-[#D8DFD5]">
+          <div className="max-w-3xl">
+            <div className="text-xs font-mono uppercase tracking-wider text-[#256B45] font-semibold mb-1">
+              Banc d’Essai Combinatoire & Évaluation Multi-Critères sur VM Oracle
+            </div>
+            <h1 className="font-display text-2xl font-bold text-[#16211B] tracking-tight">
+              Campagnes de Tests Exhaustives — Version {versionCible}
+            </h1>
+            <p className="text-sm text-[#55645B] mt-1.5 leading-relaxed">
+              Validation en profondeur d’une version par balayage intégral de son produit cartésien d’options et de paramètres, journalisation complète de chaque partie (<code className="font-mono text-xs bg-[#F4F5F0] px-1.5 py-0.5 rounded">.jsonl</code>), évaluation par 5 algorithmes dédiés et sélection assistée par IA sur le Front de Pareto.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 text-xs font-mono-tabular">
-            <div>
-              Variantes V0.4 Viables :{' '}
-              <strong className="text-[#256B45]">{nbViablesV04}</strong>
-            </div>
-            <div>
-              Éliminées V0.4 :{' '}
-              <strong className="text-[#C2412D]">{nbElimineesV04}</strong>
-            </div>
-            {nbElimineesTotal > 0 && (
-              <button
-                onClick={handlePurgerEliminees}
-                disabled={enCours}
-                className="px-3 py-1.5 rounded-lg bg-[#C2412D] text-white font-sans font-semibold hover:bg-red-800 whitespace-nowrap shrink-0"
-              >
-                Purger les {nbElimineesTotal} éliminées
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Guide rapide : Comment se déclenchent les tests V0.4 */}
-        <div className="pt-3 border-t border-[#EAECE4] grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-[#55645B]">
-          <div>
-            <strong className="text-[#16211B]">
-              1. Campagne Exploratoire V0.4 (Onglet 3.3) :
-            </strong>{' '}
-            Génère automatiquement de nouvelles variantes V0.4 (topologies, nb de défenseurs, Options 1·2·4) puis lance le banc comparatif complet.
-          </div>
-          <div>
-            <strong className="text-[#16211B]">
-              2. Inspection Détaillée (Onglet 3.2) :
-            </strong>{' '}
-            Mesure sur une variante précise l’échelle des 9 Bots, le Gain de Planification, la Tension des Choix et le banc 3 à 6 joueurs.
-          </div>
-          <div>
-            <strong className="text-[#16211B]">
-              3. Coupe-Circuit Rapide (Onglet 3.1) :
-            </strong>{' '}
-            Vérifie en quelques secondes qu’une variante respecte les 5 invariants de survie avant de l’inclure au palmarès.
-          </div>
-        </div>
-      </div>
-
-      {messageSucces && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-[#256B45] text-xs font-semibold text-[#16211B] flex items-center justify-between">
-          <span>{messageSucces}</span>
-          <button
-            onClick={() => setMessageSucces('')}
-            className="text-[#55645B] hover:text-[#16211B] font-mono-tabular"
-          >
-            Fermer
-          </button>
-        </div>
-      )}
-
-      {/* Navigation des 4 sous-sections V0.4 */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D8DFD5] pb-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setSubTab('selection_vm_33')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
-              subTab === 'selection_vm_33'
-                ? 'bg-[#1E3528] text-white'
-                : 'bg-white text-[#16211B] border border-[#D8DFD5] hover:bg-[#EAECE4]'
-            }`}
-          >
-            3.3 Campagne & Palmarès V0.4
-          </button>
-          <button
-            onClick={() => setSubTab('interet_32')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
-              subTab === 'interet_32'
-                ? 'bg-[#1E3528] text-white'
-                : 'bg-white text-[#16211B] border border-[#D8DFD5] hover:bg-[#EAECE4]'
-            }`}
-          >
-            3.2 Détail Variante (9 Bots, Tension & 3–6J)
-          </button>
-          <button
-            onClick={() => setSubTab('viabilite_31')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
-              subTab === 'viabilite_31'
-                ? 'bg-[#1E3528] text-white'
-                : 'bg-white text-[#16211B] border border-[#D8DFD5] hover:bg-[#EAECE4]'
-            }`}
-          >
-            3.1 Coupe-Circuit Viabilité
-          </button>
-          <button
-            onClick={() => setSubTab('analyse_gemini_34')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
-              subTab === 'analyse_gemini_34'
-                ? 'bg-[#256B45] text-white'
-                : 'bg-emerald-50 text-[#1E3528] border border-[#256B45]/40 hover:bg-emerald-100'
-            }`}
-          >
-            3.4 Synthèse & Hybrides V0.4 ({analysesV04.length})
-          </button>
-        </div>
-
-        {/* Sélecteur de la variante V0.4 inspectée */}
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-[#55645B] font-medium">
-            Variante V0.4 inspectée :
-          </span>
-          <select
-            value={varianteActive.id}
-            onChange={(e) => onSelectVariante(e.target.value)}
-            className="px-2.5 py-1.5 border border-[#D8DFD5] rounded-lg bg-white font-semibold text-[#16211B] max-w-[320px]"
-          >
-            <optgroup label={`Variantes Version 0.4 (${variantesV04.length})`}>
-              {variantesV04.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.statutViabilite === 'eliminee' ? '✗ ' : '✓ '}
-                  {v.nom}
-                </option>
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <label className="text-[11px] font-mono uppercase tracking-wider text-[#55645B]">
+              Version soumise au banc d’essai
+            </label>
+            <div className="flex items-center gap-2">
+              {(['0.4', '0.3', '0.2', '0.1'] as GameVersionId[]).map((ver) => (
+                <button
+                  key={ver}
+                  type="button"
+                  onClick={() => setVersionCible(ver)}
+                  className={`px-3 py-1.5 text-xs font-mono font-semibold rounded-lg border transition-colors ${
+                    versionCible === ver
+                      ? 'bg-[#1E3528] text-white border-[#1E3528]'
+                      : 'bg-[#F4F5F0] text-[#55645B] border-[#D8DFD5] hover:text-[#16211B]'
+                  }`}
+                >
+                  V{ver}
+                  {ver === '0.4' ? ' (Active)' : ''}
+                </button>
               ))}
-            </optgroup>
-            {varianteActive.version !== '0.4' && (
-              <optgroup label="Archive consultée (V0.1–V0.3)">
-                <option value={varianteActive.id}>
-                  [V{varianteActive.version}] {varianteActive.nom}
-                </option>
-              </optgroup>
-            )}
-          </select>
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* Sommaire rapide des 6 sections */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-4">
+          {[
+            {
+              href: '#sec-01',
+              num: '01.',
+              titre: 'Stratégie de Test',
+              sous: 'Exhaustivité & 2 étages',
+            },
+            {
+              href: '#sec-02',
+              num: '02.',
+              titre: 'Panel & Volumétrie',
+              sous: `${panelCombinatoire.nbTotalVariantesExhaustives} variantes × 3–6J`,
+            },
+            {
+              href: '#sec-03',
+              num: '03.',
+              titre: 'Critères & Méthodes',
+              sous: '5 algorithmes pondérés',
+            },
+            {
+              href: '#sec-04',
+              num: '04.',
+              titre: 'Workflow Campagne',
+              sous: 'Pipeline en 5 étapes',
+            },
+            {
+              href: '#sec-05',
+              num: '05.',
+              titre: 'Lancement & Direct',
+              sous: 'Job VM à la demande',
+            },
+            {
+              href: '#sec-06',
+              num: '06.',
+              titre: 'Bilan & Palmarès IA',
+              sous: 'Pareto, JSONL & Gemini',
+            },
+          ].map((item) => (
+            <a
+              key={item.num}
+              href={item.href}
+              className="p-2.5 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/60 hover:bg-[#EAECE4] transition-colors block"
+            >
+              <div className="text-xs font-mono font-bold text-[#256B45]">
+                {item.num}{' '}
+                <span className="text-[#16211B] font-sans">{item.titre}</span>
+              </div>
+              <div className="text-[11px] text-[#55645B] mt-0.5 truncate">
+                {item.sous}
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
 
       {/* =====================================================================
-          SOUS-ONGLET 3.1 : TESTS DE VIABILITÉ & ÉLIMINATION DIRECTE V0.4
-          ===================================================================== */}
-      {subTab === 'viabilite_31' && (
-        <div className="space-y-5">
-          <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-mono-tabular text-[#256B45] font-semibold">
-                3.1 — Filtre Coupe-Circuit de Viabilité (Version {varianteActive.version || '0.4'})
-              </div>
-              <h3 className="font-display text-base font-bold text-[#16211B] mt-0.5">
-                {varianteActive.nom} ·{' '}
-                {libelleGeometrieCourt(varianteActive.geometriePlateau)}
-              </h3>
-              <p className="text-xs text-[#55645B] mt-0.5">
-                Vérifie les 5 invariants éliminatoires : Terminaison, Plancher Inerte (&lt; 65 %), Plafond Déductif (&gt; 42 %), Gain de compétence (≥ +12 pts) et Anti-Boucle aveugle (≥ +6 pts).
-              </p>
-            </div>
+          01. STRATÉGIE DE TEST
+      ===================================================================== */}
+      <section
+        id="sec-01"
+        className="bg-white border border-[#D8DFD5] rounded-xl p-6 shadow-xs space-y-5"
+      >
+        <div className="border-b border-[#D8DFD5] pb-4 flex flex-wrap items-baseline justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#256B45]">
+              01. Stratégie de Test
+            </span>
+            <h2 className="font-display text-xl font-bold text-[#16211B] mt-0.5">
+              Principes Directeurs : Exhaustivité Combinatoire, Exécution à la Demande & Traçabilité par Partie
+            </h2>
+          </div>
+          <span className="text-xs font-mono text-[#55645B]">
+            Zéro tâche périodique (Cron désactivé) · Puissance dédiée VM Oracle Cloud
+          </span>
+        </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="flex items-center gap-1.5 text-xs">
-                <span className="text-[#55645B]">Parties / bot :</span>
-                <input
-                  type="number"
-                  min={6}
-                  max={60}
-                  value={nbPartiesViab}
-                  onChange={(e) => setNbPartiesViab(Number(e.target.value))}
-                  className="w-16 px-2 py-1 border border-[#D8DFD5] rounded font-mono-tabular text-center"
-                />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="p-4 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] space-y-2">
+            <div className="text-xs font-mono font-bold text-[#1E3528] uppercase">
+              Pilier 1 — Balayage Combinatoire Exhaustif
+            </div>
+            <p className="text-xs text-[#16211B] leading-relaxed">
+              Plutôt que d’échantillonner quelques variantes au hasard, une campagne génère systématiquement le <strong>produit cartésien complet</strong> de toutes les options structurelles de la version ({panelCombinatoire.nbTotalVariantesExhaustives} variantes distinctes en V{versionCible}) et confronte chaque variante aux différentes configurations de table (<strong>3, 4, 5 et 6 joueurs</strong>).
+            </p>
+          </div>
+
+          <div className="p-4 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] space-y-2">
+            <div className="text-xs font-mono font-bold text-[#1E3528] uppercase">
+              Pilier 2 — Double Étage : Coupe-Circuit puis Profondeur
+            </div>
+            <p className="text-xs text-[#16211B] leading-relaxed">
+              <strong>Étage A (Coupe-circuit de viabilité) :</strong> élimine rapidement les combinaisons dégénérées (victoire passive, effondrement systématique, exploit par boucle répétitive).
+              <br />
+              <strong>Étage B (Évaluation intensive) :</strong> concentre le budget de calcul de la VM Oracle (500 à 2 500 parties/variante) sur les variantes viables avec l’échelle complète des <strong>9 bots</strong>.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] space-y-2">
+            <div className="text-xs font-mono font-bold text-[#1E3528] uppercase">
+              Pilier 3 — Journalisation JSONL & Synthèse IA
+            </div>
+            <p className="text-xs text-[#16211B] leading-relaxed">
+              Chaque partie simulée est enregistrée en flux continu dans un fichier <code className="font-mono">.jsonl</code> sur le disque de la VM avec ses métriques décisionnelles (entropie de Shannon, regret contrefactuel, frictions spatiales). L’IA <strong>Gemini</strong> synthétise ensuite le Front de Pareto pour isoler les variantes les plus riches.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          02. PANEL DE VARIANTES & VOLUMÉTRIE COMBINATOIRE
+      ===================================================================== */}
+      <section
+        id="sec-02"
+        className="bg-white border border-[#D8DFD5] rounded-xl p-6 shadow-xs space-y-5"
+      >
+        <div className="border-b border-[#D8DFD5] pb-4 flex flex-wrap items-baseline justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#256B45]">
+              02. Panel de Variantes & Volumétrie Combinatoire
+            </span>
+            <h2 className="font-display text-xl font-bold text-[#16211B] mt-0.5">
+              Matrice Factorielle Complète de la Version V{versionCible} ({panelCombinatoire.nbTotalVariantesExhaustives} Variantes)
+            </h2>
+          </div>
+          <div className="text-xs font-mono font-semibold text-[#1E3528] bg-[#EAECE4] px-3 py-1 rounded-md border border-[#D8DFD5]">
+            {panelCombinatoire.formuleCombinatoire}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3.5">
+          {panelCombinatoire.axes.map((axe, i) => (
+            <div
+              key={axe.id}
+              className="p-3.5 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/70 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <span className="text-[11px] font-mono font-bold text-[#256B45]">
+                    AXE {i + 1}
+                  </span>
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-white border border-[#D8DFD5] text-[#16211B]">
+                    {axe.nbModalites} modalités
+                  </span>
+                </div>
+                <h3 className="text-xs font-bold text-[#16211B] mb-2">
+                  {axe.nom}
+                </h3>
+                <ul className="space-y-1 text-[11px] text-[#55645B]">
+                  {axe.modalites.map((m) => (
+                    <li key={m.code} className="flex items-start gap-1.5">
+                      <span className="text-[#256B45] font-bold">·</span>
+                      <span>{m.label}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <button
-                onClick={handleRunViabiliteActive}
-                disabled={enCours}
-                className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-[#256B45] text-white hover:bg-[#1E5637] whitespace-nowrap shrink-0"
-              >
-                {enCours
-                  ? 'Test en cours...'
-                  : 'Tester la viabilité de cette variante'}
-              </button>
-              <button
-                onClick={() => handleGenererEtFiltrerLotV04(4)}
-                disabled={enCours}
-                className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-[#16211B] text-white hover:bg-black whitespace-nowrap shrink-0"
-              >
-                + Générer & Filtrer 4 variantes V0.4
-              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Synthèse volumétrique selon le calibre */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+          <div className="p-4 rounded-lg border border-[#D8DFD5] bg-white">
+            <div className="text-[11px] font-mono uppercase text-[#55645B]">
+              Variantes de la grille V{versionCible}
+            </div>
+            <div className="text-2xl font-mono font-bold text-[#16211B] mt-1">
+              {estimationsVolumetrie.nbVariantes}
+            </div>
+            <div className="text-[11px] text-[#55645B] mt-0.5">
+              Produit cartésien exhaustif + références
             </div>
           </div>
 
-          {rapportViabActif ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div className="p-4 rounded-lg border border-[#D8DFD5] bg-white">
+            <div className="text-[11px] font-mono uppercase text-[#55645B]">
+              Calibre sélectionné par variante
+            </div>
+            <div className="text-2xl font-mono font-bold text-[#256B45] mt-1">
+              {calibreParties.toLocaleString('fr-FR')} parties
+            </div>
+            <div className="text-[11px] text-[#55645B] mt-0.5">
+              9 Bots IA × Tables de 3, 4, 5 et 6 joueurs
+            </div>
+          </div>
+
+          <div className="p-4 rounded-lg border border-[#D8DFD5] bg-white">
+            <div className="text-[11px] font-mono uppercase text-[#55645B]">
+              Volume total de la campagne
+            </div>
+            <div className="text-2xl font-mono font-bold text-[#16211B] mt-1">
+              ~{estimationsVolumetrie.partiesTotales.toLocaleString('fr-FR')}
+            </div>
+            <div className="text-[11px] text-[#55645B] mt-0.5">
+              Parties intégralement journalisées et analysées
+            </div>
+          </div>
+
+          <div className="p-4 rounded-lg border border-[#D8DFD5] bg-white">
+            <div className="text-[11px] font-mono uppercase text-[#55645B]">
+              Empreinte Disque JSONL estimée
+            </div>
+            <div className="text-2xl font-mono font-bold text-[#16211B] mt-1">
+              ~{estimationsVolumetrie.tailleMo} Mo
+            </div>
+            <div className="text-[11px] text-[#55645B] mt-0.5">
+              Stocké dans <code className="font-mono">resultats/logs/*.jsonl</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          03. CRITÈRES D'ÉVALUATION PONDÉRÉS & MÉTHODES ALGORITHMIQUES
+      ===================================================================== */}
+      <section
+        id="sec-03"
+        className="bg-white border border-[#D8DFD5] rounded-xl p-6 shadow-xs space-y-5"
+      >
+        <div className="border-b border-[#D8DFD5] pb-4 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#256B45]">
+              03. Critères d’Évaluation Pondérés & Méthodes Algorithmiques
+            </span>
+            <h2 className="font-display text-xl font-bold text-[#16211B] mt-0.5">
+              5 Critères Orthogonaux Évalués par des Algorithmes Dédiés
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-mono text-[#55645B]">
+              Somme des poids :{' '}
+              <strong className="text-[#16211B]">{sommePoids}%</strong> (normalisée auto sur 100%)
+            </span>
+            <button
+              type="button"
+              onClick={() => setPoidsCriteres({ ...POIDS_CRITERES_DEFAUT })}
+              className="px-2.5 py-1 text-xs font-mono rounded border border-[#D8DFD5] bg-[#F4F5F0] hover:bg-[#EAECE4] text-[#16211B]"
+            >
+              Réinitialiser (30/25/20/15/10)
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+          {/* Critère 1 */}
+          <div className="p-4 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/60 flex flex-col justify-between space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold uppercase text-[#256B45]">
+                  Critère 1
+                </span>
+                <span className="text-sm font-mono font-bold text-[#16211B]">
+                  {poidsCriteres.profondeurStrategique}%
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-[#16211B]">
+                Profondeur Stratégique & Mérite Tactique
+              </h3>
+              <div className="text-[11px] font-mono bg-white px-2 py-1 rounded border border-[#D8DFD5] text-[#1E3528]">
+                IS-MCTS · Expectimax Bayésien 2D6 · Beam Rollout
+              </div>
+              <p className="text-xs text-[#55645B] leading-relaxed">
+                Mesure le différentiel de score <span className="font-mono">Δ(Bots de pointe − Bots naïfs)</span>, la monotonie de la courbe des 9 bots et la marge anti-exploit du garde-fou <em>Bot Boucle</em>.
+              </p>
+            </div>
+            <div>
+              <input
+                type="range"
+                min={5}
+                max={60}
+                step={5}
+                value={poidsCriteres.profondeurStrategique}
+                onChange={(e) =>
+                  setPoidsCriteres((p) => ({
+                    ...p,
+                    profondeurStrategique: Number(e.target.value),
+                  }))
+                }
+                className="w-full accent-[#256B45]"
+              />
+            </div>
+          </div>
+
+          {/* Critère 2 */}
+          <div className="p-4 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/60 flex flex-col justify-between space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold uppercase text-[#256B45]">
+                  Critère 2
+                </span>
+                <span className="text-sm font-mono font-bold text-[#16211B]">
+                  {poidsCriteres.tensionChoix}%
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-[#16211B]">
+                Tension & Criticité des Choix par Tour
+              </h3>
+              <div className="text-[11px] font-mono bg-white px-2 py-1 rounded border border-[#D8DFD5] text-[#1E3528]">
+                Entropie de Shannon H(p) & Regret Contrefactuel ΔQ
+              </div>
+              <p className="text-xs text-[#55645B] leading-relaxed">
+                Évalue à chaque tour si plusieurs coups candidats ont une utilité proche (entropie élevée = vrai dilemme) tout en punissant les erreurs d’inattention (regret contrefactuel + parties serrées).
+              </p>
+            </div>
+            <div>
+              <input
+                type="range"
+                min={5}
+                max={60}
+                step={5}
+                value={poidsCriteres.tensionChoix}
+                onChange={(e) =>
+                  setPoidsCriteres((p) => ({
+                    ...p,
+                    tensionChoix: Number(e.target.value),
+                  }))
+                }
+                className="w-full accent-[#256B45]"
+              />
+            </div>
+          </div>
+
+          {/* Critère 3 */}
+          <div className="p-4 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/60 flex flex-col justify-between space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold uppercase text-[#256B45]">
+                  Critère 3
+                </span>
+                <span className="text-sm font-mono font-bold text-[#16211B]">
+                  {poidsCriteres.dynamiqueCooperative}%
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-[#16211B]">
+                Dynamique Coopérative & Frictions Spatiales
+              </h3>
+              <div className="text-[11px] font-mono bg-white px-2 py-1 rounded border border-[#D8DFD5] text-[#1E3528]">
+                Synergie de Shapley · Fenêtre Contrariée 8%–22%
+              </div>
+              <p className="text-xs text-[#55645B] leading-relaxed">
+                Quantifie le gain d’une équipe coordonnée (Barrages & Coalitions) face au bot égoïste <em>Glouton</em>, et vérifie que le taux de mouvements contrariés reste dans la zone stimulante (8% à 22%).
+              </p>
+            </div>
+            <div>
+              <input
+                type="range"
+                min={5}
+                max={60}
+                step={5}
+                value={poidsCriteres.dynamiqueCooperative}
+                onChange={(e) =>
+                  setPoidsCriteres((p) => ({
+                    ...p,
+                    dynamiqueCooperative: Number(e.target.value),
+                  }))
+                }
+                className="w-full accent-[#256B45]"
+              />
+            </div>
+          </div>
+
+          {/* Critère 4 */}
+          <div className="p-4 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/60 flex flex-col justify-between space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold uppercase text-[#256B45]">
+                  Critère 4
+                </span>
+                <span className="text-sm font-mono font-bold text-[#16211B]">
+                  {poidsCriteres.equilibreMultiJoueurs}%
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-[#16211B]">
+                Équilibre 3–6 Joueurs & Robustesse CVaR 10%
+              </h3>
+              <div className="text-[11px] font-mono bg-white px-2 py-1 rounded border border-[#D8DFD5] text-[#1E3528]">
+                Écart-type Inter-Tables σ(3–6J) · Décile D1 (CVaR)
+              </div>
+              <p className="text-xs text-[#55645B] leading-relaxed">
+                Sanctionne toute dérive de difficulté entre 3, 4, 5 et 6 joueurs et évalue la résilience sur les 10% de tirages 2D6 les plus hostiles (Conditional Value at Risk).
+              </p>
+            </div>
+            <div>
+              <input
+                type="range"
+                min={5}
+                max={60}
+                step={5}
+                value={poidsCriteres.equilibreMultiJoueurs}
+                onChange={(e) =>
+                  setPoidsCriteres((p) => ({
+                    ...p,
+                    equilibreMultiJoueurs: Number(e.target.value),
+                  }))
+                }
+                className="w-full accent-[#256B45]"
+              />
+            </div>
+          </div>
+
+          {/* Critère 5 */}
+          <div className="p-4 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/60 flex flex-col justify-between space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold uppercase text-[#256B45]">
+                  Critère 5
+                </span>
+                <span className="text-sm font-mono font-bold text-[#16211B]">
+                  {poidsCriteres.ergonomieLisibilite}%
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-[#16211B]">
+                Ergonomie Physique & Lisibilité sur Table
+              </h3>
+              <div className="text-[11px] font-mono bg-white px-2 py-1 rounded border border-[#D8DFD5] text-[#1E3528]">
+                Modèle Topologique de Graphe & Charge Manip.
+              </div>
+              <p className="text-xs text-[#55645B] leading-relaxed">
+                Évalue la clarté visuelle des adjacences (degré moyen du graphe <span className="font-mono">d̄</span>, repérage des 3 Cols et des frontières) et la sobriété des manipulations de pions par tour.
+              </p>
+            </div>
+            <div>
+              <input
+                type="range"
+                min={5}
+                max={60}
+                step={5}
+                value={poidsCriteres.ergonomieLisibilite}
+                onChange={(e) =>
+                  setPoidsCriteres((p) => ({
+                    ...p,
+                    ergonomieLisibilite: Number(e.target.value),
+                  }))
+                }
+                className="w-full accent-[#256B45]"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          04. WORKFLOW D'UNE CAMPAGNE DE TEST
+      ===================================================================== */}
+      <section
+        id="sec-04"
+        className="bg-white border border-[#D8DFD5] rounded-xl p-6 shadow-xs space-y-5"
+      >
+        <div className="border-b border-[#D8DFD5] pb-4">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#256B45]">
+            04. Workflow d’une Campagne de Test
+          </span>
+          <h2 className="font-display text-xl font-bold text-[#16211B] mt-0.5">
+            Pipeline d’Exécution séquentiel en 5 Étapes sur la VM Oracle
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3.5">
+          {[
+            {
+              etape: 'ÉTAPE 1',
+              num: 1,
+              titre: 'Génération de la Grille Combinatoire',
+              detail: `Instanciation déterministe des ${panelCombinatoire.nbTotalVariantesExhaustives} variantes du produit cartésien de V${versionCible} + variantes de référence.`,
+            },
+            {
+              etape: 'ÉTAPE 2',
+              num: 2,
+              titre: 'Coupe-Circuit de Viabilité (5 Invariants)',
+              detail:
+                'Test éliminatoire rapide (Bot Inerte = 0%, Déductif ≥ 30%, marge anti-boucle ≥ 5 pts, absence de blocage). Écarte immédiatement les variantes cassées.',
+            },
+            {
+              etape: 'ÉTAPE 3',
+              num: 3,
+              titre: 'Simulation Intensive 9 Bots & Banc 3–6J',
+              detail: `Exécution des ${calibreParties} parties/variante viable (IS-MCTS, Expectimax 2D6, Beam Rollout, tables 3 à 6J) avec écriture streaming dans le fichier .jsonl.`,
+            },
+            {
+              etape: 'ÉTAPE 4',
+              num: 4,
+              titre: 'Agrégation des 5 Critères & Front de Pareto',
+              detail:
+                'Calcul des 5 scores algorithmiques pondérés et identification des variantes Pareto-optimales (non dominées sur l’ensemble des critères).',
+            },
+            {
+              etape: 'ÉTAPE 5',
+              num: 5,
+              titre: 'Synthèse IA Gemini & Recommandations',
+              detail:
+                'Classement argumenté des meilleures variantes, synthèse de leurs avantages respectifs et proposition d’hybridations instanciables en 1 clic.',
+            },
+          ].map((step) => {
+            const estActif = jobEstActif && jobStatus?.etapeNumero === step.num;
+            return (
               <div
-                className={`lg:col-span-4 rounded-xl p-5 border flex flex-col justify-between ${
-                  rapportViabActif.viable
-                    ? 'bg-emerald-50/70 border-[#256B45]'
-                    : 'bg-red-50/80 border-[#C2412D]'
+                key={step.etape}
+                className={`p-4 rounded-lg border transition-colors ${
+                  estActif
+                    ? 'border-[#256B45] bg-emerald-50/70'
+                    : 'border-[#D8DFD5] bg-[#F4F5F0]/50'
                 }`}
               >
-                <div>
-                  <div className="text-xs font-mono-tabular font-bold text-[#55645B]">
-                    Verdict du Coupe-Circuit 3.1
-                  </div>
-                  <div
-                    className={`font-display text-2xl font-bold mt-1 ${
-                      rapportViabActif.viable
-                        ? 'text-[#256B45]'
-                        : 'text-[#C2412D]'
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-mono font-bold text-[#256B45]">
+                    {step.etape}
+                  </span>
+                  {estActif && (
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#256B45] text-white">
+                      EN COURS
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-xs font-bold text-[#16211B] mb-1.5">
+                  {step.titre}
+                </h3>
+                <p className="text-[11px] text-[#55645B] leading-relaxed">
+                  {step.detail}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* =====================================================================
+          05. LANCEMENT À LA DEMANDE & DÉROULÉ EN DIRECT (VM ORACLE & CLI)
+      ===================================================================== */}
+      <section
+        id="sec-05"
+        className="bg-white border border-[#D8DFD5] rounded-xl p-6 shadow-xs space-y-6"
+      >
+        <div className="border-b border-[#D8DFD5] pb-4 flex flex-wrap items-baseline justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#256B45]">
+              05. Lancement à la Demande & Déroulé en Direct
+            </span>
+            <h2 className="font-display text-xl font-bold text-[#16211B] mt-0.5">
+              Poste de Commande de la Campagne Exhaustive (Job Web Asynchrone ou CLI SSH sur VM Oracle)
+            </h2>
+          </div>
+          <div className="text-xs font-mono text-[#55645B]">
+            Statut Job VM :{' '}
+            <strong
+              className={
+                jobEstActif
+                  ? 'text-[#256B45]'
+                  : jobStatus?.statut === 'erreur'
+                  ? 'text-[#C2412D]'
+                  : 'text-[#16211B]'
+              }
+            >
+              {jobEstActif
+                ? 'EXÉCUTION EN COURS'
+                : jobStatus?.statut === 'termine'
+                ? 'DERNIER JOB TERMINÉ'
+                : jobStatus?.statut === 'interrompu'
+                ? 'INTERROMPU (PARTIEL SAUVEGARDÉ)'
+                : 'PRÊT (À LA DEMANDE)'}
+            </strong>
+          </div>
+        </div>
+
+        {/* Sélecteur de Calibre & Boutons de déclenchement */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-7 p-5 rounded-xl border border-[#D8DFD5] bg-[#F4F5F0]/70 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs font-mono font-bold uppercase text-[#1E3528]">
+                A. Calibre de Profondeur (Nombre de parties par variante viable)
+              </span>
+              <span className="text-xs font-mono text-[#55645B]">
+                Total estimé :{' '}
+                <strong>
+                  ~{estimationsVolumetrie.partiesTotales.toLocaleString('fr-FR')} parties
+                </strong>
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {[
+                {
+                  val: 180,
+                  label: '180 parties / var.',
+                  desc: 'Validation Standard (~21 600 parties)',
+                },
+                {
+                  val: 500,
+                  label: '500 parties / var.',
+                  desc: 'Campagne Approfondie (~60 000 parties)',
+                },
+                {
+                  val: 1000,
+                  label: '1 000 parties / var.',
+                  desc: 'Haute Précision VM (~120 000 parties)',
+                },
+                {
+                  val: 2500,
+                  label: '2 500 parties / var.',
+                  desc: 'Intensif Longue Durée (~300 000 parties)',
+                },
+              ].map((preset) => {
+                const actif = calibreParties === preset.val;
+                return (
+                  <button
+                    key={preset.val}
+                    type="button"
+                    onClick={() => setCalibreParties(preset.val)}
+                    className={`p-3 rounded-lg border text-left transition-colors ${
+                      actif
+                        ? 'bg-[#1E3528] text-white border-[#1E3528]'
+                        : 'bg-white text-[#16211B] border-[#D8DFD5] hover:bg-[#EAECE4]'
                     }`}
                   >
-                    {rapportViabActif.viable
-                      ? 'VARIANTE VIABLE'
-                      : 'ÉLIMINÉE (NON VIABLE)'}
-                  </div>
-                  <p className="text-xs text-[#16211B] mt-2 leading-relaxed">
-                    {rapportViabActif.motifElimination ||
-                      'Tous les critères éliminatoires sont validés.'}
-                  </p>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-black/10 flex items-center justify-between text-xs font-mono-tabular">
-                  <span>
-                    Parties testées : {rapportViabActif.nbPartiesTestees}
-                  </span>
-                  <span>Durée : {rapportViabActif.dureeMs} ms</span>
-                </div>
-              </div>
-
-              <div className="lg:col-span-8 bg-white rounded-xl p-5 border border-[#D8DFD5]">
-                <h4 className="font-display text-sm font-semibold text-[#16211B] mb-3">
-                  Détail des 5 Invariants Éliminatoires (Protocole 3.1)
-                </h4>
-                <div className="space-y-2.5">
-                  {rapportViabActif.criteres.map((c) => (
+                    <div className="text-xs font-mono font-bold">
+                      {preset.label}
+                    </div>
                     <div
-                      key={c.code}
-                      className={`p-3 rounded-lg border flex items-start justify-between gap-4 ${
-                        c.valide
-                          ? 'bg-[#F4F5F0] border-[#D8DFD5]'
-                          : 'bg-red-50 border-red-300'
+                      className={`text-[11px] mt-1 ${
+                        actif ? 'text-emerald-100' : 'text-[#55645B]'
                       }`}
                     >
-                      <div>
-                        <div className="text-xs font-semibold text-[#16211B]">
-                          {c.valide ? '✓ ' : '✗ '}
-                          {c.intitule}
-                        </div>
-                        <div className="text-xs text-[#55645B] mt-0.5">
-                          {c.detail}
-                        </div>
-                      </div>
-                      <div className="text-right font-mono-tabular shrink-0">
-                        <div
-                          className={`text-xs font-bold ${
-                            c.valide ? 'text-[#256B45]' : 'text-[#C2412D]'
-                          }`}
-                        >
-                          {c.valeurObservee}
-                        </div>
-                        <div className="text-[10px] text-[#55645B]">
-                          Seuil : {c.seuilAttendu}
-                        </div>
-                      </div>
+                      {preset.desc}
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-xl p-6 border border-[#D8DFD5] text-center">
-              <p className="text-sm text-[#55645B] mb-3">
-                Aucun rapport de viabilité 3.1 n’a encore été exécuté sur «{' '}
-                <strong>{varianteActive.nom}</strong> ».
-              </p>
-              <button
-                onClick={handleRunViabiliteActive}
-                disabled={enCours}
-                className="px-4 py-2 rounded-lg text-xs font-semibold bg-[#256B45] text-white hover:bg-[#1E5637]"
-              >
-                Lancer le test de viabilité 3.1 maintenant
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* =====================================================================
-          SOUS-ONGLET 3.2 : INTÉRÊT STRATÉGIQUE (9 BOTS), TENSION V0.4 & BANC 3–6J
-          ===================================================================== */}
-      {subTab === 'interet_32' && (
-        <div className="space-y-5">
-          <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-mono-tabular text-[#256B45] font-semibold">
-                3.2 — Évaluation Détaillée : 9 Bots, Tension du Placement V0.4 & Banc 3–6 Joueurs
-              </div>
-              <h3 className="font-display text-base font-bold text-[#16211B] mt-0.5">
-                {varianteActive.nom} ·{' '}
-                {libelleGeometrieCourt(varianteActive.geometriePlateau)} ·{' '}
-                {libelleRegleContrarieCourt(
-                  varianteActive.regleMouvementContrarie
-                )}
-              </h3>
-              <p className="text-xs text-[#55645B] mt-0.5">
-                Mesure le gain d’anticipation (IS-MCTS vs Réflexe), la tension de chaque choix de placement, les mouvements contrariés et la stabilité de 3 à 6 joueurs.
-              </p>
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-1.5 text-xs">
-                <span className="text-[#55645B]">Parties / bot :</span>
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-[#D8DFD5]">
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="input-calibre-custom"
+                  className="text-xs font-medium text-[#16211B]"
+                >
+                  Calibre personnalisé (parties/variante) :
+                </label>
                 <input
+                  id="input-calibre-custom"
                   type="number"
-                  min={8}
-                  max={80}
-                  value={nbPartiesInteret}
-                  onChange={(e) => setNbPartiesInteret(Number(e.target.value))}
-                  className="w-16 px-2 py-1 border border-[#D8DFD5] rounded font-mono-tabular text-center"
+                  min={120}
+                  max={5000}
+                  step={50}
+                  value={calibreParties}
+                  onChange={(e) =>
+                    setCalibreParties(
+                      Math.max(120, Math.min(5000, Number(e.target.value) || 120))
+                    )
+                  }
+                  className="w-24 px-2.5 py-1.5 text-xs font-mono font-bold rounded border border-[#D8DFD5] bg-white text-[#16211B]"
                 />
               </div>
-              <button
-                onClick={handleRunInteretActive}
-                disabled={enCours}
-                className="px-4 py-2 rounded-lg text-xs font-semibold bg-[#256B45] text-white hover:bg-[#1E5637] whitespace-nowrap shrink-0"
-              >
-                {enCours
-                  ? 'Simulation en cours...'
-                  : 'Évaluer cette variante (9 Bots + 3–6J)'}
-              </button>
+
+              <div className="flex items-center gap-3">
+                {jobEstActif ? (
+                  <button
+                    type="button"
+                    onClick={handleArreterCampagneVM}
+                    className="px-4 py-2.5 text-xs font-bold rounded-lg bg-[#C2412D] text-white hover:bg-[#a83523] transition-colors"
+                  >
+                    Arrêter proprement et sauvegarder l’état partiel
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={lancementEnCours}
+                    onClick={handleDemarrerCampagneVM}
+                    className="px-5 py-2.5 text-xs font-bold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] transition-colors disabled:opacity-50"
+                  >
+                    {lancementEnCours
+                      ? 'Démarrage du job sur la VM...'
+                      : `Lancer la Campagne Exhaustive V${versionCible} (${panelCombinatoire.nbTotalVariantesExhaustives} var. × ${calibreParties} parties)`}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
-          {!rapportInteretActif ? (
-            <div className="bg-white rounded-xl p-6 border border-[#D8DFD5] text-center">
-              <p className="text-sm text-[#55645B] mb-3">
-                Aucun rapport d’évaluation 3.2 n’a encore été généré pour «{' '}
-                <strong>{varianteActive.nom}</strong> ».
-              </p>
-              <button
-                onClick={handleRunInteretActive}
-                disabled={enCours}
-                className="px-4 py-2 rounded-lg text-xs font-semibold bg-[#256B45] text-white hover:bg-[#1E5637]"
-              >
-                Lancer l’évaluation 9 Bots + 3–6 Joueurs maintenant
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-5">
-              {/* Indicateurs Métriques V0.4 (Pur Placement, Tension des Choix & Mouvements Contrariés) au 1er plan */}
-              {rapportInteretActif.metriquesPlacementV04 && (
-                <div className="bg-emerald-50/70 rounded-xl p-4 border border-emerald-300">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-[#165B36]">
-                      Métriques V0.4 — Qualité Stratégique du Pur Placement & Contrariétés
-                    </span>
-                    <span className="text-xs font-mono-tabular font-semibold text-[#165B36]">
-                      {libelleGeometrieCourt(varianteActive.geometriePlateau)} ·{' '}
-                      {varianteActive.defenseursParJoueur} Déf./J ·{' '}
-                      {libelleRegleContrarieCourt(
-                        varianteActive.regleMouvementContrarie
-                      )}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                    <div className="bg-white p-3 rounded-lg border border-emerald-200">
-                      <div className="text-[11px] text-[#55645B] font-medium leading-tight">
-                        Gain Planification Multi-Coups
-                      </div>
-                      <div className="font-mono-tabular text-lg font-bold text-[#256B45] mt-1">
-                        +{rapportInteretActif.metriquesPlacementV04.gainPlanificationPct}%
-                      </div>
-                      <div className="text-[10px] text-[#55645B] mt-0.5">
-                        Écart IS-MCTS vs Réflexe
-                      </div>
-                    </div>
-                    <div className="bg-white p-3 rounded-lg border border-emerald-200">
-                      <div className="text-[11px] text-[#55645B] font-medium leading-tight">
-                        Tension des Choix de Placement
-                      </div>
-                      <div className="font-mono-tabular text-lg font-bold text-[#16211B] mt-1">
-                        {rapportInteretActif.metriquesPlacementV04.tensionDecisionsPct}%
-                      </div>
-                      <div className="text-[10px] text-[#55645B] mt-0.5">
-                        Dilemme entre options
-                      </div>
-                    </div>
-                    <div className="bg-white p-3 rounded-lg border border-rose-200">
-                      <div className="text-[11px] text-rose-900 font-medium leading-tight">
-                        Taux Mouvements Contrariés
-                      </div>
-                      <div className="font-mono-tabular text-lg font-bold text-rose-700 mt-1">
-                        {rapportInteretActif.metriquesPlacementV04.tauxMouvementsContrariesPct}%
-                      </div>
-                      <div className="text-[10px] text-[#55645B] mt-0.5">
-                        Plans brisés en cascade
-                      </div>
-                    </div>
-                    <div className="bg-white p-3 rounded-lg border border-sky-200">
-                      <div className="text-[11px] text-sky-900 font-medium leading-tight">
-                        Coalitions 2 Peuples Réussies
-                      </div>
-                      <div className="font-mono-tabular text-lg font-bold text-sky-700 mt-1">
-                        {rapportInteretActif.metriquesPlacementV04.tauxCoalitionsReussiesPct}%
-                      </div>
-                      <div className="text-[10px] text-[#55645B] mt-0.5">
-                        Coupes bloquées à deux
-                      </div>
-                    </div>
-                    <div className="bg-white p-3 rounded-lg border border-amber-200">
-                      <div className="text-[11px] text-amber-900 font-medium leading-tight">
-                        Barrages d’Entrée Efficaces
-                      </div>
-                      <div className="font-mono-tabular text-lg font-bold text-amber-700 mt-1">
-                        {rapportInteretActif.metriquesPlacementV04.tauxBarragesEfficacesPct}%
-                      </div>
-                      <div className="text-[10px] text-[#55645B] mt-0.5">
-                        Machines repoussées
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Bandeau des 3 Axes Prioritaires de Conception */}
-              {rapportInteretActif.troisAxesPrioritaires && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-white rounded-xl p-4 border border-[#D8DFD5]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono-tabular font-bold text-[#256B45]">
-                        1. Intérêt Stratégique
-                      </span>
-                      <span className="font-mono-tabular text-xl font-bold text-[#16211B]">
-                        {rapportInteretActif.troisAxesPrioritaires.interetStrategique}/100
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#55645B] mt-1.5">
-                      {rapportInteretActif.troisAxesPrioritaires.detailStrategie}
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded-xl p-4 border border-[#D8DFD5]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono-tabular font-bold text-[#256B45]">
-                        2. Lisibilité & Ergonomie
-                      </span>
-                      <span className="font-mono-tabular text-xl font-bold text-[#16211B]">
-                        {rapportInteretActif.troisAxesPrioritaires.lisibiliteErgonomie}/100
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#55645B] mt-1.5">
-                      {rapportInteretActif.troisAxesPrioritaires.detailErgonomie}
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded-xl p-4 border border-[#D8DFD5]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono-tabular font-bold text-[#256B45]">
-                        3. Équilibre 3 à 6 Joueurs
-                      </span>
-                      <span className="font-mono-tabular text-xl font-bold text-[#16211B]">
-                        {rapportInteretActif.troisAxesPrioritaires.equilibreJoueurs36}/100
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#55645B] mt-1.5">
-                      {rapportInteretActif.troisAxesPrioritaires.detailEquilibre36}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Graphique de progression de l'échelle des 9 Bots */}
-              <div className="bg-white rounded-xl p-5 border border-[#D8DFD5]">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                  <div>
-                    <h4 className="font-display text-sm font-semibold text-[#16211B]">
-                      Échelle de Compétence des {rapportInteretActif.echelleBots.length} Bots (% moyen de Forêt sauvée)
-                    </h4>
-                    <p className="text-xs text-[#55645B]">
-                      Escalier de progression depuis le Bot Inerte jusqu’aux algorithmes Expectimax Bayésien, Beam Rollout et IS-MCTS.
-                    </p>
-                  </div>
-                  <div className="font-mono-tabular text-sm font-bold text-[#256B45]">
-                    Score Global : {rapportInteretActif.scoreInteretGlobal}/100
-                  </div>
-                </div>
-
-                <div className="space-y-2.5">
-                  {rapportInteretActif.echelleBots.map((b, idx) => {
-                    const estPointe =
-                      b.botId === 'expectimax_bayesien' ||
-                      b.botId === 'beam_rollout' ||
-                      b.botId === 'ismcts';
-                    const couleurBarre =
-                      b.botId === 'boucle'
-                        ? 'bg-amber-600'
-                        : estPointe
-                        ? 'bg-[#1E3528]'
-                        : idx >= 4
-                        ? 'bg-[#256B45]'
-                        : 'bg-slate-600';
-                    return (
-                      <div
-                        key={b.botId}
-                        className="grid grid-cols-12 items-center gap-3 text-xs"
-                      >
-                        <div className="col-span-4 sm:col-span-3 font-medium text-[#16211B] truncate">
-                          {idx + 1}. {b.botNom}
-                        </div>
-                        <div className="col-span-5 sm:col-span-6 bg-[#EAECE4] h-5 rounded overflow-hidden relative">
-                          <div
-                            style={{
-                              width: `${Math.min(
-                                100,
-                                Math.max(2, b.foretSauveeMoyennePct)
-                              )}%`,
-                            }}
-                            className={`h-full ${couleurBarre}`}
-                          />
-                        </div>
-                        <div className="col-span-3 font-mono-tabular text-right text-[#16211B]">
-                          <strong>{b.foretSauveeMoyennePct}%</strong>{' '}
-                          <span className="text-[#55645B] text-[11px]">
-                            (±{b.ecartTypePct} · D1:{b.pireDecilePct}%)
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+          <div className="lg:col-span-5 p-5 rounded-xl border border-[#D8DFD5] bg-[#16211B] text-[#F4F5F0] flex flex-col justify-between space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase text-emerald-400">
+                  B. Lancement CLI en SSH sur la VM Oracle
+                </span>
+                <span className="text-[11px] font-mono text-gray-300">
+                  tmux / screen / nohup
+                </span>
               </div>
-
-              {/* Banc d'Équilibre 3, 4, 5 et 6 Joueurs */}
-              {listeEquilibre36.length > 0 && (
-                <div className="bg-white rounded-xl p-5 border border-[#D8DFD5]">
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <div>
-                      <h4 className="font-display text-sm font-semibold text-[#16211B]">
-                        Banc d’Équilibrage selon le Nombre de Joueurs (3, 4, 5 et 6 Joueurs)
-                      </h4>
-                      <p className="text-xs text-[#55645B]">
-                        {rapportInteretActif.troisAxesPrioritaires?.detailEquilibre36}
-                      </p>
-                    </div>
-                    <div className="font-mono-tabular text-xs text-[#256B45] font-bold">
-                      Score Équilibre 3–6J :{' '}
-                      {rapportInteretActif.troisAxesPrioritaires?.equilibreJoueurs36 ?? 88}/100
-                    </div>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse text-xs">
-                      <thead>
-                        <tr className="border-b border-[#D8DFD5] text-[#55645B] font-mono-tabular text-[11px]">
-                          <th className="py-2 pr-3">Configuration</th>
-                          <th className="py-2 px-3">Survie Moyenne Forêt</th>
-                          <th className="py-2 px-3">Pire Décile (D1)</th>
-                          <th className="py-2 px-3">Coalitions / Neutralisations</th>
-                          <th className="py-2 px-3">Gain Coopération (vs Glouton)</th>
-                          <th className="py-2 pl-3">Score Stratégique</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#EAECE4] font-mono-tabular">
-                        {listeEquilibre36.map((row) => (
-                          <tr key={row.nbJoueurs}>
-                            <td className="py-2.5 pr-3 font-sans font-semibold text-[#16211B]">
-                              {row.nbJoueurs} Joueurs
-                            </td>
-                            <td className="py-2.5 px-3 font-bold text-[#16211B]">
-                              {row.survieMoyennePct}%
-                            </td>
-                            <td className="py-2.5 px-3">{row.pireDecilePct}%</td>
-                            <td className="py-2.5 px-3">{row.sabotagesMoyens}</td>
-                            <td className="py-2.5 px-3 text-[#256B45] font-semibold">
-                              +{row.ecartMechantVsGlouton} pts
-                            </td>
-                            <td className="py-2.5 pl-3 font-bold text-[#256B45]">
-                              {row.scoreStrategique}/100
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
+              <p className="text-xs text-gray-300 leading-relaxed">
+                Pour des traitements très lourds de plusieurs heures en tâche de fond sur votre VM Oracle, vous pouvez également lancer le worker directement en SSH. Il écrit en direct dans <code className="font-mono text-emerald-300">resultats/campaign-job-status.json</code> et <code className="font-mono text-emerald-300">resultats/logs/*.jsonl</code> : cette page affichera automatiquement sa progression en temps réel.
+              </p>
             </div>
-          )}
-        </div>
-      )}
 
-      {/* =====================================================================
-          SOUS-ONGLET 3.3 : CAMPAGNE D'EXPLORATION V0.4 & PALMARÈS DU PLACEMENT
-          ===================================================================== */}
-      {subTab === 'selection_vm_33' && (
-        <div className="space-y-6">
-          {/* Lancement en 1 clic d'une campagne exploratoire V0.4 */}
-          <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] space-y-4">
+            <div className="space-y-2">
+              <div className="p-3 rounded-lg bg-black/50 border border-white/15 font-mono text-xs text-emerald-300 break-all">
+                {commandeCliVM}
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleCopierCommandeCLI}
+                  className="px-3 py-1.5 text-xs font-mono font-semibold rounded bg-white/10 hover:bg-white/20 text-white transition-colors"
+                >
+                  {commandeCopiee
+                    ? '✓ Commande copiée dans le presse-papiers'
+                    : 'Copier la commande CLI SSH'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Moniteur de télémétrie en direct du Job VM */}
+        {jobStatus && jobStatus.jobId !== 'idle' && (
+          <div className="p-5 rounded-xl border border-[#D8DFD5] bg-[#F4F5F0] space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <div className="text-xs font-mono-tabular text-[#256B45] font-semibold">
-                  3.3 — Campagne Globale V0.4 : Exploration Topologique, Contrariétés & Évaluation 9 Bots
+                <div className="text-xs font-mono font-bold text-[#256B45] uppercase">
+                  Télémétrie du Job VM ({jobStatus.sourceLancement === 'cli_vm_ssh' ? 'CLI SSH VM Oracle' : 'Job Web Asynchrone'}) · ID {jobStatus.jobId}
                 </div>
-                <h3 className="font-display text-base font-bold text-[#16211B] mt-0.5">
-                  Génération Exploratoire V0.4 + Banc Comparatif (6 Topologies · 3 à 6 Joueurs · Options 1, 2 & 4)
-                </h3>
-                <p className="text-xs text-[#55645B]">
-                  Enrichit le catalogue de nouvelles variantes V0.4 paramétriques puis évalue toutes les variantes V0.4 viables sur l’échelle des 9 bots et le banc 3–6 joueurs.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5">
-                <button
-                  onClick={() => handleRunCampagneV04(nbNouvellesExplorationsV04)}
-                  disabled={enCours}
-                  className="px-4 py-2.5 rounded-lg text-xs font-semibold bg-[#256B45] text-white hover:bg-[#1E5637] whitespace-nowrap shrink-0"
-                >
-                  {enCours
-                    ? 'Exploration & Simulation V0.4 en cours...'
-                    : nbNouvellesExplorationsV04 > 0
-                    ? `Générer +${nbNouvellesExplorationsV04} Variantes V0.4 & Lancer la Campagne`
-                    : 'Lancer la Campagne sur le Catalogue V0.4'}
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[#EAECE4] flex flex-wrap items-center justify-between gap-4 text-xs">
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-[#16211B]">
-                    Nouvelles variantes V0.4 à générer avant la campagne :
-                  </span>
-                  <select
-                    value={nbNouvellesExplorationsV04}
-                    onChange={(e) =>
-                      setNbNouvellesExplorationsV04(Number(e.target.value))
-                    }
-                    className="px-2.5 py-1 border border-[#D8DFD5] rounded-lg bg-[#F4F5F0] font-mono-tabular font-semibold text-[#16211B]"
-                  >
-                    <option value={0}>0 (Tester uniquement le catalogue V0.4 actuel)</option>
-                    <option value={2}>+2 nouvelles variantes V0.4 exploratoires</option>
-                    <option value={4}>+4 nouvelles variantes V0.4 exploratoires (Recommandé)</option>
-                    <option value={6}>+6 nouvelles variantes V0.4 exploratoires</option>
-                    <option value={8}>+8 nouvelles variantes V0.4 exploratoires</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4">
-                <label className="flex items-center gap-1.5 cursor-pointer font-medium">
-                  <input
-                    type="checkbox"
-                    checked={inclureBotsPointe}
-                    onChange={(e) => setInclureBotsPointe(e.target.checked)}
-                  />
-                  <span>9 Bots (dont IS-MCTS / Beam / Bayes)</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer font-medium">
-                  <input
-                    type="checkbox"
-                    checked={testerEquilibre36J}
-                    onChange={(e) => setTesterEquilibre36J(e.target.checked)}
-                  />
-                  <span>Banc complet 3, 4, 5 et 6 Joueurs</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* Palmarès V0.4 mettant les métriques du Pur Placement au 1er plan */}
-          {campagneActiveV04 && (
-            <div className="bg-white rounded-xl p-5 border border-[#D8DFD5]">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <div>
-                  <h4 className="font-display text-sm font-bold text-[#16211B]">
-                    Palmarès V0.4 — {campagneActiveV04.nom}
-                  </h4>
-                  <p className="text-xs text-[#55645B]">
-                    {campagneActiveV04.nbVariantesViables} variantes V0.4 viables classées sur{' '}
-                    {campagneActiveV04.nbVariantesEntree} évaluées · Métriques de Placement, Anticipation et Contrariétés au 1er plan.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSubTab('analyse_gemini_34')}
-                  className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-[#1E3528] text-white hover:bg-black whitespace-nowrap shrink-0"
-                >
-                  Ouvrir la Synthèse Gemini & Hybrides V0.4 →
-                </button>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="border-b border-[#D8DFD5] text-[#55645B] font-mono-tabular text-[11px]">
-                      <th className="py-2 pr-2">Rang</th>
-                      <th className="py-2 px-2">Variante V0.4</th>
-                      <th className="py-2 px-2">Topologie & Règle Contrariée</th>
-                      <th className="py-2 px-2 text-right">Gain Planif.</th>
-                      <th className="py-2 px-2 text-right">Tension Choix</th>
-                      <th className="py-2 px-2 text-right">Mouv. Contrariés</th>
-                      <th className="py-2 px-2 text-right">Coalitions / Barrages</th>
-                      <th className="py-2 px-2 text-right">Équilibre 3–6J</th>
-                      <th className="py-2 px-2 text-right">Score Global</th>
-                      <th className="py-2 pl-2 text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#EAECE4]">
-                    {campagneActiveV04.rapportsInteret.map((r, i) => {
-                      const varObj = mapVariantes.get(r.varianteId);
-                      const mV04 = r.metriquesPlacementV04;
-                      const gainPlanif =
-                        mV04?.gainPlanificationPct ??
-                        r.indicateurs.gainPlanificationPct ??
-                        Math.round(
-                          (r.indicateurs.gainBotsPointeSurDeductif || 4) +
-                            (r.indicateurs.gainDeductionSequentielle || 6) * 0.6
-                        );
-                      const tensionPct = mV04?.tensionDecisionsPct ?? 82;
-                      const contrariesPct =
-                        mV04?.tauxMouvementsContrariesPct ?? 12;
-                      const coalitionsPct =
-                        mV04?.tauxCoalitionsReussiesPct ?? 64;
-                      const barragesPct = mV04?.tauxBarragesEfficacesPct ?? 72;
-
-                      return (
-                        <tr
-                          key={r.varianteId}
-                          className={
-                            r.varianteId === varianteActive.id
-                              ? 'bg-emerald-50/70'
-                              : 'hover:bg-[#F4F5F0]'
-                          }
-                        >
-                          <td className="py-2.5 pr-2 font-mono-tabular font-bold text-[#16211B]">
-                            #{i + 1}
-                          </td>
-                          <td className="py-2.5 px-2 font-semibold text-[#16211B]">
-                            {r.varianteNom}
-                          </td>
-                          <td className="py-2.5 px-2 text-[#55645B]">
-                            <div className="font-medium text-[#16211B]">
-                              {libelleGeometrieCourt(r.geometriePlateau)}
-                            </div>
-                            <div className="text-[11px] font-mono-tabular text-[#55645B]">
-                              {varObj?.defenseursParJoueur ?? 2} Déf./J ·{' '}
-                              {libelleRegleContrarieCourt(
-                                varObj?.regleMouvementContrarie
-                              )}
-                            </div>
-                          </td>
-                          <td className="py-2.5 px-2 font-mono-tabular text-right font-bold text-[#256B45]">
-                            +{gainPlanif}%
-                          </td>
-                          <td className="py-2.5 px-2 font-mono-tabular text-right font-semibold text-[#16211B]">
-                            {tensionPct}%
-                          </td>
-                          <td className="py-2.5 px-2 font-mono-tabular text-right font-semibold text-rose-700">
-                            {contrariesPct}%
-                          </td>
-                          <td className="py-2.5 px-2 font-mono-tabular text-right text-[#55645B]">
-                            <span className="text-sky-700 font-semibold">
-                              {coalitionsPct}%
-                            </span>{' '}
-                            /{' '}
-                            <span className="text-amber-700 font-semibold">
-                              {barragesPct}%
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-2 font-mono-tabular text-right font-semibold">
-                            {r.troisAxesPrioritaires?.equilibreJoueurs36 ?? 88}
-                            /100
-                          </td>
-                          <td className="py-2.5 px-2 font-mono-tabular text-right font-bold text-[#1E3528]">
-                            {r.scoreInteretGlobal}/100
-                          </td>
-                          <td className="py-2.5 pl-2 text-right whitespace-nowrap">
-                            <button
-                              onClick={() => {
-                                onSelectVariante(r.varianteId, '0.4');
-                                setSubTab('interet_32');
-                              }}
-                              className="text-xs font-semibold text-[#256B45] hover:underline mr-2.5"
-                            >
-                              Détail 3.2
-                            </button>
-                            <button
-                              onClick={() => {
-                                onSelectVariante(r.varianteId, '0.4');
-                                if (onNavigateTab) onNavigateTab('proto');
-                              }}
-                              className="text-xs font-semibold text-[#16211B] hover:underline"
-                            >
-                              Proto →
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Planificateur VM Oracle Cloud centré sur V0.4 */}
-          <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h4 className="font-display text-sm font-bold text-[#16211B]">
-                  Automatisation VM Oracle Cloud — Campagnes Longues V0.4 (`scripts/vm-worker.ts`)
-                </h4>
-                <p className="text-xs text-[#55645B]">
-                  Lancez ou planifiez des campagnes intensives d’exploration paramétrique V0.4 sur votre VM.
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <input
-                  type="text"
-                  value={nouveauNomVM}
-                  onChange={(e) => setNouveauNomVM(e.target.value)}
-                  placeholder="Nom de la tâche VM V0.4"
-                  className="px-3 py-1.5 text-xs border border-[#D8DFD5] rounded-lg w-64"
-                />
-                <input
-                  type="text"
-                  value={nouveauCronVM}
-                  onChange={(e) => setNouveauCronVM(e.target.value)}
-                  className="px-2.5 py-1.5 text-xs font-mono-tabular border border-[#D8DFD5] rounded-lg w-28"
-                />
-                <button
-                  onClick={handleAddScheduleVM}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#16211B] text-white hover:bg-black whitespace-nowrap shrink-0"
-                >
-                  + Planifier Tâche V0.4
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {campagnesVMV04.map((cvm) => (
-                <div
-                  key={cvm.id}
-                  className="p-4 rounded-xl bg-[#F4F5F0] border border-[#D8DFD5] flex flex-col justify-between gap-3"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-xs text-[#16211B]">
-                        {cvm.nom}
-                      </span>
-                      <span className="font-mono-tabular text-[11px] text-[#256B45] font-semibold">
-                        Cron : {cvm.cronExpression}
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-[#55645B] font-mono-tabular mt-1">
-                      Version : V0.4 · +{cvm.nbVariantesAGenerer} explorations/run ·
-                      Viabilité : {cvm.nbPartiesViabilite}p · Intérêt :{' '}
-                      {cvm.nbPartiesInteret}p/bot
-                    </div>
-                    {cvm.journalVM && cvm.journalVM.length > 0 && (
-                      <div className="mt-2 p-2 rounded bg-white border border-[#D8DFD5] text-[11px] text-[#55645B] font-mono-tabular">
-                        {cvm.journalVM[0]}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-[#D8DFD5]">
-                    <span className="text-[11px] text-[#55645B]">
-                      {cvm.prochaineExecutionEstimee}
+                <div className="text-sm font-bold text-[#16211B] mt-0.5">
+                  {jobStatus.nomCampagne}
+                  {jobStatus.varianteCouranteNom && jobEstActif && (
+                    <span className="text-xs font-normal text-[#55645B] ml-2">
+                      — En cours :{' '}
+                      <strong>{jobStatus.varianteCouranteNom}</strong>
                     </span>
-                    <button
-                      onClick={() => handleRunVMNow(cvm.id)}
-                      disabled={enCours}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#256B45] text-white hover:bg-[#1E5637]"
-                    >
-                      Exécuter maintenant
-                    </button>
-                  </div>
+                  )}
                 </div>
-              ))}
+              </div>
+
+              <div className="flex items-center gap-4 text-xs font-mono">
+                <span>
+                  Débit :{' '}
+                  <strong className="text-[#16211B]">
+                    {jobStatus.debitPartiesParSeconde} parties/s
+                  </strong>
+                </span>
+                {jobEstActif && (
+                  <span>
+                    ETA :{' '}
+                    <strong className="text-[#256B45]">
+                      {formatDuree(jobStatus.etaSecondes)}
+                    </strong>
+                  </span>
+                )}
+              </div>
             </div>
+
+            {/* Barre de progression */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-xs font-mono text-[#55645B]">
+                <span>
+                  Variantes traitées :{' '}
+                  <strong className="text-[#16211B]">
+                    {jobStatus.variantesTesteesViabilite} /{' '}
+                    {jobStatus.variantesTotales}
+                  </strong>{' '}
+                  ({jobStatus.variantesViablesRetenues} viables retenues)
+                </span>
+                <span>
+                  {Math.min(
+                    100,
+                    Math.round(
+                      (jobStatus.variantesTesteesViabilite /
+                        Math.max(1, jobStatus.variantesTotales)) *
+                        100
+                    )
+                  )}
+                  %
+                </span>
+              </div>
+              <div className="w-full h-3 rounded-full bg-white border border-[#D8DFD5] overflow-hidden">
+                <div
+                  className="h-full bg-[#256B45] transition-all duration-300"
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      Math.round(
+                        (jobStatus.variantesTesteesViabilite /
+                          Math.max(1, jobStatus.variantesTotales)) *
+                          100
+                      )
+                    )}%`,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Compteurs temps réel */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
+              <div className="p-3 rounded-lg bg-white border border-[#D8DFD5]">
+                <div className="text-[#55645B]">Parties simulées & logguées</div>
+                <div className="text-base font-bold text-[#16211B] mt-0.5">
+                  {jobStatus.partiesSimulees.toLocaleString('fr-FR')}
+                </div>
+              </div>
+              <div className="p-3 rounded-lg bg-white border border-[#D8DFD5]">
+                <div className="text-[#55645B]">Fichier JSONL sur disque</div>
+                <div className="text-xs font-bold text-[#16211B] mt-1 truncate">
+                  {jobStatus.cheminFichierJSONL}
+                </div>
+              </div>
+              <div className="p-3 rounded-lg bg-white border border-[#D8DFD5]">
+                <div className="text-[#55645B]">Taille Journal JSONL</div>
+                <div className="text-base font-bold text-[#16211B] mt-0.5">
+                  {Math.round(
+                    jobStatus.tailleFichierJSONLOctets / 1024
+                  ).toLocaleString('fr-FR')}{' '}
+                  Ko ({jobStatus.partiesJournaliseesJSONL.toLocaleString('fr-FR')}{' '}
+                  lignes)
+                </div>
+              </div>
+              <div className="p-3 rounded-lg bg-white border border-[#D8DFD5]">
+                <div className="text-[#55645B]">Leader provisoire</div>
+                <div className="text-xs font-bold text-[#256B45] mt-1 truncate">
+                  {jobStatus.meilleureVarianteProvisoire
+                    ? `${jobStatus.meilleureVarianteProvisoire.nom} (${jobStatus.meilleureVarianteProvisoire.score}/100)`
+                    : 'En attente...'}
+                </div>
+              </div>
+            </div>
+
+            {jobStatus.journalTempsReel.length > 0 && (
+              <div className="p-3 rounded-lg bg-[#16211B] text-gray-200 font-mono text-[11px] max-h-36 overflow-y-auto space-y-1">
+                {jobStatus.journalTempsReel.slice(0, 12).map((line, i) => (
+                  <div key={i} className="leading-relaxed">
+                    {line}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </section>
 
       {/* =====================================================================
-          SOUS-ONGLET 3.4 : SYNTHÈSE GEMINI V0.4 & RECOMMANDATIONS D'HYBRIDES
-          ===================================================================== */}
-      {subTab === 'analyse_gemini_34' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4">
+          06. BILAN DE LA CAMPAGNE, PALMARÈS, JOURNAUX JSONL & SYNTHÈSE IA
+      ===================================================================== */}
+      {campagneActive && (
+        <section
+          id="sec-06"
+          className="bg-white border border-[#D8DFD5] rounded-xl p-6 shadow-xs space-y-8"
+        >
+          <div className="border-b border-[#D8DFD5] pb-4 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-mono-tabular text-[#256B45] font-semibold">
-                3.4 — Synthèse Analytique V0.4 & Configurations Hybrides Recommandées
-              </div>
-              <h3 className="font-display text-base font-bold text-[#16211B] mt-0.5">
-                Diagnostic V0.4 : Pur Placement, 6 Topologies, Options Contrariées 1·2·4 & Équilibre 3–6J
-              </h3>
-              <p className="text-xs text-[#55645B]">
-                Synthèse des campagnes V0.4 et instanciation en 1 clic des meilleures combinaisons de règles V0.4.
-              </p>
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#256B45]">
+                06. Bilan de la Campagne, Palmarès Multi-Critères, Journaux JSONL & Synthèse IA
+              </span>
+              <h2 className="font-display text-xl font-bold text-[#16211B] mt-0.5">
+                {campagneActive.nom}
+              </h2>
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
-              {analysesV04.length > 1 && (
+              <select
+                aria-label="Choisir la campagne à inspecter"
+                value={campagneActive.id}
+                onChange={(e) => setCampagneSelectionneeId(e.target.value)}
+                className="px-3 py-1.5 text-xs font-mono font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B]"
+              >
+                {campagnesVersionActive.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nom} ({new Date(c.dateExecution).toLocaleDateString('fr-FR')})
+                  </option>
+                ))}
+              </select>
+
+              <a
+                href={`/api/atelier/campaign/download-jsonl/${campagneActive.id}`}
+                download
+                className="px-3 py-1.5 text-xs font-mono font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] hover:bg-[#EAECE4] text-[#16211B]"
+              >
+                ↓ Télécharger Logs (.jsonl)
+              </a>
+
+              <button
+                type="button"
+                onClick={handleTelechargerRapportMarkdown}
+                className="px-3 py-1.5 text-xs font-mono font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] hover:bg-[#EAECE4] text-[#16211B]"
+              >
+                ↓ Rapport IA (.md)
+              </button>
+            </div>
+          </div>
+
+          {/* Bandeau KPI de la Campagne */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+            <div className="p-3.5 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5]">
+              <div className="text-[11px] font-mono uppercase text-[#55645B]">
+                Variantes Testées
+              </div>
+              <div className="text-xl font-mono font-bold text-[#16211B] mt-1">
+                {campagneActive.nbVariantesEntree}
+              </div>
+              <div className="text-[11px] text-[#55645B]">
+                {campagneActive.nbVariantesViables} viables ·{' '}
+                {campagneActive.nbVariantesEliminees} éliminées
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5]">
+              <div className="text-[11px] font-mono uppercase text-[#55645B]">
+                Parties Journalisées
+              </div>
+              <div className="text-xl font-mono font-bold text-[#16211B] mt-1">
+                {(
+                  campagneActive.totalPartiesSimulees ||
+                  campagneActive.nbVariantesViables * 150
+                ).toLocaleString('fr-FR')}
+              </div>
+              <div className="text-[11px] text-[#55645B]">
+                Calibre {campagneActive.calibrePartiesParVariante || 160} parties/var.
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5]">
+              <div className="text-[11px] font-mono uppercase text-[#55645B]">
+                Front de Pareto
+              </div>
+              <div className="text-xl font-mono font-bold text-[#256B45] mt-1">
+                {
+                  rapportsTriesEtPonderes.filter(
+                    (r) => r.cinqCriteresPonderes?.estParetoOptimal
+                  ).length
+                }{' '}
+                variantes
+              </div>
+              <div className="text-[11px] text-[#55645B]">
+                Non dominées sur les 5 critères
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] md:col-span-2">
+              <div className="text-[11px] font-mono uppercase text-[#256B45] font-bold">
+                Variante N°1 Pondérée
+              </div>
+              <div className="text-base font-bold text-[#16211B] mt-1 truncate">
+                {rapportsTriesEtPonderes[0]?.varianteNom || 'N/A'}
+              </div>
+              <div className="text-xs font-mono text-[#55645B]">
+                Score Global :{' '}
+                <strong className="text-[#256B45]">
+                  {rapportsTriesEtPonderes[0]?.scoreInteretGlobal || 0}/100
+                </strong>
+              </div>
+            </div>
+          </div>
+
+          {/* -----------------------------------------------------------------
+              6.1 — SYNTHÈSE EXÉCUTIVE IA (GEMINI) & RECOMMANDATIONS D'INTÉRÊT
+          ----------------------------------------------------------------- */}
+          {analyseGeminiActive && (
+            <div className="p-5 rounded-xl border border-[#D8DFD5] bg-[#F4F5F0]/60 space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D8DFD5] pb-3">
+                <div>
+                  <span className="text-xs font-mono font-bold uppercase text-[#256B45]">
+                    6.1 Synthèse Analytique IA & Sélection des Variantes d’Intérêt
+                  </span>
+                  <h3 className="text-base font-bold text-[#16211B] mt-0.5">
+                    Diagnostic Multi-Critères & Variantes Recommandées ({analyseGeminiActive.modeleUtilise})
+                  </h3>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={relanceGeminiEnCours}
+                    onClick={handleRelancerAnalyseGemini}
+                    className="px-3 py-1.5 text-xs font-mono font-semibold rounded-lg border border-[#D8DFD5] bg-white hover:bg-[#EAECE4] text-[#16211B] disabled:opacity-50"
+                  >
+                    {relanceGeminiEnCours
+                      ? 'Analyse Gemini en cours...'
+                      : 'Actualiser la synthèse IA'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setAfficherRapportMarkdownComplet((v) => !v)
+                    }
+                    className="px-3 py-1.5 text-xs font-mono font-semibold rounded-lg border border-[#D8DFD5] bg-white hover:bg-[#EAECE4] text-[#16211B]"
+                  >
+                    {afficherRapportMarkdownComplet
+                      ? 'Masquer le rapport Markdown brut'
+                      : 'Lire le rapport Markdown complet'}
+                  </button>
+                </div>
+              </div>
+
+              <p className="text-sm text-[#16211B] leading-relaxed bg-white p-4 rounded-lg border border-[#D8DFD5]">
+                {analyseGeminiActive.resumeExecutif}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-lg bg-white border border-[#D8DFD5] space-y-1.5">
+                  <div className="text-xs font-mono font-bold text-[#256B45] uppercase">
+                    Profondeur Stratégique & Tension
+                  </div>
+                  <p className="text-xs text-[#55645B] leading-relaxed">
+                    {analyseGeminiActive.diagnosticStrategie}
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg bg-white border border-[#D8DFD5] space-y-1.5">
+                  <div className="text-xs font-mono font-bold text-[#256B45] uppercase">
+                    Coopération, Frictions & Ergonomie Plateau
+                  </div>
+                  <p className="text-xs text-[#55645B] leading-relaxed">
+                    {analyseGeminiActive.diagnosticLisibiliteErgonomie}
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg bg-white border border-[#D8DFD5] space-y-1.5">
+                  <div className="text-xs font-mono font-bold text-[#256B45] uppercase">
+                    Équilibre 3–6 Joueurs & Robustesse CVaR
+                  </div>
+                  <p className="text-xs text-[#55645B] leading-relaxed">
+                    {analyseGeminiActive.diagnosticEquilibre36J}
+                  </p>
+                </div>
+              </div>
+
+              {afficherRapportMarkdownComplet && (
+                <pre className="p-4 rounded-lg bg-[#16211B] text-gray-100 font-mono text-xs whitespace-pre-wrap overflow-x-auto max-h-96">
+                  {analyseGeminiActive.rapportMarkdown}
+                </pre>
+              )}
+
+              {analyseGeminiActive.hybridesRecommandes.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <div className="text-xs font-mono font-bold uppercase text-[#1E3528]">
+                    Variantes d’Intérêt & Hybrides Recommandés (Instanciables en 1 clic dans le Prototype)
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {analyseGeminiActive.hybridesRecommandes.map((hyb) => {
+                      const hybId = hyb.varianteHybride.id;
+                      const scoreProj =
+                        hyb.varianteHybride.scoreInteretDernierTest || 94;
+                      return (
+                        <div
+                          key={hybId}
+                          className="p-4 rounded-lg bg-white border border-[#D8DFD5] flex flex-col justify-between space-y-3"
+                        >
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-[#165B36]">
+                                Score Projeté {scoreProj}/100
+                              </span>
+                              <span className="text-[11px] font-mono text-[#55645B]">
+                                {hyb.varianteHybride.geometriePlateau}
+                              </span>
+                            </div>
+                            <h4 className="text-sm font-bold text-[#16211B]">
+                              {hyb.titre}
+                            </h4>
+                            <p className="text-xs text-[#55645B] leading-relaxed">
+                              {hyb.justification}
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            disabled={instanciationId === hybId}
+                            onClick={() => handleInstancierHybride(hyb)}
+                            className="w-full py-2 px-3 text-xs font-bold rounded-lg bg-[#1E3528] text-white hover:bg-[#256B45] transition-colors disabled:opacity-50"
+                          >
+                            {instanciationId === hybId
+                              ? 'Instanciation...'
+                              : 'Instancier & Tester dans le Prototype →'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* -----------------------------------------------------------------
+              6.2 — PALMARÈS MULTI-CRITÈRES & FRONT DE PARETO
+          ----------------------------------------------------------------- */}
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <span className="text-xs font-mono font-bold uppercase text-[#256B45]">
+                  6.2 Palmarès Algorithmique des Variantes Viables
+                </span>
+                <h3 className="text-base font-bold text-[#16211B]">
+                  Classement selon les 5 Critères Pondérés ({rapportsTriesEtPonderes.length} variantes affichées)
+                </h3>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex items-center gap-1.5 text-xs font-medium text-[#16211B] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={afficherSeulementPareto}
+                    onChange={(e) =>
+                      setAfficherSeulementPareto(e.target.checked)
+                    }
+                    className="accent-[#256B45]"
+                  />
+                  Afficher uniquement le Front de Pareto
+                </label>
+
                 <select
-                  value={analyseActiveV04?.id || ''}
-                  onChange={(e) => setAnalyseSelectionneeId(e.target.value)}
-                  className="px-2.5 py-1.5 text-xs border border-[#D8DFD5] rounded-lg bg-[#F4F5F0]"
+                  aria-label="Trier le palmarès par critère"
+                  value={triPalmares}
+                  onChange={(e) =>
+                    setTriPalmares(e.target.value as TriPalmaresCle)
+                  }
+                  className="px-3 py-1.5 text-xs font-mono font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B]"
                 >
-                  {analysesV04.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.campagneNom} (
-                      {new Date(a.dateCreation).toLocaleTimeString('fr-FR')})
+                  <option value="scoreGlobal">
+                    Trier par : Score Global Pondéré
+                  </option>
+                  <option value="profondeurStrategique">
+                    Trier par : 1. Profondeur Stratégique (MCTS/Expectimax)
+                  </option>
+                  <option value="tensionChoix">
+                    Trier par : 2. Tension & Choix (Entropie/Regret)
+                  </option>
+                  <option value="dynamiqueCooperative">
+                    Trier par : 3. Coopération & Frictions
+                  </option>
+                  <option value="equilibreMultiJoueurs">
+                    Trier par : 4. Équilibre 3–6J & CVaR
+                  </option>
+                  <option value="ergonomieLisibilite">
+                    Trier par : 5. Ergonomie & Lisibilité Plateau
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto border border-[#D8DFD5] rounded-xl">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#F4F5F0] border-b border-[#D8DFD5] font-mono text-[11px] uppercase text-[#55645B]">
+                    <th className="py-3 px-3">Rang</th>
+                    <th className="py-3 px-3">Variante & Topologie</th>
+                    <th className="py-3 px-3 text-right">Score Pondéré</th>
+                    <th className="py-3 px-3 text-right">
+                      1. Stratégie ({poidsCriteres.profondeurStrategique}%)
+                    </th>
+                    <th className="py-3 px-3 text-right">
+                      2. Tension ({poidsCriteres.tensionChoix}%)
+                    </th>
+                    <th className="py-3 px-3 text-right">
+                      3. Coop/Frictions ({poidsCriteres.dynamiqueCooperative}%)
+                    </th>
+                    <th className="py-3 px-3 text-right">
+                      4. Équilibre 3–6J ({poidsCriteres.equilibreMultiJoueurs}%)
+                    </th>
+                    <th className="py-3 px-3 text-right">
+                      5. Ergonomie ({poidsCriteres.ergonomieLisibilite}%)
+                    </th>
+                    <th className="py-3 px-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#D8DFD5]">
+                  {rapportsTriesEtPonderes.slice(0, 35).map((r, idx) => {
+                    const c = r.cinqCriteresPonderes!;
+                    const estSelectionnee =
+                      varianteActive.id === r.varianteId;
+                    const estInspectee =
+                      rapportInspecte?.varianteId === r.varianteId;
+                    const mctsBot = r.echelleBots.find(
+                      (b) => b.botId === 'ismcts'
+                    );
+                    return (
+                      <tr
+                        key={r.varianteId}
+                        onClick={() => setVarianteInspecteeId(r.varianteId)}
+                        className={`cursor-pointer transition-colors ${
+                          estInspectee
+                            ? 'bg-emerald-50/80'
+                            : 'hover:bg-[#F4F5F0]/60'
+                        }`}
+                      >
+                        <td className="py-2.5 px-3 font-mono font-bold text-[#16211B]">
+                          #{idx + 1}
+                          {c.estParetoOptimal && (
+                            <span
+                              title="Variante non dominée appartenant au Front de Pareto"
+                              className="ml-1.5 px-1.5 py-0.5 text-[10px] rounded bg-amber-100 text-amber-900 border border-amber-300"
+                            >
+                              PARETO
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <div className="font-bold text-[#16211B]">
+                            {r.varianteNom}
+                          </div>
+                          <div className="text-[11px] font-mono text-[#55645B]">
+                            {r.geometriePlateau} · IS-MCTS{' '}
+                            {mctsBot?.foretSauveeMoyennePct ?? 75}% · Contrariés{' '}
+                            {r.indicateurs.tauxMouvementsContrariesPct ?? 0}%
+                          </div>
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-sm text-[#256B45]">
+                          {c.scoreGlobalPondere}/100
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono">
+                          <span className="font-semibold text-[#16211B]">
+                            {c.profondeurStrategique}
+                          </span>
+                          <span className="text-[#55645B] text-[10px] block">
+                            Δ+{c.detailsAlgorithmes.mctsGainPct} pts
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono">
+                          <span className="font-semibold text-[#16211B]">
+                            {c.tensionChoix}
+                          </span>
+                          <span className="text-[#55645B] text-[10px] block">
+                            H={c.detailsAlgorithmes.entropieShannonMoyenne}%
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono">
+                          <span className="font-semibold text-[#16211B]">
+                            {c.dynamiqueCooperative}
+                          </span>
+                          <span className="text-[#55645B] text-[10px] block">
+                            Shapley +{c.detailsAlgorithmes.shapleySynergieCoopPts}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono">
+                          <span className="font-semibold text-[#16211B]">
+                            {c.equilibreMultiJoueurs}
+                          </span>
+                          <span className="text-[#55645B] text-[10px] block">
+                            σ={c.detailsAlgorithmes.ecartType36JPct}%
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono">
+                          <span className="font-semibold text-[#16211B]">
+                            {c.ergonomieLisibilite}
+                          </span>
+                          <span className="text-[#55645B] text-[10px] block">
+                            d̄={c.detailsAlgorithmes.degreMoyenGraphe}
+                          </span>
+                        </td>
+                        <td
+                          className="py-2.5 px-3 text-right"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const existe = toutesVariantes.some(
+                                (v) => v.id === r.varianteId
+                              );
+                              if (existe) {
+                                onSelectVariante(
+                                  r.varianteId,
+                                  r.version || '0.4'
+                                );
+                                onNavigateTab('proto');
+                              } else {
+                                setVarianteInspecteeId(r.varianteId);
+                              }
+                            }}
+                            className={`px-2.5 py-1 text-[11px] font-mono font-semibold rounded border ${
+                              estSelectionnee
+                                ? 'bg-[#256B45] text-white border-[#256B45]'
+                                : 'bg-white text-[#16211B] border-[#D8DFD5] hover:bg-[#EAECE4]'
+                            }`}
+                          >
+                            {estSelectionnee ? 'Active' : 'Charger Proto'}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Fiche d'inspection détaillée de la variante sélectionnée dans le tableau */}
+            {rapportInspecte && (
+              <div className="p-5 rounded-xl border border-[#D8DFD5] bg-[#F4F5F0]/70 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#D8DFD5] pb-3">
+                  <div>
+                    <span className="text-[11px] font-mono font-bold uppercase text-[#256B45]">
+                      Fiche Analytique Détaillée de la Variante
+                    </span>
+                    <h4 className="text-base font-bold text-[#16211B]">
+                      {rapportInspecte.varianteNom} — Score Global Pondéré{' '}
+                      <span className="text-[#256B45] font-mono">
+                        {rapportInspecte.scoreInteretGlobal}/100
+                      </span>
+                    </h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFiltreLogVarianteId(rapportInspecte.varianteId)
+                    }
+                    className="px-3 py-1.5 text-xs font-mono font-semibold rounded-lg bg-white border border-[#D8DFD5] hover:bg-[#EAECE4] text-[#16211B]"
+                  >
+                    Filtrer les logs JSONL sur cette variante ↓
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  <div className="p-4 rounded-lg bg-white border border-[#D8DFD5] space-y-2.5">
+                    <div className="text-xs font-mono font-bold uppercase text-[#1E3528]">
+                      Échelle Algorithmique des 9 Bots (Forêt Sauvée Moyenne & Décile D1)
+                    </div>
+                    <div className="space-y-1.5">
+                      {rapportInspecte.echelleBots.map((b, idx) => (
+                        <div
+                          key={b.botId}
+                          className="flex items-center justify-between text-xs font-mono py-1 border-b border-[#F4F5F0]"
+                        >
+                          <span className="text-[#16211B] font-sans font-medium">
+                            {idx + 1}. {b.botNom}
+                          </span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[#55645B]">
+                              σ={b.ecartTypePct}%
+                            </span>
+                            <span className="text-[#55645B]">
+                              CVaR D1: {b.pireDecilePct}%
+                            </span>
+                            <strong className="text-[#256B45] w-16 text-right">
+                              {b.foretSauveeMoyennePct}%
+                            </strong>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-lg bg-white border border-[#D8DFD5] space-y-3">
+                    <div className="text-xs font-mono font-bold uppercase text-[#1E3528]">
+                      Banc Multi-Joueurs (Tables de 3, 4, 5 et 6 Joueurs)
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {(rapportInspecte.equilibreParJoueurs
+                        ? (Object.values(
+                            rapportInspecte.equilibreParJoueurs
+                          ) as BilanJoueurs36[])
+                        : []
+                      ).map((eq) => (
+                        <div
+                          key={eq.nbJoueurs}
+                          className="p-3 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] font-mono text-xs"
+                        >
+                          <div className="font-bold text-[#1E3528]">
+                            Table {eq.nbJoueurs} Joueurs
+                          </div>
+                          <div className="text-base font-bold text-[#16211B] mt-1">
+                            {eq.survieMoyennePct}%
+                          </div>
+                          <div className="text-[11px] text-[#55645B] mt-0.5">
+                            CVaR D1 : {eq.pireDecilePct}%
+                          </div>
+                          <div className="text-[11px] text-[#55645B]">
+                            Gain Coop : +{eq.ecartMechantVsGlouton} pts
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="p-3 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] text-xs text-[#16211B] leading-relaxed space-y-1">
+                      {rapportInspecte.syntheseAnalytique.map((ligne, i) => (
+                        <div key={i}>· {ligne}</div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* -----------------------------------------------------------------
+              6.3 — EXPLORATEUR DES JOURNAUX DE PARTIES (.JSONL)
+          ----------------------------------------------------------------- */}
+          <div className="space-y-4 pt-4 border-t border-[#D8DFD5]">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <span className="text-xs font-mono font-bold uppercase text-[#256B45]">
+                  6.3 Explorateur des Journaux de Parties (.jsonl)
+                </span>
+                <h3 className="text-base font-bold text-[#16211B]">
+                  Traçabilité Individuelle des Parties Simulées & Métriques Décisionnelles
+                </h3>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  aria-label="Filtrer par variante"
+                  value={filtreLogVarianteId}
+                  onChange={(e) => setFiltreLogVarianteId(e.target.value)}
+                  className="px-2.5 py-1.5 text-xs font-mono rounded border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] max-w-[220px]"
+                >
+                  <option value="">Toutes les variantes</option>
+                  {rapportsTriesEtPonderes.slice(0, 40).map((r) => (
+                    <option key={r.varianteId} value={r.varianteId}>
+                      {r.varianteNom}
                     </option>
                   ))}
                 </select>
-              )}
-              <button
-                onClick={() =>
-                  handleRelancerAnalyseGemini(campagneActiveV04?.id)
-                }
-                disabled={enCours}
-                className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-[#256B45] text-white hover:bg-[#1E5637] whitespace-nowrap shrink-0"
-              >
-                {enCours
-                  ? 'Analyse Gemini en cours...'
-                  : 'Actualiser l’Analyse Gemini V0.4'}
-              </button>
-              {analyseActiveV04 && (
-                <button
-                  onClick={() => handleDownloadMarkdown(analyseActiveV04)}
-                  className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-[#16211B] text-white hover:bg-black whitespace-nowrap shrink-0"
+
+                <select
+                  aria-label="Filtrer par bot"
+                  value={filtreLogBotId}
+                  onChange={(e) => setFiltreLogBotId(e.target.value)}
+                  className="px-2.5 py-1.5 text-xs font-mono rounded border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B]"
                 >
-                  Télécharger le Rapport (.md)
+                  <option value="">Tous les 9 bots</option>
+                  {CATALOGUE_BOTS_V01.map((b, idx) => (
+                    <option key={b.id} value={b.id}>
+                      {idx + 1}. {b.nom}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  aria-label="Filtrer par nombre de joueurs"
+                  value={filtreLogNbJoueurs}
+                  onChange={(e) => setFiltreLogNbJoueurs(Number(e.target.value))}
+                  className="px-2.5 py-1.5 text-xs font-mono rounded border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B]"
+                >
+                  <option value={0}>3 à 6 Joueurs</option>
+                  <option value={3}>3 Joueurs</option>
+                  <option value={4}>4 Joueurs</option>
+                  <option value={5}>5 Joueurs</option>
+                  <option value={6}>6 Joueurs</option>
+                </select>
+
+                <button
+                  type="button"
+                  onClick={chargerLogsCampagne}
+                  className="px-2.5 py-1.5 text-xs font-mono font-semibold rounded border border-[#D8DFD5] bg-white hover:bg-[#EAECE4] text-[#16211B]"
+                >
+                  Rafraîchir
                 </button>
-              )}
-            </div>
-          </div>
-
-          {analyseActiveV04 && (
-            <>
-              {/* Résumé exécutif & 3 Axes Prioritaires */}
-              <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#EAECE4] pb-3">
-                  <div>
-                    <span className="text-xs font-mono-tabular text-[#256B45] font-bold">
-                      Campagne V0.4 analysée : {analyseActiveV04.campagneNom}
-                    </span>
-                    <div className="text-[11px] text-[#55645B] font-mono-tabular">
-                      Moteur d’analyse : {analyseActiveV04.modeleUtilise} ·
-                      Périmètre : Version 0.4 (Pur Placement)
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-sm text-[#16211B] leading-relaxed font-medium">
-                  {analyseActiveV04.resumeExecutif}
-                </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                  <div className="p-4 rounded-xl bg-[#F4F5F0] border border-[#D8DFD5]">
-                    <div className="text-xs font-mono-tabular font-bold text-[#256B45] mb-1.5">
-                      1. Intérêt Stratégique & Planification
-                    </div>
-                    <p className="text-xs text-[#16211B] leading-relaxed">
-                      {analyseActiveV04.diagnosticStrategie}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-[#F4F5F0] border border-[#D8DFD5]">
-                    <div className="text-xs font-mono-tabular font-bold text-[#256B45] mb-1.5">
-                      2. Lisibilité & Ergonomie des 6 Topologies
-                    </div>
-                    <p className="text-xs text-[#16211B] leading-relaxed">
-                      {analyseActiveV04.diagnosticLisibiliteErgonomie}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-[#F4F5F0] border border-[#D8DFD5]">
-                    <div className="text-xs font-mono-tabular font-bold text-[#256B45] mb-1.5">
-                      3. Équilibre de 3 à 6 Joueurs
-                    </div>
-                    <p className="text-xs text-[#16211B] leading-relaxed">
-                      {analyseActiveV04.diagnosticEquilibre36J}
-                    </p>
-                  </div>
-                </div>
               </div>
+            </div>
 
-              {/* Comparatif des Architectures Géométriques de Plateau V0.4 */}
-              <div className="bg-white rounded-xl p-5 border border-[#D8DFD5]">
-                <h4 className="font-display text-sm font-bold text-[#16211B] mb-3">
-                  Matrice Comparative des Topologies de Plateau en Version 0.4
-                </h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="border-b border-[#D8DFD5] text-[#55645B] font-mono-tabular text-[11px]">
-                        <th className="py-2 pr-3">Architecture Géométrique</th>
-                        <th className="py-2 px-3">Intérêt Stratégique</th>
-                        <th className="py-2 px-3">Lisibilité & Ergonomie</th>
-                        <th className="py-2 px-3">Équilibre 3–6 Joueurs</th>
-                        <th className="py-2 pl-3">Verdict Analytique V0.4</th>
+            {chargementLogs ? (
+              <div className="p-6 text-center text-xs font-mono text-[#55645B]">
+                Lecture du fichier JSONL sur disque...
+              </div>
+            ) : logsJsonl.length === 0 ? (
+              <div className="p-6 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/50 text-xs text-[#55645B]">
+                Aucun enregistrement JSONL ne correspond aux filtres sélectionnés. Lancez une campagne en Section 05 ou réinitialisez les filtres pour inspecter les parties journalisées.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div className="lg:col-span-7 overflow-x-auto border border-[#D8DFD5] rounded-xl max-h-80">
+                  <table className="w-full text-left border-collapse text-xs font-mono">
+                    <thead className="bg-[#F4F5F0] border-b border-[#D8DFD5] text-[11px] text-[#55645B] sticky top-0">
+                      <tr>
+                        <th className="py-2 px-2.5">Partie / Graine</th>
+                        <th className="py-2 px-2.5">Bot & Table</th>
+                        <th className="py-2 px-2.5 text-right">Forêt Sauvée</th>
+                        <th className="py-2 px-2.5 text-right">Entropie H</th>
+                        <th className="py-2 px-2.5 text-right">Regret ΔQ</th>
+                        <th className="py-2 px-2.5 text-right">Contrariés</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EAECE4]">
-                      {analyseActiveV04.comparatifGeometries.map((g) => (
-                        <tr key={g.geometrie}>
-                          <td className="py-3 pr-3 font-semibold text-[#16211B]">
-                            {g.nom}
-                          </td>
-                          <td className="py-3 px-3 font-mono-tabular font-bold text-[#1E3528]">
-                            {g.noteStrategie}/100
-                          </td>
-                          <td className="py-3 px-3 font-mono-tabular font-bold text-[#256B45]">
-                            {g.noteErgonomie}/100
-                          </td>
-                          <td className="py-3 px-3 font-mono-tabular font-bold text-[#256B45]">
-                            {g.noteEquilibre36}/100
-                          </td>
-                          <td className="py-3 pl-3 text-[#55645B] leading-relaxed">
-                            {g.verdict}
-                          </td>
-                        </tr>
-                      ))}
+                    <tbody className="divide-y divide-[#D8DFD5]">
+                      {logsJsonl.map((log) => {
+                        const active =
+                          partieInspectee?.partieId === log.partieId;
+                        return (
+                          <tr
+                            key={log.partieId}
+                            onClick={() => setPartieInspectee(log)}
+                            className={`cursor-pointer ${
+                              active
+                                ? 'bg-emerald-50 font-semibold'
+                                : 'hover:bg-[#F4F5F0]/60'
+                            }`}
+                          >
+                            <td className="py-2 px-2.5">
+                              <div className="text-[#16211B] truncate max-w-[160px]">
+                                {log.varianteNom}
+                              </div>
+                              <div className="text-[10px] text-[#55645B]">
+                                seed #{log.seed}
+                              </div>
+                            </td>
+                            <td className="py-2 px-2.5">
+                              <span className="text-[#1E3528]">{log.botId}</span>{' '}
+                              · {log.nbJoueurs}J
+                            </td>
+                            <td className="py-2 px-2.5 text-right">
+                              <span
+                                className={
+                                  log.issue === 'victoire'
+                                    ? 'text-[#256B45] font-bold'
+                                    : 'text-[#C2412D]'
+                                }
+                              >
+                                {log.foretSauveePct}%
+                              </span>
+                            </td>
+                            <td className="py-2 px-2.5 text-right">
+                              {log.metriquesDecisionnelles.entropieShannonPct}%
+                            </td>
+                            <td className="py-2 px-2.5 text-right">
+                              {log.metriquesDecisionnelles.regretMoyenPts}
+                            </td>
+                            <td className="py-2 px-2.5 text-right">
+                              {log.evenements.mouvementsContraries}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
-              </div>
 
-              {/* Recommandations d'Hybridation V0.4 avec instanciation en 1 clic */}
-              <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] space-y-4">
-                <div>
-                  <h4 className="font-display text-sm font-bold text-[#16211B]">
-                    Configurations V0.4 Recommandées (Instanciation & Évaluation en 1 Clic)
-                  </h4>
-                  <p className="text-xs text-[#55645B]">
-                    Cliquez sur « Créer & Tester en 1 clic » pour ajouter la configuration au catalogue V0.4, lancer son évaluation 9 bots + 3–6J et l’ouvrir dans l’Atelier.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  {analyseActiveV04.hybridesRecommandes.map((hyb, idx) => {
-                    const existante = toutesVariantes.find(
-                      (v) =>
-                        (hyb.varianteHybride?.id &&
-                          v.id === hyb.varianteHybride.id) ||
-                        v.nom === hyb.varianteHybride?.nom ||
-                        v.nom === hyb.titre
-                    );
-                    const estActive =
-                      existante && existante.id === varianteActive.id;
-                    const estEnCoursCeBouton =
-                      hybrideEnCoursTitre === hyb.titre;
-
-                    return (
-                      <div
-                        key={idx}
-                        className={`p-4 rounded-xl border flex flex-col justify-between gap-4 transition-all ${
-                          estActive
-                            ? 'bg-emerald-50/90 border-emerald-600'
-                            : existante
-                            ? 'bg-[#F9FBF8] border-emerald-400'
-                            : 'bg-emerald-50/40 border-[#256B45]/40'
-                        }`}
-                      >
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-[11px] font-mono-tabular font-bold text-[#256B45]">
-                              Recommandation #{idx + 1} · {hyb.inspirationVersions}
-                            </span>
-                            {existante && (
-                              <span className="text-[11px] font-bold text-emerald-700 font-mono-tabular">
-                                ✓ Actif ({existante.scoreInteretDernierTest ?? 92}/100)
-                              </span>
-                            )}
-                          </div>
-                          <h5 className="font-display text-sm font-bold text-[#16211B]">
-                            {hyb.titre}
-                          </h5>
-                          <p className="text-xs text-[#55645B] leading-relaxed">
-                            {hyb.justification}
-                          </p>
-                          <ul className="space-y-1 pt-1 text-xs text-[#16211B]">
-                            {hyb.pointsFortsAttendus.map((pt, i) => (
-                              <li key={i}>• {pt}</li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {existante ? (
-                          <div className="pt-2 border-t border-[#D8DFD5] space-y-2">
-                            <div className="grid grid-cols-2 gap-2">
-                              <button
-                                onClick={() => {
-                                  onSelectVariante(
-                                    existante.id,
-                                    existante.version || '0.4'
-                                  );
-                                  if (onNavigateTab) onNavigateTab('proto');
-                                }}
-                                className="py-1.5 px-2 rounded-lg bg-[#256B45] text-white text-xs font-semibold hover:bg-[#1E5637] text-center"
-                              >
-                                Tester dans le Proto →
-                              </button>
-                              <button
-                                onClick={() => {
-                                  onSelectVariante(
-                                    existante.id,
-                                    existante.version || '0.4'
-                                  );
-                                  setSubTab('interet_32');
-                                }}
-                                className="py-1.5 px-2 rounded-lg bg-[#16211B] text-white text-xs font-semibold hover:bg-black text-center"
-                              >
-                                Voir Détail 3.2
-                              </button>
+                {/* Inspecteur du journal tour par tour d'une partie */}
+                <div className="lg:col-span-5 p-4 rounded-xl border border-[#D8DFD5] bg-[#16211B] text-gray-100 font-mono text-xs flex flex-col justify-between max-h-80 overflow-y-auto">
+                  {partieInspectee || logsJsonl[0] ? (
+                    (() => {
+                      const p = partieInspectee || logsJsonl[0];
+                      return (
+                        <div className="space-y-2.5">
+                          <div className="border-b border-white/15 pb-2">
+                            <div className="text-emerald-400 font-bold">
+                              ENREGISTREMENT JSONL — {p.partieId}
+                            </div>
+                            <div className="text-[11px] text-gray-300 mt-0.5">
+                              {p.varianteNom} · Bot{' '}
+                              <strong className="text-white">{p.botId}</strong> ·{' '}
+                              {p.nbJoueurs}J · Forêt {p.foretSauveePct}% (
+                              {p.issue})
                             </div>
                           </div>
-                        ) : (
-                          <button
-                            onClick={() => handleCreerHybrideUnClic(hyb)}
-                            disabled={enCours}
-                            className={`w-full py-2.5 px-3 rounded-lg text-xs font-semibold text-white transition-all ${
-                              estEnCoursCeBouton
-                                ? 'bg-amber-600 cursor-wait'
-                                : 'bg-[#256B45] hover:bg-[#1E5637]'
-                            }`}
-                          >
-                            {estEnCoursCeBouton
-                              ? 'Évaluation 9 bots & banc 3–6J...'
-                              : '+ Créer & Tester cette configuration V0.4'}
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Rapport Markdown complet */}
-              <div className="bg-white rounded-xl p-5 border border-[#D8DFD5]">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-display text-sm font-bold text-[#16211B]">
-                    Rapport Consolidé Markdown (`resultats/derniere-analyse-gemini.md`)
-                  </h4>
-                  <button
-                    onClick={() => handleDownloadMarkdown(analyseActiveV04)}
-                    className="text-xs font-semibold text-[#256B45] hover:underline"
-                  >
-                    Exporter en fichier .md
-                  </button>
-                </div>
-                <pre className="p-4 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] text-xs font-mono-tabular text-[#16211B] whitespace-pre-wrap overflow-x-auto max-h-[420px]">
-                  {analyseActiveV04.rapportMarkdown}
-                </pre>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* =====================================================================
-          TIROIR D'ARCHIVES EN BAS DE PAGE : VERSIONS HISTORIQUES V0.1 · V0.2 · V0.3
-          ===================================================================== */}
-      <details className="bg-[#F4F5F0] rounded-xl border border-[#D8DFD5] overflow-hidden">
-        <summary className="px-5 py-3.5 cursor-pointer select-none flex flex-wrap items-center justify-between gap-3 text-xs font-semibold text-[#55645B] hover:text-[#16211B] hover:bg-[#EAECE4]/60 transition-colors">
-          <span>
-            Archives des Tests & Campagnes Historiques (Versions 0.1 · 0.2 · 0.3) — Consultation à la demande
-          </span>
-          <span className="font-mono-tabular text-[11px] text-[#55645B]">
-            {campagnesHistoriques.length} campagne(s) ·{' '}
-            {analysesHistoriques.length} rapport(s) ·{' '}
-            {variantesHistoriques.length} variantes archivées
-          </span>
-        </summary>
-
-        <div className="p-5 border-t border-[#D8DFD5] bg-white space-y-6">
-          <p className="text-xs text-[#55645B]">
-            Ces résultats et variantes issus des cycles de conception V0.1 (Socle), V0.2 (Éclaireur & Peuples) et V0.3 (Nouveaux Plateaux) sont conservés pour mémoire et référence comparative.
-          </p>
-
-          {/* 1. Anciennes campagnes V0.1 - V0.3 */}
-          {campagnesHistoriques.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-display text-sm font-bold text-[#16211B]">
-                Palmarès des Campagnes Archivées (V0.1 · V0.2 · V0.3)
-              </h4>
-              {campagnesHistoriques.map((campHist) => (
-                <div
-                  key={campHist.id}
-                  className="p-4 rounded-xl bg-[#F4F5F0] border border-[#D8DFD5] space-y-3"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <span className="text-xs font-bold text-[#16211B]">
-                        {campHist.nom}
-                      </span>
-                      <span className="ml-2 text-[11px] font-mono-tabular text-[#55645B]">
-                        ({campHist.nbVariantesViables} viables /{' '}
-                        {campHist.nbVariantesEntree} testées)
-                      </span>
+                          <div className="grid grid-cols-3 gap-2 text-[11px] bg-black/40 p-2 rounded">
+                            <div>
+                              Entropie H :{' '}
+                              <strong className="text-emerald-300">
+                                {p.metriquesDecisionnelles.entropieShannonPct}%
+                              </strong>
+                            </div>
+                            <div>
+                              Regret ΔQ :{' '}
+                              <strong className="text-emerald-300">
+                                {p.metriquesDecisionnelles.regretMoyenPts}
+                              </strong>
+                            </div>
+                            <div>
+                              Coalitions :{' '}
+                              <strong className="text-emerald-300">
+                                {p.evenements.coalitionsFormees}
+                              </strong>
+                            </div>
+                          </div>
+                          <div className="space-y-1 text-[11px] text-gray-300">
+                            <div className="text-white font-semibold">
+                              Trace tour par tour (JSONL) :
+                            </div>
+                            {(p.resumeTours || []).map((t) => (
+                              <div key={t.tour} className="leading-relaxed">
+                                T{t.tour} [2D6={t.somme2D6} · {t.tactiqueTiree}] :
+                                Barrages={t.barragesTour}, Coalitions=
+                                {t.coalitionsTour}, Contrariés={t.contrariesTour},
+                                Coupes={t.coupesTour} → Forêt {t.foretFinTourPct}%
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <div className="text-gray-400">
+                      Sélectionnez une ligne pour inspecter le détail JSONL de la partie.
                     </div>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse text-xs bg-white rounded-lg overflow-hidden">
-                      <thead>
-                        <tr className="border-b border-[#D8DFD5] text-[#55645B] font-mono-tabular text-[11px]">
-                          <th className="py-2 px-2">Rang</th>
-                          <th className="py-2 px-2">Ver.</th>
-                          <th className="py-2 px-2">Variante Archivée</th>
-                          <th className="py-2 px-2">Géométrie</th>
-                          <th className="py-2 px-2 text-right">Stratégie</th>
-                          <th className="py-2 px-2 text-right">Ergonomie</th>
-                          <th className="py-2 px-2 text-right">Équilibre 3–6J</th>
-                          <th className="py-2 px-2 text-right">Score Global</th>
-                          <th className="py-2 px-2 text-right">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#EAECE4]">
-                        {campHist.rapportsInteret.map((r, idx) => (
-                          <tr key={r.varianteId} className="hover:bg-[#F4F5F0]">
-                            <td className="py-2 px-2 font-mono-tabular font-bold">
-                              #{idx + 1}
-                            </td>
-                            <td className="py-2 px-2 font-mono-tabular text-[#55645B]">
-                              V{r.version || '0.1'}
-                            </td>
-                            <td className="py-2 px-2 font-medium text-[#16211B]">
-                              {r.varianteNom}
-                            </td>
-                            <td className="py-2 px-2 text-[#55645B]">
-                              {libelleGeometrieCourt(r.geometriePlateau)}
-                            </td>
-                            <td className="py-2 px-2 font-mono-tabular text-right">
-                              {r.troisAxesPrioritaires?.interetStrategique ??
-                                r.scoreInteretGlobal}
-                              /100
-                            </td>
-                            <td className="py-2 px-2 font-mono-tabular text-right">
-                              {r.troisAxesPrioritaires?.lisibiliteErgonomie ??
-                                80}
-                              /100
-                            </td>
-                            <td className="py-2 px-2 font-mono-tabular text-right">
-                              {r.troisAxesPrioritaires?.equilibreJoueurs36 ??
-                                82}
-                              /100
-                            </td>
-                            <td className="py-2 px-2 font-mono-tabular text-right font-bold">
-                              {r.scoreInteretGlobal}/100
-                            </td>
-                            <td className="py-2 px-2 text-right">
-                              <button
-                                onClick={() => {
-                                  onSelectVariante(
-                                    r.varianteId,
-                                    (r.version as GameVersionId) || '0.3'
-                                  );
-                                  setSubTab('interet_32');
-                                }}
-                                className="text-xs font-semibold text-[#256B45] hover:underline"
-                              >
-                                Consulter 3.2
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* 2. Rapports Gemini Historiques V0.1-V0.3 */}
-          {analysesHistoriques.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="font-display text-sm font-bold text-[#16211B]">
-                Rapports d’Analyse Historiques (V0.1 · V0.2 · V0.3)
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {analysesHistoriques.map((ah) => (
-                  <div
-                    key={ah.id}
-                    className="p-3.5 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] flex items-center justify-between gap-3 text-xs"
-                  >
-                    <div>
-                      <div className="font-semibold text-[#16211B]">
-                        {ah.campagneNom}
-                      </div>
-                      <div className="text-[11px] text-[#55645B] font-mono-tabular mt-0.5">
-                        Versions :{' '}
-                        {(ah.versionsAnalysees || [])
-                          .map((v) => `V${v}`)
-                          .join(', ')}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleDownloadMarkdown(ah)}
-                      className="px-3 py-1.5 rounded bg-white border border-[#D8DFD5] font-semibold text-[#16211B] hover:bg-[#EAECE4] shrink-0"
-                    >
-                      Télécharger .md
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 3. Liste des variantes archivées V0.1-V0.3 et Tâches VM historiques */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-[#F4F5F0] border border-[#D8DFD5] space-y-2">
-              <div className="text-xs font-bold text-[#16211B]">
-                Variantes Archivées V0.1 · V0.2 · V0.3 ({variantesHistoriques.length})
-              </div>
-              <div className="max-h-48 overflow-y-auto divide-y divide-[#D8DFD5] text-xs">
-                {variantesHistoriques.map((vh) => (
-                  <div
-                    key={vh.id}
-                    className="py-1.5 flex items-center justify-between gap-2"
-                  >
-                    <span className="truncate text-[#16211B]">
-                      <strong className="font-mono-tabular text-[#55645B]">
-                        [V{vh.version}]
-                      </strong>{' '}
-                      {vh.nom}
-                    </span>
-                    <button
-                      onClick={() => {
-                        onSelectVariante(vh.id, vh.version);
-                        setSubTab('interet_32');
-                      }}
-                      className="text-[11px] font-semibold text-[#256B45] hover:underline shrink-0"
-                    >
-                      Inspecter
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {campagnesVMHistoriques.length > 0 && (
-              <div className="p-4 rounded-xl bg-[#F4F5F0] border border-[#D8DFD5] space-y-2">
-                <div className="text-xs font-bold text-[#16211B]">
-                  Anciennes Tâches Planifiées VM (V0.1–V0.3)
-                </div>
-                <div className="space-y-2 text-xs">
-                  {campagnesVMHistoriques.map((cvm) => (
-                    <div
-                      key={cvm.id}
-                      className="p-2.5 rounded bg-white border border-[#D8DFD5] flex items-center justify-between gap-2"
-                    >
-                      <span className="truncate text-[#55645B]">{cvm.nom}</span>
-                      <span className="font-mono-tabular text-[11px] text-[#55645B] shrink-0">
-                        Archivée
-                      </span>
-                    </div>
-                  ))}
+                  )}
                 </div>
               </div>
             )}
           </div>
-        </div>
-      </details>
+        </section>
+      )}
 
-      {/* Toast flottant pour confirmer la création d'un hybride V0.4 */}
-      {notificationToast && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-xl bg-[#1E3528] text-white shadow-2xl border border-emerald-500/60 transition-all">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-[11px] font-mono-tabular text-emerald-400 font-bold">
-                ✓ CONFIGURATION V0.4 CRÉÉE ET ACTIVÉE
-              </div>
-              <div className="text-sm font-bold text-white mt-1">
-                {notificationToast.nom}
-              </div>
-              <div className="text-xs text-emerald-200 mt-0.5">
-                Score Global :{' '}
-                <strong className="text-white font-mono-tabular">
-                  {notificationToast.score}/100
-                </strong>{' '}
-                ({libelleGeometrieCourt(notificationToast.geometrie as GeometriePlateau)})
-              </div>
+      {/* =====================================================================
+          TIROIR REPLIÉ : ARCHIVES DES VERSIONS ANTERIEURES (V0.1 – V0.3)
+      ===================================================================== */}
+      {campagnesArchives.length > 0 && (
+        <section className="bg-white border border-[#D8DFD5] rounded-xl p-4 shadow-xs">
+          <button
+            type="button"
+            onClick={() => setAfficherArchives((v) => !v)}
+            className="w-full flex items-center justify-between text-left text-xs font-mono font-semibold text-[#55645B] hover:text-[#16211B]"
+          >
+            <span>
+              Archives historiques des campagnes V0.1, V0.2 et V0.3 ({campagnesArchives.length} campagnes conservées)
+            </span>
+            <span>{afficherArchives ? '▲ Replier' : '▼ Consulter au besoin'}</span>
+          </button>
+
+          {afficherArchives && (
+            <div className="mt-4 pt-4 border-t border-[#D8DFD5] grid grid-cols-1 md:grid-cols-2 gap-3">
+              {campagnesArchives.map((c) => (
+                <div
+                  key={c.id}
+                  className="p-3 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] flex items-center justify-between gap-2 text-xs"
+                >
+                  <div>
+                    <div className="font-bold text-[#16211B]">{c.nom}</div>
+                    <div className="font-mono text-[11px] text-[#55645B]">
+                      Versions : {(c.versionsCibles || []).join(', ')} ·{' '}
+                      {c.nbVariantesViables}/{c.nbVariantesEntree} viables · N°1 :{' '}
+                      {c.rapportsInteret[0]?.varianteNom || 'N/A'}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCampagneSelectionneeId(c.id);
+                      window.location.hash = '#sec-06';
+                    }}
+                    className="px-2.5 py-1 font-mono text-[11px] rounded bg-white border border-[#D8DFD5] hover:bg-[#EAECE4] shrink-0"
+                  >
+                    Charger dans le Bilan
+                  </button>
+                </div>
+              ))}
             </div>
-            <button
-              onClick={() => setNotificationToast(null)}
-              className="text-emerald-400 hover:text-white text-xs font-mono p-1"
-              aria-label="Fermer"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="mt-3 pt-2.5 border-t border-emerald-700/60 flex flex-wrap items-center gap-2 text-xs">
-            <button
-              onClick={() => {
-                onSelectVariante(notificationToast.id, '0.4');
-                if (onNavigateTab) onNavigateTab('proto');
-              }}
-              className="px-3 py-1.5 rounded-lg bg-emerald-500 text-black font-semibold hover:bg-emerald-400"
-            >
-              Tester dans le Proto →
-            </button>
-            <button
-              onClick={() => {
-                onSelectVariante(notificationToast.id, '0.4');
-                setSubTab('interet_32');
-              }}
-              className="px-3 py-1.5 rounded-lg bg-emerald-800 text-white font-semibold hover:bg-emerald-700"
-            >
-              Voir Détail 3.2
-            </button>
-          </div>
-        </div>
+          )}
+        </section>
       )}
     </div>
   );

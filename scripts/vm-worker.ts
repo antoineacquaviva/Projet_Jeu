@@ -1,162 +1,118 @@
 /**
- * Démon & Exécuteur de Campagnes VM Oracle Cloud (Atelier V1 — V0.1 / V0.2 / V0.3)
+ * Exécuteur CLI à la Demande de Campagnes Combinatoires Exhaustives — VM Oracle Cloud
  *
- * Permet de faire tourner en tâche de fond ou via cron sur votre VM Oracle Cloud :
- * 1. La génération automatique de nouvelles variantes exploratoires (notamment V0.3 géométries de plateau),
- * 2. Le filtre éliminatoire coupe-circuit 3.1 (purgeant immédiatement les variantes non viables),
- * 3. L'évaluation complète 3.2 sur l'échelle des 9 bots (jusqu'à Expectimax Bayésien, Beam Rollout et IS-MCTS) + Banc 3, 4, 5 et 6 joueurs,
- * 4. La synthèse analytique Gemini et la génération des variantes hybrides recommandées + rapport Markdown.
+ * Zéro cron / zéro démon périodique : ce script se lance uniquement à la demande
+ * pour mettre à profit la puissance de calcul et la stabilité de la VM Oracle sur
+ * des campagnes longues (500 à 2 500+ parties par variante).
  *
- * Usage sur votre VM Oracle Cloud :
- *   npx tsx scripts/vm-worker.ts --once
- *   npx tsx scripts/vm-worker.ts --daemon
+ * Il partage exactement le même pipeline que l'interface Web :
+ * 1. Génération du produit cartésien complet de la version cible (ex. 120 variantes pour V0.4),
+ * 2. Criblage éliminatoire de viabilité (5 invariants coupe-circuit),
+ * 3. Évaluation approfondie sur l'échelle des 9 bots (jusqu'à IS-MCTS, Expectimax Bayésien 2D6, Beam Rollout)
+ *    et le banc multi-joueurs (tables de 3, 4, 5 et 6 joueurs),
+ * 4. Journalisation intégrale de chaque partie dans resultats/logs/campagne-<id>.jsonl,
+ * 5. Mise à jour en temps réel de resultats/campaign-job-status.json (suivi en direct dans l'UI Web),
+ * 6. Extraction du Front de Pareto sur les 5 critères pondérés et synthèse analytique Gemini.
+ *
+ * Exemples d'utilisation en SSH sur la VM Oracle (dans tmux / screen / nohup) :
+ *   npx tsx scripts/vm-worker.ts --version 0.4 --calibre 500
+ *   npx tsx scripts/vm-worker.ts --version 0.4 --calibre 1000
+ *   npx tsx scripts/vm-worker.ts --version 0.4 --calibre 2500
  */
 
-import {
-  chargerEtatAtelier,
-  genererAnalyseGeminiOuFallback,
-  sauvegarderEtatAtelier,
-} from '../server';
-import {
-  evaluerViabiliteVariante31,
-  executerCampagneSelection33,
-  genererVariantesExploratoiresV01,
-} from '../src/shared/tests-engine';
+import { executerJobCampagneExhaustiveAsync } from '../server';
+import { POIDS_CRITERES_DEFAUT } from '../src/shared/tests-engine';
+import { GameVersionId } from '../src/shared/types';
 
-async function executerCycleVM() {
-  console.log(
-    `[VM Oracle Cloud - ${new Date().toISOString()}] Démarrage du cycle intensif V0.1 · V0.2 · V0.3 (9 Bots + Banc 3–6J)...`
-  );
-  const state = chargerEtatAtelier();
-
-  for (const sched of state.campagnesPlanifieesVM) {
-    if (!sched.actif) continue;
-
-    console.log(`\n---> Exécution de la tâche planifiée : ${sched.nom}`);
-    sched.statut = 'en_cours';
-
-    const versionsCibles =
-      sched.versionsCibles && sched.versionsCibles.length > 0
-        ? sched.versionsCibles
-        : ['0.1', '0.2', '0.3'];
-
-    // 1. Générer de nouvelles variantes exploratoires si configuré
-    const nbGen = sched.nbVariantesAGenerer ?? 4;
-    if (nbGen > 0) {
-      const verGen = versionsCibles.includes('0.3')
-        ? '0.3'
-        : versionsCibles[0] || '0.3';
-      const nouvelles = genererVariantesExploratoiresV01(
-        nbGen,
-        state.variantes.length + 1,
-        verGen
-      );
-      let viablesCount = 0;
-      for (const v of nouvelles) {
-        const rapV = evaluerViabiliteVariante31(v, sched.nbPartiesViabilite);
-        state.rapportsViabilite = [
-          rapV,
-          ...state.rapportsViabilite.filter((r) => r.varianteId !== v.id),
-        ];
-        if (rapV.viable) {
-          v.statutViabilite = 'viable';
-          v.bandeSante = 'vert';
-          viablesCount++;
-        } else {
-          v.statutViabilite = 'eliminee';
-          v.motifElimination = rapV.motifElimination;
-          v.bandeSante = 'rouge';
-        }
-      }
-      state.variantes = [...nouvelles, ...state.variantes];
-      console.log(
-        `   [Filtre 3.1] ${nouvelles.length} variantes V${verGen} générées -> ${viablesCount} viables, ${
-          nouvelles.length - viablesCount
-        } éliminées.`
-      );
-    }
-
-    // 2. Purger automatiquement les variantes non viables si demandé
-    if (sched.eliminerNonViablesAuto) {
-      const avant = state.variantes.length;
-      state.variantes = state.variantes.filter(
-        (v) => v.statutViabilite !== 'eliminee'
-      );
-      const purgees = avant - state.variantes.length;
-      if (purgees > 0) {
-        console.log(
-          `   [Purge 3.1] ${purgees} variantes non viables supprimées du registre.`
-        );
-      }
-    }
-
-    // 3. Lancer la campagne 3.3 sur les variantes viables des versions cibles
-    const cibles = state.variantes.filter(
-      (v) => v.statutViabilite !== 'eliminee'
-    );
-
-    const { campagne, variantesMisesAJour } = executerCampagneSelection33(
-      cibles,
-      `[VM Auto] ${sched.nom}`,
-      sched.nbPartiesViabilite,
-      sched.nbPartiesInteret,
-      versionsCibles
-    );
-
-    const mapMaj = new Map(variantesMisesAJour.map((v) => [v.id, v]));
-    state.variantes = state.variantes.map((v) => mapMaj.get(v.id) || v);
-    state.campagnesSelection.unshift(campagne);
-
-    for (const rv of campagne.rapportsViabilite) {
-      state.rapportsViabilite = [
-        rv,
-        ...state.rapportsViabilite.filter((r) => r.varianteId !== rv.varianteId),
-      ];
-    }
-    for (const ri of campagne.rapportsInteret) {
-      state.rapportsInteret = [
-        ri,
-        ...state.rapportsInteret.filter((r) => r.varianteId !== ri.varianteId),
-      ];
-    }
-
-    // 4. Générer la synthèse analytique Gemini et sauvegarder le rapport Markdown
-    const analyse = await genererAnalyseGeminiOuFallback(campagne);
-    state.analysesGemini = [
-      analyse,
-      ...(state.analysesGemini || []).filter(
-        (a) => a.campagneId !== campagne.id
-      ),
-    ];
-
-    sched.statut = 'terminee';
-    sched.derniereExecution = new Date().toISOString();
-    sched.dernierResultatId = campagne.id;
-    const meilleure = campagne.rapportsInteret[0];
-    const logLine = `[${new Date().toLocaleTimeString('fr-FR')}] Cycle VM terminé (${versionsCibles
-      .map((v) => `V${v}`)
-      .join('+')}) : ${campagne.nbVariantesViables} viables classées. N°1 : ${
-      meilleure ? `${meilleure.varianteNom} (${meilleure.scoreInteretGlobal}/100)` : 'N/A'
-    }. Rapport Gemini mis à jour.`;
-    sched.journalVM.unshift(logLine);
-    console.log(`   ${logLine}`);
+function parseArgValue(args: string[], flag: string, defaultVal: string): string {
+  const idx = args.indexOf(flag);
+  if (idx >= 0 && idx + 1 < args.length) {
+    return args[idx + 1];
   }
+  return defaultVal;
+}
 
-  sauvegarderEtatAtelier(state);
+async function main() {
+  const args = process.argv.slice(2);
+  const versionCible = parseArgValue(args, '--version', '0.4') as GameVersionId;
+  const calibreRaw = parseArgValue(
+    args,
+    '--calibre',
+    args.includes('--exhaustive-v04') ? '500' : '500'
+  );
+  const calibrePartiesParVariante = Math.max(
+    120,
+    Math.min(5000, parseInt(calibreRaw, 10) || 500)
+  );
+
   console.log(
-    `[VM Oracle Cloud] État et rapport Gemini sauvegardés dans resultats/atelier-v1-state.json et resultats/derniere-analyse-gemini.md.`
+    `\n================================================================================`
+  );
+  console.log(
+    `  CAMPAGNE COMBINATOIRE EXHAUSTIVE À LA DEMANDE — VM ORACLE CLOUD`
+  );
+  console.log(`  Version cible              : V${versionCible}`);
+  console.log(
+    `  Calibre par variante       : ${calibrePartiesParVariante} parties / variante viable`
+  );
+  console.log(
+    `  Critères pondérés          : Stratégie ${POIDS_CRITERES_DEFAUT.profondeurStrategique}% · Tension ${POIDS_CRITERES_DEFAUT.tensionChoix}% · Coopération ${POIDS_CRITERES_DEFAUT.dynamiqueCooperative}% · Équilibre 3–6J ${POIDS_CRITERES_DEFAUT.equilibreMultiJoueurs}% · Ergonomie ${POIDS_CRITERES_DEFAUT.ergonomieLisibilite}%`
+  );
+  console.log(
+    `================================================================================\n`
+  );
+
+  const t0 = Date.now();
+  const { campagne, analyseGemini } = await executerJobCampagneExhaustiveAsync({
+    versionCible,
+    calibrePartiesParVariante,
+    poidsCriteres: POIDS_CRITERES_DEFAUT,
+    sourceLancement: 'cli_vm_ssh',
+    nomCampagne: `[CLI VM Oracle] Campagne Exhaustive V${versionCible} (${calibrePartiesParVariante} parties/variante)`,
+  });
+
+  const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+  const top3 = campagne.rapportsInteret.slice(0, 3);
+
+  console.log(
+    `\n================================================================================`
+  );
+  console.log(`  BILAN DE LA CAMPAGNE EXHAUSTIVE V${versionCible} (${elapsed}s)`);
+  console.log(
+    `================================================================================`
+  );
+  console.log(
+    `  Variantes évaluées         : ${campagne.nbVariantesEntree} (${campagne.nbVariantesViables} viables · ${campagne.nbVariantesEliminees} éliminées)`
+  );
+  console.log(
+    `  Total parties simulées     : ${(campagne.totalPartiesSimulees || 0).toLocaleString('fr-FR')} parties`
+  );
+  console.log(
+    `  Journal JSONL sur disque   : ${campagne.cheminFichierJSONL} (${Math.round((campagne.tailleFichierJSONLOctets || 0) / 1024)} Ko)`
+  );
+  console.log(`  Modèle synthèse IA         : ${analyseGemini.modeleUtilise}\n`);
+
+  console.log(`  PODIUM MULTI-CRITÈRES & FRONT DE PARETO :`);
+  top3.forEach((r, idx) => {
+    const c = r.cinqCriteresPonderes;
+    console.log(
+      `   #${idx + 1} ${r.varianteNom} — Score Global : ${r.scoreInteretGlobal}/100 ${c?.estParetoOptimal ? '[PARETO OPTIMAL]' : ''}`
+    );
+    if (c) {
+      console.log(
+        `      Stratégie: ${c.profondeurStrategique}/100 | Tension: ${c.tensionChoix}/100 | Coop: ${c.dynamiqueCooperative}/100 | 3–6J: ${c.equilibreMultiJoueurs}/100 | Ergo: ${c.ergonomieLisibilite}/100`
+      );
+    }
+  });
+  console.log(
+    `\n  Fichiers mis à jour : resultats/atelier-v1-state.json & resultats/derniere-analyse-gemini.md`
+  );
+  console.log(
+    `================================================================================\n`
   );
 }
 
-const args = process.argv.slice(2);
-if (args.includes('--daemon')) {
-  console.log(
-    'Démon VM Oracle Cloud actif (exécution toutes les 6 heures)...'
-  );
-  executerCycleVM();
-  setInterval(() => {
-    executerCycleVM();
-  }, 6 * 3600 * 1000);
-} else {
-  executerCycleVM();
-}
+main().catch((err) => {
+  console.error('Erreur lors de la campagne CLI VM :', err);
+  process.exit(1);
+});

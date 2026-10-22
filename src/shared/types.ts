@@ -438,6 +438,113 @@ export interface TroisAxesPrioritaires {
   detailEquilibre36: string;
 }
 
+export interface PoidsCriteresEvaluation {
+  profondeurStrategique: number; // Défaut: 30%
+  tensionChoix: number;          // Défaut: 25%
+  dynamiqueCooperative: number;  // Défaut: 20%
+  equilibreMultiJoueurs: number; // Défaut: 15%
+  ergonomieLisibilite: number;   // Défaut: 10%
+}
+
+export interface ScoresCinqCriteres {
+  profondeurStrategique: number; // /100
+  tensionChoix: number;          // /100
+  dynamiqueCooperative: number;  // /100
+  equilibreMultiJoueurs: number; // /100
+  ergonomieLisibilite: number;   // /100
+  scoreGlobalPondere: number;    // /100
+  estParetoOptimal?: boolean;
+  detailsAlgorithmes: {
+    mctsGainPct: number;
+    expectimaxGainPct: number;
+    beamGainPct: number;
+    entropieShannonMoyenne: number;
+    regretContrefactuelMoyen: number;
+    tauxPartiesSerreesPct: number;
+    shapleySynergieCoopPts: number;
+    ratioCoalitionBarragePct: number;
+    tauxMouvementsContrariesPct: number;
+    ecartType36JPct: number;
+    cvar10PireDecilePct: number;
+    degreMoyenGraphe: number;
+    chargeManipulationsParTour: number;
+  };
+}
+
+export interface JournalPartieJSONL {
+  partieId: string;
+  campagneId: string;
+  horodatage: string;
+  varianteId: string;
+  varianteNom: string;
+  version: GameVersionId;
+  geometriePlateau: GeometriePlateau;
+  regleMouvementContrarie: RegleMouvementContrarie;
+  nbJoueurs: 3 | 4 | 5 | 6;
+  botId: BotProfileId;
+  botNom: string;
+  seed: number;
+  issue: 'victoire' | 'defaite';
+  foretSauveePct: number;
+  foretRestante: number;
+  foretInitiale: number;
+  nbToursJoues: number;
+  nbToursMax: number;
+  evenements: {
+    coupesSubies: number;
+    barragesReussis: number;
+    coalitionsFormees: number;
+    mouvementsContraries: number;
+    sabotagesOuRenvois: number;
+  };
+  metriquesDecisionnelles: {
+    entropieShannonPct: number;
+    regretMoyenPts: number;
+    partieTendue: boolean;
+  };
+  resumeTours: {
+    tour: number;
+    tactiqueTiree: string;
+    somme2D6: number;
+    barragesTour: number;
+    coalitionsTour: number;
+    contrariesTour: number;
+    coupesTour: number;
+    foretFinTourPct: number;
+  }[];
+}
+
+export interface EtatJobCampagneVM {
+  jobId: string;
+  campagneId: string;
+  nomCampagne: string;
+  versionCible: GameVersionId;
+  sourceLancement: 'web_ui' | 'cli_vm_ssh';
+  statut: 'inactif' | 'en_cours' | 'analyse_ia' | 'termine' | 'interrompu' | 'erreur';
+  etapeNumero: 1 | 2 | 3 | 4 | 5;
+  etapeLibelle: string;
+  calibrePartiesParVariante: number;
+  poidsCriteres: PoidsCriteresEvaluation;
+  variantesTotales: number;
+  variantesTesteesViabilite: number;
+  variantesViablesRetenues: number;
+  variantesEvalueesProfondeur: number;
+  varianteCouranteId?: string;
+  varianteCouranteNom?: string;
+  partiesSimulees: number;
+  partiesTotalesPrevues: number;
+  partiesJournaliseesJSONL: number;
+  debitPartiesParSeconde: number;
+  dateDebut: string;
+  dateFin?: string;
+  dureeEcouleeSecondes: number;
+  etaSecondes: number;
+  cheminFichierJSONL: string;
+  tailleFichierJSONLOctets: number;
+  journalTempsReel: string[];
+  meilleureVarianteProvisoire?: { id: string; nom: string; score: number };
+}
+
 export interface RapportInteret32 {
   varianteId: string;
   varianteNom: string;
@@ -470,6 +577,9 @@ export interface RapportInteret32 {
     tauxCoalitionsReussiesPct: number;
     tauxBarragesEfficacesPct: number;
   };
+  cinqCriteresPonderes?: ScoresCinqCriteres;
+  echantillonPartiesVariante?: JournalPartieJSONL[];
+  nbTotalPartiesSimuleesVariante?: number;
   scoreInteretGlobal: number; // 0 à 100
   bandeSante: 'vert' | 'orange' | 'rouge';
   syntheseAnalytique: string[];
@@ -483,6 +593,13 @@ export interface CampagneSelection33 {
   nbVariantesEntree: number;
   nbVariantesViables: number;
   nbVariantesEliminees: number;
+  calibrePartiesParVariante?: number;
+  totalPartiesSimulees?: number;
+  dureeTotaleSecondes?: number;
+  cheminFichierJSONL?: string;
+  tailleFichierJSONLOctets?: number;
+  poidsCriteres?: PoidsCriteresEvaluation;
+  echantillonPartiesRemarquables?: JournalPartieJSONL[];
   rapportsViabilite: RapportViabilite31[];
   rapportsInteret: RapportInteret32[]; // triés par scoreInteretGlobal décroissant
   meilleureVarianteId: string | null;
@@ -523,7 +640,7 @@ export interface ScheduledCampaignVM {
   id: string;
   nom: string;
   cibleExecution: 'vm_oracle_cloud' | 'serveur_local';
-  cronExpression: string; // ex. "0 2 * * *" (tous les jours à 02:00 sur la VM Oracle Cloud)
+  cronExpression: string;
   actif: boolean;
   nbVariantesAGenerer?: number;
   nbPartiesViabilite: number;
