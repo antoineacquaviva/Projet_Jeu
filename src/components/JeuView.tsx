@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   AtelierComponentId,
   GameVersionId,
@@ -7,6 +7,7 @@ import {
   VariantV01,
 } from '../shared/types';
 import { creerNouvelleVersionDepuisLabo } from '../shared/versions-registry';
+import { genererLivretPhysiqueVariante } from '../shared/moteur';
 
 interface JeuViewProps {
   versions: GameVersionSpec[];
@@ -40,8 +41,13 @@ export const JeuView: React.FC<JeuViewProps> = ({
   onUpdateVarianteOption,
 }) => {
   const [sectionActive, setSectionActive] = useState<
-    'synthese' | 'options_regles' | 'parametres' | 'variantes'
-  >('options_regles');
+    'regle_complete' | 'synthese' | 'options_regles' | 'parametres' | 'variantes'
+  >('regle_complete');
+
+  const livretCompletVariante = useMemo(
+    () => genererLivretPhysiqueVariante(varianteActive),
+    [varianteActive]
+  );
   const [afficherModalNouvelleVersion, setAfficherModalNouvelleVersion] =
     useState<boolean>(false);
 
@@ -139,7 +145,7 @@ export const JeuView: React.FC<JeuViewProps> = ({
                 onClick={() =>
                   onSelectVariante(
                     varianteRecommandee.id,
-                    varianteRecommandee.version || '0.3'
+                    varianteRecommandee.version || '0.5'
                   )
                 }
                 className="px-4 py-2 text-xs font-extrabold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] shadow-xs transition-colors whitespace-nowrap"
@@ -152,7 +158,20 @@ export const JeuView: React.FC<JeuViewProps> = ({
               onClick={() => {
                 onSelectVariante(
                   varianteRecommandee.id,
-                  varianteRecommandee.version || '0.3'
+                  varianteRecommandee.version || '0.5'
+                );
+                setSectionActive('regle_complete');
+              }}
+              className="px-3.5 py-2 text-xs font-bold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] transition-colors whitespace-nowrap"
+            >
+              📖 Lire la règle complète
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onSelectVariante(
+                  varianteRecommandee.id,
+                  varianteRecommandee.version || '0.5'
                 );
                 onNavigateTab('demo');
               }}
@@ -165,7 +184,7 @@ export const JeuView: React.FC<JeuViewProps> = ({
               onClick={() => {
                 onSelectVariante(
                   varianteRecommandee.id,
-                  varianteRecommandee.version || '0.3'
+                  varianteRecommandee.version || '0.5'
                 );
                 onNavigateTab('proto');
               }}
@@ -454,6 +473,10 @@ export const JeuView: React.FC<JeuViewProps> = ({
           {(
             [
               {
+                id: 'regle_complete',
+                label: `📖 Règle Complète (${livretCompletVariante.length} chapitres)`,
+              },
+              {
                 id: 'options_regles',
                 label: `Options de Règles Possibles (${versionActive.optionsRegles.length})`,
               },
@@ -490,6 +513,70 @@ export const JeuView: React.FC<JeuViewProps> = ({
           <strong className="text-[#16211B]">{varianteActive.nom}</strong>
         </div>
       </div>
+
+      {/* SECTION 0 : LIVRET DE RÈGLE COMPLÈTE DE LA VARIANTE SÉLECTIONNÉE */}
+      {sectionActive === 'regle_complete' && (
+        <div className="bg-white rounded-xl p-6 border border-[#D8DFD5] space-y-5">
+          <div className="border-b border-[#D8DFD5] pb-4 flex flex-wrap items-start justify-between gap-4">
+            <div className="space-y-1 max-w-4xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded bg-[#1E3528] text-white text-xs font-bold uppercase tracking-wider">
+                  📖 Livret de Règle Complète — Version {varianteActive.version || versionActive.id}
+                </span>
+                {estRecommandeeActive && (
+                  <span className="px-2.5 py-0.5 rounded bg-amber-400 text-[#16211B] text-xs font-extrabold">
+                    ★ Variante Recommandée (Référence V0.5)
+                  </span>
+                )}
+              </div>
+              <h2 className="font-display text-xl font-bold text-[#16211B]">
+                {varianteActive.nom}
+              </h2>
+              <p className="text-xs text-[#55645B] leading-relaxed">
+                Règle intégrale et auto-suffisante générée dynamiquement pour la variante sélectionnée ({varianteActive.nbJoueurs} joueurs · {varianteActive.defenseursParJoueur} Défenseur{varianteActive.defenseursParJoueur > 1 ? 's' : ''}/joueur · {varianteActive.machinesInitiales}/6 Machines initiales · {varianteActive.nbTours} tours). Ce même livret est également consultable à tout moment pendant une partie dans l’onglet <strong>Proto → bouton « 📖 Règles »</strong>.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => onNavigateTab('demo')}
+                className="px-3.5 py-2 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] hover:bg-stone-200/70 transition-colors"
+              >
+                Voir le tour guidé en Démo →
+              </button>
+              <button
+                type="button"
+                onClick={() => onNavigateTab('proto')}
+                className="px-4 py-2 text-xs font-bold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] transition-colors"
+              >
+                Tester sur le plateau Proto →
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {livretCompletVariante.map((sec, idx) => (
+              <div
+                key={idx}
+                className="p-4 rounded-xl bg-[#F4F5F0] border border-[#D8DFD5] flex flex-col justify-between space-y-2.5"
+              >
+                <div className="space-y-1.5">
+                  <h3 className="font-display text-sm font-bold text-[#16211B] border-b border-[#D8DFD5] pb-1.5">
+                    {sec.section}
+                  </h3>
+                  <div className="text-[11px] text-[#256B45] font-semibold bg-emerald-50/80 px-2.5 py-1 rounded border border-emerald-200/80">
+                    Matériel : {sec.materielConcerne}
+                  </div>
+                  <p className="text-xs text-[#16211B] whitespace-pre-line leading-relaxed pt-1">
+                    {sec.texteRegle}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* SECTION 1 : TOUTES LES OPTIONS DE RÈGLES POSSIBLES */}
       {sectionActive === 'options_regles' && (
