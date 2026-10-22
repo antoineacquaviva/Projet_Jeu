@@ -36,9 +36,27 @@ export type ModeProgrammation =
 
 // Options de séquencement de la résolution
 export type ModeResolution =
-  | 'entrelacee_coupe_fin'   // Référence confirmée : 1res actions -> Ciblage/Déplacement Machines -> 2es actions -> Coupe des Forêts & Apprentissage
+  | 'entrelacee_coupe_fin'   // Référence V0.1-V0.4 : 1res actions -> Ciblage/Déplacement Machines -> 2es actions -> Coupe des Forêts & Apprentissage
+  | 'lineaire_2c_fin'        // Référence V0.5 (Option 2C) : Déplacement I -> Déplacement II -> Chaque Machine se déplace et coupe immédiatement
   | 'deux_vagues_completes'  // Vague I (1res actions + moitié des Machines ciblent et coupent) -> Vague II (2es actions + reste des Machines)
   | 'machines_avant_actions'; // Les Machines ciblent et se déplacent en premier -> 1res et 2es actions Défenseurs -> Coupe des Forêts
+
+// Options V0.5 — Cœur Unifié Pur Placement (3 Curseurs sans Barrage d'entrée ni Mouvement contrarié)
+export type OptionResolutionV05 =
+  | '2C_lineaire_1_temps'     // Curseur 1 - Choix B (Option 2C) : Déplacement I -> Déplacement II -> Machines bougent et coupent directement
+  | '2B_entrelacee_seuil_pur' // Curseur 1 - Choix A (Option 2B) : Déplacement I -> Machines bougent -> Déplacement II -> Verdict des coupes
+  | '2A_entrelacee_coalition'; // Curseur 1 - Choix A (Option 2A) : Déplacement I -> Machines bougent -> Déplacement II -> Verdict Coalition 2 Peuples
+
+export type SeuilParadeV05 =
+  | '1_defenseur'  // Curseur 2 - Choix A : 1 seul Défenseur présent sur la case suffit à bloquer la coupe
+  | '2_peuples'    // Curseur 2 - Choix B : 2 Défenseurs de Peuples différents (Coalition) requis pour bloquer la coupe
+  | 'gradue_1_bloque_2_chantier' // Curseur 2 - Choix C (Gradué) : 1 Défenseur bloque sur place, 2 Peuples différents démontent vers le Chantier
+  | '2_defenseurs'; // Alias de compatibilité : 2 Défenseurs sur la case
+
+export type EffetParadeV05 =
+  | 'bloquer_sur_place'          // Curseur 3 - Choix A : La Machine contrée reste sur place (neutralisée pour ce tour)
+  | 'renvoyer_chantier'          // Curseur 3 - Choix B : La Machine contrée est renvoyée au Chantier (Réserve)
+  | 'gradue_1_bloque_2_chantier'; // Effet associé au Curseur 2 Choix C (Gradué) : 1 Défenseur bloque sur place, 2 Peuples différents renvoient au Chantier
 
 // Options sur les actions (V0.1–V0.3)
 export type EffetProteger =
@@ -53,6 +71,7 @@ export type EffetSaboter =
 
 // Options V0.4 — Pur Placement & Coalition
 export type ComportementBarrageV04 =
+  | 'aucun_barrage_v05'   // V0.5 : Suppression du Barrage d'entrée (les Machines entrent toujours sur leur case cible)
   | 'annulation_stricte'  // Référence V0.4 : si la case ciblée contient >= 1 Défenseur, le déplacement de la Machine est annulé (elle reste sur place)
   | 'report_cible_libre'; // Variante V0.4 : la Machine se reporte sur la meilleure case voisine libre de tout Défenseur
 
@@ -65,7 +84,7 @@ export type EffetCoalitionV04 =
 
 export type PaletteTactiquesV04 =
   | '4_tactiques_acharnement'          // Référence V0.4 : Cupidité, Acharnement (Coupe rase), Percée, Opportunisme
-  | '3_tactiques_sans_represailles'    // Variante V0.4 : 3 Tactiques épurées (sans Représailles)
+  | '3_tactiques_sans_represailles'    // Variante V0.4/V0.5 : 3 Tactiques épurées (sans Représailles)
   | '4_tactiques_represailles_contours' // Représailles privilégie lisières et contournements
   | '4_tactiques_represailles_perce_1'; // Représailles brise-barrage (peut entrer sur 1 seul Défenseur isolé)
 
@@ -73,7 +92,7 @@ export type ProfilTactiquesV04 = PaletteTactiquesV04;
 
 // Règles de Mouvement Contrarié (V0.4)
 export type RegleMouvementContrarie =
-  | 'aucun'                  // Option 3 : Déplacement libre sans contrariété
+  | 'aucun'                  // Option 3 / V0.5 : Déplacement libre sans contrariété dans le cœur
   | 'capacite_max_tuile'     // Option 1 : Plafond physique global (max 2 défenseurs par clairière)
   | 'goulots_sentiers_seuls' // Option 2 : Clairières libres, seuls les cols et sentiers étroits ont une capacité de 1
   | 'goulot_sentier_strict'  // Alias pour Option 2
@@ -96,7 +115,7 @@ export type StatutViabilite = 'non_teste' | 'viable' | 'eliminee';
 export interface VariantV01 {
   id: string;
   nom: string;
-  version: GameVersionId; // '0.1', '0.2', '0.3', '0.4'
+  version: GameVersionId; // '0.1', '0.2', '0.3', '0.4', '0.5'
   description: string;
   origine: 'socle' | 'exploration' | 'utilisateur' | 'hybride_gemini';
   statutViabilite: StatutViabilite;
@@ -125,6 +144,11 @@ export interface VariantV01 {
   effetCoalitionV04?: EffetCoalitionV04;
   paletteTactiques?: PaletteTactiquesV04;
   profilTactiquesV04?: ProfilTactiquesV04;
+
+  // Règles V0.5 — Cœur Épuré (Sans Barrage d'entrée & Options 2A / 2B / 2C)
+  optionResolutionV05?: OptionResolutionV05;
+  seuilParadeV05?: SeuilParadeV05;
+  effetParadeV05?: EffetParadeV05;
 
   // Mécanique de contrariété de mouvement & saturation
   regleMouvementContrarie?: RegleMouvementContrarie;
@@ -666,6 +690,8 @@ export type LabIdeaMaturite =
   | 'Intégrée V0.1'
   | 'Intégrée V0.2'
   | 'Intégrée V0.3'
+  | 'Intégrée V0.4'
+  | 'Intégrée V0.5'
   | 'Différée';
 
 export interface LabIdea {

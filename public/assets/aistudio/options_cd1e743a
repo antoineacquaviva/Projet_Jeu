@@ -1,0 +1,44 @@
+﻿Critère
+	Option 2A — « Unifiée Fin de Tour » (Plus de Barrage d'entrée à mi-tour)
+	Option 2B — « Unifiée 1 Défenseur = 1 Parade » (Règle unique de présence)
+	Option 2C — « Séquence Linéaire en 1 temps » (Défenseurs I+II → Machines bougent et coupent)
+	Principe en 1 phrase
+	Les Machines entrent toujours sur leur case cible à mi-tour ; tout se joue en fin de tour sur la case de la Machine.
+	À la fin du tour, la simple présence de Défenseurs sur la case d’une Machine suffit à bloquer sa coupe.
+	On supprime l’entrelacement : les joueurs exécutent leurs 2 déplacements, puis on révèle les gobelets et chaque Machine se déplace et coupe immédiatement.
+	Ce qu'on supprime de la V0.4
+	On supprime le Barrage d’entrée à l’Étape 2. Les Défenseurs ne bloquent jamais le déplacement d’une Machine.
+	On supprime le Barrage d’entrée ET la distinction entre « barrage » et « coalition ».
+	On supprime l’étape intermédiaire des Machines au milieu des déplacements des joueurs.
+	Déroulement de la résolution
+	1. Déplacement I des Défenseurs.
+
+
+2. Les Machines se déplacent librement vers leur cible.
+
+
+3. Déplacement II des Défenseurs.
+
+
+4. Verdict unique : Si la condition de défense est remplie sur la case de la Machine → coupe annulée (apprentissage -). Sinon → arbre coupé (apprentissage +).
+	Identique à 2A, avec un seuil paramétrique pur en fin de tour :
+
+
+• Variante Solo : 1 Défenseur sur la case bloque la coupe.
+
+
+• Variante Alliance : 2 Défenseurs (ou 2 Peuples) bloquent la coupe (ou 1 bloque / 2 renvoient au Chantier).
+	1. Les Défenseurs exécutent leur Déplacement I puis II.
+
+
+2. On révèle chaque gobelet 2D6 un par un : la Machine se déplace vers sa cible et on résout immédiatement son verdict (bloquée si Défenseur présent, sinon coupe 1 arbre) + Apprentissage immédiat.
+	Pourquoi c'est intéressant pour l'Asymétrie ?
+	• Fini le paradoxe de la Machine barrée qui coupe sur sa case de départ.
+
+
+• Le « Barrage d’entrée » peut devenir un Avantage exclusif d’un Peuple (ex. Mammifères ou Reptiles) !
+	Permet au banc d’essai V0.5 de tester un paramètre simple : faut-il 1 ou 2 Défenseurs pour contrer une Machine ? Et la Machine reste-t-elle sur place ou retourne-t-elle au Chantier ?
+	• Ultra-fluide sur table et très lisible.
+
+
+• Donne un poids énorme aux pouvoirs du Secteur B (Timing) : ex. les Reptiles (3 pts) qui exécutent leur 2e déplacement après les Machines deviennent uniques !

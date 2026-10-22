@@ -15,6 +15,7 @@ import {
   clonerEtatJeu,
   compterPeuplesDistinctsSurCase,
   creerEtatInitialV01,
+  estVarianteEpureeV05,
   estVariantePlacementV04,
   NOMS_TACTIQUES,
   nextRng,
@@ -186,9 +187,10 @@ export function analyserPosesAlliesPrecedents(
   const peuplesParCaseEtape2 = new Map<number, Set<number>>();
 
   const estV04 = estVariantePlacementV04(etat.variante);
+  const estV05 = estVarianteEpureeV05(etat.variante);
 
   if (estV04) {
-    // En V0.4, tout pion présent ou programmé sur une case apporte la présence de son Peuple
+    // En V0.4 / V0.5, tout pion présent ou programmé sur une case apporte sa présence
     for (const d of etat.defenseurs) {
       if (d.joueur === joueurCourant) continue;
       const prog = etat.programmations[d.joueur] || [];
@@ -221,7 +223,46 @@ export function analyserPosesAlliesPrecedents(
       }
     }
 
-    // Évaluer pour chaque case si elle est déjà barrée ou si elle attend un 2e Peuple pour Coalition
+    if (estV05) {
+      const seuilV05 =
+        etat.variante.optionResolutionV05 === '2A_entrelacee_coalition'
+          ? '2_peuples'
+          : etat.variante.seuilParadeV05 || '1_defenseur';
+      for (const c of etat.cases) {
+        const peuplesE2 = peuplesParCaseEtape2.get(c.id) || new Set<number>();
+        const nbDefAlliesE2 = destinationsAllies.get(c.id) || 0;
+        if (seuilV05 === '1_defenseur') {
+          if (nbDefAlliesE2 >= 1 || peuplesE2.size >= 1) {
+            casesDejaCouvertes.add(c.id);
+          }
+        } else if (
+          seuilV05 === 'gradue_1_bloque_2_chantier' ||
+          etat.variante.effetParadeV05 === 'gradue_1_bloque_2_chantier'
+        ) {
+          if (peuplesE2.size === 1 && !peuplesE2.has(joueurCourant)) {
+            casesAttendantAlliance.add(c.id);
+          } else if (peuplesE2.size >= 2) {
+            casesDejaCouvertes.add(c.id);
+          }
+        } else {
+          // 2_peuples
+          if (peuplesE2.size === 1 && !peuplesE2.has(joueurCourant)) {
+            casesAttendantAlliance.add(c.id);
+          } else if (peuplesE2.size >= 2) {
+            casesDejaCouvertes.add(c.id);
+          }
+        }
+      }
+      return {
+        casesDejaCouvertes,
+        casesAttendantAlliance,
+        destinationsAllies,
+        peuplesParCaseEtape1,
+        peuplesParCaseEtape2,
+      };
+    }
+
+    // Évaluer pour chaque case en V0.4 si elle est déjà barrée ou si elle attend un 2e Peuple pour Coalition
     for (const c of etat.cases) {
       const peuplesE1 = peuplesParCaseEtape1.get(c.id) || new Set<number>();
       const peuplesE2 = peuplesParCaseEtape2.get(c.id) || new Set<number>();
@@ -754,17 +795,31 @@ function evaluerEtatHorizonMultiTours(etat: EtatJeuV01): number {
     }
   }
 
-  // Bonus de couverture spatiale en V0.4 (pions répartis sur des cases boisées distinctes ou en coalition sur une Machine)
+  // Bonus de couverture spatiale en V0.4 / V0.5
   let bonusPlacementV04 = 0;
   if (estVariantePlacementV04(etat.variante)) {
+    const estV05 = estVarianteEpureeV05(etat.variante);
+    const seuilUnSeul =
+      estV05 &&
+      etat.variante.optionResolutionV05 !== '2A_entrelacee_coalition' &&
+      (etat.variante.seuilParadeV05 || '1_defenseur') === '1_defenseur';
     for (const c of etat.cases) {
       if ((etat.forets[c.id] || 0) === 0) continue;
       const nbPeuples = compterPeuplesDistinctsSurCase(etat, c.id);
+      const nbDefs = etat.defenseurs.filter((d) => d.caseId === c.id).length;
       const aMachine = etat.machines.some((m) => m.caseId === c.id);
-      if (aMachine && nbPeuples >= 2) {
-        bonusPlacementV04 += 2.2;
-      } else if (!aMachine && nbPeuples >= 1) {
-        bonusPlacementV04 += 0.6;
+      if (seuilUnSeul) {
+        if (aMachine && nbDefs >= 1) {
+          bonusPlacementV04 += 2.2;
+        } else if (!aMachine && nbDefs >= 1) {
+          bonusPlacementV04 += 0.9;
+        }
+      } else {
+        if (aMachine && nbPeuples >= 2) {
+          bonusPlacementV04 += 2.2;
+        } else if (!aMachine && nbPeuples >= 1) {
+          bonusPlacementV04 += 0.6;
+        }
       }
     }
   }

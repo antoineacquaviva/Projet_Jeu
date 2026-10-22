@@ -130,7 +130,7 @@ export const TestsView: React.FC<TestsViewProps> = ({
   onNavigateTab,
   onUpdateStateFromTests,
 }) => {
-  const [versionCible, setVersionCible] = useState<GameVersionId>('0.4');
+  const [versionCible, setVersionCible] = useState<GameVersionId>('0.5');
   const [calibreParties, setCalibreParties] = useState<number>(500);
   const [poidsCriteres, setPoidsCriteres] = useState<PoidsCriteresEvaluation>({
     ...POIDS_CRITERES_DEFAUT,
@@ -173,7 +173,7 @@ export const TestsView: React.FC<TestsViewProps> = ({
   const campagnesVersionActive = useMemo(
     () =>
       campagnesSelection.filter((c) =>
-        (c.versionsCibles || ['0.4']).includes(versionCible)
+        (c.versionsCibles || ['0.5']).includes(versionCible)
       ),
     [campagnesSelection, versionCible]
   );
@@ -181,7 +181,7 @@ export const TestsView: React.FC<TestsViewProps> = ({
   const campagnesArchives = useMemo(
     () =>
       campagnesSelection.filter(
-        (c) => !(c.versionsCibles || ['0.1']).includes('0.4')
+        (c) => !(c.versionsCibles || ['0.1']).includes('0.5')
       ),
     [campagnesSelection]
   );

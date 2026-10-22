@@ -1052,15 +1052,237 @@ export const ETAPES_MISE_EN_PLACE_V04: SetupStepSpec[] = [
   },
 ];
 
+export const OPTIONS_REGLES_V05_EPURE: RuleOptionSpec[] = [
+  {
+    id: 'opt_curseur1_timing_machines_v05',
+    cleVariante: 'optionResolutionV05',
+    nom: 'Curseur 1 — Le moment où les Machines bougent (Entrelacé vs Linéaire 2C)',
+    categorie: 'Séquencement de la Résolution',
+    introduiteEnVersion: '0.5',
+    description:
+      'En V0.5, le « Barrage d’entrée » et le « Mouvement contrarié » sont supprimés du cœur de règles : les Machines entrent toujours librement sur leur case cible et un seul test de présence a lieu au moment de la coupe. Ce 1er curseur règle le moment où les Machines se déplacent.',
+    choix: [
+      {
+        valeur: '2C_lineaire_1_temps',
+        label: 'Choix B (Option 2C) — Linéaire en fin de tour : Déplacement I → Déplacement II → Machines bougent et coupent directement',
+        estReference: true,
+        description:
+          'On supprime l’entrelacement : les joueurs exécutent leurs 2 déplacements (I puis II), puis on révèle chaque gobelet 2D6 un par un : la Machine se déplace vers sa cible et résout immédiatement son verdict (bloquée si la condition du Curseur 2 est remplie, sinon coupe 1 arbre) + Apprentissage immédiat. Donne un relief unique au Secteur B (Timing) de l’Asymétrie !',
+        impactPhysique:
+          '1) Jouez tous les Déplacements I puis II des Défenseurs. 2) Révélez les gobelets 2D6 un par un : déplacez la Machine et résolvez immédiatement sur sa case d’arrivée son verdict et l’apprentissage.',
+      },
+      {
+        valeur: '2B_entrelacee_seuil_pur',
+        label: 'Choix A (Options 2A/2B) — Entrelacé : Déplacement I → Machines bougent → Déplacement II → Verdict des coupes',
+        description:
+          'Les Défenseurs exécutent leur Déplacement I, puis toutes les Machines se déplacent librement vers leur cible (sans jamais être bloquées à l’entrée), puis les Défenseurs exécutent leur Déplacement II, suivi du verdict unique des coupes en fin de tour.',
+        impactPhysique:
+          'Déplacez les Machines au milieu du tour sans jamais les bloquer à l’entrée ; vérifiez uniquement la condition de parade sur chaque Machine après le Déplacement II.',
+      },
+      {
+        valeur: '2A_entrelacee_coalition',
+        label: 'Choix A (Option 2A stricte) — Entrelacé + Coalition 2 Peuples en fin de tour',
+        description:
+          'Identique au Choix A Entrelacé (Déplacement I → Machines bougent librement → Déplacement II) avec verdict exigeant 2 Peuples différents sur la case de la Machine.',
+        impactPhysique:
+          'Les Machines entrent toujours sur leur cible à mi-tour ; en fin de tour, vérifiez si 2 couleurs de Défenseurs différentes entourent la Machine.',
+      },
+    ],
+  },
+  {
+    id: 'opt_curseur2_seuil_parade_v05',
+    cleVariante: 'seuilParadeV05',
+    nom: 'Curseur 2 — Le seuil pour contrer une Machine sur sa case',
+    categorie: 'Actions des Défenseurs',
+    introduiteEnVersion: '0.5',
+    description:
+      'Une seule règle d’interaction Défenseurs / Machines au moment où la Machine veut couper : combien de Défenseurs doivent occuper la case de la Machine ?',
+    choix: [
+      {
+        valeur: '1_defenseur',
+        label: 'Choix A — 1 seul Défenseur présent sur la case suffit à bloquer la coupe',
+        estReference: true,
+        description:
+          'À la fin du tour (ou lors de la révélation 2C), la simple présence d’au moins 1 Défenseur sur la case d’une Machine suffit à bloquer sa coupe et déclenche un apprentissage négatif.',
+        impactPhysique:
+          'S’il y a au moins 1 pion Défenseur sur la case de la Machine au moment du verdict, aucun arbre n’est coupé.',
+      },
+      {
+        valeur: '2_peuples',
+        label: 'Choix B — 2 Défenseurs de Peuples différents (Coalition) sont requis pour bloquer la coupe',
+        description:
+          'Il faut réunir au moins 2 Défenseurs appartenant à des Peuples (joueurs) différents sur la case de la Machine pour former une Coalition et bloquer sa coupe.',
+        impactPhysique:
+          'Vérifiez qu’au moins 2 pions Défenseurs de couleurs distinctes occupent la case de la Machine pour annuler la coupe.',
+      },
+      {
+        valeur: 'gradue_1_bloque_2_chantier',
+        label: 'Choix C (Gradué) — 1 Défenseur bloque la coupe sur place · 2 Peuples différents démontent la Machine (Chantier)',
+        description:
+          'Seuil gradué sans règle complexe : 1 seul Défenseur présent sur la case bloque la coupe sur place ; réunir 2 Défenseurs de Peuples différents démonte la Machine et la renvoie au Chantier.',
+        impactPhysique:
+          '1 Défenseur sur la case = coupe annulée sur place ; ≥ 2 Peuples différents = coupe annulée ET figurine Machine renvoyée au Chantier.',
+      },
+    ],
+  },
+  {
+    id: 'opt_curseur3_sort_machine_v05',
+    cleVariante: 'effetParadeV05',
+    nom: 'Curseur 3 — Le sort d’une Machine contrée',
+    categorie: 'Actions des Défenseurs',
+    introduiteEnVersion: '0.5',
+    description:
+      'Détermine ce qu’il advient matériellement de la figurine Machine lorsque sa coupe est contrée par les Défenseurs.',
+    choix: [
+      {
+        valeur: 'bloquer_sur_place',
+        label: 'Choix A — Elle reste sur place (neutralisée pour ce tour)',
+        estReference: true,
+        description:
+          'La coupe est annulée et les pistes reculent, mais la figurine Machine demeure sur sa case pour le tour suivant (le renvoi au Chantier est alors réservé aux Avantages asymétriques des Peuples !).',
+        impactPhysique:
+          'Ne retirez aucun arbre et laissez la figurine Machine sur sa case.',
+      },
+      {
+        valeur: 'renvoyer_chantier',
+        label: 'Choix B — Elle est renvoyée au Chantier (Réserve)',
+        description:
+          'Dès que la condition de parade est remplie sur la case, la coupe est annulée et la Machine est immédiatement renvoyée dans la réserve du Chantier.',
+        impactPhysique:
+          'Remettez la figurine Machine contrée dans la zone Chantier hors plateau.',
+      },
+      {
+        valeur: 'gradue_1_bloque_2_chantier',
+        label: 'Mode Gradué (associé au Curseur 2 Choix C : 1 bloque sur place / 2 Peuples renvoient au Chantier)',
+        description:
+          '1 Défenseur bloque la coupe sur place ; 2 Défenseurs de Peuples différents renvoient la Machine au Chantier.',
+        impactPhysique:
+          '1 Défenseur = la Machine reste sur place sans couper ; ≥ 2 couleurs différentes = remettez la Machine au Chantier.',
+      },
+    ],
+  },
+  {
+    id: 'opt_palette_tactiques_v05',
+    cleVariante: 'paletteTactiques',
+    nom: 'Palette des Tactiques du Méchant (Piste 2 à 12)',
+    categorie: 'Automatismes du Méchant',
+    introduiteEnVersion: '0.5',
+    description:
+      'Choix d’option simple sur la Piste Tactique (3 tactiques épurées vs 4 tactiques avec Acharnement) sur le Plateau Double Face Fixe.',
+    choix: [
+      {
+        valeur: '3_tactiques_sans_represailles',
+        label: '3 Tactiques Épurées (Cupidité, Percée, Opportunisme)',
+        estReference: true,
+        description:
+          'La piste 2–12 n’utilise que les 3 tactiques les plus intuitives : Cupidité (+ d’arbres), Percée (vers le Cœur) et Opportunisme (case la moins gardée). Simplicité maximale.',
+        impactPhysique:
+          'Placez uniquement les tuiles Cupidité, Percée et Opportunisme sur les cases 2 à 12.',
+      },
+      {
+        valeur: '4_tactiques_acharnement',
+        label: '4 Tactiques avec « Acharnement » (Cible la clairière la plus entamée)',
+        description:
+          'Ajoute la 4e tactique « Acharnement » qui cible la case boisée ayant le moins d’arbres restants (> 0).',
+        impactPhysique:
+          'Incluez les 3 tuiles « Acharnement » (cases 3, 9, 12 au départ) sur la piste 2–12.',
+      },
+    ],
+  },
+];
+
+export const COMPOSANTS_BOITE_V05: BoxComponentSpec[] = [
+  {
+    id: 'comp_plateau_v05',
+    categorie: 'Plateau Central Fixe V0.5',
+    nom: '1 Plateau Double Face Fixe (Recto 3–4J à 9 zones / Verso 5–6J à 13 zones)',
+    quantiteFormule: '1 plateau recto-verso',
+    descriptionMat:
+      'Plateau central épuré sans aucune règle de saturation ni de barrage d’entrée : les pions Défenseurs et les Machines se déplacent toujours librement sans limite de capacité par zone ni goulot bloquant.',
+    usageRegle:
+      'Les Défenseurs se déplacent librement d’une case adjacente par étape ; les Machines entrent toujours sur leur case cible.',
+    nouveauteVersion: true,
+  },
+  {
+    id: 'comp_pions_defenseurs_v05',
+    categorie: 'Peuples Défenseurs (Cœur Unifié)',
+    nom: 'Pions Défenseurs en bois aux couleurs des 6 Peuples',
+    quantiteFormule: 'dynamique_defenseurs',
+    descriptionMat:
+      'Pions Défenseurs en bois (1 ou 2 par joueur selon le calibrage) + marqueurs de déplacement I et II.',
+    usageRegle:
+      'Une seule règle d’interaction Défenseurs / Machines : on vérifie uniquement au moment où la Machine veut couper si le seuil de Défenseurs est présent sur sa case.',
+    nouveauteVersion: true,
+  },
+  COMPOSANTS_BOITE_V04[2], // Double Piste Statistique
+  COMPOSANTS_BOITE_V01[1], // Pions Forêt en bois
+  COMPOSANTS_BOITE_V01[3], // 6 Figurines Machines M0 à M5
+  COMPOSANTS_BOITE_V04[5], // Gobelets Opaques & 2D6
+];
+
+export const ETAPES_MISE_EN_PLACE_V05: SetupStepSpec[] = [
+  {
+    numero: 1,
+    titre: 'Déplier le Plateau Double Face V0.5 & Planter les Forêts',
+    materiel: 'Plateau Double Face (3–4J / 5–6J) + Pions Forêt verts',
+    consigne:
+      'Posez le plateau central sur sa face « 3–4 Joueurs » (9 zones) ou « 5–6 Joueurs » (13 zones) et placez les pions Forêt initiaux sur le Cœur et sur chaque clairière.',
+    astuceTable:
+      'Règle d’or V0.5 : il n’y a ni mouvement contrarié (capacité illimitée), ni barrage d’entrée des Machines.',
+  },
+  ETAPES_MISE_EN_PLACE_V04[2],
+  {
+    numero: 3,
+    titre: 'Positionner les Machines et les Pions Défenseurs (Cœur Unifié à 3 Curseurs)',
+    materiel: 'Figurines M0 à M5, Pions Défenseurs et Gobelets 2D6',
+    consigne:
+      'Posez les Machines initiales en Lisière (les autres au Chantier) et vos pions Défenseurs sur votre Clairière. En Séquence Linéaire 2C : 1) Dés secrets → 2) Programmation → 3) Déplacements I + II des Défenseurs → 4) Révélation 2D6 : chaque Machine bouge et résout sa coupe immédiatement !',
+    astuceTable:
+      'Si la condition de présence (Curseur 2 : 1 Défenseur, 2 Peuples ou Gradué) est remplie sur la case de la Machine au moment de sa coupe, la coupe est annulée et le Méchant recule sur ses pistes !',
+  },
+];
+
 export const VERSIONS_JEU_INITIALES: GameVersionSpec[] = [
+  {
+    id: '0.5',
+    nomJeu: 'Défenseurs de la forêt',
+    titreVersion: 'Version 0.5 — Cœur Unifié Pur Placement (Zéro Mouvement Contrarié, Zéro Barrage d’Entrée & 3 Curseurs Purs)',
+    statut: 'active',
+    dateCreation: '2026-10-22',
+    pitch:
+      'Socle ultra-simple conçu comme base de départ idéale pour la réflexion sur l’Asymétrie des 6 Peuples : suppression totale du Mouvement Contrarié (déplacements toujours libres sans limite de capacité ni goulot bloquant) et remplacement de la double mécanique Barrage/Coalition par UNE SEULE règle d’interaction Défenseurs/Machines au moment où la Machine veut couper. Le banc d’essai V0.5 compare à complexité constante les 3 Curseurs de résolution sur le Plateau Double Face.',
+    invariantsConception: [
+      'Liberté totale de déplacement dans le socle : suppression complète du Mouvement Contrarié (ni plafond de clairière, ni goulot bloquant, ni annulation en cascade du 2e pas).',
+      'Une seule règle d’interaction Défenseurs / Machines : plus de Barrage d’entrée à mi-tour ; les Machines rejoignent toujours leur cible et tout se joue en un seul test de présence au moment de la coupe.',
+      'Banc d’essai V0.5 piloté par 3 Curseurs purs sur Plateau Double Face : Curseur 1 (Timing Entrelacé vs Linéaire 2C), Curseur 2 (Seuil : 1 Défenseur vs 2 Peuples différents vs Gradué 1 bloque / 2 Peuples Chantier) et Curseur 3 (Sort de la Machine contrée : Sur place vs Chantier).',
+      'Transposition intégrale de la Matrice d’Asymétrie (6 Peuples × 4 Secteurs = 36 pts) : le Barrage d’entrée, le Timing réactif (Reptiles) et le 2e mouvement contrarié (« coup dans le vide » façon Colt Express coopératif) sont valorisés dans la boîte à outils de l’Asymétrie.',
+    ],
+    evolutionsDepuisPrecedente: [
+      'Suppression totale du Mouvement Contrarié dans le cœur de règles ; déport de l’idée du « 2e mouvement programmé contrarié (type Colt Express) » vers l’Asymétrie pour contrebalancer un pouvoir fort ou une synergie.',
+      'Suppression du Barrage d’entrée à l’Étape 1 (fini le paradoxe de la Machine barrée qui coupe sur sa case de départ ; le Barrage d’entrée devient un Avantage exclusif de Peuple).',
+      'Formalisation des 3 Curseurs V0.5 permettant d’éprouver Options 2A, 2B et 2C sans ajouter la moindre règle complexe.',
+      'Mise à jour complète du Dossier Maître de Conception de l’Asymétrie (`resultats/dossier-conception-asymetrie-gemini.md`) et des Post-it Labo pour reprendre le travail case par case sur la base 0.5.',
+    ],
+    ideesLaboIds: [
+      'idea-v05-coeur-unifie-3-curseurs',
+      'idea-asymetrie-6-peuples-4-secteurs',
+      'idea-asym-colt-express-contrepartie',
+      'idea-asym-barrage-entree-exclusif',
+      'idea-asym-timing-reptiles-2c',
+    ],
+    optionsRegles: OPTIONS_REGLES_V05_EPURE,
+    parametresVariables: PARAMETRES_VARIABLES_COMMUNS,
+    composantsBoite: COMPOSANTS_BOITE_V05,
+    etapesMiseEnPlace: ETAPES_MISE_EN_PLACE_V05,
+  },
   {
     id: '0.4',
     nomJeu: 'Défenseurs de la forêt',
-    titreVersion: 'Version 0.4 — Pur Placement, Barrage de Position (≥1 Déf.) & Coalition Multi-Peuples (≥2 Peuples)',
-    statut: 'active',
+    titreVersion: 'Version 0.4 (Archivée) — Pur Placement, Barrage de Position (≥1 Déf.) & Coalition Multi-Peuples (≥2 Peuples)',
+    statut: 'archivee',
     dateCreation: '2026-10-20',
     pitch:
-      'Refonte épurée centrée à 100 % sur le placement coopératif et la déduction : les Défenseurs peuvent uniquement se déplacer (1 case adjacente). Une Machine ne peut pas entrer sur une case occupée par au moins 1 Défenseur (ce qui annule ou détourne son déplacement), et 2 Défenseurs de Peuples différents sur la même case qu’une Machine l’empêchent de couper une forêt.',
+      '[Version archivée] Refonte centrée sur le placement coopératif avec double règle Barrage d’entrée (≥ 1 Défenseur) + Coalition contre la coupe (≥ 2 Peuples) et mouvements contrariés.',
     invariantsConception: [
       'Action unique des Défenseurs : Se déplacer d’une case adjacente (ou rester sur place) — suppression des cartes Protéger, Saboter et Replanter du socle.',
       'Barrage de position : toute case contenant au moins 1 Défenseur est interdite d’entrée aux Machines.',

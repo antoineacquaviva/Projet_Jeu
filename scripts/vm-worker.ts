@@ -34,7 +34,7 @@ function parseArgValue(args: string[], flag: string, defaultVal: string): string
 
 async function main() {
   const args = process.argv.slice(2);
-  const versionCible = parseArgValue(args, '--version', '0.4') as GameVersionId;
+  const versionCible = parseArgValue(args, '--version', '0.5') as GameVersionId;
   const calibreRaw = parseArgValue(
     args,
     '--calibre',

@@ -271,21 +271,34 @@ export function chargerEtatAtelier(): AtelierPersistedState {
           parsed.versions = [...VERSIONS_JEU_INITIALES];
           modified = true;
         } else {
-          const existingVersionIds = new Set(
-            parsed.versions.map((v) => v.version || v.id)
-          );
           for (const ver of VERSIONS_JEU_INITIALES) {
-            if (!existingVersionIds.has(ver.id)) {
-              parsed.versions.push(ver);
+            const idx = parsed.versions.findIndex(
+              (v) => (v.version || v.id) === ver.id
+            );
+            if (idx === -1) {
+              parsed.versions.unshift(ver);
+              modified = true;
+            } else if (ver.id === '0.5') {
+              parsed.versions[idx] = ver;
               modified = true;
             }
           }
         }
 
-        const existingVariantIds = new Set(parsed.variantes.map((v) => v.id));
         for (const varInit of VARIANTES_INITIALES_V01) {
-          if (!existingVariantIds.has(varInit.id)) {
+          const idx = parsed.variantes.findIndex((v) => v.id === varInit.id);
+          if (idx === -1) {
             parsed.variantes.push(varInit);
+            modified = true;
+          } else if (varInit.version === '0.5') {
+            parsed.variantes[idx] = {
+              ...varInit,
+              scoreInteretDernierTest:
+                parsed.variantes[idx].scoreInteretDernierTest ??
+                varInit.scoreInteretDernierTest,
+              bandeSante:
+                parsed.variantes[idx].bandeSante ?? varInit.bandeSante,
+            };
             modified = true;
           }
         }
@@ -294,10 +307,16 @@ export function chargerEtatAtelier(): AtelierPersistedState {
           parsed.ideesLabo = [...IDEES_INITIALES_LABO];
           modified = true;
         } else {
-          const existingIdeaIds = new Set(parsed.ideesLabo.map((i) => i.id));
           for (const ideaInit of IDEES_INITIALES_LABO) {
-            if (!existingIdeaIds.has(ideaInit.id)) {
+            const idx = parsed.ideesLabo.findIndex((i) => i.id === ideaInit.id);
+            if (idx === -1) {
               parsed.ideesLabo.push(ideaInit);
+              modified = true;
+            } else if (
+              ideaInit.id === 'idea-asymetrie-6-peuples-4-secteurs' ||
+              ideaInit.versionCible === '0.5'
+            ) {
+              parsed.ideesLabo[idx] = ideaInit;
               modified = true;
             }
           }
@@ -306,6 +325,16 @@ export function chargerEtatAtelier(): AtelierPersistedState {
         if (!Array.isArray(parsed.campagnesPlanifieesVM)) {
           parsed.campagnesPlanifieesVM = [...CAMPAGNES_VM_INITIALES];
           modified = true;
+        } else {
+          const existingVmIds = new Set(
+            parsed.campagnesPlanifieesVM.map((c) => c.id)
+          );
+          for (const vmInit of CAMPAGNES_VM_INITIALES) {
+            if (!existingVmIds.has(vmInit.id)) {
+              parsed.campagnesPlanifieesVM.unshift(vmInit);
+              modified = true;
+            }
+          }
         }
 
         if (!Array.isArray(parsed.analysesGemini)) {
@@ -313,29 +342,29 @@ export function chargerEtatAtelier(): AtelierPersistedState {
           modified = true;
         }
 
-        const aCampagneV04 =
+        const aCampagneV05 =
           Array.isArray(parsed.campagnesSelection) &&
           parsed.campagnesSelection.some((c) =>
-            (c.versionsCibles || []).includes('0.4')
+            (c.versionsCibles || []).includes('0.5')
           );
 
-        if (!aCampagneV04) {
-          const ciblesV04 = parsed.variantes.filter(
-            (v) => v.version === '0.4' && v.statutViabilite !== 'eliminee'
+        if (!aCampagneV05) {
+          const ciblesV05 = parsed.variantes.filter(
+            (v) => v.version === '0.5' && v.statutViabilite !== 'eliminee'
           );
-          const { campagne: campV04, variantesMisesAJour: varsV04 } =
+          const { campagne: campV05, variantesMisesAJour: varsV05 } =
             executerCampagneSelection33(
-              ciblesV04,
-              'Campagne de Référence V0.4 — Pur Placement, 6 Topologies, Options 1·2·4 Contrariées & Banc 3–6J',
+              ciblesV05,
+              'Campagne Comparative V0.5 — Cœur Épuré sans Barrage d’Entrée : Option 2C Linéaire vs 2B Seuil Pur vs 2A Coalition (Poids fort Simplicité)',
               6,
               6,
-              ['0.4']
+              ['0.5']
             );
-          const mapMajV04 = new Map(varsV04.map((v) => [v.id, v]));
+          const mapMajV05 = new Map(varsV05.map((v) => [v.id, v]));
           parsed.variantes = parsed.variantes.map(
-            (v) => mapMajV04.get(v.id) || v
+            (v) => mapMajV05.get(v.id) || v
           );
-          for (const rv of campV04.rapportsViabilite) {
+          for (const rv of campV05.rapportsViabilite) {
             parsed.rapportsViabilite = [
               rv,
               ...(parsed.rapportsViabilite || []).filter(
@@ -343,7 +372,7 @@ export function chargerEtatAtelier(): AtelierPersistedState {
               ),
             ];
           }
-          for (const ri of campV04.rapportsInteret) {
+          for (const ri of campV05.rapportsInteret) {
             parsed.rapportsInteret = [
               ri,
               ...(parsed.rapportsInteret || []).filter(
@@ -352,15 +381,15 @@ export function chargerEtatAtelier(): AtelierPersistedState {
             ];
           }
           parsed.campagnesSelection = [
-            campV04,
+            campV05,
             ...(parsed.campagnesSelection || []),
           ];
-          const analyseV04 = construireAnalyseCampagneStructurer(campV04);
+          const analyseV05 = construireAnalyseCampagneStructurer(campV05);
           parsed.analysesGemini = [
-            analyseV04,
+            analyseV05,
             ...(parsed.analysesGemini || []),
           ];
-          sauvegarderRapportMarkdownGemini(analyseV04);
+          sauvegarderRapportMarkdownGemini(analyseV05);
           modified = true;
         }
 
@@ -940,6 +969,27 @@ async function startServer() {
       return;
     }
     res.status(404).json({ error: 'Fichier JSONL introuvable pour cette campagne.' });
+  });
+
+  app.get('/api/atelier/dossier-asymetrie', (_req, res) => {
+    const dossierPath = path.resolve(
+      process.cwd(),
+      'resultats',
+      'dossier-conception-asymetrie-gemini.md'
+    );
+    try {
+      if (fs.existsSync(dossierPath)) {
+        const contenuMarkdown = fs.readFileSync(dossierPath, 'utf-8');
+        res.json({
+          chemin: 'resultats/dossier-conception-asymetrie-gemini.md',
+          contenuMarkdown,
+        });
+        return;
+      }
+      res.status(404).json({ error: 'Dossier maître d’asymétrie introuvable.' });
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
   });
 
   app.post('/api/atelier/versions', (req, res) => {

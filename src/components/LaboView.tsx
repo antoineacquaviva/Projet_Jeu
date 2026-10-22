@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   GameVersionId,
   GameVersionSpec,
@@ -39,10 +39,37 @@ export const LaboView: React.FC<LaboViewProps> = ({
   const [formulaireOuvert, setFormulaireOuvert] = useState<boolean>(false);
   const [idEnEdition, setIdEnEdition] = useState<string | null>(null);
 
+  // Dossier Maître d'Asymétrie V0.5 (resultats/dossier-conception-asymetrie-gemini.md)
+  const [dossierAsymetrieMd, setDossierAsymetrieMd] = useState<string>('');
+  const [dossierOuvert, setDossierOuvert] = useState<boolean>(false);
+  const [dossierCopie, setDossierCopie] = useState<boolean>(false);
+
+  useEffect(() => {
+    fetch('/api/atelier/dossier-asymetrie')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.contenuMarkdown) {
+          setDossierAsymetrieMd(data.contenuMarkdown);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const copierDossierAsymetrie = async () => {
+    if (!dossierAsymetrieMd) return;
+    try {
+      await navigator.clipboard.writeText(dossierAsymetrieMd);
+      setDossierCopie(true);
+      setTimeout(() => setDossierCopie(false), 2500);
+    } catch {
+      // ignore clipboard error
+    }
+  };
+
   // État du formulaire de création / édition de post-it
   const [titre, setTitre] = useState<string>('');
   const [cible, setCible] = useState<LabIdeaCible>('Jeu');
-  const [versionCible, setVersionCible] = useState<string>('0.2');
+  const [versionCible, setVersionCible] = useState<string>('0.5');
   const [categorie, setCategorie] =
     useState<LabIdea['categorie']>('Séquencement & Tour');
   const [description, setDescription] = useState<string>('');
@@ -148,10 +175,7 @@ export const LaboView: React.FC<LaboViewProps> = ({
         accentText: 'text-[#234B63]',
       };
     }
-    if (
-      idee.maturite === 'Intégrée V0.1' ||
-      idee.maturite === 'Intégrée V0.2'
-    ) {
+    if (idee.maturite.startsWith('Intégrée')) {
       return {
         cardBg: 'bg-[#ECF6EE] border-[#B6DBC0]',
         tapeBg: 'bg-[#256B45] text-white',
@@ -175,6 +199,55 @@ export const LaboView: React.FC<LaboViewProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Encart Dossier Maître d'Asymétrie V0.5 (resultats/dossier-conception-asymetrie-gemini.md) */}
+      <div className="bg-[#ECF6EE] rounded-xl p-5 border border-[#B6DBC0] shadow-xs space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#256B45] text-white">
+                Dossier Maître d’Asymétrie V0.5
+              </span>
+              <code className="text-xs font-mono-tabular text-[#1E3528] bg-white/80 px-2 py-0.5 rounded border border-[#B6DBC0]">
+                resultats/dossier-conception-asymetrie-gemini.md
+              </code>
+            </div>
+            <h2 className="font-display text-base font-bold text-[#16211B] mt-1.5">
+              Transposition intégrale V0.4 → V0.5 : 6 Peuples × 4 Secteurs (36 pts), Le Rêve partagé & Boîte à outils asymétrique (Effet « Colt Express », Barrage d’entrée, Timing Reptiles)
+            </h2>
+            <p className="text-xs text-[#2B3730] mt-0.5">
+              100 % du travail de conception sur l’asymétrie est conservé et ancré sur le Cœur Unifié V0.5 (3 Curseurs sur Plateau Double Face). Prêt à être repris case par case.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={copierDossierAsymetrie}
+              className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#1E3528] text-white hover:bg-[#16211B] transition-colors shadow-xs"
+            >
+              {dossierCopie
+                ? '✓ Dossier V0.5 copié dans le presse-papiers'
+                : 'Copier le Dossier Maître V0.5'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setDossierOuvert(!dossierOuvert)}
+              className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-white text-[#1E3528] border border-[#256B45]/40 hover:bg-[#F4F5F0] transition-colors"
+            >
+              {dossierOuvert ? 'Replier le dossier ▲' : 'Consulter le dossier complet ▼'}
+            </button>
+          </div>
+        </div>
+
+        {dossierOuvert && dossierAsymetrieMd && (
+          <div className="bg-white rounded-lg border border-[#B6DBC0] p-4 max-h-[520px] overflow-y-auto">
+            <pre className="text-xs font-mono-tabular whitespace-pre-wrap text-[#16211B] leading-relaxed">
+              {dossierAsymetrieMd}
+            </pre>
+          </div>
+        )}
+      </div>
+
       {/* Barre supérieure du Mur de Post-it : Filtres + Bouton Nouveau Post-it */}
       <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div>
@@ -211,9 +284,11 @@ export const LaboView: React.FC<LaboViewProps> = ({
             className="px-2.5 py-1.5 text-xs font-semibold border border-[#D8DFD5] rounded-lg bg-white text-[#16211B]"
           >
             <option value="Toutes">Toutes versions</option>
-            <option value="0.1">Cible : Version 0.1</option>
+            <option value="0.5">Cible : Version 0.5</option>
+            <option value="0.4">Cible : Version 0.4</option>
+            <option value="0.3">Cible : Version 0.3</option>
             <option value="0.2">Cible : Version 0.2</option>
-            <option value="0.3">Cible : Version 0.3+</option>
+            <option value="0.1">Cible : Version 0.1</option>
           </select>
 
           {/* Filtre Maturité */}
@@ -228,8 +303,11 @@ export const LaboView: React.FC<LaboViewProps> = ({
             <option value="Idée brute">Idée brute</option>
             <option value="En étude">En étude</option>
             <option value="Prête à tester">Prête à tester</option>
-            <option value="Intégrée V0.1">Intégrée V0.1</option>
+            <option value="Intégrée V0.5">Intégrée V0.5</option>
+            <option value="Intégrée V0.4">Intégrée V0.4</option>
+            <option value="Intégrée V0.3">Intégrée V0.3</option>
             <option value="Intégrée V0.2">Intégrée V0.2</option>
+            <option value="Intégrée V0.1">Intégrée V0.1</option>
             <option value="Différée">Différée</option>
           </select>
 
@@ -391,8 +469,11 @@ export const LaboView: React.FC<LaboViewProps> = ({
                 <option value="Idée brute">Idée brute</option>
                 <option value="En étude">En étude</option>
                 <option value="Prête à tester">Prête à tester</option>
-                <option value="Intégrée V0.1">Intégrée V0.1</option>
+                <option value="Intégrée V0.5">Intégrée V0.5</option>
+                <option value="Intégrée V0.4">Intégrée V0.4</option>
+                <option value="Intégrée V0.3">Intégrée V0.3</option>
                 <option value="Intégrée V0.2">Intégrée V0.2</option>
+                <option value="Intégrée V0.1">Intégrée V0.1</option>
                 <option value="Différée">Différée</option>
               </select>
             </div>
@@ -550,8 +631,11 @@ export const LaboView: React.FC<LaboViewProps> = ({
                       <option value="Idée brute">Idée brute</option>
                       <option value="En étude">En étude</option>
                       <option value="Prête à tester">Prête à tester</option>
-                      <option value="Intégrée V0.1">Intégrée V0.1</option>
+                      <option value="Intégrée V0.5">Intégrée V0.5</option>
+                      <option value="Intégrée V0.4">Intégrée V0.4</option>
+                      <option value="Intégrée V0.3">Intégrée V0.3</option>
                       <option value="Intégrée V0.2">Intégrée V0.2</option>
+                      <option value="Intégrée V0.1">Intégrée V0.1</option>
                       <option value="Différée">Différée</option>
                     </select>
                   </div>

@@ -98,9 +98,18 @@ export function formaterNomSiege(
   };
 }
 
+export function estVarianteEpureeV05(variante: VariantV01): boolean {
+  return Boolean(
+    variante.version === '0.5' || variante.optionResolutionV05 !== undefined
+  );
+}
+
 export function estVariantePlacementV04(variante: VariantV01): boolean {
   return Boolean(
-    variante.placementUniquementV04 || variante.version === '0.4'
+    variante.placementUniquementV04 ||
+      variante.version === '0.4' ||
+      variante.version === '0.5' ||
+      variante.optionResolutionV05 !== undefined
   );
 }
 
@@ -217,6 +226,253 @@ export const PISTE_MACHINE_INITIALE: Record<number, number> = {
 };
 
 export const VARIANTES_INITIALES_V01: VariantV01[] = [
+  {
+    id: 'v05_2c_lineaire_1def_surplace',
+    nom: 'V0.5 Référence (Curseur 1B · 2A · 3A) — Linéaire Fin de Tour · 1 Défenseur Bloque Sur Place (3 Tactiques)',
+    version: '0.5',
+    description:
+      'Cœur Unifié V0.5 privilégiant la simplicité maximale sur Plateau Double Face : zéro Mouvement Contrarié, zéro Barrage d’entrée. Curseur 1 Choix B (Dépl. I+II puis révélation 2D6 gobelet par gobelet) · Curseur 2 Choix A (≥ 1 Défenseur présent bloque la coupe) · Curseur 3 Choix A (Machine bloquée sur place).',
+    origine: 'socle',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 97,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'lineaire_2c_fin',
+    optionResolutionV05: '2C_lineaire_1_temps',
+    seuilParadeV05: '1_defenseur',
+    effetParadeV05: 'bloquer_sur_place',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'aucun_barrage_v05',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '3_tactiques_sans_represailles',
+    regleMouvementContrarie: 'aucun',
+    effetProteger: 'coupe_seule',
+    effetSaboter: 'immobiliser_sur_place',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 1,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v05_2c_lineaire_gradue_chantier',
+    nom: 'V0.5 (Curseur 1B · 2C Gradué) — Linéaire Fin de Tour · 1 Déf. Bloque / 2 Peuples Chantier',
+    version: '0.5',
+    description:
+      'Curseur 1 Choix B (Linéaire en fin de tour) + Curseur 2 Choix C Gradué : 1 Défenseur présent sur la case bloque la coupe sur place ; 2 Défenseurs de Peuples différents démantèlent la Machine et la renvoient au Chantier.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 95,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'lineaire_2c_fin',
+    optionResolutionV05: '2C_lineaire_1_temps',
+    seuilParadeV05: 'gradue_1_bloque_2_chantier',
+    effetParadeV05: 'gradue_1_bloque_2_chantier',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'aucun_barrage_v05',
+    effetCoalitionSurMachine: 'renvoyer_au_chantier',
+    paletteTactiques: '3_tactiques_sans_represailles',
+    regleMouvementContrarie: 'aucun',
+    effetProteger: 'coupe_seule',
+    effetSaboter: 'individuel_chantier',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 5,
+  },
+  {
+    id: 'v05_2c_lineaire_2def_alliance',
+    nom: 'V0.5 (Curseur 1B · 2B · 3B) — Linéaire Fin de Tour · Coalition 2 Peuples & Renvoi Chantier',
+    version: '0.5',
+    description:
+      'Curseur 1 Choix B (Linéaire en fin de tour) + Curseur 2 Choix B (2 Peuples différents requis sur la case de la Machine) + Curseur 3 Choix B (Renvoi au Chantier) avec 4 Tactiques.',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 93,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'lineaire_2c_fin',
+    optionResolutionV05: '2C_lineaire_1_temps',
+    seuilParadeV05: '2_peuples',
+    effetParadeV05: 'renvoyer_chantier',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'aucun_barrage_v05',
+    effetCoalitionSurMachine: 'renvoyer_au_chantier',
+    paletteTactiques: '4_tactiques_acharnement',
+    regleMouvementContrarie: 'aucun',
+    effetProteger: 'protection_collective',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v05_2b_entrelacee_1def_surplace',
+    nom: 'V0.5 (Curseur 1A · 2A · 3A) — Entrelacée Sans Barrage · 1 Défenseur Bloque Sur Place',
+    version: '0.5',
+    description:
+      'Curseur 1 Choix A (Entrelacé : Dépl. I → Les Machines entrent librement sans Barrage → Dépl. II → Verdict unique en fin de tour) · Curseur 2 Choix A (1 Défenseur bloque la coupe) · Curseur 3 Choix A (Sur place).',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 91,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    optionResolutionV05: '2B_entrelacee_seuil_pur',
+    seuilParadeV05: '1_defenseur',
+    effetParadeV05: 'bloquer_sur_place',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'aucun_barrage_v05',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '3_tactiques_sans_represailles',
+    regleMouvementContrarie: 'aucun',
+    effetProteger: 'coupe_seule',
+    effetSaboter: 'immobiliser_sur_place',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 1,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v05_2b_entrelacee_2def_chantier',
+    nom: 'V0.5 (Curseur 1A · 2B · 3B) — Entrelacée Sans Barrage · Coalition 2 Peuples & Renvoi Chantier',
+    version: '0.5',
+    description:
+      'Curseur 1 Choix A (Entrelacé sans Barrage) · Curseur 2 Choix B (2 Peuples différents requis sur la case d’une Machine en fin de tour) · Curseur 3 Choix B (Renvoi de la Machine au Chantier).',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 90,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    optionResolutionV05: '2B_entrelacee_seuil_pur',
+    seuilParadeV05: '2_peuples',
+    effetParadeV05: 'renvoyer_chantier',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'aucun_barrage_v05',
+    effetCoalitionSurMachine: 'renvoyer_au_chantier',
+    paletteTactiques: '4_tactiques_acharnement',
+    regleMouvementContrarie: 'aucun',
+    effetProteger: 'protection_collective',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v05_2a_entrelacee_coalition_2peuples',
+    nom: 'V0.5 (Curseur 1A · 2B · 3A) — Entrelacée Sans Barrage · Coalition 2 Peuples Sur Place',
+    version: '0.5',
+    description:
+      'Curseur 1 Choix A (Entrelacé : supprime le Barrage d’entrée à mi-tour, les Machines entrent toujours sur leur cible) · Curseur 2 Choix B (Coalition d’au moins 2 Peuples différents en fin de tour) · Curseur 3 Choix A (Bloquée sur place).',
+    origine: 'exploration',
+    statutViabilite: 'viable',
+    scoreInteretDernierTest: 88,
+    bandeSante: 'vert',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'alternee_1_par_1',
+    modeResolution: 'entrelacee_coupe_fin',
+    optionResolutionV05: '2A_entrelacee_coalition',
+    seuilParadeV05: '2_peuples',
+    effetParadeV05: 'bloquer_sur_place',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'aucun_barrage_v05',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_acharnement',
+    regleMouvementContrarie: 'aucun',
+    effetProteger: 'protection_collective',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'voisinage',
+    jetonEclaireurActif: false,
+    nbJoueurs: 4,
+    defenseursParJoueur: 2,
+    foretsParCaseSecteur: 4,
+    foretsCoeur: 6,
+    nbTours: 4,
+    machinesInitiales: 4,
+  },
+  {
+    id: 'v05_temoin_ecrasement_2c_sous_effectif',
+    nom: 'V0.5 Témoin Éliminé — 1 Défenseur/J avec Seuil 2 Peuples requis & 6 Machines',
+    version: '0.5',
+    description:
+      'Variante de stress-test V0.5 sur Plateau Double Face : 1 seul pion par joueur mais exigeant 2 Peuples différents sur chaque Machine face à 6 Machines.',
+    origine: 'exploration',
+    statutViabilite: 'eliminee',
+    motifElimination:
+      'Échec Viabilité 3.1 : Sous-effectif critique (1 pion/joueur) face à un seuil de 2 Peuples différents requis.',
+    scoreInteretDernierTest: 26,
+    bandeSante: 'rouge',
+    geometriePlateau: 'double_plateau_34_56',
+    modeProgrammation: 'un_seul_ordre',
+    modeResolution: 'lineaire_2c_fin',
+    optionResolutionV05: '2A_entrelacee_coalition',
+    seuilParadeV05: '2_peuples',
+    effetParadeV05: 'bloquer_sur_place',
+    placementUniquementV04: true,
+    comportementBarrageMachine: 'aucun_barrage_v05',
+    effetCoalitionSurMachine: 'bloquer_coupe_sur_place',
+    paletteTactiques: '4_tactiques_acharnement',
+    regleMouvementContrarie: 'aucun',
+    effetProteger: 'protection_collective',
+    effetSaboter: 'alliance_requise',
+    actionReplanterActive: false,
+    deplacementDoubleActif: false,
+    rythmeApprentissage: 'chaque_machine',
+    porteeTactiques: 'plateau_entier',
+    jetonEclaireurActif: false,
+    nbJoueurs: 3,
+    defenseursParJoueur: 1,
+    foretsParCaseSecteur: 2,
+    foretsCoeur: 3,
+    nbTours: 5,
+    machinesInitiales: 6,
+  },
   {
     id: 'v04_socle_placement_coalition',
     nom: 'V0.4 Socle — Pur Placement, Barrage Annulation & Coalition Sur Place (4 Tactiques Acharnement)',
@@ -1579,7 +1835,11 @@ export function construireGuidePhysique(
   joueurActif: number,
   tourActuel: number
 ): PhysicalStepGuide {
+  const estV05 = estVarianteEpureeV05(variante);
   const estV04 = estVariantePlacementV04(variante);
+  const estLineaire2C =
+    variante.optionResolutionV05 === '2C_lineaire_1_temps' ||
+    variante.modeResolution === 'lineaire_2c_fin';
   switch (sousPhase) {
     case 'observation_2d6':
       return {
@@ -1609,12 +1869,16 @@ export function construireGuidePhysique(
               'Emplacements physiques « Action I » et « Action II » devant soi',
               `Pions Défenseurs du Joueur ${joueurActif + 1}`,
             ],
-        gesteSurTable: estV04
+        gesteSurTable: estV05
+          ? `Joueur ${joueurActif + 1} : Indiquez publiquement le Déplacement I et le Déplacement II (1 case adjacente chacun) de vos ${variante.defenseursParJoueur} Défenseurs afin d’occuper les cases où les Machines tenteront de couper.`
+          : estV04
           ? `Joueur ${joueurActif + 1} : Annoncez publiquement la case adjacente visée par chacun de vos ${variante.defenseursParJoueur} Défenseurs (Déplacement I pour barrer l'entrée aux Machines, Déplacement II pour former une coalition à 2 Peuples).`
           : variante.modeProgrammation === 'alternee_1_par_1'
           ? `Joueur ${joueurActif + 1} : Choisissez 1 carte Action pour chacun de vos ${variante.defenseursParJoueur} Défenseurs et posez-la face visible sur l’emplacement « Action I ».`
           : `Joueur ${joueurActif + 1} : À votre tour de table, posez publiquement vos cartes sur les emplacements « Action I » et « Action II ».`,
-        regleDeReference: estV04
+        regleDeReference: estV05
+          ? 'Règle V0.5 §2 — Pur Placement Unifié : Les Défenseurs se déplacent librement (sans saturation ni barrage d’entrée). Une seule règle de présence contre la coupe au moment où la Machine abat.'
+          : estV04
           ? 'Règle V0.4 §2 — Pur Placement Public : Les Défenseurs ne font que se déplacer (1 case adjacente). Les coéquipiers observent vos choix pour déduire votre gobelet.'
           : 'Règle V0.1 §2 — Programmation séquentielle publique.',
       };
@@ -1625,20 +1889,26 @@ export function construireGuidePhysique(
           `Pions Défenseurs du Joueur ${joueurActif + 1}`,
           'Emplacement « Déplacement II »',
         ],
-        gesteSurTable: `Joueur ${joueurActif + 1} : Indiquez publiquement le 2e déplacement de vos Défenseurs afin de converger à 2 Peuples différents sur les cases occupées par des Machines.`,
+        gesteSurTable: `Joueur ${joueurActif + 1} : Indiquez publiquement le 2e déplacement de vos Défenseurs afin de converger sur les cases occupées par des Machines.`,
         regleDeReference:
           'Règle §2bis — Second temps de programmation.',
       };
     case 'resolution_actions_1':
       return {
-        titreEtape: estV04
+        titreEtape: estV05
+          ? `Tour ${tourActuel} — 3. Exécution du 1er Déplacement des Défenseurs`
+          : estV04
           ? `Tour ${tourActuel} — 3. Exécution du 1er Déplacement (Barrages d'Entrée)`
           : `Tour ${tourActuel} — 3. Résolution des 1res Actions des Défenseurs`,
         composantsPhysiques: ['Pions Défenseurs en bois'],
-        gesteSurTable: estV04
+        gesteSurTable: estV05
+          ? `Déplacez physiquement les pions Défenseurs selon leur Déplacement I (mouvement libre sans limite de capacité). ${estLineaire2C ? 'Enchaînez immédiatement avec le Déplacement II avant de révéler les gobelets 2D6.' : 'Les Machines vont maintenant se déplacer librement vers leurs cibles.'}`
+          : estV04
           ? 'Déplacez physiquement les pions Défenseurs selon leur Déplacement I. Rappel V0.4 : toute case contenant désormais au moins 1 Défenseur est BARRÉE et interdite d’entrée aux Machines !'
           : 'Appliquez les cartes de l’emplacement « Action I » (posées face visible lors de la programmation).',
-        regleDeReference: estV04
+        regleDeReference: estV05
+          ? 'Règle V0.5 §3 — Déplacement libre des Défenseurs (aucun mouvement contrarié dans le cœur).'
+          : estV04
           ? 'Règle V0.4 §3 — Barrage de position : ≥ 1 Défenseur sur une case interdit aux Machines d’y entrer.'
           : 'Règle V0.1 §3 — Premières actions.',
       };
@@ -1650,41 +1920,79 @@ export function construireGuidePhysique(
           'Piste Tactique (2–12) & Piste Machine (1–2–3–0–4–5)',
           '6 Figurines Machines M0 à M5',
         ],
-        gesteSurTable: estV04
+        gesteSurTable: estV05
+          ? 'Soulevez tous les gobelets 2D6 ! Pour chaque paire de dés, déplacez librement la Machine désignée (Écart) vers sa case cible selon sa Tactique (Somme). En V0.5, il n’y a aucun Barrage d’entrée : la Machine entre toujours sur sa case cible sans couper maintenant.'
+          : estV04
           ? 'Soulevez tous les gobelets 2D6 ! Pour chaque paire de dés, identifiez la Machine (Écart) et sa Tactique (Somme). Si la case visée contient au moins 1 Défenseur, la Machine ne peut pas y entrer (son déplacement est annulé ou reporté selon la variante). Ne retirez aucun arbre maintenant !'
           : 'Soulevez tous les gobelets 2D6 ! Déplacez chaque figurine Machine désignée sur sa tuile cible, mais NE RETIREZ AUCUN ARBRE POUR L’INSTANT.',
-        regleDeReference:
-          'Règle V0.4 §4 — Déplacement des Machines : Interdiction d’entrer sur une case gardée par ≥ 1 Défenseur.',
+        regleDeReference: estV05
+          ? 'Règle V0.5 Curseur 1 (Choix A Entrelacé) — Entrée libre des Machines à mi-tour ; le test de présence a lieu uniquement au moment de couper.'
+          : 'Règle V0.4 §4 — Déplacement des Machines : Interdiction d’entrer sur une case gardée par ≥ 1 Défenseur.',
       };
     case 'resolution_actions_2':
       return {
-        titreEtape: estV04
+        titreEtape: estV05
+          ? `Tour ${tourActuel} — ${estLineaire2C ? '4' : '5'}. Exécution du 2e Déplacement des Défenseurs`
+          : estV04
           ? `Tour ${tourActuel} — 5. Exécution du 2e Déplacement (Formation des Coalitions)`
           : `Tour ${tourActuel} — 5. Résolution des 2es Actions des Défenseurs`,
         composantsPhysiques: [
           'Pions Défenseurs',
           'Figurines Machines sur les cases menacées',
         ],
-        gesteSurTable: estV04
+        gesteSurTable: estV05
+          ? `Déplacez vos pions Défenseurs selon leur Déplacement II (mouvement libre). ${
+              variante.seuilParadeV05 === '2_peuples' ||
+              variante.optionResolutionV05 === '2A_entrelacee_coalition'
+                ? 'Réunissez au moins 2 Défenseurs de Peuples (joueurs) différents sur la case de chaque Machine pour bloquer sa coupe !'
+                : variante.seuilParadeV05 === 'gradue_1_bloque_2_chantier' ||
+                  variante.effetParadeV05 === 'gradue_1_bloque_2_chantier'
+                ? '1 Défenseur présent suffit à bloquer la coupe sur place ; 2 Défenseurs de Peuples différents renvoient la Machine au Chantier !'
+                : 'Au moins 1 Défenseur présent sur la case d’une Machine suffit à contrer sa coupe !'
+            }`
+          : estV04
           ? 'Déplacez vos pions Défenseurs selon leur Déplacement II pour rejoindre les cases où se trouvent des Machines : il faut au moins 2 Défenseurs de Peuples (couleurs) différents sur la même case qu’une Machine pour bloquer sa coupe !'
           : 'Appliquez les secondes actions des Défenseurs.',
-        regleDeReference: estV04
+        regleDeReference: estV05
+          ? 'Règle V0.5 §4 — Positionnement final des Défenseurs avant le verdict de coupe des Machines.'
+          : estV04
           ? 'Règle V0.4 §5 — Coalition Multi-Peuples : 2 Défenseurs de couleurs différentes sur la case d’une Machine neutralisent sa coupe.'
           : 'Règle V0.1 §5 — Secondes actions.',
       };
     case 'resolution_coupe_et_apprentissage':
       return {
-        titreEtape: `Tour ${tourActuel} — 6. Coupe des Forêts & Apprentissage Statistique`,
+        titreEtape: estV05 && estLineaire2C
+          ? `Tour ${tourActuel} — 5. Révélation Gobelet par Gobelet : Déplacement, Verdict de Coupe & Apprentissage`
+          : `Tour ${tourActuel} — 6. Coupe des Forêts & Apprentissage Statistique`,
         composantsPhysiques: [
           'Pions Forêt en bois vert',
           'Tuiles de la Piste Tactique (2–12)',
           'Tuiles de la Piste Machine (1–2–3–0–4–5)',
         ],
-        gesteSurTable: estV04
+        gesteSurTable: estV05
+          ? `${
+              estLineaire2C
+                ? 'Révélez les gobelets 2D6 un par un ! Pour chaque gobelet, déplacez la Machine désignée vers sa cible puis vérifiez immédiatement la présence des Défenseurs : '
+                : 'Pour chaque Machine appelée ce tour, vérifiez la présence des Défenseurs sur sa case : '
+            }${
+              variante.seuilParadeV05 === '2_peuples' ||
+              variante.optionResolutionV05 === '2A_entrelacee_coalition'
+                ? 'si ≥ 2 Défenseurs de Peuples différents sont présents, la coupe est contrée'
+                : variante.seuilParadeV05 === 'gradue_1_bloque_2_chantier' ||
+                  variante.effetParadeV05 === 'gradue_1_bloque_2_chantier'
+                ? 'si 1 Défenseur est présent, la coupe est bloquée sur place ; si ≥ 2 Peuples différents sont présents, la Machine est renvoyée au Chantier'
+                : 'si ≥ 1 Défenseur est présent, la coupe est contrée'
+            }${
+              variante.effetParadeV05 === 'renvoyer_chantier'
+                ? ' (et la Machine est renvoyée au Chantier)'
+                : ''
+            } et ses tuiles reculent sur les pistes. Sinon, retirez 1 pion Forêt et avancez ses tuiles vers le 7 et la gauche !`
+          : estV04
           ? 'Pour chaque Machine appelée ce tour : si au moins 2 Défenseurs de Peuples différents occupent sa case, sa coupe est BLOQUÉE (et ses tuiles reculent sur les pistes). Sinon, elle abat 1 Forêt et ses tuiles avancent vers le 7 et vers la gauche de la piste 1–2–3–0–4–5 !'
           : 'Sur chaque tuile où se trouve une Machine non contrée, retirez 1 pion Forêt et permutez les pistes.',
-        regleDeReference:
-          'Règle V0.4 §6 — Bilan des Coalitions & Apprentissage Statistique.',
+        regleDeReference: estV05
+          ? 'Règle V0.5 §5 — Règle unique d’interaction Défenseurs / Machines & Apprentissage Statistique.'
+          : 'Règle V0.4 §6 — Bilan des Coalitions & Apprentissage Statistique.',
       };
     case 'bilan_tour':
       return {
@@ -1851,11 +2159,25 @@ export function compterPeuplesDistinctsSurCase(
   return joueurs.size;
 }
 
-// Vérifie si une case est protégée contre la coupe des Machines (Coalition >= 2 Peuples en V0.4, ou posture Bouclier en V0.1-V0.3)
+// Vérifie si une case est protégée contre la coupe des Machines (Seuil V0.5, Coalition >= 2 Peuples en V0.4, ou posture Bouclier en V0.1-V0.3)
 export function caseEstProtegeeContreCoupe(
   etat: EtatJeuV01,
   caseId: number
 ): boolean {
+  if (estVarianteEpureeV05(etat.variante)) {
+    const seuil =
+      etat.variante.optionResolutionV05 === '2A_entrelacee_coalition'
+        ? '2_peuples'
+        : etat.variante.seuilParadeV05 || '1_defenseur';
+    if (
+      seuil === '1_defenseur' ||
+      seuil === 'gradue_1_bloque_2_chantier' ||
+      etat.variante.effetParadeV05 === 'gradue_1_bloque_2_chantier'
+    ) {
+      return etat.defenseurs.some((d) => d.caseId === caseId);
+    }
+    return compterPeuplesDistinctsSurCase(etat, caseId) >= 2;
+  }
   if (estVariantePlacementV04(etat.variante)) {
     return compterPeuplesDistinctsSurCase(etat, caseId) >= 2;
   }
@@ -1868,12 +2190,19 @@ export function caseEstProtegeeContreCoupe(
   return defenseursEnProtection.length >= 1;
 }
 
-// Vérifie si une case est interdite d'entrée aux Machines (Barrage >= 1 Défenseur en V0.4)
+// Vérifie si une case est interdite d'entrée aux Machines (Supprimé en V0.5 ; Barrage >= 1 Défenseur en V0.4)
 export function caseEstBarreeEntree(
   etat: EtatJeuV01,
   caseId: number,
   tactique?: TactiqueType
 ): boolean {
+  if (
+    estVarianteEpureeV05(etat.variante) ||
+    etat.variante.comportementBarrageMachine === 'aucun_barrage_v05' ||
+    etat.variante.comportementBarrageV04 === 'aucun_barrage_v05'
+  ) {
+    return false;
+  }
   if (estVariantePlacementV04(etat.variante)) {
     const nbDef = etat.defenseurs.filter((d) => d.caseId === caseId).length;
     const palette =
@@ -2533,25 +2862,66 @@ export function executerCiblageMachines(
   return etat;
 }
 
-// Coupe des Forêts après les 2es actions et apprentissage sur les deux pistes
+// Coupe des Forêts après les 2es actions et apprentissage sur les deux pistes (en Option 2C V0.5, déplace d'abord chaque Machine vers sa cible puis résout immédiatement son verdict)
 export function executerCoupesEtApprentissageFinTour(
   etatOrigine: EtatJeuV01
 ): EtatJeuV01 {
   const etat = clonerEtatJeu(etatOrigine);
   etat.mouvementsApprentissageTour = [];
   const estV04 = estVariantePlacementV04(etat.variante);
+  const estV05 = estVarianteEpureeV05(etat.variante);
+  const estLineaire2C =
+    etat.variante.optionResolutionV05 === '2C_lineaire_1_temps' ||
+    etat.variante.modeResolution === 'lineaire_2c_fin';
+
+  if (estLineaire2C) {
+    etat.lancersReveles = true;
+  }
 
   for (let idx = 0; idx < etat.lancersSecretsDuTour.length; idx++) {
     const lancer = etat.lancersSecretsDuTour[idx];
+    const tactique = etat.pisteTactique[lancer.somme];
     const machineId = etat.pisteMachine[lancer.ecart];
     const machine = etat.machines.find((m) => m.id === machineId);
 
-    if (!machine || machine.caseId === null || machine.neutraliseeCeTour) {
+    if (!machine) continue;
+
+    // En Option 2C (Séquence Linéaire en 1 temps), on révèle le gobelet, on déplace immédiatement la Machine vers sa cible, puis on résout son verdict
+    if (estLineaire2C && !machine.neutraliseeCeTour) {
+      const provenance =
+        machine.caseId === null
+          ? 'le Chantier (Réserve)'
+          : etat.cases[machine.caseId]?.nom || `Case ${machine.caseId}`;
+      const caseCible = calculerCibleMachine(
+        etat,
+        machine,
+        tactique,
+        lancer.joueurObservateur,
+        true
+      );
+      machine.caseId = caseCible;
+      machine.cibleDeclaree = caseCible;
+      machine.tactiqueDeclaree = tactique;
+      const nomCible = etat.cases[caseCible]?.nom || `Case ${caseCible}`;
+      const nomPhysCible =
+        etat.cases[caseCible]?.nomPhysique || `Tuile ${caseCible}`;
+
+      etat.journal.push({
+        id: `m-2c-move-${etat.tourActuel}-${idx}`,
+        tour: etat.tourActuel,
+        sousPhase: 'resolution_coupe_et_apprentissage',
+        message: `🎲 Gobelet J${lancer.joueurObservateur + 1} [${lancer.d1},${lancer.d2}] : Somme ${lancer.somme} (${NOMS_TACTIQUES[tactique]}) · Écart ${lancer.ecart} (${machine.nom}) → ${provenance} vers ${nomCible}.`,
+        gestePhysique: `Révélez le gobelet J${lancer.joueurObservateur + 1} et déplacez immédiatement ${machine.nom} depuis ${provenance} vers ${nomPhysCible}.`,
+        type: 'machine',
+      });
+    }
+
+    if (machine.caseId === null || machine.neutraliseeCeTour) {
       etat.journal.push({
         id: `coupe-sab-${etat.tourActuel}-${idx}`,
         tour: etat.tourActuel,
         sousPhase: 'resolution_coupe_et_apprentissage',
-        message: `${machine?.nom || 'Machine'} bloquée hors plateau ou neutralisée avant la coupe : le Méchant recule cette combinaison sur ses pistes.`,
+        message: `${machine.nom} bloquée hors plateau ou déjà neutralisée ce tour : le Méchant recule cette combinaison sur ses pistes.`,
         gestePhysique: `La Machine désignée au lancer ${idx + 1} n'ayant pu agir, faites reculer sa tuile Tactique (case ${lancer.somme}) et sa carte Machine (case ${lancer.ecart}).`,
         type: 'apprentissage',
       });
@@ -2566,15 +2936,29 @@ export function executerCoupesEtApprentissageFinTour(
     if (caseEstProtegeeContreCoupe(etat, caseId)) {
       etat.stats.coupesEviteesParProtection += 1;
       const nbPeuples = compterPeuplesDistinctsSurCase(etat, caseId);
-      const effetCoal =
-        etat.variante.effetCoalitionSurMachine ??
-        etat.variante.effetCoalitionV04 ??
-        'bloquer_coupe_sur_place';
-      const renvoyerAuChantier =
-        estV04 &&
-        (effetCoal === 'renvoyer_au_chantier' ||
+      const nbDefSurCase = etat.defenseurs.filter(
+        (d) => d.caseId === caseId
+      ).length;
+
+      let renvoyerAuChantier = false;
+      if (estV05) {
+        const effetP = etat.variante.effetParadeV05 || 'bloquer_sur_place';
+        const seuilP = etat.variante.seuilParadeV05 || '1_defenseur';
+        renvoyerAuChantier =
+          effetP === 'renvoyer_chantier' ||
+          ((effetP === 'gradue_1_bloque_2_chantier' ||
+            seuilP === 'gradue_1_bloque_2_chantier') &&
+            nbPeuples >= 2);
+      } else if (estV04) {
+        const effetCoal =
+          etat.variante.effetCoalitionSurMachine ??
+          etat.variante.effetCoalitionV04 ??
+          'bloquer_coupe_sur_place';
+        renvoyerAuChantier =
+          effetCoal === 'renvoyer_au_chantier' ||
           effetCoal === 'renvoi_chantier' ||
-          (effetCoal === 'chantier_a_3_peuples' && nbPeuples >= 3));
+          (effetCoal === 'chantier_a_3_peuples' && nbPeuples >= 3);
+      }
 
       if (renvoyerAuChantier) {
         machine.caseId = null;
@@ -2585,8 +2969,10 @@ export function executerCoupesEtApprentissageFinTour(
           id: `coupe-coal-chantier-${etat.tourActuel}-${idx}`,
           tour: etat.tourActuel,
           sousPhase: 'resolution_coupe_et_apprentissage',
-          message: `🤝⚡ COALITION (${nbPeuples} Peuples) sur ${nomCase} : ${machine.nom} est bloquée ET démantelée vers le Chantier !`,
-          gestePhysique: `${nbPeuples} Peuples différents entourent ${machine.nom} sur ${nomPhys} : aucun arbre n'est coupé, renvoyez ${machine.nom} au Chantier et reculez ses tuiles sur les pistes.`,
+          message: estV05
+            ? `🛡️⚡ PARADE & RENVOI (${nbPeuples} Peuple${nbPeuples > 1 ? 's' : ''} / ${nbDefSurCase} Déf.) sur ${nomCase} : ${machine.nom} est contrée et renvoyée au Chantier !`
+            : `🤝⚡ COALITION (${nbPeuples} Peuples) sur ${nomCase} : ${machine.nom} est bloquée ET démantelée vers le Chantier !`,
+          gestePhysique: `Aucun arbre n'est coupé sur ${nomPhys}, renvoyez ${machine.nom} au Chantier et reculez ses tuiles sur les pistes.`,
           type: 'defenseur',
         });
       } else {
@@ -2595,12 +2981,12 @@ export function executerCoupesEtApprentissageFinTour(
           id: `coupe-prot-${etat.tourActuel}-${idx}`,
           tour: etat.tourActuel,
           sousPhase: 'resolution_coupe_et_apprentissage',
-          message: estV04
+          message: estV05
+            ? `🛡️ PARADE (${nbDefSurCase} Défenseur${nbDefSurCase > 1 ? 's' : ''}) sur ${nomCase} : ${machine.nom} est contrée sur place et n'abat aucun arbre !`
+            : estV04
             ? `🤝🛡️ COALITION (${nbPeuples} Peuples différents) sur ${nomCase} : ${machine.nom} est neutralisée et n'abat aucun arbre !`
             : `Protection sur ${nomCase} : ${machine.nom} est bloquée par les Défenseurs et n'abat aucun arbre !`,
-          gestePhysique: estV04
-            ? `Les ${nbPeuples} Défenseurs de couleurs différentes sur ${nomPhys} empêchent ${machine.nom} de couper. Reculez sa tuile Tactique (case ${lancer.somme}) et sa carte Machine (case ${lancer.ecart}).`
-            : `Les Défenseurs en posture Bouclier sur la ${nomPhys} empêchent ${machine.nom} de couper. Éloignez la tuile Tactique (case ${lancer.somme}) du 7.`,
+          gestePhysique: `Les Défenseurs présents sur ${nomPhys} empêchent ${machine.nom} de couper. Reculez sa tuile Tactique (case ${lancer.somme}) et sa carte Machine (case ${lancer.ecart}).`,
           type: 'defenseur',
         });
       }
@@ -2693,11 +3079,20 @@ export function passerAuTourSuivant(etatOrigine: EtatJeuV01): EtatJeuV01 {
 // Avance d'un cran dans la machine à états de résolution d'un tour (pour Proto et Démo)
 export function avancerSousPhaseResolution(etatOrigine: EtatJeuV01): EtatJeuV01 {
   let etat = clonerEtatJeu(etatOrigine);
-  const { modeProgrammation, modeResolution } = etat.variante;
+  const { modeProgrammation, modeResolution, optionResolutionV05 } = etat.variante;
+  const estLineaire2C =
+    optionResolutionV05 === '2C_lineaire_1_temps' ||
+    modeResolution === 'lineaire_2c_fin';
 
   if (etat.sousPhase === 'resolution_actions_1') {
     etat = executerActionsDefenseursEtape(etat, 1);
-    if (modeResolution === 'machines_avant_actions') {
+    if (estLineaire2C) {
+      // Option 2C : pas de ciblage des Machines à mi-tour ! On enchaîne directement avec le Déplacement II des Défenseurs
+      etat.sousPhase =
+        modeProgrammation === 'un_seul_ordre'
+          ? 'resolution_coupe_et_apprentissage'
+          : 'resolution_actions_2';
+    } else if (modeResolution === 'machines_avant_actions') {
       etat.sousPhase =
         modeProgrammation === 'un_seul_ordre'
           ? 'resolution_coupe_et_apprentissage'
@@ -2765,6 +3160,54 @@ export function genererLivretPhysiqueVariante(variante: VariantV01): {
   materielConcerne: string;
   texteRegle: string;
 }[] {
+  const estV05 = estVarianteEpureeV05(variante);
+  const estLineaire2C =
+    variante.optionResolutionV05 === '2C_lineaire_1_temps' ||
+    variante.modeResolution === 'lineaire_2c_fin';
+
+  if (estV05) {
+    return [
+      {
+        section: '1. Matériel & Mise en place (Plateau Double Face V0.5)',
+        materielConcerne: `1 Plateau Central Double Face (Recto 3–4J à 9 zones / Verso 5–6J à 13 zones), Cœur (${variante.foretsCoeur} arbres), Clairières & Lisières (${variante.foretsParCaseSecteur} arbres/zone), ${variante.nbJoueurs * variante.defenseursParJoueur} Pions Défenseurs, 6 Figurines Machines (M0 à M5).`,
+        texteRegle: `Posez le Plateau Central sur sa face adaptée au nombre de joueurs (${variante.nbJoueurs}J). Garnissez le Cœur de ${variante.foretsCoeur} pions Forêt et chaque Clairière/Lisière de ${variante.foretsParCaseSecteur} pions Forêt. Chaque joueur place ses ${variante.defenseursParJoueur} pions Défenseurs sur sa Clairière Intérieure. Placez ${variante.machinesInitiales} figurines Machines sur les Lisières et les ${6 - variante.machinesInitiales} autres dans le Chantier (Réserve).`,
+      },
+      {
+        section: '2. Les Deux Pistes Publiques du Méchant & les Gobelets 2D6',
+        materielConcerne:
+          'Plateau Tête du Méchant : Piste Tactique (cases 2 à 12) + Piste Machine (1–2–3–0–4–5) + 2D6 par joueur sous gobelet.',
+        texteRegle:
+          'Au début de chaque tour, chaque joueur lance 2D6 sous son gobelet et les consulte en secret. La SOMME des 2 dés (2 à 12) désigne la tuile Tactique que suivra la Machine ; l’ÉCART entre les 2 dés (0 à 5) désigne la figurine Machine qui s’activera. Interdiction de révéler ses chiffres à voix haute.',
+      },
+      {
+        section: '3. Pur Placement des Défenseurs (Zéro Carte Action · Zéro Mouvement Contrarié)',
+        materielConcerne: 'Pions Défenseurs en bois et Plateau Central.',
+        texteRegle:
+          'Les Défenseurs n’utilisent aucune carte Action : ils disposent uniquement de 2 déplacements d’1 case adjacente (ou rester sur place) par tour, programmés à tour de rôle (Tour de table Déplacement I, puis Tour de table Déplacement II). En V0.5, il n’y a aucun Mouvement Contrarié ni limite de capacité dans le cœur : tous les déplacements programmés vers une case adjacente s’exécutent librement.',
+      },
+      {
+        section: '4. Règle Unique d’Interaction Défenseurs / Machines (Curseurs 2 & 3)',
+        materielConcerne: 'Pions Défenseurs, Figurines Machines, Pions Forêt en bois.',
+        texteRegle:
+          variante.seuilParadeV05 === 'gradue_1_bloque_2_chantier' ||
+          variante.effetParadeV05 === 'gradue_1_bloque_2_chantier'
+            ? 'Il n’existe aucun Barrage d’entrée : une Machine entre toujours librement sur sa case cible. Au moment où elle tente de couper : si 1 Défenseur est présent sur sa case, la coupe est bloquée sur place ; si au moins 2 Défenseurs de Peuples (joueurs) différents sont présents, la coupe est bloquée ET la Machine est renvoyée au Chantier.'
+            : variante.seuilParadeV05 === '2_peuples' ||
+              variante.optionResolutionV05 === '2A_entrelacee_coalition'
+            ? `Il n’existe aucun Barrage d’entrée : une Machine entre toujours librement sur sa case cible. Au moment où elle tente de couper, si au moins 2 Défenseurs de Peuples (joueurs) différents occupent sa case, la coupe est annulée${variante.effetParadeV05 === 'renvoyer_chantier' ? ' et la Machine est renvoyée au Chantier' : ' (la Machine reste sur place)'}.`
+            : `Il n’existe aucun Barrage d’entrée : une Machine entre toujours librement sur sa case cible. Au moment où elle tente de couper, si au moins 1 Défenseur occupe sa case, la coupe est annulée${variante.effetParadeV05 === 'renvoyer_chantier' ? ' et la Machine est renvoyée au Chantier' : ' (la Machine reste sur place)'}.`,
+      },
+      {
+        section: '5. Séquence de Résolution (Curseur 1) & Apprentissage du Méchant',
+        materielConcerne:
+          'Gobelets 2D6, Figurines Machines, Pions Forêt en bois, Tuiles Tactiques (2–12) et Cartes Machine (1–2–3–0–4–5).',
+        texteRegle: estLineaire2C
+          ? 'Curseur 1 — Choix B (Linéaire en fin de tour) : 1) Exécutez tous les Déplacements I puis tous les Déplacements II des Défenseurs. 2) Révélez ensuite les gobelets 2D6 un par un : pour chaque gobelet, la Machine se déplace vers sa case cible et résout immédiatement sa coupe (bloquée si le seuil de Défenseurs est atteint, sinon -1 pion Forêt) puis fait évoluer ses deux pistes (vers le 7 et la gauche en cas de coupe, ou recul d’un cran si elle a été contrée).'
+          : 'Curseur 1 — Choix A (Entrelacé) : 1) Exécutez les Déplacements I des Défenseurs. 2) Soulevez les gobelets 2D6 et déplacez librement chaque Machine vers sa case cible (sans Barrage d’entrée et sans couper). 3) Exécutez les Déplacements II des Défenseurs. 4) En fin de tour, vérifiez chaque Machine appelée : si le seuil de Défenseurs est présent sur sa case, la coupe est contrée (et ses pistes reculent) ; sinon elle abat 1 pion Forêt (et ses pistes avancent vers le 7 et la gauche).',
+      },
+    ];
+  }
+
   return [
     {
       section: '1. Matériel & Mise en place sur la table',

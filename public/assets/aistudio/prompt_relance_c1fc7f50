@@ -1,0 +1,69 @@
+﻿Je me rends compte que j'ai été un peu vite pour engager la réflexion sur l'asymétrie à partir de la 0.4 variante recommandée. Après quelques essais dans l'Atelier, je réalise que cette version/variante ne me convient pas exactement comme base de départ. Je voudrais recentrer sur un coeur de règle encore plus simple qui servira de départ à la réflexion sur l'asymétrie. Je veux en particulier supprimer, ou remanier dans un sens de simplification les règles de résolution :
+
+
+- Supprimer totalement du socle le Mouvement Contrarié (les pions se déplacent toujours librement sans limite de capacité par zone ni goulot bloquant) 
+
+
+* UNE SEULE règle d’interaction Défenseurs / Machines, limpide, qui s’explique en une phrase et laisse tout l’espace nécessaire aux 6 Peuples.
+Voici les 3 options de simplification mises en parallèle :
+Critère
+	Option 2A — « Unifiée Fin de Tour » (Plus de Barrage d'entrée à mi-tour)
+	Option 2B — « Unifiée 1 Défenseur = 1 Parade » (Règle unique de présence)
+	Option 2C — « Séquence Linéaire en 1 temps » (Défenseurs I+II → Machines bougent et coupent)
+	Principe en 1 phrase
+	Les Machines entrent toujours sur leur case cible à mi-tour ; tout se joue en fin de tour sur la case de la Machine.
+	À la fin du tour, la simple présence de Défenseurs sur la case d’une Machine suffit à bloquer sa coupe.
+	On supprime l’entrelacement : les joueurs exécutent leurs 2 déplacements, puis on révèle les gobelets et chaque Machine se déplace et coupe immédiatement.
+	Ce qu'on supprime de la V0.4
+	On supprime le Barrage d’entrée à l’Étape 2. Les Défenseurs ne bloquent jamais le déplacement d’une Machine.
+	On supprime le Barrage d’entrée ET la distinction entre « barrage » et « coalition ».
+	On supprime l’étape intermédiaire des Machines au milieu des déplacements des joueurs.
+	Déroulement de la résolution
+	1. Déplacement I des Défenseurs.
+
+
+2. Les Machines se déplacent librement vers leur cible.
+
+
+3. Déplacement II des Défenseurs.
+
+
+4. Verdict unique : Si la condition de défense est remplie sur la case de la Machine → coupe annulée (apprentissage -). Sinon → arbre coupé (apprentissage +).
+	Identique à 2A, avec un seuil paramétrique pur en fin de tour :
+
+
+• Variante Solo : 1 Défenseur sur la case bloque la coupe.
+
+
+• Variante Alliance : 2 Défenseurs (ou 2 Peuples) bloquent la coupe (ou 1 bloque / 2 renvoient au Chantier).
+	1. Les Défenseurs exécutent leur Déplacement I puis II.
+
+
+2. On révèle chaque gobelet 2D6 un par un : la Machine se déplace vers sa cible et on résout immédiatement son verdict (bloquée si Défenseur présent, sinon coupe 1 arbre) + Apprentissage immédiat.
+	Pourquoi c'est intéressant pour l'Asymétrie ?
+	• Fini le paradoxe de la Machine barrée qui coupe sur sa case de départ.
+
+
+• Le « Barrage d’entrée » peut devenir un Avantage exclusif d’un Peuple (ex. Mammifères ou Reptiles) !
+	Permet au banc d’essai V0.5 de tester un paramètre simple : faut-il 1 ou 2 Défenseurs pour contrer une Machine ? Et la Machine reste-t-elle sur place ou retourne-t-elle au Chantier ?
+	• Ultra-fluide sur table et très lisible.
+
+
+• Donne un poids énorme aux pouvoirs du Secteur B (Timing) : ex. les Reptiles (3 pts) qui exécutent leur 2e déplacement après les Machines deviennent uniques !
+	Remarque que ces trois options ne s’excluent pas, au contraire : elles forment exactement les choix d'options de règles simples (sans ajout de complexité) que tu voulais tester sur le banc d’essai automatisé de la V0.5 !
+Le cœur de résolution V0.5 ne repose plus que sur 1 seul test de présence au moment où la Machine veut couper, et le banc d’essai V0.5 peut comparer très proprement 3 petits curseurs de règles :
+1. Curseur 1 — Le moment où les Machines bougent :
+   * Choix A (Entrelacé) : Déplacement I → Machines bougent → Déplacement II → Verdict des coupes.
+   * Choix B (Linéaire en fin de tour - Option 2C) : Déplacement I → Déplacement II → Machines bougent et coupent directement.
+2. Curseur 2 — Le seuil pour contrer une Machine sur sa case :
+   * Choix A : 1 seul Défenseur présent sur la case suffit à bloquer la coupe.
+   * Choix B : 2 Défenseurs (Coalition) présents sur la case sont requis pour bloquer la coupe.
+   * Choix C (Gradué) : 1 Défenseur bloque la coupe sur place, 2 Défenseurs démontent la Machine (renvoi au Chantier).
+3. Curseur 3 — Le sort d'une Machine contrée :
+   * Choix A : Elle reste sur place (neutralisée pour ce tour).
+   * Choix B : Elle est renvoyée au Chantier (Réserve).
+
+
+
+
+Les mécanismes et règles que nous abandonnerons dans le coeur pourront éventuellement être déportés sur l'asymétrie, je pense en particulier à l'idée du 2ème mouvement programmé contrarié. Cette idée pourrait contrebalancer, atténuer un pouvoir fort en particulier en synergie, l'idée provient du jeu Colt Express dans lequel un coup de poing ou un tir peut tomber dans le vide, mais elle doit être adaptée pour un jeu collaboratif. Cette version simplifiée pourrait être 0.5 qu'on éprouve sur le banc d'essai automatisé avec un jeu de variantes qui est construit plus sur des variations de paramètres et des choix d'option de règles, que des ajouts de règles. Le but étant que les variantes générées n'amènent pas plus de complexité. Dans un premier temps j'aimerais que tu reformules cette nouvelle approche, que tu fasses un plan d'action pour la mettre en oeuvre et en particulier que tu me dises comment conserver tout le travail de réflexion mené sur l'asymétrie à partir de la 0.4 pour le transposer facilement sur la 0.5, c'est très important pour moi de ne pas perdre le fruit de ce travail car j'en étais très satisfait. Et je voudrais pouvoir ensuite reprendre la réflexion sur l’asymétrie à partir de ce document resultats/dossier-conception-asymetrie-gemini.md

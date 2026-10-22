@@ -34,12 +34,12 @@ export const App: React.FC = () => {
   const [versions, setVersions] = useState<GameVersionSpec[]>(
     VERSIONS_JEU_INITIALES
   );
-  const [versionActiveId, setVersionActiveId] = useState<GameVersionId>('0.4');
+  const [versionActiveId, setVersionActiveId] = useState<GameVersionId>('0.5');
   const [variantes, setVariantes] = useState<VariantV01[]>(
     VARIANTES_INITIALES_V01
   );
   const [varianteActiveId, setVarianteActiveId] = useState<string>(
-    'v04_placement_coalition_reference'
+    'v05_2c_lineaire_1def_surplace'
   );
   const [rapportsViabilite, setRapportsViabilite] = useState<
     RapportViabilite31[]
@@ -83,7 +83,7 @@ export const App: React.FC = () => {
               const verManquantes = VERSIONS_JEU_INITIALES.filter(
                 (v) => !existVerIds.has(v.id)
               );
-              setVersions([...versionsMaj, ...verManquantes]);
+              setVersions([...verManquantes, ...versionsMaj]);
             }
             if (Array.isArray(data.variantes) && data.variantes.length > 0) {
               const initVarParId = new Map(
@@ -119,37 +119,37 @@ export const App: React.FC = () => {
               ? data.analysesGemini
               : [];
 
-            const aCampV04 = campagnesExistantes.some((c) =>
-              (c.versionsCibles || []).includes('0.4')
+            const aCampV05 = campagnesExistantes.some((c) =>
+              (c.versionsCibles || []).includes('0.5')
             );
 
-            if (!aCampV04) {
-              const ciblesV04 = toutesVarsChargees.filter(
+            if (!aCampV05) {
+              const ciblesV05 = toutesVarsChargees.filter(
                 (v: VariantV01) =>
-                  v.version === '0.4' && v.statutViabilite !== 'eliminee'
+                  v.version === '0.5' && v.statutViabilite !== 'eliminee'
               );
-              const { campagne: campV04 } = executerCampagneSelection33(
-                ciblesV04,
-                'Campagne de Référence V0.4 — Pur Placement, 6 Topologies, Options 1·2·4 Contrariées & Banc 3–6J',
+              const { campagne: campV05 } = executerCampagneSelection33(
+                ciblesV05,
+                'Campagne Comparative V0.5 — Cœur Épuré sans Barrage d’Entrée : Option 2C Linéaire vs 2B Seuil Pur vs 2A Coalition (Poids fort Simplicité)',
                 5,
                 5,
-                ['0.4']
+                ['0.5']
               );
-              const anaV04 = construireAnalyseCampagneStructurer(campV04);
+              const anaV05 = construireAnalyseCampagneStructurer(campV05);
               setRapportsViabilite([
-                ...campV04.rapportsViabilite,
+                ...campV05.rapportsViabilite,
                 ...(Array.isArray(data.rapportsViabilite)
                   ? data.rapportsViabilite
                   : []),
               ]);
               setRapportsInteret([
-                ...campV04.rapportsInteret,
+                ...campV05.rapportsInteret,
                 ...(Array.isArray(data.rapportsInteret)
                   ? data.rapportsInteret
                   : []),
               ]);
-              setCampagnesSelection([campV04, ...campagnesExistantes]);
-              setAnalysesGemini([anaV04, ...analysesExistantes]);
+              setCampagnesSelection([campV05, ...campagnesExistantes]);
+              setAnalysesGemini([anaV05, ...analysesExistantes]);
             } else {
               if (Array.isArray(data.rapportsViabilite)) {
                 setRapportsViabilite(data.rapportsViabilite);
@@ -186,14 +186,14 @@ export const App: React.FC = () => {
       }
       if (!ignore) {
         const cibles = VARIANTES_INITIALES_V01.filter(
-          (v) => v.version === '0.4' && v.statutViabilite !== 'eliminee'
+          (v) => v.version === '0.5' && v.statutViabilite !== 'eliminee'
         );
         const { campagne } = executerCampagneSelection33(
           cibles,
-          'Campagne de Référence V0.4 — Pur Placement & Coalition (9 Bots + Banc 3–6J)',
+          'Campagne Comparative V0.5 — Cœur Épuré sans Barrage d’Entrée : Option 2C Linéaire vs 2B vs 2A',
           5,
           5,
-          ['0.4']
+          ['0.5']
         );
         setRapportsViabilite(campagne.rapportsViabilite);
         setRapportsInteret(campagne.rapportsInteret);
@@ -207,14 +207,14 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // Variante recommandée par les campagnes de tests (meilleur score d'intérêt parmi les variantes viables de la version active V0.4)
+  // Variante recommandée par les campagnes de tests (meilleur score d'intérêt parmi les variantes viables de la version active V0.5)
   const varianteRecommandee = useMemo(() => {
-    const viablesV04 = variantes.filter(
-      (v) => v.statutViabilite === 'viable' && v.version === '0.4'
+    const viablesV05 = variantes.filter(
+      (v) => v.statutViabilite === 'viable' && v.version === '0.5'
     );
     const pool =
-      viablesV04.length > 0
-        ? viablesV04
+      viablesV05.length > 0
+        ? viablesV05
         : variantes.filter((v) => v.statutViabilite === 'viable');
     if (pool.length === 0) return variantes[0];
 
@@ -223,11 +223,11 @@ export const App: React.FC = () => {
       const scoreA =
         (a.scoreInteretDernierTest ?? 0) +
         (a.id === premiereCampagneId ? 3 : 0) +
-        (a.version === '0.4' ? 5 : 0);
+        (a.version === '0.5' ? 5 : 0);
       const scoreB =
         (b.scoreInteretDernierTest ?? 0) +
         (b.id === premiereCampagneId ? 3 : 0) +
-        (b.version === '0.4' ? 5 : 0);
+        (b.version === '0.5' ? 5 : 0);
       return scoreB - scoreA;
     })[0];
   }, [variantes, campagnesSelection]);
@@ -235,7 +235,7 @@ export const App: React.FC = () => {
   const versionActive = useMemo(
     () =>
       versions.find((v) => v.id === versionActiveId) ||
-      versions.find((v) => v.id === '0.4') ||
+      versions.find((v) => v.id === '0.5') ||
       versions[0],
     [versions, versionActiveId]
   );

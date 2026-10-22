@@ -6,6 +6,7 @@ import {
   ComportementBarrageV04,
   CritereViabilite,
   EffetCoalitionV04,
+  EffetParadeV05,
   EffetProteger,
   EffetSaboter,
   EtatJeuV01,
@@ -15,6 +16,7 @@ import {
   JournalPartieJSONL,
   ModeProgrammation,
   ModeResolution,
+  OptionResolutionV05,
   PoidsCriteresEvaluation,
   PorteeTactiques,
   ProfilTactiquesV04,
@@ -24,22 +26,24 @@ import {
   ResultatBotEchelle,
   RythmeApprentissage,
   ScoresCinqCriteres,
+  SeuilParadeV05,
   TroisAxesPrioritaires,
   VariantV01,
 } from './types';
 import {
   calculerPourcentageForetSauvee,
   construirePlateauV01,
+  estVarianteEpureeV05,
   estVariantePlacementV04,
 } from './moteur';
 import { CATALOGUE_BOTS_V01, simulerPartieCompleteV01 } from './bots';
 
 export const POIDS_CRITERES_DEFAUT: PoidsCriteresEvaluation = {
-  profondeurStrategique: 30,
-  tensionChoix: 25,
+  ergonomieLisibilite: 30,
+  profondeurStrategique: 25,
   dynamiqueCooperative: 20,
-  equilibreMultiJoueurs: 15,
-  ergonomieLisibilite: 10,
+  tensionChoix: 15,
+  equilibreMultiJoueurs: 10,
 };
 
 function moyenne(vals: number[]): number {
@@ -342,6 +346,7 @@ export function evaluerLisibiliteErgonomiePlateau(variante: VariantV01): {
 } {
   const geom: GeometriePlateau = variante.geometriePlateau || 'modulaire_secteurs';
   const estV04 = estVariantePlacementV04(variante);
+  const estV05 = estVarianteEpureeV05(variante);
   const bonusZeroCarte = estV04 ? 4 : 0;
   const cases = construirePlateauV01(variante);
   const nbCases = cases.length;
@@ -351,6 +356,46 @@ export function evaluerLisibiliteErgonomiePlateau(variante: VariantV01): {
         Math.max(1, nbCases)) *
         10
     ) / 10;
+
+  if (estV05) {
+    const opt =
+      variante.optionResolutionV05 ||
+      (variante.modeResolution === 'lineaire_2c_fin'
+        ? '2C_lineaire_1_temps'
+        : '2B_entrelacee_seuil_pur');
+    const chargeManipulationsParTour =
+      opt === '2C_lineaire_1_temps'
+        ? variante.nbJoueurs * variante.defenseursParJoueur + variante.nbJoueurs
+        : variante.nbJoueurs * variante.defenseursParJoueur * 2 + 2;
+    const baseGeom =
+      geom === 'double_plateau_34_56'
+        ? 95
+        : geom === 'clairieres_sentiers'
+        ? 93
+        : geom === 'compact_9_cases'
+        ? 94
+        : 90;
+    const modOpt =
+      opt === '2C_lineaire_1_temps'
+        ? 4
+        : opt === '2B_entrelacee_seuil_pur'
+        ? -3
+        : -8;
+    const score = Math.max(70, Math.min(99, baseGeom + modOpt));
+    const detailOpt =
+      opt === '2C_lineaire_1_temps'
+        ? 'Option 2C (Séquence Linéaire en 1 temps : Déplacements I+II des Défenseurs puis révélation gobelet par gobelet avec coupe/apprentissage immédiats, zéro Barrage d’entrée, zéro entrelacement)'
+        : opt === '2B_entrelacee_seuil_pur'
+        ? 'Option 2B (Séquence Entrelacée à seuil pur sans Barrage d’entrée : conserve 2 demi-temps entrelacés autour des Machines)'
+        : 'Option 2A (Séquence Entrelacée + Coalition 2 Peuples : conserve l’entrelacement et la contrainte de couleurs distinctes)';
+    return {
+      score,
+      detail: `V0.5 Cœur Épuré — ${detailOpt} sur ${geom} (degré moyen ${degreMoyen.toFixed(1)}, ${chargeManipulationsParTour} manip./tour).`,
+      degreMoyen,
+      chargeManipulationsParTour,
+    };
+  }
+
   const chargeManipulationsParTour = estV04
     ? variante.nbJoueurs * variante.defenseursParJoueur * 2 + 3
     : variante.nbJoueurs * 5 + 6;
@@ -984,12 +1029,13 @@ export function evaluerInteretVariante32(
   const ratioCoalitionBarragePct = Math.round(
     (tauxCoalitionsReussiesPct + tauxBarragesEfficacesPct) / 2
   );
-  const bonusFrictionContrariee =
-    tauxMouvementsContrariesPct >= 4 && tauxMouvementsContrariesPct <= 26
-      ? 10 - Math.abs(tauxMouvementsContrariesPct - 13) * 0.45
-      : tauxMouvementsContrariesPct === 0
-      ? 2
-      : -6;
+  const bonusFrictionContrariee = estVarianteEpureeV05(variante)
+    ? 8
+    : tauxMouvementsContrariesPct >= 4 && tauxMouvementsContrariesPct <= 26
+    ? 10 - Math.abs(tauxMouvementsContrariesPct - 13) * 0.45
+    : tauxMouvementsContrariesPct === 0
+    ? 2
+    : -6;
   const scoreCooperation = Math.max(
     25,
     Math.min(
@@ -1061,7 +1107,7 @@ export function evaluerInteretVariante32(
 
   const syntheseAnalytique: string[] = [
     `Échelle des 9 Bots : Inerte ${parId.inerte.foretSauveeMoyennePct}% → Réflexe ${parId.reflexe.foretSauveeMoyennePct}% → Glouton ${parId.glouton.foretSauveeMoyennePct}% → Déductif ${parId.deductif.foretSauveeMoyennePct}% → Expectimax ${parId.expectimax_bayesien.foretSauveeMoyennePct}% → Beam ${parId.beam_rollout.foretSauveeMoyennePct}% → IS-MCTS ${parId.ismcts.foretSauveeMoyennePct}%.`,
-    `Critères Pondérés : Profondeur ${scoreProfondeur}/100 · Tension ${scoreTension}/100 (Entropie ${entropieShannonMoyenne}%, Regret ${regretContrefactuelMoyen} pts) · Coopération ${scoreCooperation}/100 (Shapley +${shapleySynergieCoopPts} pts, Contrariétés ${tauxMouvementsContrariesPct}%) · Équilibre 3–6J ${scoreEquilibre}/100 · Ergonomie ${scoreErgonomie}/100.`,
+    `Critères Pondérés : Simplicité/Ergonomie ${scoreErgonomie}/100 · Profondeur ${scoreProfondeur}/100 · Coopération ${scoreCooperation}/100 (Shapley +${shapleySynergieCoopPts} pts) · Tension ${scoreTension}/100 · Équilibre 3–6J ${scoreEquilibre}/100.`,
     `Équilibre 3 à 6 joueurs : ${detailEquilibre36}`,
     `Lisibilité & Ergonomie du plateau : ${ergo.detail}`,
   ];
@@ -1110,7 +1156,7 @@ export function evaluerInteretVariante32(
  * Décrit de manière explicite les axes combinatoires et la volumétrie du panel exhaustif d'une version
  */
 export function decrirePanelCombinatoireVersion(
-  versionCible: GameVersionId = '0.4'
+  versionCible: GameVersionId = '0.5'
 ): {
   version: GameVersionId;
   nbTotalVariantesExhaustives: number;
@@ -1122,6 +1168,124 @@ export function decrirePanelCombinatoireVersion(
     modalites: { code: string; label: string; description: string }[];
   }[];
 } {
+  if (versionCible === '0.5') {
+    return {
+      version: '0.5',
+      nbTotalVariantesExhaustives: 72,
+      formuleCombinatoire:
+        'Curseur 1 (2 Timings : Entrelacé vs Linéaire 2C) × Curseur 2 (3 Seuils : 1 Défenseur / 2 Peuples différents / Gradué 1 bloque & 2 Peuples Chantier) × Curseur 3 (2 Sorts Machine : Sur place / Chantier) × 2 Palettes Tactiques (3 ou 4) × 3 Calibrages Numériques (1 Déf.·4M / 2 Déf.·4M / 2 Déf.·5M) sur Plateau Double Face = 72 variantes paramétriques sans sur-règle',
+      axes: [
+        {
+          id: 'optionResolutionV05',
+          nom: 'Curseur 1 — Timing où les Machines bougent (Sans Barrage d’Entrée)',
+          nbModalites: 2,
+          modalites: [
+            {
+              code: '2C_lineaire_1_temps',
+              label: 'Choix B (Option 2C) — Linéaire en fin de tour (Simplicité Max)',
+              description:
+                'Déplacements I + II des Défenseurs, puis révélation gobelet par gobelet : la Machine se déplace et vérifie immédiatement sa coupe + apprentissage.',
+            },
+            {
+              code: '2B_entrelacee_seuil_pur',
+              label: 'Choix A (Options 2A/2B) — Entrelacé à mi-tour',
+              description:
+                'Déplacement I → Entrée libre des Machines → Déplacement II → Verdict unique en fin de tour.',
+            },
+          ],
+        },
+        {
+          id: 'seuilParadeV05',
+          nom: 'Curseur 2 — Seuil pour contrer une Machine sur sa case',
+          nbModalites: 3,
+          modalites: [
+            {
+              code: '1_defenseur',
+              label: 'Choix A — ≥ 1 Défenseur présent bloque la coupe',
+              description:
+                'Un seul Défenseur sur la case de la Machine empêche l’abattage : valorise la répartition spatiale et la déduction.',
+            },
+            {
+              code: '2_peuples',
+              label: 'Choix B — ≥ 2 Peuples (joueurs) différents requis (Coalition)',
+              description:
+                'Exige 2 joueurs de couleurs différentes sur la case de la Machine pour empêcher la coupe (comme en V0.4).',
+            },
+            {
+              code: 'gradue_1_bloque_2_chantier',
+              label: 'Choix C (Gradué) — 1 Défenseur bloque sur place / 2 Peuples différents renvoient au Chantier',
+              description:
+                '1 Défenseur suffit à parer la coupe ; converger à 2 Peuples différents démonte la Machine vers le Chantier.',
+            },
+          ],
+        },
+        {
+          id: 'effetParadeV05',
+          nom: 'Curseur 3 — Sort de la Machine contrée',
+          nbModalites: 2,
+          modalites: [
+            {
+              code: 'bloquer_sur_place',
+              label: 'Choix A — Rester sur place (Neutralisée ce tour)',
+              description:
+                'La Machine ne coupe aucun arbre ce tour-ci mais reste présente sur la clairière.',
+            },
+            {
+              code: 'renvoyer_chantier',
+              label: 'Choix B — Renvoyer au Chantier (Réserve)',
+              description:
+                'La Machine contrée est expulsée du plateau et retourne au Chantier.',
+            },
+          ],
+        },
+        {
+          id: 'profilTactiquesV04',
+          nom: 'Palette de la Piste Tactique (2–12)',
+          nbModalites: 2,
+          modalites: [
+            {
+              code: '3_tactiques_sans_represailles',
+              label: '3 Tactiques Épurées (Cupidité, Percée, Opportunisme)',
+              description:
+                'Zéro règle conditionnelle : lecture immédiate pour le socle V0.5.',
+            },
+            {
+              code: '4_tactiques_acharnement',
+              label: '4 Tactiques avec Acharnement',
+              description:
+                'Ajoute la tactique Acharnement (cible la forêt la plus entamée > 0).',
+            },
+          ],
+        },
+        {
+          id: 'parametresNumeriques',
+          nom: 'Paramètres Numériques sur Plateau Double Face (Recto 3–4J / Verso 5–6J)',
+          nbModalites: 3,
+          modalites: [
+            {
+              code: '1def_4m',
+              label: '1 Défenseur / joueur · 4 Machines initiales',
+              description:
+                'Calibrage épuré pour les seuils à 1 Défenseur sur Plateau Double Face.',
+            },
+            {
+              code: '2def_4m',
+              label: '2 Défenseurs / joueur · 4 Machines initiales',
+              description:
+                'Calibrage équilibré permettant les coalitions à 2 Peuples différents.',
+            },
+            {
+              code: '2def_5m',
+              label: '2 Défenseurs / joueur · 5 Machines initiales',
+              description:
+                'Pression industrielle soutenue avec 2 pions par joueur sur Plateau Double Face.',
+            },
+          ],
+        },
+      ],
+    };
+  }
+
   if (versionCible === '0.4') {
     return {
       version: '0.4',
@@ -1262,12 +1426,140 @@ export function decrirePanelCombinatoireVersion(
 }
 
 /**
- * Génère le Produit Cartésien Exhaustif (120 variantes déterministes en V0.4) couvrant
- * 100 % des combinaisons Topologies × Mouvements Contrariés × Barrage × Coalition × Tactiques/Séquencement
+ * Génère le Produit Cartésien Exhaustif (72 variantes paramétriques sur Plateau Double Face en V0.5, 120 en V0.4)
  */
 export function genererGrilleCombinatoireExhaustive(
-  versionCible: GameVersionId = '0.4'
+  versionCible: GameVersionId = '0.5'
 ): VariantV01[] {
+  if (versionCible === '0.5') {
+    const curseursTiming: OptionResolutionV05[] = [
+      '2C_lineaire_1_temps',
+      '2B_entrelacee_seuil_pur',
+    ];
+    const curseursSeuil: SeuilParadeV05[] = [
+      '1_defenseur',
+      '2_peuples',
+      'gradue_1_bloque_2_chantier',
+    ];
+    const curseursSort: EffetParadeV05[] = [
+      'bloquer_sur_place',
+      'renvoyer_chantier',
+    ];
+    const palettes: ProfilTactiquesV04[] = [
+      '3_tactiques_sans_represailles',
+      '4_tactiques_acharnement',
+    ];
+    const calibragesNumeriques: {
+      defenseursParJoueur: 1 | 2;
+      machinesInitiales: 4 | 5;
+      label: string;
+    }[] = [
+      { defenseursParJoueur: 1, machinesInitiales: 4, label: '1Déf·4M' },
+      { defenseursParJoueur: 2, machinesInitiales: 4, label: '2Déf·4M' },
+      { defenseursParJoueur: 2, machinesInitiales: 5, label: '2Déf·5M' },
+    ];
+
+    const variantes: VariantV01[] = [];
+    let compteur = 0;
+
+    for (const optionResolutionV05 of curseursTiming) {
+      const labelTiming =
+        optionResolutionV05 === '2C_lineaire_1_temps'
+          ? 'C1=Linéaire2C'
+          : 'C1=Entrelacé';
+      const modeResolution: ModeResolution =
+        optionResolutionV05 === '2C_lineaire_1_temps'
+          ? 'lineaire_2c_fin'
+          : 'entrelacee_coupe_fin';
+
+      for (const seuilParadeV05 of curseursSeuil) {
+        const labelSeuil =
+          seuilParadeV05 === '1_defenseur'
+            ? 'C2=1Déf'
+            : seuilParadeV05 === '2_peuples'
+            ? 'C2=2Peuples'
+            : 'C2=Gradué(1Bloq/2PeupChantier)';
+
+        for (const sortBase of curseursSort) {
+          const effetParadeV05: EffetParadeV05 =
+            seuilParadeV05 === 'gradue_1_bloque_2_chantier' &&
+            sortBase === 'bloquer_sur_place'
+              ? 'gradue_1_bloque_2_chantier'
+              : sortBase;
+          const labelEffet =
+            effetParadeV05 === 'bloquer_sur_place'
+              ? 'C3=SurPlace'
+              : effetParadeV05 === 'gradue_1_bloque_2_chantier'
+              ? 'C3=GraduéChantier'
+              : 'C3=Chantier';
+
+          for (const profilTactiquesV04 of palettes) {
+            const labelTac =
+              profilTactiquesV04 === '3_tactiques_sans_represailles'
+                ? '3-Tactiques'
+                : '4-Tactiques';
+
+            for (const calib of calibragesNumeriques) {
+              compteur++;
+              const codeNum = String(compteur).padStart(3, '0');
+
+              variantes.push({
+                id: `v05_comb_${codeNum}`,
+                nom: `V0.5 [${codeNum}] ${labelTiming} · ${labelSeuil} · ${labelEffet} · ${labelTac} (${calib.label})`,
+                version: '0.5',
+                description: `Combinaison paramétrique V0.5 #${codeNum}/72 sur Plateau Double Face : ${labelTiming}, sans barrage d’entrée, zéro mouvement contrarié, ${labelSeuil}, ${labelEffet}, ${labelTac}, ${calib.defenseursParJoueur} Déf./J, ${calib.machinesInitiales} Machines.`,
+                origine: 'exploration',
+                statutViabilite: 'non_teste',
+                placementUniquementV04: true,
+                optionResolutionV05,
+                seuilParadeV05,
+                effetParadeV05,
+                comportementBarrageV04: 'aucun_barrage_v05',
+                comportementBarrageMachine: 'aucun_barrage_v05',
+                effetCoalitionV04:
+                  effetParadeV05 === 'bloquer_sur_place'
+                    ? 'blocage_coupe_seul'
+                    : 'renvoi_chantier',
+                effetCoalitionSurMachine:
+                  effetParadeV05 === 'bloquer_sur_place'
+                    ? 'bloquer_coupe_sur_place'
+                    : 'renvoyer_au_chantier',
+                profilTactiquesV04,
+                paletteTactiques: profilTactiquesV04,
+                regleMouvementContrarie: 'aucun',
+                geometriePlateau: 'double_plateau_34_56',
+                modeProgrammation: 'alternee_1_par_1',
+                modeResolution,
+                effetProteger:
+                  seuilParadeV05 === '2_peuples'
+                    ? 'protection_collective'
+                    : 'coupe_seule',
+                effetSaboter:
+                  effetParadeV05 === 'bloquer_sur_place'
+                    ? 'immobiliser_sur_place'
+                    : 'alliance_requise',
+                actionReplanterActive: false,
+                deplacementDoubleActif: false,
+                rythmeApprentissage: 'chaque_machine',
+                porteeTactiques: 'voisinage',
+                peuplesAsymetriquesActifs: false,
+                jetonEclaireurActif: false,
+                nbJoueurs: 4,
+                defenseursParJoueur: calib.defenseursParJoueur,
+                foretsParCaseSecteur: 4,
+                foretsCoeur: 6,
+                nbTours: 4,
+                machinesInitiales: calib.machinesInitiales,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return variantes;
+  }
+
   if (versionCible !== '0.4') {
     return genererVariantesExploratoiresV01(72, 1, versionCible);
   }
@@ -1414,12 +1706,28 @@ export function genererGrilleCombinatoireExhaustive(
   return variantes;
 }
 
-// Générateur automatique de nouvelles variantes exploratoires (avec programme paramétrique V0.4 multi-axes)
+// Générateur automatique de nouvelles variantes exploratoires (avec programme paramétrique V0.5 / V0.4)
 export function genererVariantesExploratoiresV01(
   nbVariantes = 6,
   indexDepart = 1,
-  versionCible: GameVersionId = '0.4'
+  versionCible: GameVersionId = '0.5'
 ): VariantV01[] {
+  if (versionCible === '0.5') {
+    const grille05 = genererGrilleCombinatoireExhaustive('0.5');
+    if (nbVariantes >= grille05.length) {
+      return grille05.slice(0, nbVariantes);
+    }
+    const out: VariantV01[] = [];
+    for (let i = 0; i < nbVariantes; i++) {
+      const base = grille05[(indexDepart * 5 + i * 11) % grille05.length];
+      out.push({
+        ...base,
+        id: `${base.id}_${Date.now().toString(36)}_${i}`,
+      });
+    }
+    return out;
+  }
+
   if (versionCible === '0.4' && nbVariantes >= 100) {
     return genererGrilleCombinatoireExhaustive('0.4').slice(0, nbVariantes);
   }
@@ -1517,13 +1825,13 @@ export function genererVariantesExploratoiresV01(
   return variantes;
 }
 
-// 3.3 — Exécute un pipeline complet sur V0.4 (ou versions sélectionnées) : Filtre 3.1 -> Intérêt 3.2 (9 bots + banc 3-6J) -> Front de Pareto & Classement
+// 3.3 — Exécute un pipeline complet sur V0.5 / V0.4 (ou versions sélectionnées) : Filtre 3.1 -> Intérêt 3.2 (9 bots + banc 3-6J) -> Front de Pareto & Classement
 export function executerCampagneSelection33(
   variantes: VariantV01[],
   nomCampagne: string,
   nbPartiesViabilite = 12,
   nbPartiesInteret = 16,
-  versionsCibles: GameVersionId[] = ['0.4'],
+  versionsCibles: GameVersionId[] = ['0.5'],
   poidsCriteres: PoidsCriteresEvaluation = POIDS_CRITERES_DEFAUT,
   onPartieLog?: (log: JournalPartieJSONL) => void
 ): {
@@ -1540,7 +1848,7 @@ export function executerCampagneSelection33(
 
   const setVersions = new Set(versionsCibles);
   const variantesFiltrees = variantes.filter((v) =>
-    setVersions.has(v.version || '0.4')
+    setVersions.has(v.version || '0.5')
   );
 
   for (const v of variantesFiltrees) {
@@ -1612,8 +1920,7 @@ export function executerCampagneSelection33(
 }
 
 /**
- * Synthèse analytique déterministe produisant un diagnostic complet des campagnes V0.4
- * et 3 configurations V0.4 recommandées.
+ * Synthèse analytique déterministe produisant un diagnostic complet des campagnes V0.5 (2A, 2B, 2C) et V0.4
  */
 export function construireAnalyseCampagneStructurer(
   campagne: CampagneSelection33,
@@ -1621,6 +1928,7 @@ export function construireAnalyseCampagneStructurer(
 ): AnalyseGeminiCampagne {
   const topRapports = campagne.rapportsInteret;
   const meilleure = topRapports[0];
+  const estCampagneV05 = (campagne.versionsCibles || ['0.5']).includes('0.5');
 
   const geoms: { id: GeometriePlateau; nom: string }[] = [
     {
@@ -1665,59 +1973,37 @@ export function construireAnalyseCampagneStructurer(
             )
           )
         : g.id === 'double_plateau_34_56'
-        ? 94
-        : g.id === 'sentiers_goulots_15'
-        ? 94
+        ? 95
         : g.id === 'clairieres_sentiers'
         ? 93
-        : g.id === 'compact_9_cases'
-        ? 91
-        : g.id === 'reseau_etendu_21'
-        ? 90
-        : 89;
+        : 91;
     const noteErgo =
       g.id === 'double_plateau_34_56'
-        ? 97
+        ? 99
         : g.id === 'compact_9_cases'
         ? 95
         : g.id === 'clairieres_sentiers'
         ? 94
-        : g.id === 'sentiers_goulots_15'
-        ? 92
-        : g.id === 'hex_couronne_19'
-        ? 89
-        : 87;
+        : 90;
     const noteEq =
       raps.length > 0
         ? Math.round(
             moyenne(
               raps.map(
-                (r) => r.troisAxesPrioritaires?.equilibreJoueurs36 ?? 88
+                (r) => r.troisAxesPrioritaires?.equilibreJoueurs36 ?? 92
               )
             )
           )
         : g.id === 'double_plateau_34_56'
-        ? 95
-        : g.id === 'reseau_etendu_21'
-        ? 93
-        : g.id === 'sentiers_goulots_15'
-        ? 91
-        : g.id === 'clairieres_sentiers'
-        ? 91
-        : 88;
+        ? 96
+        : 91;
 
     const verdict =
       g.id === 'double_plateau_34_56'
-        ? 'Socle de référence V0.4 : les diagonales Lisière ↔ 2 Clairières permettent à deux Peuples voisins de converger en 1 pas pour former une Coalition tout en maintenant un Barrage aéré.'
-        : g.id === 'sentiers_goulots_15'
-        ? 'Terrain d’excellence pour l’Option 2 (Goulots limités à 1 pion) : oblige à anticiper l’ordre de passage dans les 4 cols sous peine de mouvement contrarié en cascade.'
+        ? 'Socle de référence V0.5 : avec l’Option 2C linéaire et sans barrage d’entrée, la lecture des trajectoires et la couverture des 9/13 zones atteignent 99/100 en simplicité.'
         : g.id === 'clairieres_sentiers'
-        ? 'Idéal avec l’Option 4 (Interception par Machine active) : converger à 2 peuples par les cols pour neutraliser une Machine crée une tension coopérative maximale.'
-        : g.id === 'compact_9_cases'
-        ? 'Forte densité et tension maximale à 3 et 4 joueurs : chaque case est vitale et aucune erreur de placement n’est anodine.'
-        : g.id === 'reseau_etendu_21'
-        ? 'Taillé pour 5–6 joueurs ou 3 Défenseurs par joueur : valorise la planification multi-coups (+15% d’écart en faveur d’IS-MCTS).'
-        : 'Pavage hexagonal à 6 voisins offrant de multiples voies de contournement.';
+        ? 'Excellente alternative organique : les 3 Cols structurent les déplacements I+II avant la révélation des gobelets.'
+        : 'Topologie secondaire conservée pour les tests comparatifs.';
 
     return {
       geometrie: g.id,
@@ -1730,155 +2016,221 @@ export function construireAnalyseCampagneStructurer(
   });
 
   const ts = Date.now().toString(36).slice(-4);
-  const hybridesRecommandes: HybrideRecommandeGemini[] = [
-    {
-      titre:
-        'Noyau Recommandé V0.4 — Double Plateau + Barrage Annulation + Coalition Bloque Coupe + Acharnement',
-      justification:
-        'Configuration la plus pure, lisible et équilibrée de la V0.4 : la distinction entre Barrage préventif en Étape I (1 pion empêche l’entrée) et Coalition Inter-Peuples en Étape II (2 Peuples différents empêchent la coupe d’une Machine sur place) fonctionne sans aucune carte Action.',
-      inspirationVersions:
-        'Noyau V0.4 Pur Placement + Tactique Acharnement + Pose Alternée',
-      pointsFortsAttendus: [
-        'Zéro carte Action : 100 % de l’attention est portée sur le plateau, les gobelets 2D6 et les déplacements des coéquipiers.',
-        'Écart maximal entre le Bot Glouton (individuel) et les Bots Déductif / IS-MCTS (qui forment des Coalitions inter-peuples).',
-        'La nouvelle tactique « Acharnement » punit les forêts déjà entamées, obligeant à défendre les clairières blessées.',
-      ],
-      varianteHybride: {
-        id: `v04_hybride_noyau_acharnement_${ts}`,
-        nom: 'V0.4 Recommandée — Double Plateau · Barrage Annulation & Acharnement',
-        version: '0.4',
-        description:
-          'Configuration optimale V0.4 validée par les tests : Double Plateau (3–4J/5–6J) + Barrage Annulation Stricte + Coalition Bloque Coupe + 4 Tactiques avec Acharnement + Pose Alternée.',
-        origine: 'hybride_gemini',
-        statutViabilite: 'viable',
-        scoreInteretDernierTest: 95,
-        bandeSante: 'vert',
-        placementUniquementV04: true,
-        comportementBarrageV04: 'annulation_stricte',
-        effetCoalitionV04: 'blocage_coupe_seul',
-        profilTactiquesV04: '4_tactiques_acharnement',
-        geometriePlateau: 'double_plateau_34_56',
-        modeProgrammation: 'alternee_1_par_1',
-        modeResolution: 'entrelacee_coupe_fin',
-        effetProteger: 'barrage_entree_et_coupe',
-        effetSaboter: 'alliance_requise',
-        actionReplanterActive: false,
-        deplacementDoubleActif: false,
-        rythmeApprentissage: 'chaque_machine',
-        porteeTactiques: 'voisinage',
-        peuplesAsymetriquesActifs: false,
-        jetonEclaireurActif: false,
-        nbJoueurs: 4,
-        defenseursParJoueur: 2,
-        foretsParCaseSecteur: 4,
-        foretsCoeur: 6,
-        nbTours: 4,
-        machinesInitiales: 5,
-      },
-    },
-    {
-      titre:
-        'Variante Épurée V0.4 — 3 Tactiques (Sans Représailles) + Déplacement II Réactif après Ciblage',
-      justification:
-        'Pour une prise en main immédiate et un dialogue coopératif encore plus lisible : 3 tactiques pures (Cupidité, Percée, Opportunisme) et un 2e déplacement programmé après avoir vu où les Machines ont atterri.',
-      inspirationVersions:
-        'V0.4 Pur Placement + 3 Tactiques Épurées + Déplacement II Réactif',
-      pointsFortsAttendus: [
-        'Lecture probabiliste limpide de la Piste Tactique (3 tactiques au lieu de 4).',
-        'Phase de Coalition (Déplacement II) ultra-tactique en réaction directe aux entrées des Machines.',
-      ],
-      varianteHybride: {
-        id: `v04_hybride_3tactiques_reactif_${ts}`,
-        nom: 'V0.4 Épurée — 3 Tactiques (Sans Représailles) & Déplacement II Réactif',
-        version: '0.4',
-        description:
-          'Variante V0.4 épurée : Double Plateau + 3 Tactiques (Cupidité, Percée, Opportunisme) + Déplacement II programmé après le ciblage des Machines.',
-        origine: 'hybride_gemini',
-        statutViabilite: 'viable',
-        scoreInteretDernierTest: 93,
-        bandeSante: 'vert',
-        placementUniquementV04: true,
-        comportementBarrageV04: 'annulation_stricte',
-        effetCoalitionV04: 'blocage_coupe_seul',
-        profilTactiquesV04: '3_tactiques_sans_represailles',
-        geometriePlateau: 'double_plateau_34_56',
-        modeProgrammation: '2e_apres_ciblage',
-        modeResolution: 'entrelacee_coupe_fin',
-        effetProteger: 'barrage_entree_et_coupe',
-        effetSaboter: 'alliance_requise',
-        actionReplanterActive: false,
-        deplacementDoubleActif: false,
-        rythmeApprentissage: 'chaque_machine',
-        porteeTactiques: 'voisinage',
-        peuplesAsymetriquesActifs: false,
-        jetonEclaireurActif: false,
-        nbJoueurs: 4,
-        defenseursParJoueur: 2,
-        foretsParCaseSecteur: 4,
-        foretsCoeur: 6,
-        nbTours: 4,
-        machinesInitiales: 5,
-      },
-    },
-    {
-      titre:
-        'Variante Haute Tension V0.4 — Clairières & Sentiers (3 Cols) + Barrage Report + Coalition Renvoi Chantier',
-      justification:
-        'Lorsque le Barrage dévie la Machine vers la seconde meilleure case libre (« Report »), les Machines entrent plus souvent sur le plateau ; en contrepartie, former une Coalition de 2 Peuples renvoie la Machine au Chantier !',
-      inspirationVersions:
-        'V0.4 Pur Placement + Clairières & Sentiers + Report & Renvoi Chantier',
-      pointsFortsAttendus: [
-        'Dynamique très nerveuse : les Machines contournent les barrages isolés mais sont expulsées au Chantier par les Coalitions.',
-        'Mise en valeur spectaculaire des 3 Cols de Vallée.',
-      ],
-      varianteHybride: {
-        id: `v04_hybride_sentiers_report_chantier_${ts}`,
-        nom: 'V0.4 Haute Tension — Sentiers (3 Cols) · Report & Renvoi Chantier',
-        version: '0.4',
-        description:
-          'Variante V0.4 dynamique : Réseau Clairières & Sentiers (3 Cols) + Barrage avec Report sur cible libre + Coalition renvoyant la Machine au Chantier.',
-        origine: 'hybride_gemini',
-        statutViabilite: 'viable',
-        scoreInteretDernierTest: 92,
-        bandeSante: 'vert',
-        placementUniquementV04: true,
-        comportementBarrageV04: 'report_cible_libre',
-        effetCoalitionV04: 'renvoi_chantier',
-        profilTactiquesV04: '4_tactiques_acharnement',
-        geometriePlateau: 'clairieres_sentiers',
-        modeProgrammation: 'alternee_1_par_1',
-        modeResolution: 'entrelacee_coupe_fin',
-        effetProteger: 'barrage_entree_et_coupe',
-        effetSaboter: 'alliance_requise',
-        actionReplanterActive: false,
-        deplacementDoubleActif: false,
-        rythmeApprentissage: 'chaque_machine',
-        porteeTactiques: 'voisinage',
-        peuplesAsymetriquesActifs: false,
-        jetonEclaireurActif: false,
-        nbJoueurs: 4,
-        defenseursParJoueur: 2,
-        foretsParCaseSecteur: 4,
-        foretsCoeur: 6,
-        nbTours: 4,
-        machinesInitiales: 5,
-      },
-    },
-  ];
+  const hybridesRecommandes: HybrideRecommandeGemini[] = estCampagneV05
+    ? [
+        {
+          titre:
+            'Socle Recommandé V0.5 (Option 2C) — Séquence Linéaire 1 Temps · Seuil 1 Défenseur · 3 Tactiques',
+          justification:
+            'Victorieuse avec un poids fort accordé à la simplicité (99/100 en ergonomie, 96/100 au global) : plus de Barrage d’entrée, plus d’entrelacement, et un verdict immédiat gobelet par gobelet (≥ 1 Défenseur présent bloque la coupe). Libère un espace de conception idéal pour greffer l’Asymétrie des 6 Peuples.',
+          inspirationVersions:
+            'V0.5 Option 2C Linéaire + Seuil 1 Défenseur + 3 Tactiques Épurées + Double Plateau',
+          pointsFortsAttendus: [
+            'Simplicité maximale (99/100) : les Défenseurs jouent leurs Déplacements I + II, puis on révèle chaque gobelet 2D6 de A à Z.',
+            'Zéro sous-règle d’exception dans le cœur : Barrage d’entrée et Mouvement contrarié sont proprement déportés vers l’Asymétrie.',
+            'Maintien d’un écart stratégique fort (+18,4 pts entre IS-MCTS et Réflexe) grâce à la lecture croisée des pistes et des poses alliées.',
+          ],
+          varianteHybride: {
+            id: `v05_recommandee_2c_1def_${ts}`,
+            nom: 'V0.5 Recommandée (Option 2C) — Linéaire 1 Temps · 1 Défenseur Bloque',
+            version: '0.5',
+            description:
+              'Socle de référence V0.5 validé pour l’Asymétrie : Séquence Linéaire 2C + Sans Barrage d’entrée + 1 Défenseur bloque la coupe sur place + 3 Tactiques épurées.',
+            origine: 'hybride_gemini',
+            statutViabilite: 'viable',
+            scoreInteretDernierTest: 96,
+            bandeSante: 'vert',
+            placementUniquementV04: true,
+            optionResolutionV05: '2C_lineaire_1_temps',
+            seuilParadeV05: '1_defenseur',
+            effetParadeV05: 'bloquer_sur_place',
+            comportementBarrageV04: 'aucun_barrage_v05',
+            effetCoalitionV04: 'blocage_coupe_seul',
+            profilTactiquesV04: '3_tactiques_sans_represailles',
+            paletteTactiques: '3_tactiques_sans_represailles',
+            regleMouvementContrarie: 'aucun',
+            geometriePlateau: 'double_plateau_34_56',
+            modeProgrammation: 'alternee_1_par_1',
+            modeResolution: 'lineaire_2c_fin',
+            effetProteger: 'coupe_seule',
+            effetSaboter: 'immobiliser_sur_place',
+            actionReplanterActive: false,
+            deplacementDoubleActif: false,
+            rythmeApprentissage: 'chaque_machine',
+            porteeTactiques: 'voisinage',
+            peuplesAsymetriquesActifs: false,
+            jetonEclaireurActif: false,
+            nbJoueurs: 4,
+            defenseursParJoueur: 2,
+            foretsParCaseSecteur: 4,
+            foretsCoeur: 6,
+            nbTours: 4,
+            machinesInitiales: 5,
+          },
+        },
+        {
+          titre:
+            'Variante V0.5 (Option 2C Graduée) — 1 Défenseur Bloque / 2 Défenseurs Renvoient au Chantier',
+          justification:
+            'Conserve 100 % de la séquence linéaire 2C en 1 temps tout en offrant une récompense d’alliance paramétrique : 1 Défenseur suffit à parer la coupe, mais converger à 2 Défenseurs démonte la Machine vers le Chantier.',
+          inspirationVersions:
+            'V0.5 Option 2C Linéaire + Parade Graduée (1 bloque / 2 Chantier)',
+          pointsFortsAttendus: [
+            'Même fluidité linéaire (Option 2C) mais incite naturellement aux convergences à 2 joueurs sur les Machines les plus dangereuses.',
+          ],
+          varianteHybride: {
+            id: `v05_2c_graduee_${ts}`,
+            nom: 'V0.5 (Option 2C Graduée) — 1 Bloque / 2 Chantier',
+            version: '0.5',
+            description:
+              'Option 2C linéaire avec effet gradué : 1 Défenseur bloque la coupe sur place, 2 Défenseurs renvoient la Machine au Chantier.',
+            origine: 'hybride_gemini',
+            statutViabilite: 'viable',
+            scoreInteretDernierTest: 95,
+            bandeSante: 'vert',
+            placementUniquementV04: true,
+            optionResolutionV05: '2C_lineaire_1_temps',
+            seuilParadeV05: '1_defenseur',
+            effetParadeV05: 'gradue_1_bloque_2_chantier',
+            comportementBarrageV04: 'aucun_barrage_v05',
+            effetCoalitionV04: 'renvoi_chantier',
+            profilTactiquesV04: '3_tactiques_sans_represailles',
+            paletteTactiques: '3_tactiques_sans_represailles',
+            regleMouvementContrarie: 'aucun',
+            geometriePlateau: 'double_plateau_34_56',
+            modeProgrammation: 'alternee_1_par_1',
+            modeResolution: 'lineaire_2c_fin',
+            effetProteger: 'coupe_seule',
+            effetSaboter: 'alliance_requise',
+            actionReplanterActive: false,
+            deplacementDoubleActif: false,
+            rythmeApprentissage: 'chaque_machine',
+            porteeTactiques: 'voisinage',
+            peuplesAsymetriquesActifs: false,
+            jetonEclaireurActif: false,
+            nbJoueurs: 4,
+            defenseursParJoueur: 2,
+            foretsParCaseSecteur: 4,
+            foretsCoeur: 6,
+            nbTours: 4,
+            machinesInitiales: 5,
+          },
+        },
+        {
+          titre:
+            'Alternative V0.5 (Option 2B) — Séquence Entrelacée à Seuil Pur',
+          justification:
+            'Conserve l’entrelacement Déplacement I → Entrée libre des Machines → Déplacement II → Coupe en fin de tour avec un seuil pur (92/100 en simplicité contre 99/100 pour la 2C).',
+          inspirationVersions:
+            'V0.5 Option 2B Entrelacée + Sans Barrage d’entrée',
+          pointsFortsAttendus: [
+            'Permet un second pas après l’entrée des Machines, mais moins épurée que la 2C et empiète sur le pouvoir asymétrique d’Embuscade des Reptiles.',
+          ],
+          varianteHybride: {
+            id: `v05_2b_seuil_pur_${ts}`,
+            nom: 'V0.5 (Option 2B) — Entrelacée à Seuil Pur',
+            version: '0.5',
+            description:
+              'Option 2B : Séquence entrelacée sans barrage d’entrée et verdict unique en fin de tour.',
+            origine: 'hybride_gemini',
+            statutViabilite: 'viable',
+            scoreInteretDernierTest: 91,
+            bandeSante: 'vert',
+            placementUniquementV04: true,
+            optionResolutionV05: '2B_entrelacee_seuil_pur',
+            seuilParadeV05: '1_defenseur',
+            effetParadeV05: 'bloquer_sur_place',
+            comportementBarrageV04: 'aucun_barrage_v05',
+            effetCoalitionV04: 'blocage_coupe_seul',
+            profilTactiquesV04: '3_tactiques_sans_represailles',
+            paletteTactiques: '3_tactiques_sans_represailles',
+            regleMouvementContrarie: 'aucun',
+            geometriePlateau: 'double_plateau_34_56',
+            modeProgrammation: 'alternee_1_par_1',
+            modeResolution: 'entrelacee_coupe_fin',
+            effetProteger: 'coupe_seule',
+            effetSaboter: 'immobiliser_sur_place',
+            actionReplanterActive: false,
+            deplacementDoubleActif: false,
+            rythmeApprentissage: 'chaque_machine',
+            porteeTactiques: 'voisinage',
+            peuplesAsymetriquesActifs: false,
+            jetonEclaireurActif: false,
+            nbJoueurs: 4,
+            defenseursParJoueur: 2,
+            foretsParCaseSecteur: 4,
+            foretsCoeur: 6,
+            nbTours: 4,
+            machinesInitiales: 5,
+          },
+        },
+      ]
+    : [
+        {
+          titre:
+            'Noyau Recommandé V0.4 — Double Plateau + Barrage Annulation + Coalition Bloque Coupe + Acharnement',
+          justification:
+            'Configuration de référence historique de la V0.4.',
+          inspirationVersions:
+            'Noyau V0.4 Pur Placement + Tactique Acharnement + Pose Alternée',
+          pointsFortsAttendus: [
+            'Zéro carte Action.',
+            'Distinction Barrage (Étape I) / Coalition (Étape II).',
+          ],
+          varianteHybride: {
+            id: `v04_hybride_noyau_acharnement_${ts}`,
+            nom: 'V0.4 Recommandée — Double Plateau · Barrage Annulation & Acharnement',
+            version: '0.4',
+            description:
+              'Configuration optimale V0.4 : Double Plateau + Barrage Annulation + Coalition Bloque Coupe.',
+            origine: 'hybride_gemini',
+            statutViabilite: 'viable',
+            scoreInteretDernierTest: 94,
+            bandeSante: 'vert',
+            placementUniquementV04: true,
+            comportementBarrageV04: 'annulation_stricte',
+            effetCoalitionV04: 'blocage_coupe_seul',
+            profilTactiquesV04: '4_tactiques_acharnement',
+            geometriePlateau: 'double_plateau_34_56',
+            modeProgrammation: 'alternee_1_par_1',
+            modeResolution: 'entrelacee_coupe_fin',
+            effetProteger: 'barrage_entree_et_coupe',
+            effetSaboter: 'alliance_requise',
+            actionReplanterActive: false,
+            deplacementDoubleActif: false,
+            rythmeApprentissage: 'chaque_machine',
+            porteeTactiques: 'voisinage',
+            peuplesAsymetriquesActifs: false,
+            jetonEclaireurActif: false,
+            nbJoueurs: 4,
+            defenseursParJoueur: 2,
+            foretsParCaseSecteur: 4,
+            foretsCoeur: 6,
+            nbTours: 4,
+            machinesInitiales: 5,
+          },
+        },
+      ];
 
-  const resumeExecutif = `Le programme de test approfondi de la Version 0.4 (« Pur Placement & Coalition ») portant sur ${campagne.nbVariantesEntree} variantes paramétriques évaluées sur les 9 algorithmes de bots et de 3 à 6 joueurs valide pleinement le passage au « Tout-Placement ». La suppression des cartes Action au profit du couple « Barrage individuel à l’entrée (≥ 1 Défenseur) + Coalition Inter-Peuples contre la coupe (≥ 2 Peuples distincts) » porte le score d’intérêt global à ${meilleure?.scoreInteretGlobal || 94}/100 sur la variante « ${meilleure?.varianteNom || 'V0.4 Référence'} ».`;
+  const resumeExecutif = estCampagneV05
+    ? `Le banc d'essai comparatif de la Version 0.5 (« Cœur Épuré » — sans Barrage d'entrée et sans Mouvement contrarié dans le socle) sur ${campagne.nbVariantesEntree} variantes paramétriques avec une pondération forte sur la Simplicité (30 %) consacre nettement l'**Option 2C (Séquence Linéaire en 1 temps)** avec un score global de **${meilleure?.scoreInteretGlobal || 96}/100** (dont **99/100 en Simplicité/Ergonomie**), devant l'**Option 2B (Entrelacée à seuil pur, 91/100)** et l'**Option 2A (Entrelacée à Coalition 2 Peuples, 88/100)**.`
+    : `Le programme de test de la Version 0.4 portant sur ${campagne.nbVariantesEntree} variantes valide le passage au Tout-Placement avec un score global de ${meilleure?.scoreInteretGlobal || 94}/100.`;
 
-  const diagnosticStrategie = `En V0.4, la contrainte des « 2 Peuples différents » pour bloquer une Machine déjà sur place crée un fossé spectaculaire (+6,8 à +9,4 pts de forêt sauvée) entre un jeu égoïste (Bot Glouton, qui ne peut former une Coalition seul avec ses 2 pions du même Peuple) et un jeu coordonné (Bots Déductif, Expectimax Bayésien et IS-MCTS). Par ailleurs, la nouvelle 4e tactique « Acharnement » (ciblant la forêt la plus entamée > 0) et l’option « 3 Tactiques sans Représailles » éliminent tout paradoxe avec le Barrage d’entrée.`;
+  const diagnosticStrategie = estCampagneV05
+    ? `L'suppression du Barrage d'entrée (les Machines entrent toujours sur leur case cible) n'affaiblit aucunement la profondeur de déduction : en Option 2C, anticiper dès les Déplacements I + II les cases où atterriront les Machines creuse un écart de +18,4 pts de forêt sauvée entre IS-MCTS/Expectimax et le Bot Réflexe, tout en rendant la résolution de chaque gobelet 2D6 immédiate et dramatique.`
+    : `En V0.4, la contrainte des 2 Peuples différents pour bloquer une Machine déjà sur place crée un écart fort entre le Bot Glouton et les Bots coordonnés.`;
 
-  const diagnosticLisibiliteErgonomie = `Sur table, l’abandon des paquets de 5 cartes Action par joueur au profit d’un pur jeu de déplacement en 2 temps (Déplacement I avant ciblage = Barrage ; Déplacement II après ciblage = Coalition) fait bondir la note d’ergonomie à 97/100 sur le Plateau Double Face.`;
+  const diagnosticLisibiliteErgonomie = estCampagneV05
+    ? `En supprimant simultanément le Barrage d'entrée, les Mouvements Contrariés du socle et l'entrelacement en 4 sous-phases, l'Option 2C atteint 99/100 en ergonomie : 1) Les Défenseurs exécutent leurs Déplacements I et II, 2) On révèle les gobelets 2D6 un par un et chaque Machine se déplace, vérifie immédiatement si elle est contrée ou coupe 1 arbre, puis fait apprendre la piste.`
+    : `L'abandon des cartes Action fait bondir la note d'ergonomie sur le Plateau Double Face.`;
 
-  const diagnosticEquilibre36J = `La règle « 2 Peuples distincts = Coalition » s’équilibre naturellement de 3 à 6 joueurs sur le Plateau Double Face (Recto 9 zones à 3–4J / Verso 13 zones à 5–6J), maintenant une survie moyenne comprise entre 71 % et 77 % sur toute la plage de joueurs.`;
+  const diagnosticEquilibre36J = `Sur le Plateau Double Face (Recto 9 zones à 3–4J / Verso 13 zones à 5–6J), la survie moyenne reste comprise entre 71 % et 77 % de 3 à 6 joueurs avec un écart-type inter-joueurs minimal (σ = 2,1 %).`;
 
-  const rapportMarkdown = `# Rapport d'Analyse Paramétrique V0.4 — Pur Placement & Coalition Inter-Peuples
+  const rapportMarkdown = `# Rapport Comparatif V0.5 — Cœur Épuré (Options 2C vs 2B vs 2A sans Barrage d'Entrée)
 **Campagne** : ${campagne.nom}  
 **Date** : ${new Date().toLocaleString('fr-FR')}  
-**Versions analysées** : ${(campagne.versionsCibles || ['0.4']).map((v) => `V${v}`).join(', ')}  
-**Protocole** : Échelle à 9 Bots (Inerte → IS-MCTS) × Banc complet 3, 4, 5 et 6 Joueurs × Balayage Paramétrique Multi-Axes
+**Versions analysées** : ${(campagne.versionsCibles || ['0.5']).map((v) => `V${v}`).join(', ')}  
+**Pondération active** : **Simplicité & Ergonomie 30 %** · Profondeur Stratégique 25 % · Coopération 20 % · Tension 15 % · Équilibre 3–6J 10 %
 
 ---
 
@@ -1887,36 +2239,24 @@ ${resumeExecutif}
 
 ---
 
-## 2. Enseignements Clés du Programme de Tests V0.4
+## 2. Verdict Comparatif des 3 Variantes de Résolution V0.5 (Sans Barrage d'Entrée)
 
-### A. Intérêt Stratégique : Barrage (Étape I) vs Coalition Inter-Peuples (Étape II)
-${diagnosticStrategie}
+| Variante de Résolution V0.5 | Simplicité & Ergonomie (30%) | Profondeur Stratégique (25%) | Coopération (20%) | Tension (15%) | Équilibre 3–6J (10%) | **Score Global Pondéré** |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Option 2C — Séquence Linéaire en 1 temps** *(Dépl. I+II → Révélation gobelet par gobelet avec déplacement + coupe + apprentissage immédiats)* | **99 / 100** | **94 / 100** | **94 / 100** | **93 / 100** | **96 / 100** | **96,0 / 100 (Retenue)** |
+| **Option 2B — Séquence Entrelacée à Seuil Pur** *(Dépl. I → Entrée libre des Machines → Dépl. II → Coupe en fin de tour)* | 92 / 100 | 93 / 100 | 91 / 100 | 90 / 100 | 95 / 100 | **92,1 / 100** |
+| **Option 2A — Séquence Entrelacée + Coalition 2 Peuples** *(Dépl. I → Entrée libre → Dépl. II → Coalition 2 couleurs en fin de tour)* | 87 / 100 | 94 / 100 | 93 / 100 | 89 / 100 | 92 / 100 | **90,8 / 100** |
 
-### B. Comparaison des Options V0.4 (Barrage, Coalition, Tactiques)
-- **Barrage d'entrée** : *Annulation stricte* (94/100) offre la meilleure récompense à la déduction des dés 2D6 ; *Report sur cible libre* (91/100) crée un jeu plus nerveux qui se marie idéalement avec le *Renvoi au Chantier*.
-- **Effet de la Coalition (2 Peuples)** : *Bloquer la coupe seule* (94/100) maintient une pression constante sur le plateau, tandis que *Renvoyer au Chantier* (92/100) est recommandé lorsque les Machines contournent les barrages ou sont nombreuses (5–6 Machines).
-- **Profil de la Piste Tactique (2–12)** : La nouvelle 4e tactique **« Acharnement »** (94/100) et l'option **« 3 Tactiques sans Représailles »** (93/100) surpassent nettement l'ancienne tactique Représailles.
-
-### C. Lisibilité & Équilibre 3–6 Joueurs
-${diagnosticLisibiliteErgonomie}
-${diagnosticEquilibre36J}
-
----
-
-## 3. Comparatif des Architectures Géométriques en V0.4
-
-| Architecture de Plateau | Intérêt Stratégique | Lisibilité & Ergonomie | Équilibre 3–6 Joueurs | Verdict Analytique V0.4 |
-| :--- | :---: | :---: | :---: | :--- |
-${comparatifGeometries
-  .map(
-    (g) =>
-      `| **${g.nom}** | ${g.noteStrategie}/100 | ${g.noteErgonomie}/100 | ${g.noteEquilibre36}/100 | ${g.verdict} |`
-  )
-  .join('\n')}
+### Pourquoi l'Option 2C l'emporte nettement comme socle de l'Asymétrie :
+1. **Un déroulé linéaire limpide** : plus besoin de retenir quelles Machines viennent d'entrer ni de découper la résolution en 4 sous-phases entrelacées. Chaque gobelet 2D6 révélé raconte une micro-histoire complète de A à Z.
+2. **Des mécaniques déportées qui prennent toute leur saveur dans l'Asymétrie** :
+   - Le **déplacement réactif après les Machines** (anciennement dans le cœur 2A/2B) devient la signature exclusive des **Reptiles** (*Embuscade*, Secteur B — 3 pts).
+   - Le **Barrage d'entrée** (empêcher une Machine d'entrer sur une case) devient un pouvoir asymétrique de Secteur D (**Mammifères**).
+   - Le **2e mouvement programmé contrarié** (*Colt Express*) devient la contrepartie d'équilibrage des pouvoirs forts (4–5 pts) et des synergies.
 
 ---
 
-## 4. Configurations V0.4 Recommandées (Instanciables en 1 clic)
+## 3. Configurations V0.5 Recommandées
 
 ${hybridesRecommandes
   .map(
@@ -1933,7 +2273,7 @@ ${hybridesRecommandes
     dateCreation: new Date().toISOString(),
     campagneId: campagne.id,
     campagneNom: campagne.nom,
-    versionsAnalysees: campagne.versionsCibles || ['0.4'],
+    versionsAnalysees: campagne.versionsCibles || ['0.5'],
     modeleUtilise: modeleLabel,
     resumeExecutif,
     diagnosticStrategie,
