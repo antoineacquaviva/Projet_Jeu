@@ -172,7 +172,8 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
     return {
       ...variante,
       nbJoueurs: nbJoueursTable,
-      machinesInitiales: nbJoueursTable === 3 ? 3 : 4,
+      machinesInitiales:
+        nbJoueursTable === 3 ? 3 : variante.machinesInitiales || 4,
     };
   }, [variante, nbJoueursTable]);
 
@@ -186,7 +187,8 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
           {
             ...variante,
             nbJoueurs: nbJoueursTable,
-            machinesInitiales: nbJoueursTable === 3 ? 3 : 4,
+            machinesInitiales:
+              nbJoueursTable === 3 ? 3 : variante.machinesInitiales || 4,
           },
           20261019
         )
@@ -213,7 +215,8 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
     const varAdaptee: VariantV01 = {
       ...variante,
       nbJoueurs: nouveauNb,
-      machinesInitiales: nouveauNb === 3 ? 3 : 4,
+      machinesInitiales:
+        nouveauNb === 3 ? 3 : variante.machinesInitiales || 4,
     };
     setSieges((prev) => construireSiegesDefaut(nouveauNb, prev));
     const neuf = creerEtatInitialV01(varAdaptee, graine);
@@ -237,7 +240,8 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
     const varAdaptee: VariantV01 = {
       ...variante,
       nbJoueurs: nbJoueursTable,
-      machinesInitiales: nbJoueursTable === 3 ? 3 : 4,
+      machinesInitiales:
+        nbJoueursTable === 3 ? 3 : variante.machinesInitiales || 4,
     };
     setSieges((prev) => construireSiegesDefaut(nbJoueursTable, prev));
     const nouvelEtat = creerEtatInitialV01(varAdaptee, graine);
@@ -462,72 +466,57 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* 1. BARRE SUPÉRIEURE : Table 3 à 6 Joueurs + Essentiel + Interrupteur Bots Auto/Pas-à-pas + Tiroirs */}
-      <div className="bg-white rounded-xl p-3.5 border border-[#D8DFD5] space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D8DFD5] pb-2.5">
-          <div className="space-y-0.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="font-display text-base font-bold text-[#16211B]">
-                Proto — « {variante.nom} » (V{variante.version})
-              </h2>
-              <span className="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold">
-                Table active : {nbJoueursTable} Joueurs · Face {nbJoueursTable <= 4 ? 'Recto (9 zones, 38 forêts)' : 'Verso (13 zones, 54 forêts)'}
-              </span>
-            </div>
-            <p className="text-xs text-[#55645B]">
-              Forêt préservée :{' '}
-              <strong className="font-mono-tabular text-[#256B45]">
-                {scoreSauvePct} %
-              </strong>{' '}
-              · Sièges ({nbJoueursTable}) :{' '}
-              {sieges
-                .map((_, idx) => formaterNomSiege(idx, sieges).nomCourt)
-                .join(', ')}
-            </p>
-          </div>
+      {/* 1. BARRE DE COMMANDE COMPACTE : Table 3–6J · Bots Auto/Pas-à-pas · Tiroirs */}
+      <div className="bg-white rounded-xl px-4 py-2.5 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3 text-xs">
+          <strong className="font-display text-sm text-[#16211B]">
+            {variante.nom}
+          </strong>
+          <span className="text-[#55645B] font-mono-tabular">
+            Forêt :{' '}
+            <strong className="text-[#256B45]">{scoreSauvePct}%</strong> ·{' '}
+            Face {nbJoueursTable <= 4 ? 'Recto (9 zones)' : 'Verso (13 zones)'} ·{' '}
+            {etat.machines.filter((m) => m.caseId !== null).length}/6 Machines en forêt
+          </span>
+        </div>
 
-          {/* Sélecteur direct de configuration de table 3 à 6 joueurs */}
-          <div className="flex items-center gap-1 bg-[#F4F5F0] p-1 rounded-lg border border-[#D8DFD5] text-xs">
-            <span className="px-1.5 font-bold text-[#16211B]">Configuration de table :</span>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          {/* Sélecteur 3 à 6 joueurs */}
+          <div className="flex items-center gap-1 bg-[#F4F5F0] p-0.5 rounded-lg border border-[#D8DFD5]">
             {([3, 4, 5, 6] as const).map((n) => (
               <button
                 key={n}
                 type="button"
                 onClick={() => changerNbJoueursTable(n)}
-                className={`px-2.5 py-1 rounded font-bold transition-colors ${
+                className={`px-2 py-1 rounded font-bold transition-colors ${
                   nbJoueursTable === n
-                    ? 'bg-[#256B45] text-white shadow-xs'
-                    : 'bg-white text-[#16211B] border border-[#D8DFD5] hover:bg-stone-100'
+                    ? 'bg-[#256B45] text-white'
+                    : 'text-[#16211B] hover:bg-white'
                 }`}
-                title={`Jouer à ${n} joueurs sur le plateau ${n <= 4 ? 'Recto (9 zones)' : 'Verso (13 zones)'}`}
+                title={`Table à ${n} joueurs (${n <= 4 ? 'Recto 9 zones' : 'Verso 13 zones'})`}
               >
-                {n} Joueurs {n === 4 ? '★' : ''}
+                {n}J
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {/* Interrupteur Auto / Pas-à-pas pour les Bots alliés */}
-          <div className="flex items-center bg-[#F4F5F0] p-1 rounded-lg border border-[#D8DFD5] text-xs">
-            <span className="px-2 font-semibold text-[#55645B]">
-              Tour des Bots :
-            </span>
+          {/* Interrupteur Auto / Pas-à-pas */}
+          <div className="flex items-center bg-[#F4F5F0] p-0.5 rounded-lg border border-[#D8DFD5]">
             <button
               type="button"
               onClick={() => setModeBotsAuto(true)}
-              className={`px-2.5 py-1 rounded-md font-bold transition-colors ${
+              className={`px-2 py-1 rounded font-bold transition-colors ${
                 modeBotsAuto
                   ? 'bg-[#256B45] text-white'
                   : 'text-[#16211B] hover:bg-white'
               }`}
             >
-              ⚡ Auto (focus sur Moi)
+              ⚡ Bots Auto
             </button>
             <button
               type="button"
               onClick={() => setModeBotsAuto(false)}
-              className={`px-2.5 py-1 rounded-md font-bold transition-colors ${
+              className={`px-2 py-1 rounded font-bold transition-colors ${
                 !modeBotsAuto
                   ? 'bg-indigo-700 text-white'
                   : 'text-[#16211B] hover:bg-white'
@@ -540,43 +529,43 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
           <button
             type="button"
             onClick={() => setAfficherReglageSieges((v) => !v)}
-            className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+            className={`px-2.5 py-1 font-semibold rounded-lg border transition-colors ${
               afficherReglageSieges
                 ? 'bg-[#1E3528] text-white border-[#1E3528]'
                 : 'bg-[#F4F5F0] text-[#16211B] border-[#D8DFD5]'
             }`}
           >
-            ⚙️ Sièges & Bots {afficherReglageSieges ? '▲' : '▼'}
+            ⚙️ Sièges {afficherReglageSieges ? '▲' : '▼'}
           </button>
 
           <button
             type="button"
             onClick={() => setAfficherJournalComplet((v) => !v)}
-            className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+            className={`px-2.5 py-1 font-semibold rounded-lg border transition-colors ${
               afficherJournalComplet
                 ? 'bg-[#1E3528] text-white border-[#1E3528]'
                 : 'bg-[#F4F5F0] text-[#16211B] border-[#D8DFD5]'
             }`}
           >
-            📜 Journal ({etat.journal.length}) {afficherJournalComplet ? '▲' : '▼'}
+            📜 Journal ({etat.journal.length})
           </button>
 
           <button
             type="button"
             onClick={() => setAfficherLivretPhysique((v) => !v)}
-            className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+            className={`px-2.5 py-1 font-semibold rounded-lg border transition-colors ${
               afficherLivretPhysique
                 ? 'bg-[#1E3528] text-white border-[#1E3528]'
                 : 'bg-[#F4F5F0] text-[#16211B] border-[#D8DFD5]'
             }`}
           >
-            📖 Règles {afficherLivretPhysique ? '▲' : '▼'}
+            📖 Règles
           </button>
 
           <button
             type="button"
             onClick={() => recommencerPartie(graine + 1)}
-            className="px-3 py-1.5 text-xs font-bold rounded-lg bg-[#16211B] text-white hover:bg-black transition-colors whitespace-nowrap"
+            className="px-2.5 py-1 font-bold rounded-lg bg-[#16211B] text-white hover:bg-black transition-colors whitespace-nowrap"
           >
             ↻ Nouvelle donne
           </button>

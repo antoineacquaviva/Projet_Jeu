@@ -29,6 +29,7 @@ import {
   genererGrilleCombinatoireExhaustive,
   genererVariantesExploratoiresV01,
   marquerFrontPareto,
+  resoudreVarianteParId,
 } from './src/shared/tests-engine';
 import {
   CAMPAGNES_VM_INITIALES,
@@ -285,16 +286,11 @@ export function chargerEtatAtelier(): AtelierPersistedState {
           }
         }
 
-        // Purger les anciennes variantes combinatoires obsolètes (v05_comb_*)
-        parsed.variantes = parsed.variantes.filter(
-          (v) => !v.id.startsWith('v05_comb_')
-        );
-
         for (const varInit of VARIANTES_INITIALES_V01) {
           const idx = parsed.variantes.findIndex((v) => v.id === varInit.id);
           if (idx === -1) {
             if (varInit.version === '0.5') {
-              parsed.variantes.unshift(varInit);
+              parsed.variantes.push(varInit);
             } else {
               parsed.variantes.push(varInit);
             }
@@ -311,20 +307,6 @@ export function chargerEtatAtelier(): AtelierPersistedState {
             modified = true;
           }
         }
-
-        // S'assurer que la variante socle V0.5 (v05_2c_lineaire_1def_surplace) est en tête des variantes V0.5
-        const v05OfficiellesIds = new Set(
-          VARIANTES_INITIALES_V01.filter((v) => v.version === '0.5').map(
-            (v) => v.id
-          )
-        );
-        const v05Officielles = parsed.variantes.filter((v) =>
-          v05OfficiellesIds.has(v.id)
-        );
-        const autresVars = parsed.variantes.filter(
-          (v) => !v05OfficiellesIds.has(v.id)
-        );
-        parsed.variantes = [...v05Officielles, ...autresVars];
 
         if (!Array.isArray(parsed.ideesLabo)) {
           parsed.ideesLabo = [...IDEES_INITIALES_LABO];
@@ -414,6 +396,28 @@ export function chargerEtatAtelier(): AtelierPersistedState {
           ];
           sauvegarderRapportMarkdownGemini(analyseV05);
           modified = true;
+        } else {
+          // Garantir que la variante #1 de la campagne V0.5 active est bien promue dans parsed.variantes
+          const campV05Existante = parsed.campagnesSelection.find((c) =>
+            (c.versionsCibles || []).includes('0.5')
+          );
+          const bestId =
+            campV05Existante?.meilleureVarianteId ||
+            campV05Existante?.rapportsInteret?.[0]?.varianteId;
+          if (bestId && !parsed.variantes.some((v) => v.id === bestId)) {
+            const rapBest = campV05Existante?.rapportsInteret?.find(
+              (r) => r.varianteId === bestId
+            );
+            const resolue = resoudreVarianteParId(
+              bestId,
+              parsed.variantes,
+              rapBest
+            );
+            if (resolue) {
+              parsed.variantes.unshift(resolue);
+              modified = true;
+            }
+          }
         }
 
         if (modified) {
@@ -511,14 +515,17 @@ export async function executerJobCampagneExhaustiveAsync(
 
   const state = chargerEtatAtelier();
 
-  // Étape 1 : Génération de la grille combinatoire exhaustive
+  // Étape 1 : Génération de la grille combinatoire exhaustive sans doublon
   const grilleCombinatoire = genererGrilleCombinatoireExhaustive(versionCible);
+  const grilleIds = new Set(grilleCombinatoire.map((v) => v.id));
+  const prefixeComb = `v${versionCible.replace('.', '')}_comb_`;
   const variantesExistantesVersion =
     options.inclureVariantesRegisteExistantes !== false
       ? state.variantes.filter(
           (v) =>
             (v.version || '0.1') === versionCible &&
-            !v.id.startsWith(`v${versionCible.replace('.', '')}_grid_`)
+            !grilleIds.has(v.id) &&
+            !v.id.startsWith(prefixeComb)
         )
       : [];
 
@@ -764,19 +771,15 @@ export async function executerJobCampagneExhaustiveAsync(
   const analyseGemini = await genererAnalyseGeminiOuFallback(campagne);
 
   const topGrilleIds = new Set(
-    rapportsInteretViables.slice(0, 24).map((r) => r.varianteId)
+    rapportsInteretViables.slice(0, 12).map((r) => r.varianteId)
   );
   const variantesRetenuesPourRegistre = variantesMisesAJour.filter(
-    (v) =>
-      !v.id.startsWith(`v${versionCible.replace('.', '')}_grid_`) ||
-      topGrilleIds.has(v.id)
+    (v) => !v.id.startsWith(prefixeComb) || topGrilleIds.has(v.id)
   );
 
   const mapMaj = new Map(variantesRetenuesPourRegistre.map((v) => [v.id, v]));
   const autresVariantes = state.variantes.filter(
-    (v) =>
-      !mapMaj.has(v.id) &&
-      !v.id.startsWith(`v${versionCible.replace('.', '')}_grid_`)
+    (v) => !mapMaj.has(v.id) && !v.id.startsWith(prefixeComb)
   );
   state.variantes = [...variantesRetenuesPourRegistre, ...autresVariantes];
 

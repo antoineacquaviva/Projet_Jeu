@@ -21,6 +21,7 @@ import {
 import {
   construireAnalyseCampagneStructurer,
   executerCampagneSelection33,
+  resoudreVarianteParId,
 } from './shared/tests-engine';
 import { JeuView } from './components/JeuView';
 import { DemoView } from './components/DemoView';
@@ -38,9 +39,8 @@ export const App: React.FC = () => {
   const [variantes, setVariantes] = useState<VariantV01[]>(
     VARIANTES_INITIALES_V01
   );
-  const [varianteActiveId, setVarianteActiveId] = useState<string>(
-    'v05_2c_lineaire_1def_surplace'
-  );
+  const [varianteActiveId, setVarianteActiveId] =
+    useState<string>('v05_comb_018');
   const [rapportsViabilite, setRapportsViabilite] = useState<
     RapportViabilite31[]
   >([]);
@@ -85,120 +85,77 @@ export const App: React.FC = () => {
               );
               setVersions([...verManquantes, ...versionsMaj]);
             }
+
+            let variantesChargees = VARIANTES_INITIALES_V01;
             if (Array.isArray(data.variantes) && data.variantes.length > 0) {
               const initVarParId = new Map(
                 VARIANTES_INITIALES_V01.map((v) => [v.id, v])
               );
-              const varFiltrees = data.variantes.filter(
-                (v: VariantV01) => !v.id.startsWith('v05_comb_')
-              );
-              const varMaj = varFiltrees.map((v: VariantV01) =>
-                initVarParId.has(v.id) ? initVarParId.get(v.id)! : v
+              const varMaj = data.variantes.map((v: VariantV01) =>
+                initVarParId.has(v.id) ? { ...initVarParId.get(v.id)!, ...v } : v
               );
               const existIds = new Set(varMaj.map((v: VariantV01) => v.id));
               const manquantes = VARIANTES_INITIALES_V01.filter(
                 (v) => !existIds.has(v.id)
               );
-              // Placer les variantes officielles V0.5 en tête de liste
-              const v05Officielles = VARIANTES_INITIALES_V01.filter(
-                (v) => v.version === '0.5'
-              );
-              const v05OffIds = new Set(v05Officielles.map((v) => v.id));
-              const reste = [...manquantes, ...varMaj].filter(
-                (v) => !v05OffIds.has(v.id)
-              );
-              setVariantes([...v05Officielles, ...reste]);
+              variantesChargees = [...varMaj, ...manquantes];
             }
-            const toutesVarsChargees =
-              Array.isArray(data.variantes) && data.variantes.length > 0
-                ? [
-                    ...VARIANTES_INITIALES_V01.filter(
-                      (v) =>
-                        !data.variantes.some(
-                          (dv: VariantV01) => dv.id === v.id
-                        )
-                    ),
-                    ...data.variantes.filter(
-                      (dv: VariantV01) => !dv.id.startsWith('v05_comb_')
-                    ),
-                  ]
-                : VARIANTES_INITIALES_V01;
 
             const campagnesExistantes: CampagneSelection33[] = Array.isArray(
               data.campagnesSelection
             )
               ? data.campagnesSelection
               : [];
-            const analysesExistantes: AnalyseGeminiCampagne[] = Array.isArray(
-              data.analysesGemini
-            )
-              ? data.analysesGemini
-              : [];
 
-            const aCampV05 = campagnesExistantes.some((c) =>
+            // Synchroniser d'emblée la variante n°1 de la campagne V0.5 dans la liste et la sélection active
+            const campV05 = campagnesExistantes.find((c) =>
               (c.versionsCibles || []).includes('0.5')
             );
+            const bestId =
+              campV05?.meilleureVarianteId ||
+              campV05?.rapportsInteret?.[0]?.varianteId;
+            if (bestId) {
+              const rapBest = campV05?.rapportsInteret?.find(
+                (r) => r.varianteId === bestId
+              );
+              const varResolue = resoudreVarianteParId(
+                bestId,
+                variantesChargees,
+                rapBest
+              );
+              if (varResolue) {
+                variantesChargees = [
+                  varResolue,
+                  ...variantesChargees.filter((v) => v.id !== varResolue.id),
+                ];
+                setVarianteActiveId(varResolue.id);
+              }
+            }
 
-            if (!aCampV05) {
-              const ciblesV05 = toutesVarsChargees.filter(
-                (v: VariantV01) =>
-                  v.version === '0.5' && v.statutViabilite !== 'eliminee'
-              );
-              const { campagne: campV05 } = executerCampagneSelection33(
-                ciblesV05,
-                'Campagne Comparative V0.5 — Cœur Unifié sans Barrage d’Entrée : Option 2C Linéaire vs 2B Seuil Pur vs 2A Coalition (Poids fort Simplicité)',
-                5,
-                5,
-                ['0.5']
-              );
-              const anaV05 = construireAnalyseCampagneStructurer(campV05);
-              setRapportsViabilite([
-                ...campV05.rapportsViabilite,
-                ...(Array.isArray(data.rapportsViabilite)
-                  ? data.rapportsViabilite
-                  : []),
-              ]);
-              setRapportsInteret([
-                ...campV05.rapportsInteret,
-                ...(Array.isArray(data.rapportsInteret)
-                  ? data.rapportsInteret
-                  : []),
-              ]);
-              setCampagnesSelection([campV05, ...campagnesExistantes]);
-              setAnalysesGemini([anaV05, ...analysesExistantes]);
-            } else {
-              if (Array.isArray(data.rapportsViabilite)) {
-                setRapportsViabilite(data.rapportsViabilite);
-              }
-              if (Array.isArray(data.rapportsInteret)) {
-                setRapportsInteret(data.rapportsInteret);
-              }
+            setVariantes(variantesChargees);
+            if (Array.isArray(data.rapportsViabilite)) {
+              setRapportsViabilite(data.rapportsViabilite);
+            }
+            if (Array.isArray(data.rapportsInteret)) {
+              setRapportsInteret(data.rapportsInteret);
+            }
+            if (campagnesExistantes.length > 0) {
               setCampagnesSelection(campagnesExistantes);
-              setAnalysesGemini(analysesExistantes);
+            }
+            if (Array.isArray(data.analysesGemini)) {
+              setAnalysesGemini(data.analysesGemini);
             }
             if (Array.isArray(data.campagnesPlanifieesVM)) {
-              const existVmIds = new Set(
-                data.campagnesPlanifieesVM.map((c: ScheduledCampaignVM) => c.id)
-              );
-              const vmManquantes = CAMPAGNES_VM_INITIALES.filter(
-                (c) => !existVmIds.has(c.id)
-              );
-              setCampagnesVM([...vmManquantes, ...data.campagnesPlanifieesVM]);
+              setCampagnesVM(data.campagnesPlanifieesVM);
             }
             if (Array.isArray(data.ideesLabo) && data.ideesLabo.length > 0) {
-              const existIdeaIds = new Set(
-                data.ideesLabo.map((i: LabIdea) => i.id)
-              );
-              const ideesManquantes = IDEES_INITIALES_LABO.filter(
-                (i) => !existIdeaIds.has(i.id)
-              );
-              setIdeesLabo([...data.ideesLabo, ...ideesManquantes]);
+              setIdeesLabo(data.ideesLabo);
             }
             return;
           }
         }
       } catch (_err) {
-        // Initialisation locale isomorphe si hors-ligne
+        // Initialisation locale si hors-ligne
       }
       if (!ignore) {
         const cibles = VARIANTES_INITIALES_V01.filter(
@@ -206,9 +163,9 @@ export const App: React.FC = () => {
         );
         const { campagne } = executerCampagneSelection33(
           cibles,
-          'Campagne Comparative V0.5 — Cœur Unifié sans Barrage d’Entrée : Option 2C Linéaire vs 2B vs 2A',
-          5,
-          5,
+          'Campagne Comparative V0.5 — Cœur Épuré',
+          4,
+          4,
           ['0.5']
         );
         setRapportsViabilite(campagne.rapportsViabilite);
@@ -223,38 +180,43 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // Variante recommandée par les campagnes de tests (meilleur score d'intérêt parmi les variantes viables de la version active V0.5)
+  // Variante recommandée par les campagnes de tests (priorité au #1 Pareto de la campagne active)
   const varianteRecommandee = useMemo(() => {
-    const viablesV05 = variantes.filter(
+    const campagneVActive = campagnesSelection.find((c) =>
+      (c.versionsCibles || []).includes(versionActiveId)
+    );
+    const meilleureCampagneId =
+      campagneVActive?.meilleureVarianteId ||
+      campagnesSelection[0]?.meilleureVarianteId;
+
+    if (meilleureCampagneId) {
+      const rapGagnant = campagneVActive?.rapportsInteret?.find(
+        (r) => r.varianteId === meilleureCampagneId
+      );
+      const gagnante = resoudreVarianteParId(
+        meilleureCampagneId,
+        variantes,
+        rapGagnant
+      );
+      if (gagnante) return gagnante;
+    }
+
+    const viablesVersion = variantes.filter(
       (v) =>
         v.statutViabilite === 'viable' &&
-        v.version === '0.5' &&
-        !v.id.startsWith('v05_comb_')
+        (v.version || '0.1') === versionActiveId
     );
     const pool =
-      viablesV05.length > 0
-        ? viablesV05
+      viablesVersion.length > 0
+        ? viablesVersion
         : variantes.filter((v) => v.statutViabilite === 'viable');
     if (pool.length === 0) return variantes[0];
 
-    const socleRef = pool.find(
-      (v) => v.id === 'v05_2c_lineaire_1def_surplace'
-    );
-    if (socleRef) return socleRef;
-
-    const premiereCampagneId = campagnesSelection[0]?.meilleureVarianteId;
-    return [...pool].sort((a, b) => {
-      const scoreA =
-        (a.scoreInteretDernierTest ?? 0) +
-        (a.id === premiereCampagneId ? 3 : 0) +
-        (a.version === '0.5' ? 5 : 0);
-      const scoreB =
-        (b.scoreInteretDernierTest ?? 0) +
-        (b.id === premiereCampagneId ? 3 : 0) +
-        (b.version === '0.5' ? 5 : 0);
-      return scoreB - scoreA;
-    })[0];
-  }, [variantes, campagnesSelection]);
+    return [...pool].sort(
+      (a, b) =>
+        (b.scoreInteretDernierTest ?? 0) - (a.scoreInteretDernierTest ?? 0)
+    )[0];
+  }, [variantes, campagnesSelection, versionActiveId]);
 
   const versionActive = useMemo(
     () =>
@@ -272,13 +234,11 @@ export const App: React.FC = () => {
     return filtrees.length > 0 ? filtrees : variantes;
   }, [variantes, versionActive]);
 
-  const varianteActive = useMemo(
-    () =>
-      variantesDeLaVersion.find((v) => v.id === varianteActiveId) ||
-      variantesDeLaVersion[0] ||
-      variantes[0],
-    [variantesDeLaVersion, variantes, varianteActiveId]
-  );
+  const varianteActive = useMemo(() => {
+    const resolue = resoudreVarianteParId(varianteActiveId, variantes);
+    if (resolue) return resolue;
+    return varianteRecommandee || variantesDeLaVersion[0] || variantes[0];
+  }, [variantes, varianteActiveId, varianteRecommandee, variantesDeLaVersion]);
 
   const handleSelectVersion = (nouvelleVersionId: GameVersionId) => {
     setVersionActiveId(nouvelleVersionId);
@@ -298,12 +258,16 @@ export const App: React.FC = () => {
     id: string,
     versionId?: GameVersionId
   ) => {
-    const ver =
-      versionId || variantes.find((v) => v.id === id)?.version || '0.5';
+    const varCible = resoudreVarianteParId(id, variantes);
+    if (varCible && !variantes.some((v) => v.id === id)) {
+      setVariantes((prev) => [varCible, ...prev.filter((v) => v.id !== id)]);
+    }
+    const ver = versionId || varCible?.version || '0.5';
     if (ver !== versionActiveId) {
       setVersionActiveId(ver);
     }
     setVarianteActiveId(id);
+    setEtatProtoExterne(null);
   };
 
   const handleSaveVariante = async (
@@ -422,24 +386,30 @@ export const App: React.FC = () => {
     setIdeesLabo((prev) => prev.filter((i) => i.id !== id));
   };
 
+  const estRecommandeeSelectionnee =
+    varianteRecommandee && varianteActive.id === varianteRecommandee.id;
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F4F5F0] text-[#16211B]">
-      {/* BARRE SUPÉRIEURE DE L'ATELIER : Marque | Onglets sans numérotation | Sélecteur de Version & Variante */}
-      <header className="bg-white border-b border-[#D8DFD5] px-6 py-3.5 flex flex-wrap items-center justify-between gap-6">
-        {/* Zone 1 : Identité de l'Atelier */}
+      {/* BARRE SUPÉRIEURE ÉPURÉE : Marque | 6 Onglets | Sélecteur Version & Variante */}
+      <header className="bg-white border-b border-[#D8DFD5] px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+        {/* Zone 1 : Identité */}
         <a
           href="#atelier"
           onClick={(e) => {
             e.preventDefault();
             setOngletActif('jeu');
           }}
-          className="font-display text-lg font-bold tracking-tight text-[#16211B] whitespace-nowrap shrink-0"
+          className="font-display text-base font-bold tracking-tight text-[#16211B] whitespace-nowrap shrink-0 flex items-center gap-2"
         >
-          Atelier de conception
+          <span>Les Gardiens de la Forêt</span>
+          <span className="text-xs font-mono font-normal text-[#55645B]">
+            · Atelier V{versionActive.id}
+          </span>
         </a>
 
-        {/* Zone 2 : Navigation principale ordonnée et sans numérotation */}
-        <nav className="flex items-center gap-6 text-sm font-medium text-[#55645B] overflow-x-auto">
+        {/* Zone 2 : Navigation principale */}
+        <nav className="flex items-center gap-5 text-sm font-medium text-[#55645B] overflow-x-auto">
           {(
             [
               { id: 'jeu', label: 'Le Jeu' },
@@ -467,55 +437,46 @@ export const App: React.FC = () => {
           })}
         </nav>
 
-        {/* Zone 3 : Sélecteur de Version du Jeu + Sélecteur de Variante + Accès rapide Recommandée */}
+        {/* Zone 3 : Sélecteurs compacts Version + Variante */}
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {varianteRecommandee &&
-            varianteActive.id !== varianteRecommandee.id && (
-              <button
-                type="button"
-                onClick={() =>
-                  handleSelectVarianteGlobale(
-                    varianteRecommandee.id,
-                    varianteRecommandee.version || '0.3'
-                  )
-                }
-                className="px-2.5 py-1.5 text-xs font-bold rounded-lg bg-amber-100 text-amber-900 border border-amber-400 hover:bg-amber-200 transition-colors whitespace-nowrap"
-                title={`Revenir à la variante recommandée par les tests : ${varianteRecommandee.nom}`}
-              >
-                ★ Variante recommandée
-              </button>
-            )}
-
-          {varianteRecommandee &&
-            varianteActive.id === varianteRecommandee.id && (
-              <span className="px-2.5 py-1 text-[11px] font-bold rounded-md bg-emerald-100 text-[#165B36] border border-emerald-300 whitespace-nowrap">
-                ★ Recommandée par les tests
-              </span>
-            )}
+          {varianteRecommandee && !estRecommandeeSelectionnee && (
+            <button
+              type="button"
+              onClick={() =>
+                handleSelectVarianteGlobale(
+                  varianteRecommandee.id,
+                  varianteRecommandee.version || '0.5'
+                )
+              }
+              className="px-2.5 py-1 text-xs font-bold rounded-md bg-amber-100 text-amber-900 border border-amber-400 hover:bg-amber-200 transition-colors whitespace-nowrap"
+              title={`Revenir à la variante #1 des tests : ${varianteRecommandee.nom}`}
+            >
+              ★ Activer #1 Pareto
+            </button>
+          )}
 
           <select
             aria-label="Sélectionner la version du Jeu"
             value={versionActive.id}
             onChange={(e) => handleSelectVersion(e.target.value)}
-            className="px-2.5 py-1.5 text-xs font-bold rounded-lg border border-[#1E3528] bg-[#1E3528] text-white"
+            className="px-2.5 py-1 text-xs font-mono font-bold rounded-md border border-[#1E3528] bg-[#1E3528] text-white"
           >
             <optgroup label="Version Active">
               {versions
                 .filter((ver) => ver.statut !== 'archivee')
                 .map((ver) => (
                   <option key={ver.id} value={ver.id}>
-                    Jeu V{ver.id} — Pur Placement
-                    {varianteRecommandee?.version === ver.id ? ' ★' : ''}
+                    V{ver.id}
                   </option>
                 ))}
             </optgroup>
             {versions.some((ver) => ver.statut === 'archivee') && (
-              <optgroup label="Archives (V0.1 – V0.3)">
+              <optgroup label="Archives (V0.1 – V0.4)">
                 {versions
                   .filter((ver) => ver.statut === 'archivee')
                   .map((ver) => (
                     <option key={ver.id} value={ver.id}>
-                      [Archive] Jeu V{ver.id}
+                      [Archive] V{ver.id}
                     </option>
                   ))}
               </optgroup>
@@ -523,14 +484,14 @@ export const App: React.FC = () => {
           </select>
 
           <select
-            aria-label="Sélectionner la variante de la version active"
+            aria-label="Sélectionner la variante active sur tous les onglets"
             value={varianteActive.id}
-            onChange={(e) => setVarianteActiveId(e.target.value)}
-            className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] max-w-[300px] truncate"
+            onChange={(e) => handleSelectVarianteGlobale(e.target.value)}
+            className="px-2.5 py-1 text-xs font-semibold rounded-md border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] max-w-[330px] truncate"
           >
             {variantesDeLaVersion.map((v) => (
               <option key={v.id} value={v.id}>
-                {v.id === varianteRecommandee?.id ? '★ [RECOMMANDÉE] ' : ''}
+                {v.id === varianteRecommandee?.id ? '★ [#1 PARETO] ' : ''}
                 {v.statutViabilite === 'eliminee' ? '[ÉLIMINÉE] ' : ''}
                 {v.nom}
               </option>
@@ -539,61 +500,26 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Sous-barre de contexte de la Version et Variante actives */}
-      <div className="bg-[#EAECE4] border-b border-[#D8DFD5] px-6 py-2 text-xs text-[#55645B] flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <span>
-            Le Jeu :{' '}
-            <strong className="text-[#16211B]">
-              {versionActive.nomJeu} (Version {versionActive.id})
-            </strong>
-          </span>
-          <span className="mx-2">·</span>
-          <span>
-            Variante :{' '}
-            <strong className="text-[#16211B]">{varianteActive.nom}</strong>
-          </span>
-          <span className="mx-2">·</span>
-          <span>
-            Statut :{' '}
-            <strong
-              className={
-                varianteActive.statutViabilite === 'viable'
-                  ? 'text-[#256B45]'
-                  : varianteActive.statutViabilite === 'eliminee'
-                  ? 'text-[#C2412D]'
-                  : 'text-amber-700'
-              }
-            >
-              {varianteActive.statutViabilite === 'viable'
-                ? 'Viable'
-                : varianteActive.statutViabilite === 'eliminee'
-                ? 'Éliminée (Non viable)'
-                : 'À tester'}
-            </strong>
-          </span>
+      {/* Bandeau contextuel discret sur une seule ligne (synchronisé sur les 6 onglets) */}
+      <div className="bg-[#EAECE4]/80 border-b border-[#D8DFD5] px-6 py-1.5 text-xs text-[#55645B] flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {estRecommandeeSelectionnee && (
+            <span className="font-mono font-bold text-[#256B45]">
+              ★ #1 Pareto ({varianteActive.scoreInteretDernierTest ?? 94}/100)
+            </span>
+          )}
+          <strong className="text-[#16211B]">{varianteActive.nom}</strong>
         </div>
 
-        <div className="font-mono-tabular">
+        <div className="font-mono-tabular text-[11px] flex flex-wrap items-center gap-2">
           <span>
-            Plateau :{' '}
-            <strong className="text-[#16211B]">
-              {varianteActive.geometriePlateau === 'double_plateau_34_56'
-                ? 'Double-Face 3–4J/5–6J'
-                : varianteActive.geometriePlateau === 'hex_couronne_19'
-                ? 'Hexagonal 19 cases'
-                : varianteActive.geometriePlateau === 'clairieres_sentiers'
-                ? 'Clairières & Sentiers'
-                : 'Modulaire Secteurs'}
-            </strong>
+            Plateau Double-Face (3–4J Recto 9 zones / 5–6J Verso 13 zones)
           </span>
-          <span className="mx-2">·</span>
-          <span>{varianteActive.nbJoueurs} Joueurs</span>
-          <span className="mx-2">·</span>
+          <span>·</span>
           <span>{varianteActive.defenseursParJoueur} Déf./J</span>
-          <span className="mx-2">·</span>
-          <span>{varianteActive.machinesInitiales}/6 Machines</span>
-          <span className="mx-2">·</span>
+          <span>·</span>
+          <span>{varianteActive.machinesInitiales} Machines (4–6J) / 3 (3J)</span>
+          <span>·</span>
           <span>{varianteActive.nbTours} Tours</span>
         </div>
       </div>

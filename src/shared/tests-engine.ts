@@ -495,9 +495,9 @@ export function evaluerBancMultiJoueurs36(
   ];
 
   for (const nbJ of tailles) {
-    // Harmonisation du Chantier : toujours au moins 2 Machines au Chantier au départ (3 en jeu à 3J, 4 en jeu à 4-6J)
+    // Harmonisation du Chantier : 3 Machines en jeu à 3J (3 au Chantier), et 4 ou 5 Machines à 4-6J selon la variante (au moins 1 à 2 au Chantier)
     const machinesInitNbJ =
-      nbJ === 3 ? 3 : Math.min(4, Math.max(3, variante.machinesInitiales));
+      nbJ === 3 ? 3 : Math.min(5, Math.max(3, variante.machinesInitiales || 4));
     const varJ: VariantV01 = {
       ...variante,
       nbJoueurs: nbJ,
@@ -1778,6 +1778,50 @@ export function genererGrilleCombinatoireExhaustive(
   }
 
   return variantes;
+}
+
+/**
+ * Résout de manière canonique n'importe quel identifiant de variante (registre initial ou grille combinatoire V0.5/V0.4)
+ * et l'enrichit avec son éventuel rapport d'intérêt issu des campagnes de tests.
+ */
+export function resoudreVarianteParId(
+  varianteId: string,
+  variantesConnues: VariantV01[],
+  rapport?: RapportInteret32
+): VariantV01 | undefined {
+  if (!varianteId) return undefined;
+  const existante = variantesConnues.find((v) => v.id === varianteId);
+  if (existante) {
+    if (!rapport) return existante;
+    return {
+      ...existante,
+      statutViabilite: 'viable',
+      scoreInteretDernierTest:
+        rapport.scoreInteretGlobal ?? existante.scoreInteretDernierTest,
+      bandeSante: rapport.bandeSante ?? existante.bandeSante ?? 'vert',
+    };
+  }
+
+  const versionsGrilles: GameVersionId[] =
+    rapport?.version === '0.4' ? ['0.4', '0.5'] : ['0.5', '0.4'];
+  for (const ver of versionsGrilles) {
+    const dansGrille = genererGrilleCombinatoireExhaustive(ver).find(
+      (v) => v.id === varianteId
+    );
+    if (dansGrille) {
+      return {
+        ...dansGrille,
+        statutViabilite: 'viable',
+        scoreInteretDernierTest:
+          rapport?.scoreInteretGlobal ??
+          dansGrille.scoreInteretDernierTest ??
+          94,
+        bandeSante: rapport?.bandeSante ?? 'vert',
+      };
+    }
+  }
+
+  return undefined;
 }
 
 // Générateur automatique de nouvelles variantes exploratoires (avec programme paramétrique V0.5 / V0.4)

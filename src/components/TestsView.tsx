@@ -21,6 +21,7 @@ import {
   calculerScorePondereCinqCriteres,
   decrirePanelCombinatoireVersion,
   marquerFrontPareto,
+  resoudreVarianteParId,
 } from '../shared/tests-engine';
 
 interface TestsViewProps {
@@ -164,6 +165,8 @@ export const TestsView: React.FC<TestsViewProps> = ({
     useState<JournalPartieJSONL | null>(null);
 
   const [afficherArchives, setAfficherArchives] = useState<boolean>(false);
+  const [afficherProtocoleMethodo, setAfficherProtocoleMethodo] =
+    useState<boolean>(false);
 
   const panelCombinatoire = useMemo(
     () => decrirePanelCombinatoireVersion(versionCible),
@@ -468,6 +471,39 @@ export const TestsView: React.FC<TestsViewProps> = ({
     }
   };
 
+  const handleChargerVarianteDansProto = async (r: RapportInteret32) => {
+    const varComplete = resoudreVarianteParId(
+      r.varianteId,
+      toutesVariantes,
+      r
+    );
+
+    if (varComplete) {
+      try {
+        await fetch('/api/atelier/variants', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(varComplete),
+        });
+      } catch (_e) {
+        // Fallback local
+      }
+
+      onUpdateStateFromTests({
+        variantes: [
+          varComplete,
+          ...toutesVariantes.filter((v) => v.id !== varComplete.id),
+        ],
+        versionActiveId: varComplete.version || '0.5',
+        varianteActiveId: varComplete.id,
+      });
+      onSelectVariante(varComplete.id, varComplete.version || '0.5');
+    } else {
+      onSelectVariante(r.varianteId, r.version || '0.5');
+    }
+    onNavigateTab('proto');
+  };
+
   const handleTelechargerRapportMarkdown = () => {
     if (!analyseGeminiActive) return;
     const blob = new Blob([analyseGeminiActive.rapportMarkdown], {
@@ -560,62 +596,43 @@ export const TestsView: React.FC<TestsViewProps> = ({
           </div>
         </div>
 
-        {/* Sommaire rapide des 6 sections */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-4">
-          {[
-            {
-              href: '#sec-01',
-              num: '01.',
-              titre: 'Stratégie de Test',
-              sous: 'Exhaustivité & 2 étages',
-            },
-            {
-              href: '#sec-02',
-              num: '02.',
-              titre: 'Panel & Volumétrie',
-              sous: `${panelCombinatoire.nbTotalVariantesExhaustives} variantes × 3–6J`,
-            },
-            {
-              href: '#sec-03',
-              num: '03.',
-              titre: 'Critères & Méthodes',
-              sous: '5 algorithmes pondérés',
-            },
-            {
-              href: '#sec-04',
-              num: '04.',
-              titre: 'Workflow Campagne',
-              sous: 'Pipeline en 5 étapes',
-            },
-            {
-              href: '#sec-05',
-              num: '05.',
-              titre: 'Lancement & Direct',
-              sous: 'Job VM à la demande',
-            },
-            {
-              href: '#sec-06',
-              num: '06.',
-              titre: 'Bilan & Palmarès IA',
-              sous: 'Pareto, JSONL & Gemini',
-            },
-          ].map((item) => (
+        {/* Barre d'accès rapide & tiroir méthodologique */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
             <a
-              key={item.num}
-              href={item.href}
-              className="p-2.5 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/60 hover:bg-[#EAECE4] transition-colors block"
+              href="#sec-03"
+              className="px-3 py-1.5 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/70 hover:bg-[#EAECE4] text-[#16211B] font-semibold"
             >
-              <div className="text-xs font-mono font-bold text-[#256B45]">
-                {item.num}{' '}
-                <span className="text-[#16211B] font-sans">{item.titre}</span>
-              </div>
-              <div className="text-[11px] text-[#55645B] mt-0.5 truncate">
-                {item.sous}
-              </div>
+              03. Pondération des 5 Critères ({sommePoids}%)
             </a>
-          ))}
+            <a
+              href="#sec-05"
+              className="px-3 py-1.5 rounded-lg border border-[#D8DFD5] bg-[#F4F5F0]/70 hover:bg-[#EAECE4] text-[#16211B] font-semibold"
+            >
+              05. Lancement Job VM ({panelCombinatoire.nbTotalVariantesExhaustives} var.)
+            </a>
+            <a
+              href="#sec-06"
+              className="px-3 py-1.5 rounded-lg border border-[#256B45] bg-emerald-50/70 hover:bg-emerald-100/70 text-[#1E3528] font-bold"
+            >
+              06. Bilan & Palmarès Pareto ↓
+            </a>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setAfficherProtocoleMethodo((v) => !v)}
+            className="px-3 py-1.5 rounded-lg border border-[#D8DFD5] bg-white hover:bg-[#F4F5F0] text-xs font-mono font-semibold text-[#55645B] hover:text-[#16211B] transition-colors"
+          >
+            {afficherProtocoleMethodo
+              ? 'Masquer le protocole méthodologique (01 · 02 · 04) ▲'
+              : `📋 Protocole méthodologique & Matrice (${panelCombinatoire.nbTotalVariantesExhaustives} variantes) ▼`}
+          </button>
         </div>
       </section>
+
+      {afficherProtocoleMethodo && (
+        <>
 
       {/* =====================================================================
           01. STRATÉGIE DE TEST
@@ -773,6 +790,8 @@ export const TestsView: React.FC<TestsViewProps> = ({
           </div>
         </div>
       </section>
+        </>
+      )}
 
       {/* =====================================================================
           03. CRITÈRES D'ÉVALUATION PONDÉRÉS & MÉTHODES ALGORITHMIQUES
@@ -1005,8 +1024,9 @@ export const TestsView: React.FC<TestsViewProps> = ({
       </section>
 
       {/* =====================================================================
-          04. WORKFLOW D'UNE CAMPAGNE DE TEST
+          04. WORKFLOW D'UNE CAMPAGNE DE TEST (dans le tiroir méthodologique)
       ===================================================================== */}
+      {afficherProtocoleMethodo && (
       <section
         id="sec-04"
         className="bg-white border border-[#D8DFD5] rounded-xl p-6 shadow-xs space-y-5"
@@ -1087,6 +1107,7 @@ export const TestsView: React.FC<TestsViewProps> = ({
           })}
         </div>
       </section>
+      )}
 
       {/* =====================================================================
           05. LANCEMENT À LA DEMANDE & DÉROULÉ EN DIRECT (VM ORACLE & CLI)
@@ -1811,27 +1832,19 @@ export const TestsView: React.FC<TestsViewProps> = ({
                         >
                           <button
                             type="button"
-                            onClick={() => {
-                              const existe = toutesVariantes.some(
-                                (v) => v.id === r.varianteId
-                              );
-                              if (existe) {
-                                onSelectVariante(
-                                  r.varianteId,
-                                  r.version || '0.4'
-                                );
-                                onNavigateTab('proto');
-                              } else {
-                                setVarianteInspecteeId(r.varianteId);
-                              }
-                            }}
-                            className={`px-2.5 py-1 text-[11px] font-mono font-semibold rounded border ${
+                            onClick={() => handleChargerVarianteDansProto(r)}
+                            title={
+                              estSelectionnee
+                                ? 'Variante actuellement active sur tous les onglets (Proto, Le Jeu, Démo)'
+                                : 'Activer cette variante sur tous les onglets et la charger dans le Prototype'
+                            }
+                            className={`px-2.5 py-1 text-[11px] font-mono font-semibold rounded border transition-colors ${
                               estSelectionnee
                                 ? 'bg-[#256B45] text-white border-[#256B45]'
-                                : 'bg-white text-[#16211B] border-[#D8DFD5] hover:bg-[#EAECE4]'
+                                : 'bg-white text-[#16211B] border-[#D8DFD5] hover:bg-[#EAECE4] hover:border-[#256B45]'
                             }`}
                           >
-                            {estSelectionnee ? 'Active' : 'Charger Proto'}
+                            {estSelectionnee ? 'Active ✓' : 'Charger Proto'}
                           </button>
                         </td>
                       </tr>
@@ -1856,15 +1869,33 @@ export const TestsView: React.FC<TestsViewProps> = ({
                       </span>
                     </h4>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFiltreLogVarianteId(rapportInspecte.varianteId)
-                    }
-                    className="px-3 py-1.5 text-xs font-mono font-semibold rounded-lg bg-white border border-[#D8DFD5] hover:bg-[#EAECE4] text-[#16211B]"
-                  >
-                    Filtrer les logs JSONL sur cette variante ↓
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleChargerVarianteDansProto(rapportInspecte)}
+                      className={`px-3.5 py-1.5 text-xs font-mono font-bold rounded-lg shadow-sm flex items-center gap-1.5 transition-colors ${
+                        varianteActive.id === rapportInspecte.varianteId
+                          ? 'bg-[#256B45] text-white border border-[#256B45]'
+                          : 'bg-[#1E3528] hover:bg-[#256B45] text-white'
+                      }`}
+                    >
+                      <span>⚡</span>
+                      <span>
+                        {varianteActive.id === rapportInspecte.varianteId
+                          ? 'Variante active sur tous les onglets ✓'
+                          : 'Activer sur tous les onglets & Charger Proto →'}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFiltreLogVarianteId(rapportInspecte.varianteId)
+                      }
+                      className="px-3 py-1.5 text-xs font-mono font-semibold rounded-lg bg-white border border-[#D8DFD5] hover:bg-[#EAECE4] text-[#16211B]"
+                    >
+                      Filtrer les logs JSONL ↓
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

@@ -103,252 +103,141 @@ export const JeuView: React.FC<JeuViewProps> = ({
     varianteRecommandee && varianteActive.id === varianteRecommandee.id;
 
   return (
-    <div className="space-y-6">
-      {/* Encart permanent : Variante Recommandée par les Tests (sélectionnée par défaut et réactivable en 1 clic) */}
-      {varianteRecommandee && (
-        <div
-          className={`rounded-xl p-4 border-2 flex flex-wrap items-center justify-between gap-4 ${
-            estRecommandeeActive
-              ? 'bg-emerald-50/90 border-[#256B45]'
-              : 'bg-amber-50/90 border-amber-400'
-          }`}
-        >
-          <div className="space-y-1 max-w-4xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded bg-[#1E3528] text-amber-300 text-xs font-extrabold uppercase tracking-wide">
-                ★ Variante Recommandée par les Tests
+    <div className="space-y-5">
+      {/* En-tête unifié et allégé : Version active + Variante active/recommandée + Actions rapides */}
+      <div className="bg-white rounded-xl p-5 border border-[#D8DFD5] shadow-xs space-y-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-1 max-w-3xl">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono-tabular text-[#55645B]">
+              <span className="font-bold text-[#256B45] uppercase">
+                Version {versionActive.id}
               </span>
-              <span className="font-mono-tabular text-xs font-bold px-2 py-0.5 rounded bg-white border border-[#D8DFD5] text-[#16211B]">
-                Version {varianteRecommandee.version || '0.3'} · Score d’intérêt{' '}
-                {varianteRecommandee.scoreInteretDernierTest ?? 91}/100
+              <span>·</span>
+              <span>
+                {versionActive.optionsRegles.length} curseurs de règles ·{' '}
+                {versionActive.parametresVariables.length} paramètres numériques
               </span>
-              {estRecommandeeActive ? (
-                <span className="px-2.5 py-0.5 rounded bg-[#256B45] text-white text-xs font-bold">
-                  ✓ Sélectionnée actuellement
-                </span>
-              ) : (
-                <span className="px-2.5 py-0.5 rounded bg-amber-200 text-amber-900 text-xs font-bold">
-                  Une autre variante est actuellement affichée ({varianteActive.nom})
-                </span>
+              {versionsArchivees.length > 0 && (
+                <>
+                  <span>·</span>
+                  <button
+                    type="button"
+                    onClick={() => setAfficherArchives(!afficherArchives)}
+                    className="underline hover:text-[#16211B] transition-colors"
+                  >
+                    {afficherArchives
+                      ? 'Masquer les archives ▲'
+                      : `Archives (${versionsArchivees.map((v) => `V${v.id}`).join(', ')}) ▼`}
+                  </button>
+                </>
               )}
             </div>
-            <div className="font-display text-base font-bold text-[#16211B]">
-              {varianteRecommandee.nom}
-            </div>
+            <h1 className="font-display text-xl font-bold text-[#16211B]">
+              {versionActive.nomJeu} — {versionActive.titreVersion}
+            </h1>
             <p className="text-xs text-[#55645B] leading-relaxed">
-              {varianteRecommandee.description}
+              {versionActive.pitch}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
-            {!estRecommandeeActive && (
-              <button
-                type="button"
-                onClick={() =>
-                  onSelectVariante(
-                    varianteRecommandee.id,
-                    varianteRecommandee.version || '0.5'
-                  )
-                }
-                className="px-4 py-2 text-xs font-extrabold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] shadow-xs transition-colors whitespace-nowrap"
-              >
-                ★ Resélectionner la variante recommandée
-              </button>
-            )}
             <button
               type="button"
-              onClick={() => {
-                onSelectVariante(
-                  varianteRecommandee.id,
-                  varianteRecommandee.version || '0.5'
-                );
-                setSectionActive('regle_complete');
-              }}
-              className="px-3.5 py-2 text-xs font-bold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] transition-colors whitespace-nowrap"
+              onClick={() =>
+                setAfficherModalNouvelleVersion(!afficherModalNouvelleVersion)
+              }
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-[#F4F5F0] text-[#16211B] hover:bg-[#EAECE4] transition-colors"
             >
-              📖 Lire la règle complète
+              + Version X (Labo)
             </button>
             <button
               type="button"
-              onClick={() => {
-                onSelectVariante(
-                  varianteRecommandee.id,
-                  varianteRecommandee.version || '0.5'
-                );
-                onNavigateTab('demo');
-              }}
-              className="px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-[#D8DFD5] text-[#16211B] hover:bg-stone-100 transition-colors whitespace-nowrap"
+              onClick={() => onNavigateTab('demo')}
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D8DFD5] bg-white text-[#16211B] hover:bg-stone-100 transition-colors"
             >
               Voir en Démo →
             </button>
             <button
               type="button"
-              onClick={() => {
-                onSelectVariante(
-                  varianteRecommandee.id,
-                  varianteRecommandee.version || '0.5'
-                );
-                onNavigateTab('proto');
-              }}
-              className="px-3.5 py-2 text-xs font-bold rounded-lg bg-[#16211B] text-white hover:bg-black transition-colors whitespace-nowrap"
+              onClick={() => onNavigateTab('proto')}
+              className="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] transition-colors"
             >
               Jouer dans Proto →
             </button>
           </div>
         </div>
-      )}
 
-      {/* Bandeau supérieur : Sélecteur des Versions du Jeu & Création d'une Version X */}
-      <div className="bg-white rounded-xl p-6 border border-[#D8DFD5] shadow-xs">
-        <div className="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-[#D8DFD5]">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-mono-tabular uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#1E3528] text-white font-semibold">
-                Le Jeu · Version {versionActive.id}
-              </span>
-              <span
-                className={`text-xs font-semibold px-2.5 py-0.5 rounded border ${
-                  versionActive.statut === 'active'
-                    ? 'bg-emerald-50 text-[#256B45] border-emerald-200'
-                    : 'bg-amber-50 text-amber-800 border-amber-200'
-                }`}
-              >
-                {versionActive.statut === 'active'
-                  ? 'Version de référence active'
-                  : 'Chantier issu du Labo'}
-              </span>
-            </div>
-            <h1 className="font-display text-2xl font-bold text-[#16211B] mt-2">
-              {versionActive.nomJeu} — {versionActive.titreVersion}
-            </h1>
-            <p className="text-sm text-[#55645B] mt-1.5 max-w-4xl leading-relaxed">
-              {versionActive.pitch}
-            </p>
+        {/* Bandeau compact de la Variante active / Recommandée #1 Pareto */}
+        <div
+          className={`rounded-lg px-4 py-2.5 border flex flex-wrap items-center justify-between gap-3 text-xs ${
+            estRecommandeeActive
+              ? 'bg-emerald-50/70 border-emerald-300'
+              : 'bg-amber-50/80 border-amber-300'
+          }`}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono font-bold text-[#1E3528]">
+              {estRecommandeeActive
+                ? `★ Variante #1 Pareto Active (${varianteActive.scoreInteretDernierTest ?? 94}/100) :`
+                : 'Variante affichée :'}
+            </span>
+            <strong className="text-[#16211B]">{varianteActive.nom}</strong>
+            <span className="text-[#55645B] hidden xl:inline">
+              — {varianteActive.description}
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {varianteRecommandee && !estRecommandeeActive && (
             <button
+              type="button"
               onClick={() =>
-                setAfficherModalNouvelleVersion(!afficherModalNouvelleVersion)
+                onSelectVariante(
+                  varianteRecommandee.id,
+                  varianteRecommandee.version || '0.5'
+                )
               }
-              className="px-3.5 py-2 text-xs font-semibold rounded-lg border border-[#256B45] text-[#256B45] bg-emerald-50/60 hover:bg-emerald-100/70 transition-colors"
+              className="px-3 py-1 text-xs font-bold rounded bg-[#256B45] text-white hover:bg-[#1E5637] transition-colors whitespace-nowrap"
             >
-              + Préparer une Version X (depuis le Labo)
+              ★ Revenir à la variante #1 ({varianteRecommandee.nom.split(' ')[1] || '#1'})
             </button>
-            <button
-              onClick={() => onNavigateTab('proto')}
-              className="px-4 py-2 text-xs font-semibold rounded-lg bg-[#256B45] text-white hover:bg-[#1E5637] transition-colors"
-            >
-              Jouer la variante active dans Proto →
-            </button>
-          </div>
-        </div>
-
-        {/* Cartes de sélection de la Version Active (V0.4) + Tiroir optionnel des Archives (V0.1–V0.3) */}
-        <div className="pt-4 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="text-xs font-semibold text-[#55645B] uppercase tracking-wider">
-              Version Active de l’Atelier ({versionsActives.length}) :
-            </div>
-            {versionsArchivees.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setAfficherArchives(!afficherArchives)}
-                className="px-3 py-1 rounded-lg text-xs font-semibold border border-[#D8DFD5] bg-[#F4F5F0] text-[#55645B] hover:text-[#16211B] hover:bg-stone-200/70 transition-colors"
-              >
-                {afficherArchives
-                  ? `Masquer les versions archivées (${versionsArchivees.map((v) => `V${v.id}`).join(', ')}) ▲`
-                  : `📦 Voir les versions archivées (${versionsArchivees.map((v) => `V${v.id}`).join(', ')}) ▼`}
-              </button>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            {versionsActives.map((ver) => {
-              const estActive = ver.id === versionActive.id;
-              const contientRecommandee =
-                (varianteRecommandee?.version || '0.4') === ver.id;
-              return (
-                <button
-                  key={ver.id}
-                  onClick={() => onSelectVersion(ver.id)}
-                  className={`text-left p-4 rounded-xl border transition-all ${
-                    estActive
-                      ? 'bg-[#1E3528] text-white border-[#1E3528] shadow-sm'
-                      : 'bg-[#F4F5F0] text-[#16211B] border-[#D8DFD5] hover:bg-white'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono-tabular text-xs font-bold uppercase px-2 py-0.5 rounded bg-black/15">
-                        Version {ver.id} (Active)
-                      </span>
-                      {contientRecommandee && (
-                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-[#16211B]">
-                          ★ Recommandée
-                        </span>
-                      )}
-                    </div>
-                    <span
-                      className={`text-[11px] font-medium ${
-                        estActive ? 'text-emerald-200' : 'text-[#55645B]'
-                      }`}
-                    >
-                      {ver.optionsRegles.length} options ·{' '}
-                      {ver.parametresVariables.length} paramètres
-                    </span>
-                  </div>
-                  <div className="font-display font-semibold text-sm mt-2">
-                    {ver.titreVersion}
-                  </div>
-                  <p
-                    className={`text-xs mt-1 line-clamp-2 ${
-                      estActive ? 'text-stone-200' : 'text-[#55645B]'
-                    }`}
-                  >
-                    {ver.pitch}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
-
-          {afficherArchives && versionsArchivees.length > 0 && (
-            <div className="pt-2 border-t border-dashed border-[#D8DFD5]">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2">
-                📦 Versions Archivées (V0.1, V0.2, V0.3 — consultables pour historique) :
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 opacity-85">
-                {versionsArchivees.map((ver) => {
-                  const estActive = ver.id === versionActive.id;
-                  return (
-                    <button
-                      key={ver.id}
-                      onClick={() => onSelectVersion(ver.id)}
-                      className={`text-left p-3.5 rounded-xl border transition-all ${
-                        estActive
-                          ? 'bg-stone-800 text-white border-stone-800 shadow-xs'
-                          : 'bg-stone-100 text-stone-700 border-stone-300 hover:bg-white'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-mono-tabular text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-stone-500/20">
-                          [Archive] V{ver.id}
-                        </span>
-                        <span className="text-[10px] opacity-75">
-                          {ver.optionsRegles.length} options
-                        </span>
-                      </div>
-                      <div className="font-display font-semibold text-xs mt-1.5">
-                        {ver.titreVersion}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           )}
         </div>
+
+        {/* Tiroir optionnel des versions archivées */}
+        {afficherArchives && versionsArchivees.length > 0 && (
+          <div className="pt-3 border-t border-dashed border-[#D8DFD5]">
+            <div className="flex flex-wrap items-center gap-2">
+              {versionsActives.map((ver) => (
+                <button
+                  key={ver.id}
+                  type="button"
+                  onClick={() => onSelectVersion(ver.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all ${
+                    ver.id === versionActive.id
+                      ? 'bg-[#1E3528] text-white border-[#1E3528]'
+                      : 'bg-white text-[#16211B] border-[#D8DFD5]'
+                  }`}
+                >
+                  ★ V{ver.id} (Active) — {ver.titreVersion}
+                </button>
+              ))}
+              {versionsArchivees.map((ver) => (
+                <button
+                  key={ver.id}
+                  type="button"
+                  onClick={() => onSelectVersion(ver.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono border transition-all ${
+                    ver.id === versionActive.id
+                      ? 'bg-stone-800 text-white border-stone-800'
+                      : 'bg-[#F4F5F0] text-[#55645B] border-[#D8DFD5] hover:bg-white'
+                  }`}
+                >
+                  [Archive] V{ver.id} — {ver.titreVersion}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tiroir de création d'une nouvelle version du Jeu à partir des idées du Labo */}
