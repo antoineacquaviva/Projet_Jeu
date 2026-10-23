@@ -218,8 +218,6 @@ export function simulerSeriePourBot(
   echantillonCollecte?: JournalPartieJSONL[]
 ): ResultatBotEchelle {
   const t0 = Date.now();
-  const spec = CATALOGUE_BOTS_V01.find((b) => b.id === botId)!;
-  const estV04 = estVariantePlacementV04(variante);
   const scoresPct: number[] = [];
   const coupes: number[] = [];
   const parades: number[] = [];
@@ -229,7 +227,6 @@ export function simulerSeriePourBot(
   let totalProteger = 0;
   let totalSaboter = 0;
   let totalReplanter = 0;
-  let totalActions = 0;
 
   for (let i = 0; i < nbParties; i++) {
     const graine = graineBase + i * 7919;
@@ -253,8 +250,7 @@ export function simulerSeriePourBot(
       }
     }
 
-    const pct = journalJSONL.foretSauveePct;
-    scoresPct.push(pct);
+    scoresPct.push(journalJSONL.foretSauveePct);
     coupes.push(etatFinal.stats.arbresCoupes);
     parades.push(etatFinal.stats.coupesEviteesParProtection);
     sabotages.push(etatFinal.stats.machinesSabotees);
@@ -265,6 +261,112 @@ export function simulerSeriePourBot(
     totalReplanter += etatFinal.stats.foretsReplantees;
   }
 
+  return compilerResultatBotEchelle(
+    variante,
+    botId,
+    nbParties,
+    Math.max(1, Date.now() - t0),
+    scoresPct,
+    coupes,
+    parades,
+    sabotages,
+    totalDeplacer,
+    totalProteger,
+    totalSaboter,
+    totalReplanter
+  );
+}
+
+export async function simulerSeriePourBotAsync(
+  variante: VariantV01,
+  botId: BotProfileId,
+  nbParties: number,
+  graineBase = 10000,
+  campagneId = 'camp_local',
+  onPartieLog?: (log: JournalPartieJSONL) => void,
+  echantillonCollecte?: JournalPartieJSONL[]
+): Promise<ResultatBotEchelle> {
+  const t0 = Date.now();
+  const scoresPct: number[] = [];
+  const coupes: number[] = [];
+  const parades: number[] = [];
+  const sabotages: number[] = [];
+
+  let totalDeplacer = 0;
+  let totalProteger = 0;
+  let totalSaboter = 0;
+  let totalReplanter = 0;
+
+  for (let i = 0; i < nbParties; i++) {
+    const graine = graineBase + i * 7919;
+    const { etatFinal, journalJSONL } = simulerPartieAvecJournalJSONL(
+      variante,
+      botId,
+      graine,
+      campagneId,
+      i
+    );
+    if (onPartieLog) {
+      onPartieLog(journalJSONL);
+    }
+    if (echantillonCollecte && echantillonCollecte.length < 24) {
+      if (
+        i === 0 ||
+        journalJSONL.metriquesDecisionnelles.partieTendue ||
+        journalJSONL.evenements.mouvementsContraries > 0
+      ) {
+        echantillonCollecte.push(journalJSONL);
+      }
+    }
+
+    scoresPct.push(journalJSONL.foretSauveePct);
+    coupes.push(etatFinal.stats.arbresCoupes);
+    parades.push(etatFinal.stats.coupesEviteesParProtection);
+    sabotages.push(etatFinal.stats.machinesSabotees);
+
+    totalDeplacer += etatFinal.stats.deplacementsEffectues;
+    totalProteger += etatFinal.stats.protectionsEffectuees;
+    totalSaboter += etatFinal.stats.machinesSabotees;
+    totalReplanter += etatFinal.stats.foretsReplantees;
+
+    if ((i + 1) % 8 === 0) {
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    }
+  }
+
+  return compilerResultatBotEchelle(
+    variante,
+    botId,
+    nbParties,
+    Math.max(1, Date.now() - t0),
+    scoresPct,
+    coupes,
+    parades,
+    sabotages,
+    totalDeplacer,
+    totalProteger,
+    totalSaboter,
+    totalReplanter
+  );
+}
+
+function compilerResultatBotEchelle(
+  variante: VariantV01,
+  botId: BotProfileId,
+  nbParties: number,
+  dureeTotale: number,
+  scoresPct: number[],
+  coupes: number[],
+  parades: number[],
+  sabotages: number[],
+  totalDeplacer: number,
+  totalProteger: number,
+  totalSaboter: number,
+  totalReplanter: number
+): ResultatBotEchelle {
+  const spec = CATALOGUE_BOTS_V01.find((b) => b.id === botId)!;
+  const estV04 = estVariantePlacementV04(variante);
+
   if (estV04) {
     const totalPasPossibles = Math.max(
       1,
@@ -274,7 +376,6 @@ export function simulerSeriePourBot(
         variante.defenseursParJoueur *
         (variante.modeProgrammation === 'un_seul_ordre' ? 1 : 2)
     );
-    const dureeTotale = Math.max(1, Date.now() - t0);
     return {
       botId,
       botNom: spec?.nom || botId,
@@ -308,11 +409,10 @@ export function simulerSeriePourBot(
     };
   }
 
-  totalActions = Math.max(
+  const totalActions = Math.max(
     1,
     totalDeplacer + totalProteger + totalSaboter + totalReplanter
   );
-  const dureeTotale = Math.max(1, Date.now() - t0);
 
   return {
     botId,
@@ -639,6 +739,168 @@ export function evaluerBancMultiJoueurs36(
   };
 }
 
+export async function evaluerBancMultiJoueurs36Async(
+  variante: VariantV01,
+  nbPartiesParConfig = 10,
+  campagneId = 'camp_local',
+  onPartieLog?: (log: JournalPartieJSONL) => void,
+  echantillonCollecte?: JournalPartieJSONL[]
+): Promise<ReturnType<typeof evaluerBancMultiJoueurs36>> {
+  const tailles: (3 | 4 | 5 | 6)[] = [3, 4, 5, 6];
+  const parJoueurs = {} as Record<3 | 4 | 5 | 6, BilanJoueurs36>;
+  const surviesFortes: number[] = [];
+  const scoresStrategiques36: number[] = [];
+  const piresDeciles: number[] = [];
+  let nbPartiesBanc36 = 0;
+
+  const profilsTableMixte: BotProfileId[] = [
+    'expectimax_bayesien',
+    'deductif',
+    'glouton',
+    'reflexe',
+    'beam_rollout',
+    'deductif',
+  ];
+
+  for (const nbJ of tailles) {
+    const machinesInitNbJ =
+      nbJ === 3 ? 3 : Math.min(5, Math.max(3, variante.machinesInitiales || 4));
+    const varJ: VariantV01 = {
+      ...variante,
+      nbJoueurs: nbJ,
+      machinesInitiales: machinesInitNbJ,
+    };
+
+    const nGlouton = Math.max(2, Math.floor(nbPartiesParConfig * 0.75));
+    const nPointe = Math.max(2, nbPartiesParConfig);
+    const nMixte = Math.max(2, Math.floor(nbPartiesParConfig * 0.5));
+    nbPartiesBanc36 += nGlouton + nPointe + nMixte;
+
+    const resGlouton = await simulerSeriePourBotAsync(
+      varJ,
+      'glouton',
+      nGlouton,
+      71000 + nbJ * 1000,
+      campagneId,
+      onPartieLog,
+      echantillonCollecte
+    );
+    const resPointe = await simulerSeriePourBotAsync(
+      varJ,
+      'expectimax_bayesien',
+      nPointe,
+      71000 + nbJ * 1000 + 500,
+      campagneId,
+      onPartieLog,
+      echantillonCollecte
+    );
+
+    const siegesMixtes = profilsTableMixte.slice(0, nbJ);
+    const scoresMixtes: number[] = [];
+    for (let m = 0; m < nMixte; m++) {
+      const etatMixte = simulerPartieCompleteV01(
+        varJ,
+        siegesMixtes,
+        75000 + nbJ * 1000 + m * 4999
+      );
+      scoresMixtes.push(calculerPourcentageForetSauvee(etatMixte));
+      if ((m + 1) % 8 === 0) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      }
+    }
+    const survieTableMixtePct = Math.round(moyenne(scoresMixtes) * 10) / 10;
+
+    let impactApprentissagePts = 0;
+    if (varJ.rythmeApprentissage !== 'aucun') {
+      const varSansAppJ: VariantV01 = {
+        ...varJ,
+        rythmeApprentissage: 'aucun',
+      };
+      const resSansAppJ = await simulerSeriePourBotAsync(
+        varSansAppJ,
+        'glouton',
+        2,
+        78000 + nbJ * 1000,
+        campagneId
+      );
+      nbPartiesBanc36 += 2;
+      impactApprentissagePts =
+        Math.round(
+          (Math.abs(
+            resSansAppJ.foretSauveeMoyennePct - resGlouton.foretSauveeMoyennePct
+          ) +
+            Math.max(
+              0,
+              resPointe.foretSauveeMoyennePct - resGlouton.foretSauveeMoyennePct
+            ) *
+              0.45) *
+            10
+        ) / 10;
+    }
+
+    const ecart =
+      Math.round(
+        (resPointe.foretSauveeMoyennePct - resGlouton.foretSauveeMoyennePct) * 10
+      ) / 10;
+
+    const scoreStrategiqueNbJ = Math.min(
+      99,
+      Math.max(
+        20,
+        Math.round(
+          70 +
+            ecart * 2.5 +
+            Math.min(6, impactApprentissagePts * 0.8) -
+            Math.abs(resPointe.foretSauveeMoyennePct - 74) * 0.6
+        )
+      )
+    );
+
+    surviesFortes.push(resPointe.foretSauveeMoyennePct);
+    scoresStrategiques36.push(scoreStrategiqueNbJ);
+    piresDeciles.push(resPointe.pireDecilePct);
+
+    parJoueurs[nbJ] = {
+      nbJoueurs: nbJ,
+      survieMoyennePct: resPointe.foretSauveeMoyennePct,
+      pireDecilePct: resPointe.pireDecilePct,
+      scoreStrategique: scoreStrategiqueNbJ,
+      sabotagesMoyens: resPointe.sabotagesMoyens,
+      ecartMechantVsGlouton: ecart,
+      survieTableMixtePct,
+      impactApprentissagePts,
+    };
+  }
+
+  const dispersion36 = Math.round(ecartType(surviesFortes) * 10) / 10;
+  const dispersionInteret36 =
+    Math.round(ecartType(scoresStrategiques36) * 10) / 10;
+  const cvar10PireDecilePct = Math.round(moyenne(piresDeciles) * 10) / 10;
+  const minSurvie = Math.min(...surviesFortes);
+  const maxSurvie = Math.max(...surviesFortes);
+
+  let scoreEquilibre36 = Math.round(
+    96 -
+      dispersion36 * 2.1 -
+      dispersionInteret36 * 1.1 -
+      Math.max(0, 55 - cvar10PireDecilePct) * 0.8
+  );
+  if (minSurvie < 50) scoreEquilibre36 -= 15;
+  if (maxSurvie > 94) scoreEquilibre36 -= 12;
+  scoreEquilibre36 = Math.max(20, Math.min(98, scoreEquilibre36));
+
+  const detailEquilibre36 = `Survie & Intérêt de 3 à 6J : 3J=${parJoueurs[3].survieMoyennePct}% (Intérêt ${parJoueurs[3].scoreStrategique}/100, Mixte ${parJoueurs[3].survieTableMixtePct}%) · 4J=${parJoueurs[4].survieMoyennePct}% (Intérêt ${parJoueurs[4].scoreStrategique}/100, Mixte ${parJoueurs[4].survieTableMixtePct}%) · 5J=${parJoueurs[5].survieMoyennePct}% (Intérêt ${parJoueurs[5].scoreStrategique}/100, Mixte ${parJoueurs[5].survieTableMixtePct}%) · 6J=${parJoueurs[6].survieMoyennePct}% (Intérêt ${parJoueurs[6].scoreStrategique}/100, Mixte ${parJoueurs[6].survieTableMixtePct}%) — σ_survie=${dispersion36.toFixed(1)}%, σ_intérêt=${dispersionInteret36.toFixed(1)} pts, Plancher CVaR 10%=${cvar10PireDecilePct}%.`;
+
+  return {
+    parJoueurs,
+    scoreEquilibre36,
+    detailEquilibre36,
+    ecartType36JPct: dispersion36,
+    cvar10PireDecilePct,
+    nbPartiesBanc36,
+  };
+}
+
 // 3.1 — Évaluation rapide de la viabilité / jouabilité et élimination directe des variantes défectueuses
 export function evaluerViabiliteVariante31(
   variante: VariantV01,
@@ -647,8 +909,6 @@ export function evaluerViabiliteVariante31(
   onPartieLog?: (log: JournalPartieJSONL) => void
 ): RapportViabilite31 {
   const t0 = Date.now();
-  const estV04 = estVariantePlacementV04(variante);
-
   const resInerte = simulerSeriePourBot(
     variante,
     'inerte',
@@ -673,7 +933,66 @@ export function evaluerViabiliteVariante31(
     campagneId,
     onPartieLog
   );
+  return compilerRapportViabilite31(
+    variante,
+    nbParties,
+    Math.max(1, Date.now() - t0),
+    resInerte,
+    resBoucle,
+    resDeductif
+  );
+}
 
+export async function evaluerViabiliteVariante31Async(
+  variante: VariantV01,
+  nbParties = 16,
+  campagneId = 'camp_local',
+  onPartieLog?: (log: JournalPartieJSONL) => void
+): Promise<RapportViabilite31> {
+  const t0 = Date.now();
+  const resInerte = await simulerSeriePourBotAsync(
+    variante,
+    'inerte',
+    nbParties,
+    31000,
+    campagneId,
+    onPartieLog
+  );
+  const resBoucle = await simulerSeriePourBotAsync(
+    variante,
+    'boucle',
+    nbParties,
+    31000,
+    campagneId,
+    onPartieLog
+  );
+  const resDeductif = await simulerSeriePourBotAsync(
+    variante,
+    'deductif',
+    nbParties,
+    31000,
+    campagneId,
+    onPartieLog
+  );
+  return compilerRapportViabilite31(
+    variante,
+    nbParties,
+    Math.max(1, Date.now() - t0),
+    resInerte,
+    resBoucle,
+    resDeductif
+  );
+}
+
+function compilerRapportViabilite31(
+  variante: VariantV01,
+  nbParties: number,
+  dureeMs: number,
+  resInerte: ResultatBotEchelle,
+  resBoucle: ResultatBotEchelle,
+  resDeductif: ResultatBotEchelle
+): RapportViabilite31 {
+  const estV04 = estVariantePlacementV04(variante);
   const ecartActionInaction =
     Math.round(
       (resDeductif.foretSauveeMoyennePct - resInerte.foretSauveeMoyennePct) * 10
@@ -774,7 +1093,7 @@ export function evaluerViabiliteVariante31(
     varianteNom: variante.nom,
     dateExecution: new Date().toISOString(),
     nbPartiesTestees: nbParties * 3,
-    dureeMs: Math.max(1, Date.now() - t0),
+    dureeMs,
     viable,
     motifElimination,
     criteres,
@@ -840,6 +1159,18 @@ export function marquerFrontPareto(rapports: RapportInteret32[]): void {
   }
 }
 
+const PROFILS_ORDRE_9_BOTS: BotProfileId[] = [
+  'inerte',
+  'hasard',
+  'boucle',
+  'reflexe',
+  'glouton',
+  'deductif',
+  'expectimax_bayesien',
+  'beam_rollout',
+  'ismcts',
+];
+
 // 3.2 — Évaluation approfondie sur l'échelle complète des 9 Bots + Banc 3 à 6 Joueurs + 5 Critères Pondérés
 export function evaluerInteretVariante32(
   variante: VariantV01,
@@ -849,23 +1180,10 @@ export function evaluerInteretVariante32(
   onPartieLog?: (log: JournalPartieJSONL) => void
 ): RapportInteret32 {
   const t0 = Date.now();
-  const estV04 = estVariantePlacementV04(variante);
-  const profilsOrdre: BotProfileId[] = [
-    'inerte',
-    'hasard',
-    'boucle',
-    'reflexe',
-    'glouton',
-    'deductif',
-    'expectimax_bayesien',
-    'beam_rollout',
-    'ismcts',
-  ];
-
   const echantillonPartiesVariante: JournalPartieJSONL[] = [];
   let nbTotalPartiesSimuleesVariante = 0;
 
-  const echelleBots: ResultatBotEchelle[] = profilsOrdre.map((botId) => {
+  const echelleBots: ResultatBotEchelle[] = PROFILS_ORDRE_9_BOTS.map((botId) => {
     const estLourd = botId === 'ismcts' || botId === 'beam_rollout';
     const nParties = estLourd
       ? Math.max(2, Math.round(nbPartiesParBot * 0.7))
@@ -901,6 +1219,121 @@ export function evaluerInteretVariante32(
           campagneId,
           onPartieLog
         );
+
+  const banc36 = evaluerBancMultiJoueurs36(
+    variante,
+    Math.max(4, Math.round(nbPartiesParBot * 0.5)),
+    campagneId,
+    onPartieLog,
+    echantillonPartiesVariante
+  );
+  nbTotalPartiesSimuleesVariante += banc36.nbPartiesBanc36;
+
+  return compilerRapportInteret32(
+    variante,
+    nbPartiesParBot,
+    poidsCriteres,
+    campagneId,
+    Math.max(1, Date.now() - t0),
+    echelleBots,
+    resSansApprentissage,
+    banc36,
+    echantillonPartiesVariante,
+    nbTotalPartiesSimuleesVariante,
+    onPartieLog
+  );
+}
+
+export async function evaluerInteretVariante32Async(
+  variante: VariantV01,
+  nbPartiesParBot = 20,
+  poidsCriteres: PoidsCriteresEvaluation = POIDS_CRITERES_DEFAUT,
+  campagneId = 'camp_local',
+  onPartieLog?: (log: JournalPartieJSONL) => void
+): Promise<RapportInteret32> {
+  const t0 = Date.now();
+  const echantillonPartiesVariante: JournalPartieJSONL[] = [];
+  let nbTotalPartiesSimuleesVariante = 0;
+
+  const echelleBots: ResultatBotEchelle[] = [];
+  for (const botId of PROFILS_ORDRE_9_BOTS) {
+    const estLourd = botId === 'ismcts' || botId === 'beam_rollout';
+    const nParties = estLourd
+      ? Math.max(2, Math.round(nbPartiesParBot * 0.7))
+      : Math.max(2, nbPartiesParBot);
+    nbTotalPartiesSimuleesVariante += nParties;
+    const resBot = await simulerSeriePourBotAsync(
+      variante,
+      botId,
+      nParties,
+      52000,
+      campagneId,
+      onPartieLog,
+      echantillonPartiesVariante
+    );
+    echelleBots.push(resBot);
+  }
+
+  const varianteSansApprentissage: VariantV01 = {
+    ...variante,
+    rythmeApprentissage: 'aucun',
+  };
+  const nSansApp = Math.max(2, Math.floor(nbPartiesParBot / 2));
+  if (variante.rythmeApprentissage !== 'aucun') {
+    nbTotalPartiesSimuleesVariante += nSansApp;
+  }
+  const resSansApprentissage =
+    variante.rythmeApprentissage === 'aucun'
+      ? echelleBots.find((b) => b.botId === 'glouton')!
+      : await simulerSeriePourBotAsync(
+          varianteSansApprentissage,
+          'glouton',
+          nSansApp,
+          52000,
+          campagneId,
+          onPartieLog
+        );
+
+  const banc36 = await evaluerBancMultiJoueurs36Async(
+    variante,
+    Math.max(4, Math.round(nbPartiesParBot * 0.5)),
+    campagneId,
+    onPartieLog,
+    echantillonPartiesVariante
+  );
+  nbTotalPartiesSimuleesVariante += banc36.nbPartiesBanc36;
+
+  return compilerRapportInteret32(
+    variante,
+    nbPartiesParBot,
+    poidsCriteres,
+    campagneId,
+    Math.max(1, Date.now() - t0),
+    echelleBots,
+    resSansApprentissage,
+    banc36,
+    echantillonPartiesVariante,
+    nbTotalPartiesSimuleesVariante,
+    onPartieLog
+  );
+}
+
+function compilerRapportInteret32(
+  variante: VariantV01,
+  nbPartiesParBot: number,
+  poidsCriteres: PoidsCriteresEvaluation,
+  campagneId: string,
+  dureeMsBase: number,
+  echelleBots: ResultatBotEchelle[],
+  resSansApprentissage: ResultatBotEchelle,
+  banc36: ReturnType<typeof evaluerBancMultiJoueurs36>,
+  echantillonPartiesVariante: JournalPartieJSONL[],
+  nbTotalPartiesSimuleesBase: number,
+  onPartieLog?: (log: JournalPartieJSONL) => void
+): RapportInteret32 {
+  const tCompile = Date.now();
+  const estV04 = estVariantePlacementV04(variante);
+  let nbTotalPartiesSimuleesVariante = nbTotalPartiesSimuleesBase;
 
   const parId = Object.fromEntries(
     echelleBots.map((r) => [r.botId, r])
@@ -975,26 +1408,16 @@ export function evaluerInteretVariante32(
         )
       );
 
-  // Évaluation du banc 3, 4, 5 et 6 joueurs et de l'ergonomie du plateau
   const {
     parJoueurs,
     scoreEquilibre36,
     detailEquilibre36,
     ecartType36JPct,
     cvar10PireDecilePct,
-    nbPartiesBanc36,
-  } = evaluerBancMultiJoueurs36(
-    variante,
-    Math.max(4, Math.round(nbPartiesParBot * 0.5)),
-    campagneId,
-    onPartieLog,
-    echantillonPartiesVariante
-  );
-  nbTotalPartiesSimuleesVariante += nbPartiesBanc36;
+  } = banc36;
 
   const ergo = evaluerLisibiliteErgonomiePlateau(variante);
 
-  // Mesure réelle des mouvements contrariés et métriques décisionnelles sur échantillon coordonné
   let totalDepMesures = 0;
   let totalContrariesMesures = 0;
   const entropies: number[] = [];
@@ -1033,9 +1456,6 @@ export function evaluerInteretVariante32(
       (meilleurBotPointePct - parId.reflexe.foretSauveeMoyennePct) * 10
     ) / 10;
 
-  // --- CALCUL DES 5 CRITÈRES PONDÉRÉS (/100) ---
-
-  // Critère 1 : Profondeur Stratégique (IS-MCTS, Expectimax Bayésien, Beam vs Bots naïfs + Garde-fou Boucle)
   const mctsGainPct =
     Math.round(
       (parId.ismcts.foretSauveeMoyennePct -
@@ -1069,7 +1489,6 @@ export function evaluerInteretVariante32(
   }
   scoreProfondeur = Math.max(15, Math.min(99, Math.round(scoreProfondeur)));
 
-  // Critère 2 : Tension & Criticité des Choix (Entropie de Shannon + Regret Contrefactuel + Parties Serrées)
   const entropieShannonMoyenne = Math.round(moyenne(entropies) * 10) / 10;
   const regretContrefactuelMoyen = Math.round(moyenne(regrets) * 10) / 10;
   const tauxPartiesSerreesPct = Math.round(
@@ -1089,7 +1508,6 @@ export function evaluerInteretVariante32(
     )
   );
 
-  // Critère 3 : Dynamique Coopérative & Frictions Spatiales (Synergie de Shapley + Barrage/Coalition + Mouvements Contrariés)
   const shapleySynergieCoopPts =
     Math.round(
       (meilleurBotPointePct - parId.glouton.foretSauveeMoyennePct) * 10
@@ -1123,10 +1541,7 @@ export function evaluerInteretVariante32(
     )
   );
 
-  // Critère 4 : Équilibre Multi-Joueurs 3–6J & Robustesse CVaR
   const scoreEquilibre = scoreEquilibre36;
-
-  // Critère 5 : Ergonomie Physique & Lisibilité sur Table
   const scoreErgonomie = ergo.score;
 
   const baseCinqCriteres = {
@@ -1193,7 +1608,7 @@ export function evaluerInteretVariante32(
     geometriePlateau: variante.geometriePlateau || 'modulaire_secteurs',
     dateExecution: new Date().toISOString(),
     nbPartiesParBot,
-    dureeMs: Math.max(1, Date.now() - t0),
+    dureeMs: dureeMsBase + Math.max(0, Date.now() - tCompile),
     echelleBots,
     indicateurs: {
       progressionEchelleValide,

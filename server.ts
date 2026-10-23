@@ -24,7 +24,9 @@ import {
   POIDS_CRITERES_DEFAUT,
   construireAnalyseCampagneStructurer,
   evaluerInteretVariante32,
+  evaluerInteretVariante32Async,
   evaluerViabiliteVariante31,
+  evaluerViabiliteVariante31Async,
   executerCampagneSelection33,
   genererGrilleCombinatoireExhaustive,
   genererVariantesExploratoiresV01,
@@ -204,8 +206,8 @@ Rédige en français :
 - Un diagnostic sur l'équilibre de 3 à 6 joueurs et la robustesse CVaR 10%.
 - Un rapport Markdown complet et structuré présentant le classement des meilleures variantes du front de Pareto et leurs avantages respectifs.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+    const callGemini = ai.models.generateContent({
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -229,11 +231,20 @@ Rédige en français :
       },
     });
 
-    if (response.text) {
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(
+        () => reject(new Error('Timeout 20s dépassé pour la synthèse Gemini')),
+        20000
+      )
+    );
+
+    const response = await Promise.race([callGemini, timeoutPromise]);
+
+    if (response && response.text) {
       const parsed = JSON.parse(response.text);
       const enrichie: AnalyseGeminiCampagne = {
         ...baseDeterministe,
-        modeleUtilise: 'gemini-3-flash-preview',
+        modeleUtilise: 'gemini-2.5-flash',
         resumeExecutif: parsed.resumeExecutif || baseDeterministe.resumeExecutif,
         diagnosticStrategie:
           parsed.diagnosticStrategie || baseDeterministe.diagnosticStrategie,
@@ -251,7 +262,7 @@ Rédige en français :
     }
   } catch (err) {
     console.warn(
-      'Appel API Gemini indisponible ou erreur réseau, bascule sur la synthèse analytique déterministe :',
+      'Appel API Gemini indisponible ou délai dépassé, bascule sur la synthèse analytique déterministe :',
       err
     );
   }
@@ -463,6 +474,16 @@ export function sauvegarderEtatAtelier(state: AtelierPersistedState): void {
   try {
     ensureDirs();
     state.derniereSauvegarde = new Date().toISOString();
+    // Conserver un maximum de 5 campagnes dans le state pour éviter la dégradation mémoire/disque
+    if (Array.isArray(state.campagnesSelection) && state.campagnesSelection.length > 5) {
+      state.campagnesSelection = state.campagnesSelection.slice(0, 5);
+    }
+    // Nettoyer les échantillons volumineux dans l'état persistant (les parties complètes restent dans les .jsonl)
+    for (const c of state.campagnesSelection || []) {
+      if (Array.isArray(c.echantillonPartiesRemarquables) && c.echantillonPartiesRemarquables.length > 30) {
+        c.echantillonPartiesRemarquables = c.echantillonPartiesRemarquables.slice(0, 30);
+      }
+    }
     fs.writeFileSync(STATE_FILE_PATH, JSON.stringify(state, null, 2), 'utf-8');
   } catch (err) {
     console.error('Erreur sauvegarde atelier-v1-state.json :', err);
@@ -590,6 +611,30 @@ export async function executerJobCampagneExhaustiveAsync(
     bufferJsonl = [];
   };
 
+  const updateTelemetry = () => {
+    const elapsedSec = Math.max(0.2, (Date.now() - tStart) / 1000);
+    status.dureeEcouleeSecondes = Math.round(elapsedSec * 10) / 10;
+    status.debitPartiesParSeconde =
+      Math.round((status.partiesSimulees / elapsedSec) * 10) / 10;
+    if (status.variantesTesteesViabilite >= 5) {
+      const moyParVariante =
+        status.partiesSimulees / status.variantesTesteesViabilite;
+      status.partiesTotalesPrevues = Math.max(
+        status.partiesSimulees,
+        Math.round(moyParVariante * status.variantesTotales)
+      );
+    }
+    const restantes = Math.max(
+      0,
+      status.partiesTotalesPrevues - status.partiesSimulees
+    );
+    status.etaSecondes =
+      status.debitPartiesParSeconde > 0
+        ? Math.round(restantes / status.debitPartiesParSeconde)
+        : 0;
+    sauvegarderStatutJobVM(status);
+  };
+
   const handlePartieLog = (log: JournalPartieJSONL) => {
     const enrichi: JournalPartieJSONL = {
       ...log,
@@ -602,6 +647,9 @@ export async function executerJobCampagneExhaustiveAsync(
     if (bufferJsonl.length >= 120) {
       flushJsonlBuffer();
     }
+    if (status.partiesSimulees % 250 === 0) {
+      updateTelemetry();
+    }
 
     if (
       echantillonPartiesRemarquables.length < 80 &&
@@ -611,22 +659,6 @@ export async function executerJobCampagneExhaustiveAsync(
     ) {
       echantillonPartiesRemarquables.push(enrichi);
     }
-  };
-
-  const updateTelemetry = () => {
-    const elapsedSec = Math.max(0.2, (Date.now() - tStart) / 1000);
-    status.dureeEcouleeSecondes = Math.round(elapsedSec * 10) / 10;
-    status.debitPartiesParSeconde =
-      Math.round((status.partiesSimulees / elapsedSec) * 10) / 10;
-    const restantes = Math.max(
-      0,
-      status.partiesTotalesPrevues - status.partiesSimulees
-    );
-    status.etaSecondes =
-      status.debitPartiesParSeconde > 0
-        ? Math.round(restantes / status.debitPartiesParSeconde)
-        : 0;
-    sauvegarderStatutJobVM(status);
   };
 
   const rapportsViabilite: RapportViabilite31[] = [];
@@ -648,7 +680,7 @@ export async function executerJobCampagneExhaustiveAsync(
     status.etapeNumero = 2;
     status.etapeLibelle = 'Coupe-circuit de viabilité (5 invariants)';
 
-    const rapV = evaluerViabiliteVariante31(
+    const rapV = await evaluerViabiliteVariante31Async(
       v,
       nbPartiesViab,
       campagneId,
@@ -666,7 +698,7 @@ export async function executerJobCampagneExhaustiveAsync(
       status.etapeNumero = 3;
       status.etapeLibelle =
         'Simulation intensive 9 Bots (MCTS/Expectimax) & Banc 3–6J';
-      const rapI = evaluerInteretVariante32(
+      const rapI = await evaluerInteretVariante32Async(
         v,
         nbPartiesParBot,
         poids,
@@ -714,7 +746,7 @@ export async function executerJobCampagneExhaustiveAsync(
 
     updateTelemetry();
 
-    await new Promise<void>((resolve) => setImmediate(resolve));
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
   }
 
   flushJsonlBuffer();
@@ -883,8 +915,12 @@ async function startServer() {
   let state = chargerEtatAtelier();
 
   app.get('/api/atelier/state', (_req, res) => {
-    state = chargerEtatAtelier();
     res.json(state);
+  });
+
+  app.post('/api/atelier/state/reload', (_req, res) => {
+    state = chargerEtatAtelier();
+    res.json({ reloaded: true, state });
   });
 
   app.get('/api/atelier/campaign/status', (_req, res) => {
@@ -1366,9 +1402,19 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.resolve(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*all', (_req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+    } else {
+      console.warn(`[ATTENTION] Répertoire dist/ introuvable à : ${distPath}. Pensez à exécuter 'npm run build'.`);
+    }
+    app.use((req, res, next) => {
+      if (req.method !== 'GET') return next();
+      const indexPath = path.join(distPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).send('Atelier : index.html introuvable dans dist/. Exécutez npm run build.');
+      }
     });
   }
 
