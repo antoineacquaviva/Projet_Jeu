@@ -120,9 +120,21 @@ export const DemoView: React.FC<DemoViewProps> = ({
       ? 'Machine parée renvoyée au Chantier'
       : 'Machine parée reste sur place en forêt';
 
+  const [nbJoueursDemo, setNbJoueursDemo] = useState<3 | 4 | 5 | 6>(
+    variante.nbJoueurs || 4
+  );
+
+  const varDemo = useMemo<VariantV01>(() => {
+    return {
+      ...variante,
+      nbJoueurs: nbJoueursDemo,
+      machinesInitiales: Math.min(6, Math.max(3, nbJoueursDemo)),
+    };
+  }, [variante, nbJoueursDemo]);
+
   useEffect(() => {
     setIndexEtapeTour(0);
-  }, [variante.id, variante.modeResolution]);
+  }, [variante.id, variante.modeResolution, nbJoueursDemo]);
 
   // Construire les étapes successives d'un tour de démonstration complet (5 étapes en V0.5 Linéaire 2C, 6 étapes sinon)
   const etapesTourDemo = useMemo(() => {
@@ -136,7 +148,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
     }[] = [];
 
     // Étape 1 : Début du tour — Tirages secrets 2D6 sous les gobelets
-    const e0 = creerEtatInitialV01(variante, 20261019);
+    const e0 = creerEtatInitialV01(varDemo, 20261019);
     const e0Obs = clonerEtatJeu(e0);
     e0Obs.sousPhase = 'observation_2d6';
     etats.push({
@@ -151,7 +163,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
 
     // Étape 2 : Programmation publique séquentielle
     const e1 = clonerEtatJeu(e0);
-    for (let j = 0; j < variante.nbJoueurs; j++) {
+    for (let j = 0; j < varDemo.nbJoueurs; j++) {
       const prog = calculerProgrammationBot(e1, j, 'deductif');
       const pionsJ = e1.defenseurs.filter((d) => d.joueur === j);
       const actionsEnrichies: ActionProgrammee[] = [...prog.actions];
@@ -438,7 +450,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
 
     return etats;
   }, [
-    variante,
+    varDemo,
     estV04,
     estV05,
     estV05Lineaire,
@@ -446,9 +458,10 @@ export const DemoView: React.FC<DemoViewProps> = ({
     effetParadeLabelCourt,
   ]);
 
+  const nbSecteursFixes = nbJoueursDemo <= 4 ? 4 : 6;
   const totalForetsBoite =
     variante.foretsCoeur +
-    variante.nbJoueurs * 2 * variante.foretsParCaseSecteur;
+    nbSecteursFixes * 2 * variante.foretsParCaseSecteur;
 
   const etapeCourante =
     etapesTourDemo[Math.min(indexEtapeTour, etapesTourDemo.length - 1)];
@@ -481,19 +494,45 @@ export const DemoView: React.FC<DemoViewProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Barre supérieure compacte de la Démo */}
-      <div className="bg-white rounded-xl p-3.5 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="font-display text-base font-bold text-[#16211B]">
-            Démo Interactive — « {variante.nom} » (V{variante.version})
-          </h2>
-          <p className="text-xs text-[#55645B]">
-            {variante.nbJoueurs} joueurs (MOI + {variante.nbJoueurs - 1} Bots alliés) ·{' '}
-            {totalForetsBoite} Forêts en bois · Piste Machine statistique (1, 2, 3, 0, 4, 5)
-          </p>
+      {/* Barre supérieure de la Démo avec sélecteur de table 3 à 6 joueurs */}
+      <div className="bg-white rounded-xl p-3.5 border border-[#D8DFD5] space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D8DFD5] pb-2.5">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-display text-base font-bold text-[#16211B]">
+                Démo Interactive — « {variante.nom} » (V{variante.version})
+              </h2>
+              <span className="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold">
+                Table Démo : {nbJoueursDemo} Joueurs · Face {nbJoueursDemo <= 4 ? 'Recto (9 zones, 38 forêts)' : 'Verso (13 zones, 54 forêts)'}
+              </span>
+            </div>
+            <p className="text-xs text-[#55645B]">
+              Jeu universel 3 à 6 joueurs · Table actuelle : {nbJoueursDemo} joueurs (MOI + {nbJoueursDemo - 1} Bots alliés) ·{' '}
+              {totalForetsBoite} Forêts en bois
+            </p>
+          </div>
+
+          <div className="flex items-center gap-1 bg-[#F4F5F0] p-1 rounded-lg border border-[#D8DFD5] text-xs">
+            <span className="px-1.5 font-bold text-[#16211B]">Configuration de table :</span>
+            {([3, 4, 5, 6] as const).map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setNbJoueursDemo(n)}
+                className={`px-2.5 py-1 rounded font-bold transition-colors ${
+                  nbJoueursDemo === n
+                    ? 'bg-[#256B45] text-white shadow-xs'
+                    : 'bg-white text-[#16211B] border border-[#D8DFD5] hover:bg-stone-100'
+                }`}
+                title={`Démonstration à ${n} joueurs`}
+              >
+                {n} Joueurs {n === 4 ? '★' : ''}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-1 bg-[#F4F5F0] p-1 rounded-lg border border-[#D8DFD5]">
             <button
               onClick={() => setSubTab('tour_guide')}

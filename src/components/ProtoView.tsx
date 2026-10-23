@@ -162,13 +162,34 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
   onClearEtatExterne,
 }) => {
   const [graine, setGraine] = useState<number>(20261019);
+  const [nbJoueursTable, setNbJoueursTable] = useState<3 | 4 | 5 | 6>(
+    (etatInitialExterne?.variante.nbJoueurs as 3 | 4 | 5 | 6) ||
+      variante.nbJoueurs ||
+      4
+  );
+
+  const variantePourTable = useMemo<VariantV01>(() => {
+    return {
+      ...variante,
+      nbJoueurs: nbJoueursTable,
+      machinesInitiales: Math.min(6, Math.max(3, nbJoueursTable)),
+    };
+  }, [variante, nbJoueursTable]);
+
   const [sieges, setSieges] = useState<SiegeProtoType[]>(() =>
-    construireSiegesDefaut(variante.nbJoueurs)
+    construireSiegesDefaut(nbJoueursTable)
   );
   const [etat, setEtat] = useState<EtatJeuV01>(() =>
     etatInitialExterne
       ? clonerEtatJeu(etatInitialExterne)
-      : creerEtatInitialV01(variante, 20261019)
+      : creerEtatInitialV01(
+          {
+            ...variante,
+            nbJoueurs: nbJoueursTable,
+            machinesInitiales: Math.min(6, Math.max(3, nbJoueursTable)),
+          },
+          20261019
+        )
   );
   const [etatPrecedent, setEtatPrecedent] = useState<EtatJeuV01 | null>(null);
   const [modeBotsAuto, setModeBotsAuto] = useState<boolean>(true);
@@ -187,16 +208,39 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
   const [afficherLivretPhysique, setAfficherLivretPhysique] =
     useState<boolean>(false);
 
+  const changerNbJoueursTable = (nouveauNb: 3 | 4 | 5 | 6) => {
+    setNbJoueursTable(nouveauNb);
+    const varAdaptee: VariantV01 = {
+      ...variante,
+      nbJoueurs: nouveauNb,
+      machinesInitiales: Math.min(6, Math.max(3, nouveauNb)),
+    };
+    setSieges((prev) => construireSiegesDefaut(nouveauNb, prev));
+    const neuf = creerEtatInitialV01(varAdaptee, graine);
+    setEtat(neuf);
+    setEtatPrecedent(null);
+    setPionSelectionneId(neuf.defenseurs[0]?.id ?? null);
+    setEtapeEdition(1);
+  };
+
   // Synchroniser quand la variante change ou qu'un état externe arrive depuis Démo
   useEffect(() => {
     if (etatInitialExterne) {
       setEtat(clonerEtatJeu(etatInitialExterne));
+      setNbJoueursTable(
+        (etatInitialExterne.variante.nbJoueurs as 3 | 4 | 5 | 6) || 4
+      );
       setEtatPrecedent(null);
       if (onClearEtatExterne) onClearEtatExterne();
       return;
     }
-    setSieges((prev) => construireSiegesDefaut(variante.nbJoueurs, prev));
-    const nouvelEtat = creerEtatInitialV01(variante, graine);
+    const varAdaptee: VariantV01 = {
+      ...variante,
+      nbJoueurs: nbJoueursTable,
+      machinesInitiales: Math.min(6, Math.max(3, nbJoueursTable)),
+    };
+    setSieges((prev) => construireSiegesDefaut(nbJoueursTable, prev));
+    const nouvelEtat = creerEtatInitialV01(varAdaptee, graine);
     setEtat(nouvelEtat);
     setEtatPrecedent(null);
     setPionSelectionneId(nouvelEtat.defenseurs[0]?.id ?? null);
@@ -259,7 +303,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
   const recommencerPartie = (nouvelleGraine?: number) => {
     const g = nouvelleGraine ?? graine;
     setGraine(g);
-    const neuf = creerEtatInitialV01(variante, g);
+    const neuf = creerEtatInitialV01(variantePourTable, g);
     setEtat(neuf);
     setPionSelectionneId(neuf.defenseurs[0]?.id ?? null);
     setEtapeEdition(1);
@@ -418,28 +462,52 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* 1. BARRE SUPÉRIEURE COMPACTE : Essentiel + Interrupteur Bots Auto/Pas-à-pas + Boutons des tiroirs optionnels */}
-      <div className="bg-white rounded-xl p-3.5 border border-[#D8DFD5] flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <div>
-            <h2 className="font-display text-base font-bold text-[#16211B]">
-              Proto — « {variante.nom} » (V{variante.version})
-            </h2>
+      {/* 1. BARRE SUPÉRIEURE : Table 3 à 6 Joueurs + Essentiel + Interrupteur Bots Auto/Pas-à-pas + Tiroirs */}
+      <div className="bg-white rounded-xl p-3.5 border border-[#D8DFD5] space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D8DFD5] pb-2.5">
+          <div className="space-y-0.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-display text-base font-bold text-[#16211B]">
+                Proto — « {variante.nom} » (V{variante.version})
+              </h2>
+              <span className="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold">
+                Table active : {nbJoueursTable} Joueurs · Face {nbJoueursTable <= 4 ? 'Recto (9 zones, 38 forêts)' : 'Verso (13 zones, 54 forêts)'}
+              </span>
+            </div>
             <p className="text-xs text-[#55645B]">
               Forêt préservée :{' '}
               <strong className="font-mono-tabular text-[#256B45]">
                 {scoreSauvePct} %
               </strong>{' '}
-              · {variante.nbJoueurs} sièges (
+              · Sièges ({nbJoueursTable}) :{' '}
               {sieges
                 .map((_, idx) => formaterNomSiege(idx, sieges).nomCourt)
                 .join(', ')}
-              )
             </p>
+          </div>
+
+          {/* Sélecteur direct de configuration de table 3 à 6 joueurs */}
+          <div className="flex items-center gap-1 bg-[#F4F5F0] p-1 rounded-lg border border-[#D8DFD5] text-xs">
+            <span className="px-1.5 font-bold text-[#16211B]">Configuration de table :</span>
+            {([3, 4, 5, 6] as const).map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => changerNbJoueursTable(n)}
+                className={`px-2.5 py-1 rounded font-bold transition-colors ${
+                  nbJoueursTable === n
+                    ? 'bg-[#256B45] text-white shadow-xs'
+                    : 'bg-white text-[#16211B] border border-[#D8DFD5] hover:bg-stone-100'
+                }`}
+                title={`Jouer à ${n} joueurs sur le plateau ${n <= 4 ? 'Recto (9 zones)' : 'Verso (13 zones)'}`}
+              >
+                {n} Joueurs {n === 4 ? '★' : ''}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Interrupteur Auto / Pas-à-pas pour les Bots alliés */}
           <div className="flex items-center bg-[#F4F5F0] p-1 rounded-lg border border-[#D8DFD5] text-xs">
             <span className="px-2 font-semibold text-[#55645B]">

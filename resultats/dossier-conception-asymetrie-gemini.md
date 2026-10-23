@@ -1,5 +1,5 @@
 # DOSSIER MAÎTRE DE CONCEPTION : L'ASYMÉTRIE DES 6 PEUPLES
-## Projet « La Forêt qui Rêve » (Défenseurs de la Forêt — Base V0.5 « Cœur Unifié Pur Placement · 3 Curseurs »)
+## Projet « La Forêt qui Rêve » (Défenseurs de la Forêt — Ancré sur la Variante Recommandée V0.5)
 *Document de cadrage complet pour session de travail itérative avec Gemini (et consultable directement dans l'Atelier)*
 
 ---
@@ -10,15 +10,19 @@
 > 
 > *« Bonjour Gemini. Tu es mon co-auteur et game designer senior pour finaliser le système d'asymétrie de mon jeu de société coopératif "La Forêt qui Rêve".*
 > 
-> *Tu trouveras ci-dessous l'intégralité du contexte du projet, mis à jour lors du passage de la V0.4 à la Version 0.5 ("Cœur Unifié Pur Placement") :*
+> *Tu trouveras ci-dessous l'intégralité du contexte du projet, calé sur la **Variante Recommandée de la Version 0.5** (`v05_2c_lineaire_1def_surplace` — Score d'intérêt 97/100) :*
 > *1. Le cadre méthodologique et le lexique formel que j'ai défini (Spécificité, Mécanique spécifique, Synergies 3.1 & 3.2, Échelle d'Avantages de 1 à 5).*
-> *2. Le nouveau socle épuré V0.5 sur Plateau Double Face (Recto 3–4J / Verso 5–6J) : suppression totale du Mouvement Contrarié du cœur, suppression du Barrage d'entrée à mi-tour (une seule règle d'interaction Défenseurs / Machines au moment où la Machine veut couper), et structuration autour des 3 Curseurs de règles (Curseur 1 Timing des Machines, Curseur 2 Seuil de Parade avec coalition à 2 Peuples différents dès qu'il faut 2 pions, Curseur 3 Sort de la Machine contrée).*
-> *3. La boîte à outils des 3 mécaniques retirées de la V0.4 et déportées vers l'Asymétrie V0.5 : le Barrage d'entrée exclusif, le Déplacement réactif post-Machine, et surtout le "2e mouvement programmé contrarié" (inspiré de Colt Express et adapté au coopératif, où le 2e pas ou pouvoir programmé peut tomber dans le vide comme contrepartie d'équilibrage d'un pouvoir fort ou d'une synergie).*
+> *2. Le socle de règles arrêté de la Variante Recommandée V0.5 sur Plateau Double Face Fixe (Recto 3–4J à 9 zones / Verso 5–6J à 13 zones) :*
+> *   - **Pur Placement libre** : 1 pion Défenseur par joueur (à 4J), 2 déplacements programmés (Déplacement I puis II), zéro carte Action, zéro Mouvement Contrarié et capacité illimitée des zones.*
+> *   - **Curseur 1B (Séquence Linéaire en fin de tour)** : tous les Défenseurs exécutent leurs Déplacements I puis II ; ensuite on révèle les gobelets 2D6 **un par un**, et chaque Machine se déplace vers sa cible, résout immédiatement son verdict de coupe et fait évoluer ses deux pistes avant le gobelet suivant.*
+> *   - **Curseur 2A + 3A (Règle unique de Parade)** : aucun Barrage d'entrée. Au moment où la Machine veut couper, si **au moins 1 Défenseur** occupe sa zone, la coupe est annulée, la Machine **reste sur place** et ses tuiles reculent sur les deux pistes ; sinon elle abat 1 arbre et ses tuiles avancent vers le 7 et vers la gauche (case 1).*
+> *   - **3 Tactiques épurées** sur la piste 2–12 : Cupidité (+ d'arbres), Percée (vers le Cœur) et Opportunisme (zone la moins gardée).*
+> *3. La boîte à outils des mécaniques déportées dans l'Asymétrie V0.5 : le Barrage d'entrée exclusif, le Déplacement réactif après révélation d'un gobelet, le renvoi au Chantier d'une Machine parée (au lieu de rester sur place), et le "2e mouvement programmé contrarié" (inspiré de Colt Express et adapté au coopératif, où le 2e pas ou pouvoir programmé peut tomber dans le vide comme contrepartie d'équilibrage d'un pouvoir fort ou d'une synergie).*
 > *4. La matrice mathématique intégralement préservée des 6 Peuples et des 4 Secteurs (36 points, 9 points par Secteur, Famille A Spécialistes 5-1 / 4-2 / 3-3 et Famille B Polyvalents 4-1-1 / 3-2-1 / 2-2-2).*
 > *5. Le fonctionnement arrêté pour la mécanique spécifique partagée du "Rêve" (Entités Magiques à 4 pts vs Humains Chamanes à 3 pts).*
 > *6. L'anthologie de mes idées et inspirations thématiques.*
 > 
-> *Notre objectif de travail : Affiner et formaliser chaque règle et avantage associé aux Peuples, case par case de la matrice, de manière itérative et collaborative sur ce socle V0.5.*
+> *Notre objectif de travail : Affiner et formaliser chaque règle et avantage associé aux Peuples, case par case de la matrice, de manière itérative et collaborative sur ce socle V0.5 recommandé.*
 > 
 > *RÈGLES D'INTERACTION STRICTES :*
 > *- Ne génère PAS une solution globale d'un coup.*
@@ -43,71 +47,56 @@ Ce système d'asymétrie repose sur 3 concepts exclusifs et une échelle de vale
 
 ### 1.2. Échelle de Puissance des Avantages (1 à 5 points)
 - **Avantages Forts (4 ou 5 points) :** De véritables mécaniques qui s'ajoutent (sous-système greffé, matériel propre) — régulées en V0.5 par une contrepartie de programmation (notamment le *2e mouvement programmé contrarié* type *Colt Express*).
-- **Avantages Moyens (2 ou 3 points) :** Modifient une mécanique existante de la V0.5 de manière significative (portée, condition d'activation, moment de résolution).
+- **Avantages Moyens (2 ou 3 points) :** Modifient une mécanique existante du socle V0.5 recommandé de manière significative (portée, condition d'activation, moment de résolution ou sort de la Machine contrée).
 - **Avantages Faibles (1 point) :** Bonus ponctuels (une fois par partie) ou récurrents légers, servant principalement de **passerelles synergiques** avec les coéquipiers.
 
 ---
 
-## 2. LE SOCLE DE RÈGLES V0.5 : « CŒUR UNIFIÉ PUR PLACEMENT & 3 CURSEURS »
+## 2. LE SOCLE ARRÊTÉ : LA VARIANTE RECOMMANDÉE V0.5 (`Curseur 1B · 2A · 3A`)
 
-Pour offrir une fondation ultra-lisible à l'Asymétrie des 6 Peuples sans empiler des sous-règles d'exception, la **Version 0.5** opère deux simplifications majeures par rapport à la V0.4 :
-1. **Suppression totale du Mouvement Contrarié dans le socle :** Les pions Défenseurs se déplacent toujours librement d'une case adjacente, sans limite de capacité par zone ni goulot bloquant dans le cœur de règles.
-2. **Une seule règle d'interaction Défenseurs / Machines, qui s'explique en une phrase :** Il n'y a plus de « Barrage d'entrée » à mi-tour (les Machines entrent toujours librement sur leur case cible) ; tout se joue en **un seul test de présence sur la case de la Machine au moment où elle veut couper**.
+À l'issue des campagnes comparatives V0.5, la **Variante Recommandée** (`v05_2c_lineaire_1def_surplace`) constitue désormais le socle de référence unique sur lequel se greffent les 6 Peuples. Elle se résume en **5 règles fondamentales** :
 
-### 2.1. Synthèse des 3 Options d'Unification (2A, 2B, 2C)
+### 2.1. Les 5 Piliers de la Variante Recommandée V0.5
 
-| Critère | Option 2A — « Unifiée Fin de Tour » *(Plus de Barrage d'entrée)* | Option 2B — « Unifiée 1 Défenseur = 1 Parade » *(Règle unique de présence)* | Option 2C — « Séquence Linéaire en 1 temps » *(Défenseurs I+II → Machines bougent & coupent)* |
-| :--- | :--- | :--- | :--- |
-| **Principe en 1 phrase** | Les Machines entrent toujours sur leur case cible à mi-tour ; tout se joue en fin de tour sur la case de la Machine. | À la fin du tour, la simple présence de Défenseurs sur la case d'une Machine suffit à bloquer sa coupe. | On supprime l'entrelacement : les joueurs exécutent leurs 2 déplacements, puis on révèle les gobelets et chaque Machine se déplace et coupe immédiatement. |
-| **Ce qu'on supprime de la V0.4** | Le Barrage d'entrée à mi-tour. Les Défenseurs ne bloquent jamais le déplacement d'une Machine. | Le Barrage d'entrée ET la dualité entre « barrage » et « coalition ». | L'étape intermédiaire des Machines au milieu des déplacements des joueurs. |
-| **Déroulement de la résolution** | 1. Dépl. I des Défenseurs.<br>2. Les Machines entrent librement sur leur cible.<br>3. Dépl. II des Défenseurs.<br>4. Verdict unique en fin de tour (Coalition de 2 Peuples différents). | Identique à 2A, avec un seuil paramétrique pur en fin de tour :<br>• Solo : 1 Défenseur bloque la coupe.<br>• Coalition : 2 Peuples différents bloquent la coupe (ou 1 bloque / 2 Peuples renvoient au Chantier). | 1. Les Défenseurs exécutent leur Dépl. I puis II.<br>2. On révèle chaque gobelet 2D6 un par un : la Machine se déplace vers sa cible et résout immédiatement son verdict (bloquée si seuil atteint, sinon coupe 1 arbre) + Apprentissage immédiat. |
-| **Intérêt pour l'Asymétrie** | • Fini le paradoxe de la Machine barrée qui coupe sur sa case de départ.<br>• Le « Barrage d'entrée » devient un Avantage exclusif d'un Peuple ! | Permet au banc d'essai V0.5 de tester proprement le seuil (1 Défenseur vs 2 Peuples différents) et le sort de la Machine (sur place vs Chantier). | • Ultra-fluide sur table (99/100 en simplicité).<br>• Donne un poids décisif au Secteur B (Timing) : ex. les Reptiles qui jouent leur 2e déplacement *après* les Machines deviennent uniques ! |
-
-### 2.2. Les 3 Curseurs de Règles V0.5 (Éprouvés sur Plateau Double Face)
-
-Ces trois options ne s'excluent pas : elles forment les **3 curseurs paramétriques** de la V0.5 (sans aucun ajout de règles complexes), croisés sur le **Plateau Double Face Fixe** (Recto 3–4J à 9 zones / Verso 5–6J à 13 zones) :
-
-1. **Curseur 1 — Le moment où les Machines bougent :**
-   - **Choix A (Entrelacé — Options 2A/2B) :** Déplacement I $\to$ Machines bougent librement $\to$ Déplacement II $\to$ Verdict des coupes.
-   - **Choix B (Linéaire en fin de tour — Option 2C, Recommandé) :** Déplacement I $\to$ Déplacement II $\to$ On révèle les gobelets 2D6 un par un : chaque Machine bouge et résout immédiatement sa coupe et son apprentissage.
-2. **Curseur 2 — Le seuil pour contrer une Machine sur sa case :**
-   - **Choix A :** **1 seul Défenseur** présent sur la case suffit à bloquer la coupe.
-   - **Choix B :** **2 Défenseurs de Peuples (joueurs) différents** (Coalition) présents sur la case sont requis pour bloquer la coupe *(règle de coalition identique à la V0.4)*.
-   - **Choix C (Gradué) :** **1 Défenseur** bloque la coupe sur place ; **2 Défenseurs de Peuples différents** démontent la Machine (renvoi au Chantier).
-3. **Curseur 3 — Le sort d'une Machine contrée :**
-   - **Choix A :** Elle **reste sur place** (neutralisée pour ce tour).
-   - **Choix B :** Elle est **renvoyée au Chantier** (Réserve).
+| Pilier du Socle V0.5 | Règle retenue dans la Variante Recommandée | Ouverture offerte à l'Asymétrie des 6 Peuples |
+| :--- | :--- | :--- |
+| **1. Plateau & Effectifs** | **Plateau Double Face Fixe** (Recto 3–4J à 9 zones : 1 Cœur, 4 Clairières, 4 Lisières avec diagonales d'entraide ; Verso 5–6J à 13 zones). **1 pion Défenseur par joueur** (à 4J), **4 Machines initiales** en Lisière (2 au Chantier), **4 tours**. Capacité illimitée par zone. | • Un joueur seul ne couvre qu'une seule zone à la fois $\to$ valorise le transport d'allié (Oiseaux) et la démultiplication de présence (Insectes). |
+| **2. Tête du Méchant & 3 Tactiques** | Chacun lance **2D6 secrets** sous son gobelet en début de tour. **Somme (2–12)** = Tactique parmi **3 Tactiques épurées** (*Cupidité* = + d'arbres, *Percée* = vers le Cœur, *Opportunisme* = moins de Défenseurs). **Écart (0–5)** = Machine sur la piste statistique `1 – 2 – 3 – 0 – 4 – 5`. | • Lecture immédiate des probabilités $\to$ laisse toute la place mentale au **Versant du Rêve** (cases 8–12) des Entités et des Chamanes Humains. |
+| **3. Programmation Pur Placement** | **Zéro carte Action, zéro Mouvement Contrarié** dans le socle. Deux tours de table horaires publics : chacun annonce le **Déplacement I** (0 ou 1 zone adjacente), puis le **Déplacement II** (à partir de la zone atteinte en I). | • La trajectoire choisie est le seul signal silencieux.<br>• Le *Mouvement Contrarié* est réservé comme contrepartie des pouvoirs forts. |
+| **4. Curseur 1B — Séquence Linéaire en 5 étapes** | 1) Lecture secrète des 2D6 $\to$ 2) Programmation I puis II $\to$ 3) Exécution du Déplacement I $\to$ 4) Exécution immédiate du Déplacement II $\to$ 5) **Révélation des gobelets 2D6 un par un** : chaque Machine se déplace vers sa cible, résout son verdict et met à jour les pistes **avant** le gobelet suivant. | • Crée un enchaînement dynamique entre les gobelets d'un même tour.<br>• Rend exceptionnel le pouvoir des **Reptiles (Secteur B)** qui jouent leur 2e pas *après* le déplacement d'une Machine ! |
+| **5. Curseurs 2A & 3A — Règle unique de Parade** | **Zéro Barrage d'entrée** : la Machine entre toujours librement sur sa cible. Au moment où elle veut couper :<br>• **Seuil 2A (≥ 1 Défenseur)** : si au moins 1 Défenseur occupe la zone, la coupe est **annulée** et les 2 pistes reculent d'un cran (vers 2/12 et vers la droite `case 5`).<br>• **Sort 3A (Sur place)** : la Machine parée **reste sur sa zone** pour le tour suivant.<br>• Sinon : **-1 arbre** et les 2 pistes avancent (vers `7` et vers la gauche `case 1`). | • Puisque la Machine parée reste sur place dans le socle, **l'expulsion au Chantier** (Reptiles / Mammifères ou synergie à 2 Peuples) et le **Barrage d'entrée** (Mammifères) deviennent de vrais pouvoirs asymétriques majeurs ! |
 
 ---
 
-## 3. TRANSPOSITION V0.4 $\to$ V0.5 & MÉCANIQUES DÉPORTÉES VERS L'ASYMÉTRIE
+## 3. BOÎTE À OUTILS ASYMÉTRIQUE ISSUE DE L'ÉPURATION V0.5
 
-Le passage de la V0.4 à la V0.5 **conserve 100 % de l'architecture d'asymétrie** (les 4 Secteurs à 9 points, la matrice à 36 points, le Rêve partagé et les profils des 6 Peuples). Mieux encore : les règles retirées du socle V0.4 trouvent une place bien plus naturelle et thématique en tant que **mécanismes asymétriques dédiés** :
+Le choix de la variante recommandée (`Curseur 1B · 2A · 3A`) dégage **4 leviers mécaniques exclusifs** qui n'existent plus dans le socle de base et deviennent la signature des Peuples :
 
 ### 3.1. Le « 2e Mouvement Programmé Contrarié » (Effet *Colt Express* Coopératif)
-*   **Origine :** Dans *Colt Express*, la programmation à l'avance fait qu'un coup de poing ou un tir peut « tomber dans le vide » si la cible s'est déplacée entre-temps.
-*   **Pourquoi le retirer du socle et le transférer à l'Asymétrie :** Dans le cœur de règles, bloquer les déplacements ordinaires alourdissait inutilement le jeu. En revanche, transféré dans l'Asymétrie comme **contrepartie d'équilibrage des pouvoirs forts (4–5 points) ou des synergies puissantes**, il devient un ressort dramatique et coopératif formidable !
-*   **Fonctionnement concret dans l'Asymétrie V0.5 :**
-    1. Les déplacements normaux des Défenseurs ne sont **jamais** contrariés.
-    2. En revanche, lorsqu'un joueur programme l'activation d'un **pouvoir fort (4 ou 5 pts)** ou d'une **synergie exigeante** sur son **2e mouvement programmé (Déplacement II)**, cette action spéciale requiert une condition spatiale stricte à l'instant précis de sa résolution (ex. *présence effective d'une Machine sur la case d'arrivée*, *présence d'un allié d'un autre Peuple pour porter la synergie*, ou *clairière non rasée*).
-    3. **Verdict « Colt Express » :** Si un coéquipier a déjà renvoyé la Machine au Chantier, si la Machine a ciblé une autre clairière que celle anticipée, ou si l'allié attendu a dû bifurquer, **le 2e mouvement/pouvoir programmé est contrarié et tombe dans le vide** (le pion reste sur sa case de l'Étape I ou perd l'effet de son pouvoir). Plus un pouvoir est puissant, plus il exige une coordination sans faille autour de la table !
+*   **Origine :** Dans *Colt Express*, la programmation à l'avance fait qu'une action spéciale peut « tomber dans le vide » si la situation a changé au moment de sa résolution.
+*   **Fonctionnement concret sur le socle V0.5 :**
+    1. Les déplacements ordinaires des Défenseurs ne sont **jamais** contrariés.
+    2. En revanche, lorsqu'un joueur programme l'activation d'un **pouvoir fort (4 ou 5 pts)** ou d'une **synergie exigeante** sur son **2e mouvement programmé (Déplacement II)**, cette action spéciale requiert une condition spatiale stricte à l'instant précis de sa résolution (ex. *présence effective d'une Machine sur la zone*, *présence d'un allié d'un autre Peuple sur la zone*, ou *clairière non rasée*).
+    3. **Verdict « Colt Express » :** Si la condition n'est pas remplie (la Machine a bifurqué à cause d'un gobelet précédent ou l'allié attendu n'est pas là), **le 2e mouvement/pouvoir programmé est contrarié et tombe dans le vide** (le pion reste sur sa case de l'Étape I ou perd l'effet de son pouvoir).
 
-### 3.2. Le « Barrage d'Entrée Exclusif » (Déporté en Secteur D)
-*   Puisqu'en V0.5 les Machines entrent toujours librement sur leur case cible dans les règles de base, la capacité d'**interdire l'entrée d'une case aux Machines** (ou de les forcer à se dévier / rester au Chantier) devient un **Avantage exclusif de Secteur D**, incarné au premier chef par les **Mammifères (4 pts — *Barrage / Écorce Durable & Force du Réveil*)**.
+### 3.2. Le « Barrage d'Entrée Exclusif » (Secteur D — Mammifères)
+*   Puisqu'en V0.5 les Machines entrent toujours librement sur leur zone cible, la capacité d'**interdire l'entrée d'une zone aux Machines** (ou d'y poser une *Écorce durable* protégeant les arbres même après le départ du pion) devient le privilège exclusif des **Mammifères (4 pts)**.
 
-### 3.3. Le « Déplacement Réactif après les Machines » (Déporté en Secteur B)
-*   Avec le Curseur 1 réglé sur le **Choix B (Option 2C Linéaire)**, tous les Défenseurs jouent leurs deux déplacements *avant* que les gobelets 2D6 ne soient révélés.
-*   Dès lors, le pouvoir des **Reptiles (Secteur B — 3 pts : *L'Embuscade à Sang Froid*)** consistant à **garder son 2e déplacement en réserve pour le jouer en réaction APRÈS le déplacement d'une Machine** (juste avant qu'elle ne coupe) devient une exception temporelle unique, limpide et décisive !
+### 3.3. L'Expulsion vers le Chantier & l'Enrayage sur Place (Secteur D — Reptiles, Mammifères, Insectes)
+*   Puisque dans la variante recommandée (**Curseur 3A**), une Machine contrée par 1 Défenseur **reste sur place** et continue de menacer le voisinage au tour suivant, la capacité de **renvoyer physiquement une Machine au Chantier (Réserve)** ou de **l'enrayer durablement sur place** devient un levier stratégique de premier plan (incarné par l'*Étreinte* des Reptiles, la *Force du Réveil* des Mammifères et la *Corrosion* des Insectes).
+
+### 3.4. Le « Déplacement Réactif post-Gobelet » (Secteur B — Reptiles)
+*   Puisque dans la variante recommandée (**Curseur 1B Linéaire**), tous les Défenseurs terminent leurs Déplacements I et II *avant* qu'on ne soulève le moindre gobelet 2D6, le pouvoir des **Reptiles (Secteur B — 3 pts : *L'Embuscade à Sang Froid*)** de **retenir son Déplacement II pour l'exécuter en réaction APRÈS le déplacement d'une Machine** (juste avant son verdict de coupe) offre un filet de sécurité unique autour de la table.
 
 ---
 
-## 4. LES 4 SECTEURS DU JEU EN V0.5 (9 POINTS CHACUN)
+## 4. LES 4 SECTEURS DU JEU SUR LA VARIANTE RECOMMANDÉE V0.5 (9 POINTS CHACUN)
 
-Les 4 secteurs du modèle mathématique s'articulent directement sur les 4 compartiments du moteur V0.5 :
-*   **Secteur A — Le Méchant & les Pistes 2D6 (9 pts) :** Piste Tactique (cases 2 à 12), Piste Machine (1–2–3–0–4–5), dés 2D6 sous gobelets, mémoire par renforcement, Versant du Rêve et Esprits.
-*   **Secteur B — La Programmation & le Timing (9 pts) :** Ordre du tour, pose alternée des déplacements, dérogation au timing linéaire du Curseur 1 (action réactive post-gobelet), communication et pactes d'alliance, gestion du risque de *2e mouvement programmé contrarié*.
-*   **Secteur C — Les Défenseurs sur le Plateau (9 pts) :** Mobilité sur le Plateau Double Face (vol, saut, transport d'allié), réserve de ressources forestières (Graines de Vie / Sève), différenciation ou démultiplication des pions.
-*   **Secteur D — La Résolution & l'Interaction Machines (9 pts) :** Modification des Curseurs 2 et 3 (abaissement du seuil de parade, renvoi direct au Chantier), **Barrage d'entrée exclusif**, protection durable d'arbres (Écorce), corrosion des Machines.
+Les 4 secteurs du modèle mathématique s'articulent directement sur les 4 compartiments de la Variante Recommandée V0.5 :
+*   **Secteur A — Le Méchant & les Pistes 2D6 (9 pts) :** Piste Tactique (cases 2 à 12 à 3 Tactiques), Piste Machine (`1–2–3–0–4–5`), dés 2D6 sous gobelets révélés un par un, apprentissage immédiat après chaque gobelet, Versant du Rêve (cases 8–12) et Esprits.
+*   **Secteur B — La Programmation & le Timing Linéaire 1B (9 pts) :** Ordre du tour, programmation publique des Déplacements I et II, dérogation à la séquence linéaire 1B (action réactive post-gobelet des Reptiles), communication et pactes d'alliance, gestion du risque de *2e mouvement programmé contrarié*.
+*   **Secteur C — Les Défenseurs sur le Plateau Double Face (9 pts) :** Mobilité sur les 9 ou 13 zones du Plateau Double Face (vol d'un bout à l'autre, saut, transport d'allié), réserve de ressources forestières (Graines de Vie / Sève), démultiplication de présence (alors que chaque joueur n'a qu'1 pion Défenseur dans le socle).
+*   **Secteur D — La Parade (Curseurs 2A/3A) & l'Interaction Machines (9 pts) :** Renvoi d'une Machine parée au Chantier (dérogeant au maintien sur place du Curseur 3A), **Barrage d'entrée exclusif**, protection durable d'arbres sans pion (Écorce), corrosion et immobilisation des Machines restées en forêt.
 
 ---
 
@@ -132,62 +121,62 @@ Chaque Peuple cumule **exactement 6 points** sur 2 ou 3 secteurs. Chaque Secteur
 ---
 
 ## 6. FOCUS MAJEUR : LE RÊVE, MÉCANIQUE SPÉCIFIQUE PARTAGÉE
-*(Validée pour Entités Magiques à 4 pts vs Humains Chamanes à 3 pts sur le socle V0.5)*
+*(Validée pour Entités Magiques à 4 pts vs Humains Chamanes à 3 pts sur la Variante Recommandée V0.5)*
 
 La mécanique du Rêve s'active dès qu'au moins l'un de ces deux Peuples est présent autour de la table.
 
 ### 6.1. Le Socle Matériel Commun
 - **3 tuiles Esprit** physiques.
 - La moitié droite de la Piste Tactique (cases 8 à 12) est déclarée **Versant du Rêve**.
-- **Effet sur le socle V0.5 :** Lors de la révélation d'un gobelet 2D6, si la somme tombe sur une case occupée par un Esprit, **l'activation de la Machine est immédiatement annulée** (elle s'égare dans le Rêve : ni déplacement, ni coupe). En revanche, si une Machine parvient à couper un arbre durant la manche, l'Esprit le plus avancé recule d'une case vers 12 (*Tir à la corde*).
+- **Effet lors de la révélation séquentielle (Étape 5 Linéaire 1B) :** Lorsqu'on soulève un gobelet 2D6, si la somme `d1 + d2` tombe sur une case occupée par un Esprit, **l'activation de la Machine est immédiatement annulée** (elle s'égare dans le Rêve : ni déplacement, ni coupe). En revanche, chaque fois qu'une Machine parvient à couper un arbre lors de la révélation d'un gobelet, l'Esprit le plus avancé recule d'une case vers 12 (*Tir à la corde*).
 
 ### 6.2. Différenciation Entités (4 pts) vs Humains (3 pts)
 *   **Entités Magiques (Avantage A = 4 pts — L'Incarnation Onirique / *Hanter*) :**
     - Elles contrôlent la **profondeur d'invasion des Esprits** sur la Piste Tactique.
-    - Quand une Entité contre une Machine avec un allié ou qu'un allié médite au Cœur (*Synergie 3.1*), un Esprit entre en case 12 ou avance d'une case vers le centre.
-    - **Victoire par Long Sommeil :** Seules les Entités peuvent pousser un Esprit **jusqu'en case 7**. Si un Esprit tient la case 7 en fin de manche sans qu'aucune coupe n'ait eu lieu, le Méchant s'endort définitivement.
+    - Quand une Entité pare une Machine (ou la pare en présence d'un allié) ou qu'un allié médite au Cœur (*Synergie 3.1*), un Esprit entre en case 12 ou avance d'une case vers le centre.
+    - **Victoire par Long Sommeil :** Seules les Entités peuvent pousser un Esprit **jusqu'en case 7**. Si un Esprit tient la case 7 à la fin d'un tour sans qu'aucune coupe n'ait eu lieu, le Méchant s'endort définitivement.
 *   **Humains / Chamanes (Avantage A = 3 pts — La Transe Chamanique / *Faire Rêver*) :**
     - Ils contrôlent **l'inflexion des dés 2D6 vers le Rêve**.
     - Ils maintiennent jusqu'à 2 Esprits sur les cases 8 à 12 (bouclier d'annulation), mais ne peuvent pas franchir seuls la case 7.
-    - **Tambour de Transe :** 1 fois par manche, lors de la révélation d'un gobelet 2D6, si un Chamane est sur une clairière intacte, il peut **décaler la somme 2D6 de $\pm 1$** (ou **inverser un jet d'Éveil en son miroir de Rêve**, ex. $4 \to 10$) *pour forcer le dé à atterrir sur une case occupée par un Esprit*.
+    - **Tambour de Transe :** 1 fois par tour, au moment où l'on soulève un gobelet 2D6 à l'Étape 5, si le Chamane est sur une clairière intacte, il peut **décaler la somme 2D6 de $\pm 1$** (ou **inverser un jet d'Éveil en son miroir de Rêve**, ex. $4 \to 10$) *pour forcer le dé à atterrir sur une case occupée par un Esprit*.
 
 ### 6.3. Fonctionnement en Synergie 3.2 (Quand les deux jouent ensemble)
 - **Plafond anti-emballement :** Jamais plus de 3 tuiles Esprit en jeu, et 1 seule case d'avancée maximum par étape.
-- **Complémentarité qualitative :** L'Entité déploie et fait monter les Esprits sur les cases centrales (9, 8, 7) ; le Chamane Humain oriente les gobelets 2D6 lors de leur révélation pour qu'ils tombent pile sur les Esprits de l'Entité.
+- **Complémentarité qualitative :** L'Entité déploie et fait monter les Esprits sur les cases centrales (9, 8, 7) ; le Chamane Humain oriente les gobelets 2D6 lors de leur révélation séquentielle pour qu'ils tombent pile sur les Esprits de l'Entité.
 
 ---
 
-## 7. ANTHOLOGIE DES IDÉES & PISTES THÉMATIQUES (TRANSPOSÉES SUR V0.5)
+## 7. ANTHOLOGIE DES IDÉES & PISTES THÉMATIQUES (CALÉES SUR LA VARIANTE RECOMMANDÉE V0.5)
 
-Ce réservoir d'idées sert de matière première pour affiner chaque case de la matrice sur le socle V0.5 :
+Ce réservoir d'idées sert de matière première pour affiner chaque case de la matrice sur la base `Curseur 1B · 2A · 3A` :
 
 *   **Inspirations culturelles :** Davi Kopenawa (*La Chute du ciel*, chamanisme yanomami : les Blancs ne rêvent que d'eux-mêmes, la forêt les fait rêver d'autre chose) ; le folklore brésilien (*Curupira* aux pieds inversés qui égare les bûcherons).
 *   **Oiseaux (« Le Regard » — 5-1) :** Voler d'un bout à l'autre du Plateau Double Face, transporter un allié (la Harpie porte un Défenseur allié), semer/replanter des Graines de Vie / Sève (l'Ara), Présage sur un gobelet (avec contrepartie de *2e mouvement contrarié* si la cible de livraison ou de semis est perturbée).
-*   **Mammifères (« La Force » — 4-1-1) :** Seul peuple capable d'ériger un **Barrage d'entrée** ou une **Écorce durable** (le Tapir), bond offensif (le Jaguar), force du Réveil qui renvoie les engins au Chantier (avec risque de *2e mouvement programmé contrarié façon Colt Express* si la Machine visée n'est plus sur la case au moment de l'impact).
-*   **Reptiles (« L'Embuscade » — 3-3) :** Programmation réactive unique sur le socle V0.5 Option 2C (jouer son 2e déplacement **après** la révélation d'un gobelet Machine), Étreinte du constricteur qui renvoie la Machine au Chantier (abaisse le Curseur 2 ou active le Curseur 3B).
-*   **Insectes (« L'Essaim » — 2-2-2) :** Greffer son déplacement sur celui d'un allié sans dépenser d'ordre, Infiltration, Corrosion silencieuse des moteurs (abaisse le seuil de parade de 2 Peuples à 1 seul Défenseur ou immobilise une Machine au tour suivant).
-*   **Humains (« La Parole » — 3-2-1) :** Transe Chamanique sur les gobelets 2D6, rompre le silence de la programmation (Parole & Pacte), Sentier Guide.
+*   **Mammifères (« La Force » — 4-1-1) :** Seul peuple capable d'ériger un **Barrage d'entrée** ou une **Écorce durable** (le Tapir), bond offensif (le Jaguar), force du Réveil qui expulse les engins au **Chantier** au lieu de les laisser sur place (avec risque de *2e mouvement programmé contrarié façon Colt Express* si la Machine visée n'est plus sur la zone au moment de l'impact).
+*   **Reptiles (« L'Embuscade » — 3-3) :** Programmation réactive unique dérogeant au **Curseur 1B Linéaire** (jouer son 2e déplacement **après** la révélation d'un gobelet Machine), et *Étreinte du constricteur* en Secteur D dérogeant au **Curseur 3A** (renvoie la Machine parée directement au **Chantier** au lieu de la laisser sur place !).
+*   **Insectes (« L'Essaim » — 2-2-2) :** Greffer son déplacement sur celui d'un allié sans dépenser d'ordre (Essaim en B), *Infiltration / Démultiplication* en C (permettant de couvrir une 2e zone alors que le socle V0.5 ne donne qu'1 Défenseur par joueur), et *Corrosion silencieuse* en D (sabote sur place une Machine laissée en forêt par le Curseur 3A pour l'empêcher de bouger au tour suivant ou accentuer son recul vers l'Écart 5).
+*   **Humains (« La Parole » — 3-2-1) :** Transe Chamanique sur les gobelets 2D6 lors de leur révélation un par un, rompre le silence de la programmation (Parole & Pacte), Sentier Guide.
 
 ---
 
-## 8. FEUILLE DE ROUTE DE LA SESSION DE TRAVAIL CASE PAR CASE (SUR SOCLE V0.5)
+## 8. FEUILLE DE ROUTE DE LA SESSION DE TRAVAIL CASE PAR CASE (SUR SOCLE V0.5 RECOMMANDÉ)
 
-Voici l'ordre structuré pour affiner chaque règle et la tester au cas par cas sur le socle V0.5 :
+Voici l'ordre structuré pour affiner chaque règle et la tester au cas par cas sur la Variante Recommandée V0.5 (`Curseur 1B · 2A · 3A`) :
 
 1.  **Bloc 1 — Le Secteur A (Le Méchant & les Pistes — 9 pts) :**
-    - Finaliser la rédaction exacte du *Rêve des Entités* (A = 4 pts) et du *Rêve des Humains* (A = 3 pts) lors de la révélation des gobelets 2D6 en V0.5.
-    - Définir le bonus *Présage* des Oiseaux (A = 1 pt) et le *Rugissement* des Mammifères (A = 1 pt).
+    - Finaliser la rédaction exacte du *Rêve des Entités* (A = 4 pts) et du *Rêve des Humains* (A = 3 pts) lors de la révélation séquentielle gobelet par gobelet (Étape 5 Linéaire).
+    - Définir le bonus *Présage* des Oiseaux (A = 1 pt) et le *Rugissement* des Mammifères (A = 1 pt) sur la piste `1–2–3–0–4–5` et les 3 Tactiques.
 2.  **Bloc 2 — Le Secteur C (Les Défenseurs sur le Plateau Double Face — 9 pts) :**
     - Définir la Mécanique Spécifique des Oiseaux : *Graines de Vie / Sève & Vol* (C = 5 pts) et sa contrepartie de prudence (*2e mouvement programmé contrarié*).
-    - Définir les *Infiltrations d'Essaim* des Insectes (C = 2 pts).
+    - Définir les *Infiltrations d'Essaim* des Insectes (C = 2 pts) dans un socle à 1 Défenseur par joueur.
     - Préciser les passerelles de 1 pt (*Bond du Jaguar* pour Mammifères, *Sentier Guide* pour Humains).
-3.  **Bloc 3 — Le Secteur B (La Programmation & le Timing — 9 pts) :**
-    - Définir *L'Embuscade Réactive* des Reptiles (B = 3 pts) qui déroge à la séquence linéaire 2C du Curseur 1.
+3.  **Bloc 3 — Le Secteur B (La Programmation & le Timing Linéaire 1B — 9 pts) :**
+    - Définir *L'Embuscade Réactive* des Reptiles (B = 3 pts) qui déroge à la séquence linéaire 1B en intervenant après la révélation d'un gobelet.
     - Définir *La Parole / Pacte d'Alliance* des Humains (B = 2 pts).
     - Définir *La Greffe d'Essaim* des Insectes (B = 2 pts) et le *Pas Spectral* des Entités (B = 2 pts).
-4.  **Bloc 4 — Le Secteur D (La Résolution & les Curseurs 2/3 — 9 pts) :**
+4.  **Bloc 4 — Le Secteur D (La Parade 2A/3A & l'Interaction Machines — 9 pts) :**
     - Définir la Mécanique Spécifique des Mammifères : *Barrage d'Entrée Exclusif / Écorce Durable & Force du Réveil* (D = 4 pts) avec sa contrepartie *Colt Express*.
-    - Définir *L'Étreinte / Renvoi Chantier* des Reptiles (D = 3 pts).
-    - Définir *La Corrosion Silencieuse* des Insectes (D = 2 pts).
+    - Définir *L'Étreinte / Renvoi au Chantier* des Reptiles (D = 3 pts) dérogeant au maintien sur place du Curseur 3A.
+    - Définir *La Corrosion Silencieuse* des Insectes (D = 2 pts) sur les Machines restées en forêt.
 5.  **Bloc 5 — Revue de Synthèse des Synergies 3.1 & 3.2 et du Contrepoids « Colt Express » :**
-    - Validation des 3 duos complets à 2 joueurs (Oiseaux+Insectes, Mammifères+Humains, Reptiles+Entités) et de l'expérience à 3, 4 et 5 joueurs sur le socle V0.5.
+    - Validation des 3 duos complets à 2 joueurs (Oiseaux+Insectes, Mammifères+Humains, Reptiles+Entités) et de l'expérience à 3, 4 et 5 joueurs sur la Variante Recommandée V0.5.

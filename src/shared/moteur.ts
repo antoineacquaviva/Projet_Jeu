@@ -3154,8 +3154,11 @@ export function calculerPourcentageForetSauvee(etat: EtatJeuV01): number {
   return Math.round((restant / etat.foretsInitialesTotales) * 1000) / 10;
 }
 
-// Génère le livret de règles physiques dynamique et exhaustif adapté à la variante active
-export function genererLivretPhysiqueVariante(variante: VariantV01): {
+// Génère le livret de règles physiques dynamique et exhaustif adapté à la variante active (3 à 6 joueurs)
+export function genererLivretPhysiqueVariante(
+  variante: VariantV01,
+  configTableOptionnelle?: 3 | 4 | 5 | 6
+): {
   section: string;
   materielConcerne: string;
   texteRegle: string;
@@ -3164,139 +3167,147 @@ export function genererLivretPhysiqueVariante(variante: VariantV01): {
   const estLineaire2C =
     variante.optionResolutionV05 === '2C_lineaire_1_temps' ||
     variante.modeResolution === 'lineaire_2c_fin';
-  const nbSecteursFixes = variante.nbJoueurs <= 4 ? 4 : 6;
-  const nbZonesTotal = 1 + nbSecteursFixes * 2;
-  const totalArbresDepart =
+  const tableCible = configTableOptionnelle ?? variante.nbJoueurs ?? 4;
+  const nbSecteursFixes = tableCible <= 4 ? 4 : 6;
+  const nbZonesTable = 1 + nbSecteursFixes * 2;
+  const arbresTable =
     variante.foretsCoeur +
     nbSecteursFixes * 2 * variante.foretsParCaseSecteur;
+  const machinesEnJeuTable = Math.min(6, Math.max(3, tableCible));
   const est3Tactiques =
     variante.paletteTactiques === '3_tactiques_sans_represailles';
 
   if (estV05) {
     return [
       {
-        section: '1. But du Jeu & Conditions de Fin de Partie',
-        materielConcerne: `${totalArbresDepart} Pions Forêt en bois verts · Marqueur de Compte-Tours (1 à ${variante.nbTours}).`,
+        section: '1. But du Jeu & Conditions de Fin de Partie (3 à 6 Joueurs)',
+        materielConcerne: `Plateau Double-Face (Recto 38 Forêts / Verso 54 Forêts) · Marqueur de Compte-Tours (1 à ${variante.nbTours}).`,
         texteRegle: [
-          `• Coopération intégrale : Les ${variante.nbJoueurs} joueurs incarnent les Peuples Défenseurs de la Forêt et jouent ensemble contre les 6 Machines d’abattage du Méchant.`,
-          `• Durée : Une partie se joue exactement en ${variante.nbTours} tours complets.`,
-          `• Décompte final : À la fin du Tour ${variante.nbTours}, on compte le nombre total de pions Forêt encore debout sur l’ensemble des ${nbZonesTotal} zones du plateau (sur les ${totalArbresDepart} arbres initiaux). Le score de l’équipe est le pourcentage de Forêt préservée.`,
+          `• Coopération intégrale pour 3 à 6 joueurs : Les 3 à 6 joueurs incarnent les Peuples Défenseurs de la Forêt et luttent ensemble contre les 6 Machines d’abattage de la Tête du Méchant.`,
+          `• Durée de la partie : La partie se joue rigoureusement en ${variante.nbTours} tours complets, quel que soit le nombre de joueurs.`,
+          `• Décompte final & Victoire : À la fin du Tour ${variante.nbTours}, l’équipe compte le nombre total de pions Forêt en bois encore debout sur l’ensemble du plateau :`,
+          `  — À 3 ou 4 joueurs (Plateau Recto, 9 zones) : pourcentage d’arbres sauvés sur les 38 arbres de départ.`,
+          `  — À 5 ou 6 joueurs (Plateau Verso, 13 zones) : pourcentage d’arbres sauvés sur les 54 arbres de départ.`,
+          `  — Objectif d’excellence : Préserver au moins 50 % de la canopée pour sauver la Forêt Ancestrale (au-delà de 70 %, victoire éclatante des Peuples !). Si le Cœur de la Forêt est complètement rasé (0 arbre), la défaite est immédiate.`,
         ].join('\n'),
       },
       {
-        section: '2. Architecture du Plateau Central Fixe (Double Face V0.5)',
-        materielConcerne: `1 Grand Plateau Central Double Face : Recto 3–4 Joueurs (9 zones) / Verso 5–6 Joueurs (13 zones).`,
+        section: '2. Architecture du Plateau Central Fixe (Double Face Recto 3–4J / Verso 5–6J)',
+        materielConcerne: `1 Grand Plateau Central Fixe Double Face : Recto (3–4 Joueurs, 9 zones) / Verso (5–6 Joueurs, 13 zones).`,
         texteRegle: [
-          `• Face utilisée à ${variante.nbJoueurs} joueurs : Face ${nbSecteursFixes === 4 ? 'Recto « 3–4 Joueurs » à 9 zones (1 Cœur + 4 Clairières + 4 Lisières)' : 'Verso « 5–6 Joueurs » à 13 zones (1 Cœur + 6 Clairières + 6 Lisières)'}.`,
-          `• Topologie et connexions (adjacences) :`,
-          `  1) Le Cœur de la Forêt (centre, distance 0) est relié aux ${nbSecteursFixes} Clairières Intérieures.`,
-          `  2) Chaque Clairière Intérieure (anneau médian, distance 1) est reliée à 5 zones : le Cœur, les 2 Clairières latérales voisines, et les 2 Lisières Extérieures encadrantes (diagonales d’entraide).`,
-          `  3) Chaque Lisière Extérieure (anneau périphérique, distance 2) est reliée à 4 zones : les 2 Clairières Intérieures qu’elle surplombe et les 2 Lisières latérales voisines.`,
-          `• Règle d’or V0.5 : Aucune zone n’a de limite de capacité. Autant de Défenseurs et de Machines que souhaité peuvent occuper la même zone.`,
+          `• Choix de la face selon la table :`,
+          `  — À 3 et 4 Joueurs : Posez le plateau sur sa face RECTO « 3–4 Joueurs » comprenant 9 zones (1 Cœur Central + 4 Clairières Intérieures + 4 Lisières Extérieures).`,
+          `  — À 5 et 6 Joueurs : Retournez le plateau sur sa face VERSO « 5–6 Joueurs » comprenant 13 zones (1 Cœur Central + 6 Clairières Intérieures + 6 Lisières Extérieures).`,
+          `• Topologie et adjacences :`,
+          `  1) Cœur de la Forêt (distance 0) : situé au centre exact, il est relié à toutes les Clairières Intérieures (4 au Recto, 6 au Verso).`,
+          `  2) Clairières Intérieures (distance 1) : chaque clairière est reliée à 5 zones — le Cœur, ses 2 clairières latérales voisines, et 2 Lisières Extérieures (diagonales d’entraide).`,
+          `  3) Lisières Extérieures (distance 2, orée de la forêt) : chaque lisière surplombe 2 Clairières Intérieures et touche ses 2 lisières voisines.`,
+          `• Liberté totale de mouvement (Zéro Mouvement Contrarié) : Aucune zone n’a de limite de capacité. Plusieurs Défenseurs et plusieurs Machines peuvent occuper simultanément la même clairière sans blocage.`,
         ].join('\n'),
       },
       {
-        section: '3. Mise en Place Complète sur la Table',
-        materielConcerne: `${totalArbresDepart} Pions Forêt, ${variante.nbJoueurs * variante.defenseursParJoueur} Pions Défenseurs (${variante.defenseursParJoueur}/joueur), 6 Figurines Machines (M0 à M5), Plateau Double Piste, ${variante.nbJoueurs} Gobelets opaques + ${variante.nbJoueurs} paires de dés 2D6.`,
+        section: '3. Mise en Place Complète & Échelle de Table (3, 4, 5 ou 6 Joueurs)',
+        materielConcerne: `54 Pions Forêt en bois, 6 Pions Défenseurs (1 par couleur de Peuple), 6 Figurines Machines (M0 à M5), Plateau Double Piste, 6 Gobelets opaques + 6 paires de dés 2D6.`,
         texteRegle: [
-          `1) Forêts : Posez ${variante.foretsCoeur} pions Forêt sur le Cœur Central et ${variante.foretsParCaseSecteur} pions Forêt sur chacune des ${nbSecteursFixes} Clairières et des ${nbSecteursFixes} Lisières (total : ${totalArbresDepart} arbres).`,
-          `2) Défenseurs : Chaque joueur choisit sa couleur de Peuple et pose ${variante.defenseursParJoueur === 1 ? 'son pion Défenseur' : `ses ${variante.defenseursParJoueur} pions Défenseurs`} sur sa Clairière Intérieure de départ.`,
-          `3) Figurines Machines : Posez ${variante.machinesInitiales} figurines Machines (M0 à M${variante.machinesInitiales - 1}) réparties sur les Lisières Extérieures. Les ${6 - variante.machinesInitiales} autres Machines (${variante.machinesInitiales < 6 ? `M${variante.machinesInitiales} à M5` : 'aucune'}) attendent hors plateau dans la zone « Chantier / Réserve ».`,
-          `4) Piste Tactique (cases 2 à 12, somme de 2D6) — Disposition initiale :`,
+          `• Tableau d’adaptation de la table selon le nombre de joueurs :`,
+          `  — À 3 JOUEURS : Plateau Recto (9 zones) · 38 Forêts (6 au Cœur, 4×8 sur les 8 zones périphériques) · 3 Défenseurs (1/joueur) · 3 Gobelets 2D6 · 3 Machines en jeu (M0, M1, M2 sur les lisières) · 3 Machines au Chantier (M3, M4, M5).`,
+          `  — À 4 JOUEURS (Standard) : Plateau Recto (9 zones) · 38 Forêts · 4 Défenseurs (1/joueur) · 4 Gobelets 2D6 · 4 Machines en jeu (M0, M1, M2, M3 sur les lisières) · 2 Machines au Chantier (M4, M5).`,
+          `  — À 5 JOUEURS : Plateau Verso (13 zones) · 54 Forêts (6 au Cœur, 4×12 sur les 12 zones périphériques) · 5 Défenseurs (1/joueur) · 5 Gobelets 2D6 · 5 Machines en jeu (M0 à M4 sur les lisières) · 1 Machine au Chantier (M5).`,
+          `  — À 6 JOUEURS : Plateau Verso (13 zones) · 54 Forêts · 6 Défenseurs (1/joueur) · 6 Gobelets 2D6 · 6 Machines en jeu (M0 à M5, toutes sur les lisières) · 0 Machine au Chantier.`,
+          `• Disposition des Pistes de la Tête du Méchant (identique de 3 à 6 joueurs) :`,
+          `  1) Piste Tactique (cases 2 à 12, somme de 2D6) :`,
           est3Tactiques
-            ? `   • 3 Tactiques Épurées : Case 2 [Percée] · Case 3 [Cupidité] · Case 4 [Percée] · Case 5 [Opportunisme] · Case 6 [Cupidité] · Case 7 [Opportunisme] · Case 8 [Cupidité] · Case 9 [Percée] · Case 10 [Opportunisme] · Case 11 [Cupidité] · Case 12 [Percée].`
-            : `   • 4 Tactiques avec Acharnement : Case 2 [Percée] · Case 3 [Acharnement] · Case 4 [Percée] · Case 5 [Opportunisme] · Case 6 [Cupidité] · Case 7 [Opportunisme] · Case 8 [Cupidité] · Case 9 [Acharnement] · Case 10 [Percée] · Case 11 [Cupidité] · Case 12 [Acharnement].`,
-          `5) Piste Machine (6 cases ordonnées de gauche à droite par probabilité décroissante d’écart |d1 - d2|) :`,
-          `   • Case Écart 1 (10/36) : M1 · Case Écart 2 (8/36) : M2 · Case Écart 3 (6/36) : M3 · Case Écart 0 (doubles, 6/36) : M0 · Case Écart 4 (4/36) : M4 · Case Écart 5 (2/36) : M5.`,
+            ? `     • Case 2 [Percée] · Case 3 [Cupidité] · Case 4 [Percée] · Case 5 [Opportunisme] · Case 6 [Cupidité] · Case 7 [Opportunisme] · Case 8 [Cupidité] · Case 9 [Percée] · Case 10 [Opportunisme] · Case 11 [Cupidité] · Case 12 [Percée].`
+            : `     • Case 2 [Percée] · Case 3 [Acharnement] · Case 4 [Percée] · Case 5 [Opportunisme] · Case 6 [Cupidité] · Case 7 [Opportunisme] · Case 8 [Cupidité] · Case 9 [Acharnement] · Case 10 [Percée] · Case 11 [Cupidité] · Case 12 [Acharnement].`,
+          `  2) Piste Machine (6 cases 1–2–3–0–4–5 classées par probabilité d’écart décroissante) :`,
+          `     • Case Écart 1 (10/36) : M1 · Case Écart 2 (8/36) : M2 · Case Écart 3 (6/36) : M3 · Case Écart 0 (doubles, 6/36) : M0 · Case Écart 4 (4/36) : M4 · Case Écart 5 (2/36) : M5.`,
         ].join('\n'),
       },
       {
-        section: '4. La Tête du Méchant & l’Observation Secrète des Gobelets 2D6',
-        materielConcerne: `${variante.nbJoueurs} Gobelets opaques avec 2D6 (1 par joueur) + Plateau Double Piste public.`,
+        section: '4. La Tête du Méchant & l’Observation Secrète sous les Gobelets 2D6',
+        materielConcerne: `1 Gobelet opaque + 1 paire de dés 2D6 par joueur présent (3, 4, 5 ou 6 gobelets) + Plateau Double Piste public.`,
         texteRegle: [
-          `• Tirage secret simultané (Étape 1 du tour) : Au début de chaque tour, les ${variante.nbJoueurs} joueurs secouent simultanément leurs 2 dés sous leur gobelet opaque, puis soulèvent discrètement leur gobelet pour regarder leur tirage en secret.`,
-          `• Lecture d’un gobelet 2D6 : Chaque paire de dés [d1, d2] définit exactement 1 activation de Machine pour ce tour :`,
-          `  — La SOMME (d1 + d2, de 2 à 12) désigne la case de la Piste Tactique (la tactique que suivra la Machine).`,
-          `  — L’ÉCART (|d1 - d2|, de 0 à 5) désigne la case de la Piste Machine (la figurine Machine qui obéira).`,
-          `• Couplage mathématique Somme / Écart : Comme la Somme et l’Écart proviennent des mêmes 2 dés, ils ont toujours la même parité (ex. un Écart 1, 3 ou 5 ne peut produire qu’une Somme impaire 3, 5, 7, 9, 11 ; un Écart 0, 2 ou 4 ne peut produire qu’une Somme paire 2, 4, 6, 8, 10, 12 ; l’Écart 5 ne sort qu’avec [1,6] donc toujours avec la Somme 7).`,
-          `• Silence absolu : Il est interdit de dire ou mimer ses chiffres. Toute la communication passe par le choix public des déplacements sur le plateau.`,
+          `• Tirage secret simultané (Étape 1 du tour) : Au début de chaque tour, tous les joueurs secouent simultanément leurs 2 dés sous leur gobelet opaque, puis soulèvent discrètement leur gobelet pour regarder leur tirage en secret.`,
+          `• Décodage d’un gobelet 2D6 : Chaque paire de dés [d1, d2] définit exactement 1 ordre de Machine pour ce tour :`,
+          `  — La SOMME (d1 + d2, de 2 à 12) désigne la case de la Piste Tactique (la tactique d’abattage que suivra la Machine).`,
+          `  — L’ÉCART (|d1 - d2|, de 0 à 5) désigne la case de la Piste Machine (la figurine Machine M0 à M5 qui obéira).`,
+          `• Couplage statistique fondamental : Comme la Somme et l’Écart découlent des mêmes deux dés, ils ont obligatoirement la même parité (un Écart impair 1, 3 ou 5 engendre toujours une Somme impaire 3, 5, 7, 9, 11 ; un Écart pair 0, 2 ou 4 engendre toujours une Somme paire 2, 4, 6, 8, 10, 12).`,
+          `• Règle de Communication : Silence strict sur les chiffres ! Il est interdit de révéler sa Somme, son Écart ou le numéro d’une Machine. Toute la coordination coopérative passe par les déplacements visibles sur le plateau.`,
         ].join('\n'),
       },
       {
         section: '5. Programmation Publique des Déplacements (Pur Placement V0.5)',
-        materielConcerne: `Pions Défenseurs en bois et Marqueurs de programmation I & II (aucun paquet de cartes Action).`,
+        materielConcerne: `Pions Défenseurs en bois (1 par joueur) et marqueurs de programmation I & II (zéro carte Action).`,
         texteRegle: [
-          `• Action unique (« Pur Placement ») : En V0.5, les cartes Protéger/Saboter/Replanter n’existent plus. Un pion Défenseur ne peut faire qu’une seule chose à chaque étape : se déplacer vers 1 zone directement reliée (adjacente) OU rester sur place.`,
-          `• Programmation publique en 2 tours de table horaires :`,
-          variante.modeProgrammation === 'alternee_1_par_1'
-            ? `  1) 1er tour de table (Déplacement I) : Du Joueur 1 au Joueur ${variante.nbJoueurs}, chacun annonce publiquement à son tour la destination du Déplacement I de ${variante.defenseursParJoueur === 1 ? 'son Défenseur' : `ses ${variante.defenseursParJoueur} Défenseurs`}.\n  2) 2e tour de table (Déplacement II) : Du Joueur 1 au Joueur ${variante.nbJoueurs}, chacun annonce publiquement la destination du Déplacement II (à partir de la zone atteinte en I).`
-            : `  Chacun à son tour dans le sens horaire annonce publiquement les Déplacements I et II de ses Défenseurs.`,
-          `• Zéro Mouvement Contrarié : Aucun déplacement programmé vers une zone adjacente ne peut être bloqué ou annulé. En voyant où les joueurs précédents dirigent leurs pions, les joueurs suivants déduisent quelles zones sont menacées par leurs gobelets !`,
+          `• Action unique (« Pur Placement ») : En V0.5, les cartes d’action sont supprimées. Un Défenseur ne peut faire qu’une chose à chaque temps : se déplacer vers 1 zone directement reliée (adjacente) OU rester sur place.`,
+          `• Programmation publique en 2 tours de table :`,
+          `  1) Tour de table I (Déplacement I) : Du Joueur 1 au dernier joueur dans le sens horaire, chacun annonce publiquement la zone où se déplace son Défenseur pour le Déplacement I (ou déclare rester sur place).`,
+          `  2) Tour de table II (Déplacement II) : Du Joueur 1 au dernier joueur, chacun annonce publiquement la zone de son Déplacement II (à partir de la case atteinte en I).`,
+          `• Déduction coopérative émergente : En observant où les premiers joueurs envoient leurs Défenseurs, les joueurs suivants déduisent quelles zones et quelles lisières sont menacées d’après leurs gobelets secrets !`,
         ].join('\n'),
       },
       {
-        section: '6. Séquence de Résolution du Tour (Curseur 1)',
+        section: '6. Séquence de Résolution du Tour (Curseur 1 — Séquence Linéaire 2C Recommandée)',
         materielConcerne: `Pions Défenseurs, Gobelets 2D6, Figurines Machines.`,
         texteRegle: estLineaire2C
           ? [
-              `• Curseur 1 — Choix B (Séquence Linéaire en 5 étapes — Variante Recommandée) :`,
-              `  — Étape 1 : Chaque joueur consulte secrètement son gobelet 2D6.`,
-              `  — Étape 2 : Programmation publique des Déplacements I puis II autour de la table.`,
-              `  — Étape 3 : Exécution physique du Déplacement I de tous les Défenseurs.`,
-              `  — Étape 4 : Exécution physique immédiate du Déplacement II de tous les Défenseurs. Les positions des Défenseurs sont désormais finales pour le tour !`,
-              `  — Étape 5 (Révélation séquentielle gobelet par gobelet) : On soulève les gobelets du Joueur 1 au Joueur ${variante.nbJoueurs} UN PAR UN. Pour chaque gobelet, on résout intégralement : (a) le déplacement de la Machine vers sa cible, (b) son verdict immédiat de coupe ou parade, et (c) la permutation d’apprentissage sur les deux pistes, AVANT de soulever le gobelet du joueur suivant !`,
+              `• Séquence Linéaire en 5 étapes fluides (Variante Recommandée V0.5) :`,
+              `  — Étape 1 : Chaque joueur jette et consulte secrètement son gobelet 2D6.`,
+              `  — Étape 2 : Programmation publique des Déplacements I puis II autour de la table (du Joueur 1 au dernier joueur).`,
+              `  — Étape 3 : Exécution physique simultanée du Déplacement I de tous les Défenseurs.`,
+              `  — Étape 4 : Exécution physique simultanée du Déplacement II de tous les Défenseurs. Les positions des Défenseurs sont désormais définitives pour le tour !`,
+              `  — Étape 5 (Révélation gobelet par gobelet) : On soulève les gobelets du Joueur 1 au dernier joueur UN PAR UN. Pour chaque gobelet révélé, on résout immédiatement et dans l’ordre :`,
+              `     (a) La Machine désignée (Écart) bondit vers sa zone cible selon sa Tactique (Somme).`,
+              `     (b) Verdict immédiat de Parade ou de Coupe selon la présence des Défenseurs sur la zone.`,
+              `     (c) Permutation immédiate d’apprentissage sur la Piste Tactique et la Piste Machine, AVANT de soulever le gobelet du joueur suivant !`,
             ].join('\n')
           : [
-              `• Curseur 1 — Choix A (Séquence Entrelacée en 6 étapes) :`,
-              `  — Étapes 1 & 2 : Consultation des gobelets 2D6 et programmation publique.`,
-              `  — Étape 3 : Exécution du Déplacement I des Défenseurs.`,
-              `  — Étape 4 : On soulève tous les gobelets 2D6 et chaque Machine rejoint librement sa zone cible (aucun Barrage d’entrée en V0.5, et pas encore de coupe).`,
-              `  — Étape 5 : Exécution du Déplacement II des Défenseurs pour converger sur les Machines.`,
-              `  — Étape 6 : Verdict de coupe et apprentissage pour chacune des Machines appelées.`,
+              `• Séquence Entrelacée en 6 étapes (Option 2A / 2B) :`,
+              `  — Étapes 1 & 2 : Consultation secrète des gobelets 2D6 et programmation publique des Déplacements I et II.`,
+              `  — Étape 3 : Exécution physique du Déplacement I des Défenseurs.`,
+              `  — Étape 4 : Révélation de tous les gobelets 2D6 : les Machines désignées rejoignent leurs cibles (sans couper).`,
+              `  — Étape 5 : Exécution physique du Déplacement II des Défenseurs pour converger vers les zones menacées.`,
+              `  — Étape 6 : Verdict de coupe et apprentissage pour chaque Machine appelée ce tour.`,
             ].join('\n'),
       },
       {
         section: '7. Ciblage des Machines, Tactiques & Règles de Départage',
-        materielConcerne: `Figurines Machines (M0 à M5) et Piste Tactique (2 à 12).`,
+        materielConcerne: `6 Figurines Machines (M0 à M5) et Piste Tactique (cases 2 à 12).`,
         texteRegle: [
-          `• Zones candidates (Rayon de la Machine) :`,
-          `  — Si la Machine est déjà sur le plateau : elle choisit parmi sa zone actuelle ET les zones directement reliées (adjacentes).`,
-          `  — Si la Machine est au Chantier (Réserve) : elle entre en choisissant parmi toutes les Lisières Extérieures du plateau.`,
-          `  — Priorité aux arbres : La Machine filtre d’abord les zones candidates qui possèdent encore au moins 1 pion Forêt (> 0). (Si aucune zone candidate n’a d’arbre, elle évalue toutes les zones candidates).`,
-          `• Choix selon la Tactique active (lue sur la case Somme d1 + d2 au moment où la Machine agit) :`,
-          `  — CUPIDITÉ (Plus boisée) : Cible la zone candidate portant le PLUS grand nombre de pions Forêt. (Égalité : la plus proche du Cœur).`,
-          `  — PERCÉE (Vers le Cœur) : Cible la zone candidate la plus proche du Cœur Central (Cœur > Clairière Intérieure > Lisière Extérieure). (Égalité : la plus boisée).`,
-          `  — OPPORTUNISME (Moins gardée) : Cible la zone candidate comptant le MOINS de pions Défenseurs présents sur la zone. (Égalité : la zone ayant le voisinage le moins gardé [2 × Défenseurs sur la zone + Défenseurs sur les zones adjacentes], puis la plus boisée).`,
+          `• Rayon d’action de la Machine :`,
+          `  — Si la Machine est déjà sur le plateau : elle choisit sa cible parmi sa zone actuelle ET les zones adjacentes directement reliées.`,
+          `  — Si la Machine est au Chantier (Réserve) : elle entre sur le plateau en choisissant parmi toutes les Lisières Extérieures.`,
+          `  — Filtre des zones boisées : La Machine examine en priorité les zones candidates comportant encore au moins 1 arbre (> 0 Forêt).`,
+          `• Détermination selon la Tactique active (lue sur la case Somme d1 + d2) :`,
+          `  — CUPIDITÉ (Plus boisée) : Vise la zone candidate ayant le PLUS GRAND nombre de pions Forêt. (Égalité : la plus proche du Cœur).`,
+          `  — PERCÉE (Vers le Cœur) : Vise la zone candidate la plus proche du Cœur Central (Cœur > Clairière > Lisière). (Égalité : la plus boisée).`,
+          `  — OPPORTUNISME (Moins gardée) : Vise la zone candidate comptant le MOINS de pions Défenseurs. (Égalité : voisinage le moins gardé, puis la plus boisée).`,
           ...(est3Tactiques
             ? []
             : [
-                `  — ACHARNEMENT (Coupe rase — option 4 tactiques) : Cible la zone boisée (> 0 arbre) ayant le MOINS de pions Forêt restants pour achever une clairière entamée. (Égalité : la plus proche du Cœur).`,
+                `  — ACHARNEMENT (Coupe rase) : Vise la zone boisée candidate ayant le MOINS de pions Forêt restants pour achever une clairière entamée. (Égalité : la plus proche du Cœur).`,
               ]),
-          `• Ultime départage : Si une égalité persiste encore entre deux zones, on retient la zone de plus petit numéro d’identifiant dans le sens horaire (Cœur = 0, puis Clairières Nord/Est/Sud/Ouest, puis Lisières).`,
+          `• Départage ultime : Si une égalité parfaite subsiste, on retient la zone de plus petit identifiant dans le sens horaire (Cœur = 0, puis Clairières, puis Lisières).`,
         ].join('\n'),
       },
       {
         section: '8. Règle Unique de Parade (Curseurs 2 & 3) & Apprentissage Statistique',
         materielConcerne: `Pions Défenseurs, Pions Forêt en bois, Tuiles Tactiques (2–12) et Tuiles Machine (1–2–3–0–4–5).`,
         texteRegle: [
-          `• Zéro Barrage d’Entrée : Une Machine n’est jamais bloquée en chemin ; elle entre toujours sur sa zone cible.`,
-          `• Test unique au moment de la coupe (Curseurs 2 & 3) : Dès que la Machine est sur sa zone cible et veut abattre un arbre, on regarde les Défenseurs présents sur cette zone :`,
+          `• Zéro Barrage d’Entrée : Les Machines ne sont jamais bloquées en chemin ; elles entrent toujours sur leur zone cible.`,
+          `• Test de Parade au moment de la coupe (Curseurs 2 & 3) : Dès qu’une Machine est sur sa cible et s’apprête à couper :`,
           variante.seuilParadeV05 === 'gradue_1_bloque_2_chantier' ||
           variante.effetParadeV05 === 'gradue_1_bloque_2_chantier'
-            ? `  — CAS 1 (Parade Graduée) : S’il y a 1 Défenseur (ou plusieurs du même Peuple), la coupe est ANNULÉE et la Machine reste sur place. S’il y a au moins 2 Défenseurs de Peuples (couleurs) différents, la coupe est ANNULÉE et la Machine est renvoyée au Chantier !`
+            ? `  — Parade Graduée : S’il y a 1 Défenseur sur la zone, la coupe est BLOQUÉE (la Machine reste sur place). S’il y a au moins 2 Défenseurs de Peuples différents, la coupe est BLOQUÉE et la Machine est RENVOYÉE AU CHANTIER !`
             : variante.seuilParadeV05 === '2_peuples' ||
               variante.optionResolutionV05 === '2A_entrelacee_coalition'
-            ? `  — CAS 1 (Parade par Coalition ≥ 2 Peuples) : S’il y a au moins 2 Défenseurs de Peuples (couleurs) différents sur la zone, la coupe est ANNULÉE (aucun arbre retiré) et ${variante.effetParadeV05 === 'renvoyer_chantier' ? 'la Machine est renvoyée au Chantier' : 'la Machine reste sur place'}.`
-            : `  — CAS 1 (Parade réussie — Variante Recommandée : ≥ 1 Défenseur) : S’il y a au moins 1 pion Défenseur sur la zone de la Machine, la coupe est ANNULÉE (aucun arbre n’est retiré) et ${variante.effetParadeV05 === 'renvoyer_chantier' ? 'la Machine est renvoyée au Chantier' : 'la Machine reste sur place sur cette zone'}.`,
-          `  — CAS 2 (Coupe réussie par la Machine) : Si le seuil de Défenseurs n’est pas atteint (et qu’il reste ≥ 1 arbre), la Machine abat 1 pion Forêt en bois (retirez-le du plateau).`,
-          `• Apprentissage Statistique immédiat sur la Double Piste :`,
-          `  — Si la Machine a COUPÉ 1 arbre (Succès du Méchant) :`,
-          `    1) Sur la Piste Tactique (2–12), la tuile de la case Somme appelée s’échange d’un cran VERS LE 7 (pic à 6/36) avec sa voisine (si elle est déjà en 7, elle ne bouge pas).`,
-          `    2) Sur la Piste Machine (1–2–3–0–4–5), la tuile de la case Écart appelée s’échange d’un cran VERS LA GAUCHE (vers la case 1 à 10/36 ; si elle est déjà en 1, elle ne bouge pas).`,
-          `  — Si la Machine a été PARÉE par les Défenseurs (Échec du Méchant) :`,
-          `    1) Sur la Piste Tactique (2–12), la tuile de la case Somme appelée recule d’un cran VERS LE BORD extérieur (vers 2 si Somme ≤ 7, donc la case 7 recule vers 6 ; vers 12 si Somme > 7 ; immobile en 2 ou 12).`,
-          `    2) Sur la Piste Machine (1–2–3–0–4–5), la tuile de la case Écart appelée recule d’un cran VERS LA DROITE (vers la case 5 à 2/36 ; immobile en 5).`,
-          `  (Remarque : en Séquence Linéaire 2C, cet échange sur les pistes a lieu immédiatement après chaque gobelet, ce qui modifie les pistes pour les gobelets suivants du même tour !)`,
+            ? `  — Parade par Coalition (≥ 2 Peuples) : S’il y a au moins 2 Défenseurs de Peuples différents sur la zone, la coupe est ANNULÉE et ${variante.effetParadeV05 === 'renvoyer_chantier' ? 'la Machine est renvoyée au Chantier' : 'la Machine reste sur place'}.`
+            : `  — Parade Standard (Variante Recommandée : ≥ 1 Défenseur) : S’il y a au moins 1 pion Défenseur sur la zone, la coupe est ANNULÉE (aucun arbre n’est retiré) et ${variante.effetParadeV05 === 'renvoyer_chantier' ? 'la Machine est renvoyée au Chantier' : 'la Machine reste sur place'}.`,
+          `  — Coupe Réussie : Si aucun Défenseur n’est présent pour bloquer (et qu’il reste ≥ 1 arbre), la Machine coupe 1 pion Forêt en bois (retirez-le du plateau).`,
+          `• Apprentissage Statistique sur les deux pistes :`,
+          `  — En cas de COUPE (Succès Méchant) : La tuile Tactique appelée glisse d’un cran vers le 7 (centre) ; la tuile Machine appelée glisse d’un cran vers la case 1 (gauche, 10/36).`,
+          `  — En cas de PARADE (Succès Défenseurs) : La tuile Tactique appelée recule d’un cran vers les extrémités (vers 2 ou 12) ; la tuile Machine appelée recule d’un cran vers la case 5 (droite, 2/36).`,
+          `  (Note : en Séquence Linéaire 2C, cet apprentissage a lieu immédiatement après chaque gobelet, dynamisant les gobelets suivants du tour !)`,
         ].join('\n'),
       },
     ];

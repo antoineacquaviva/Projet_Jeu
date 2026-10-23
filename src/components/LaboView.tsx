@@ -212,10 +212,10 @@ export const LaboView: React.FC<LaboViewProps> = ({
               </code>
             </div>
             <h2 className="font-display text-base font-bold text-[#16211B] mt-1.5">
-              Transposition intégrale V0.4 → V0.5 : 6 Peuples × 4 Secteurs (36 pts), Le Rêve partagé & Boîte à outils asymétrique (Effet « Colt Express », Barrage d’entrée, Timing Reptiles)
+              Dossier d’Asymétrie calé sur la Variante Recommandée V0.5 (Curseur 1B Linéaire · 2A 1 Déf. suffit · 3A Sur place · 3 Tactiques) : 6 Peuples × 4 Secteurs (36 pts) & Rêve partagé
             </h2>
             <p className="text-xs text-[#2B3730] mt-0.5">
-              100 % du travail de conception sur l’asymétrie est conservé et ancré sur le Cœur Unifié V0.5 (3 Curseurs sur Plateau Double Face). Prêt à être repris case par case.
+              100 % du travail de conception sur l’asymétrie est ancré sur les règles arrêtées de la Variante Recommandée V0.5 (Plateau Double Face, 1 Défenseur/J). Prêt à être repris case par case.
             </p>
           </div>
 

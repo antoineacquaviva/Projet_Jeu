@@ -44,9 +44,11 @@ export const JeuView: React.FC<JeuViewProps> = ({
     'regle_complete' | 'synthese' | 'options_regles' | 'parametres' | 'variantes'
   >('regle_complete');
 
+  const [configTableApercu, setConfigTableApercu] = useState<3 | 4 | 5 | 6>(4);
+
   const livretCompletVariante = useMemo(
-    () => genererLivretPhysiqueVariante(varianteActive),
-    [varianteActive]
+    () => genererLivretPhysiqueVariante(varianteActive, configTableApercu),
+    [varianteActive, configTableApercu]
   );
   const [afficherModalNouvelleVersion, setAfficherModalNouvelleVersion] =
     useState<boolean>(false);
@@ -518,23 +520,45 @@ export const JeuView: React.FC<JeuViewProps> = ({
       {sectionActive === 'regle_complete' && (
         <div className="bg-white rounded-xl p-6 border border-[#D8DFD5] space-y-5">
           <div className="border-b border-[#D8DFD5] pb-4 flex flex-wrap items-start justify-between gap-4">
-            <div className="space-y-1 max-w-4xl">
+            <div className="space-y-1.5 max-w-4xl">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded bg-[#1E3528] text-white text-xs font-bold uppercase tracking-wider">
-                  📖 Livret de Règle Complète — Version {varianteActive.version || versionActive.id}
+                  📖 Livret de Règle Complète — Version {varianteActive.version || versionActive.id} (3 à 6 Joueurs)
                 </span>
                 {estRecommandeeActive && (
                   <span className="px-2.5 py-0.5 rounded bg-amber-400 text-[#16211B] text-xs font-extrabold">
                     ★ Variante Recommandée (Référence V0.5)
                   </span>
                 )}
+                <span className="px-2.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-semibold">
+                  Plateau Double-Face : Recto 3–4J (9 zones) / Verso 5–6J (13 zones)
+                </span>
               </div>
               <h2 className="font-display text-xl font-bold text-[#16211B]">
                 {varianteActive.nom}
               </h2>
               <p className="text-xs text-[#55645B] leading-relaxed">
-                Règle intégrale et auto-suffisante générée dynamiquement pour la variante sélectionnée ({varianteActive.nbJoueurs} joueurs · {varianteActive.defenseursParJoueur} Défenseur{varianteActive.defenseursParJoueur > 1 ? 's' : ''}/joueur · {varianteActive.machinesInitiales}/6 Machines initiales · {varianteActive.nbTours} tours). Ce même livret est également consultable à tout moment pendant une partie dans l’onglet <strong>Proto → bouton « 📖 Règles »</strong>.
+                Règle intégrale universelle pour <strong>3 à 6 joueurs</strong>. Une variante définit le système de règles (mécanismes de programmation, parade et résolution) ; le matériel et la face du plateau s’adaptent au nombre de joueurs réunis autour de la table. Ce livret complet est également accessible pendant une partie dans l’onglet <strong>Proto → bouton « 📖 Règles »</strong>.
               </p>
+
+              {/* Sélecteur interactif d'aperçu de configuration de table */}
+              <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
+                <span className="font-bold text-[#16211B]">Aperçu matériel & mise en place pour :</span>
+                {([3, 4, 5, 6] as const).map((nbJ) => (
+                  <button
+                    key={nbJ}
+                    type="button"
+                    onClick={() => setConfigTableApercu(nbJ)}
+                    className={`px-3 py-1 rounded-lg font-bold border transition-colors ${
+                      configTableApercu === nbJ
+                        ? 'bg-[#256B45] text-white border-[#256B45] shadow-xs'
+                        : 'bg-[#F4F5F0] text-[#16211B] border-[#D8DFD5] hover:bg-stone-200'
+                    }`}
+                  >
+                    {nbJ} Joueurs {nbJ === 4 ? '(Standard)' : ''} · Face {nbJ <= 4 ? 'Recto (9 zones, 38 forêts)' : 'Verso (13 zones, 54 forêts)'}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 shrink-0">
