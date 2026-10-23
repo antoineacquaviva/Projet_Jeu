@@ -128,7 +128,7 @@ export const DemoView: React.FC<DemoViewProps> = ({
     return {
       ...variante,
       nbJoueurs: nbJoueursDemo,
-      machinesInitiales: Math.min(6, Math.max(3, nbJoueursDemo)),
+      machinesInitiales: nbJoueursDemo === 3 ? 3 : 4,
     };
   }, [variante, nbJoueursDemo]);
 

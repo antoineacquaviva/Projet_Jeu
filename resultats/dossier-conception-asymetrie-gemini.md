@@ -10,11 +10,13 @@
 > 
 > *« Bonjour Gemini. Tu es mon co-auteur et game designer senior pour finaliser le système d'asymétrie de mon jeu de société coopératif "La Forêt qui Rêve".*
 > 
-> *Tu trouveras ci-dessous l'intégralité du contexte du projet, calé sur la **Variante Recommandée de la Version 0.5** (`v05_2c_lineaire_1def_surplace` — Score d'intérêt 97/100) :*
+> *Tu trouveras ci-dessous l'intégralité du contexte du projet, calé sur la **Variante Recommandée de la Version 0.5** (`v05_2c_lineaire_1def_surplace` — Score d'intérêt 97/100), conçue pour être jouée de **3 à 6 joueurs** avec un intérêt constant quelle que soit la taille de la table :*
 > *1. Le cadre méthodologique et le lexique formel que j'ai défini (Spécificité, Mécanique spécifique, Synergies 3.1 & 3.2, Échelle d'Avantages de 1 à 5).*
-> *2. Le socle de règles arrêté de la Variante Recommandée V0.5 sur Plateau Double Face Fixe (Recto 3–4J à 9 zones / Verso 5–6J à 13 zones) :*
-> *   - **Pur Placement libre** : 1 pion Défenseur par joueur (à 4J), 2 déplacements programmés (Déplacement I puis II), zéro carte Action, zéro Mouvement Contrarié et capacité illimitée des zones.*
-> *   - **Curseur 1B (Séquence Linéaire en fin de tour)** : tous les Défenseurs exécutent leurs Déplacements I puis II ; ensuite on révèle les gobelets 2D6 **un par un**, et chaque Machine se déplace vers sa cible, résout immédiatement son verdict de coupe et fait évoluer ses deux pistes avant le gobelet suivant.*
+> *2. Le socle de règles arrêté de la Variante Recommandée V0.5 (3 à 6 joueurs) sur Plateau Double Face Fixe (Recto 3–4J à 9 zones / 38 arbres · Verso 5–6J à 13 zones / 54 arbres) :*
+> *   - **Pur Placement libre (3 à 6J)** : 1 pion Défenseur par joueur, 1 gobelet 2D6 par joueur, 2 déplacements programmés (Déplacement I puis II), zéro carte Action, zéro Mouvement Contrarié et capacité illimitée des zones.*
+> *   - **Réserve du Chantier toujours active (3 à 6J)** : 3 Machines en lisière (et 3 au Chantier) à 3 joueurs ; **4 Machines en lisière (et 2 au Chantier M4, M5) à 4, 5 et 6 joueurs**. Le Chantier n'est jamais vide au départ, garantissant une valeur constante aux pouvoirs d'expulsion au Chantier de 3 à 6 joueurs.*
+> *   - **Bilan positif sans défaite à 0 arbre** : La partie dure toujours 4 tours complets sans condition de « Game Over » prématuré (même si le Cœur perd ses arbres, la partie continue). Plus de la moitié de la forêt survit mathématiquement toujours, et l'équipe évalue sa performance sur une échelle positive d'harmonie forestière.*
+> *   - **Curseur 1B (Séquence Linéaire en fin de tour)** : tous les Défenseurs exécutent leurs Déplacements I puis II ; ensuite on révèle les gobelets 2D6 **un par un** (de 1 à N joueurs), et chaque Machine se déplace vers sa cible, résout immédiatement son verdict de coupe et fait évoluer ses deux pistes avant le gobelet suivant.*
 > *   - **Curseur 2A + 3A (Règle unique de Parade)** : aucun Barrage d'entrée. Au moment où la Machine veut couper, si **au moins 1 Défenseur** occupe sa zone, la coupe est annulée, la Machine **reste sur place** et ses tuiles reculent sur les deux pistes ; sinon elle abat 1 arbre et ses tuiles avancent vers le 7 et vers la gauche (case 1).*
 > *   - **3 Tactiques épurées** sur la piste 2–12 : Cupidité (+ d'arbres), Percée (vers le Cœur) et Opportunisme (zone la moins gardée).*
 > *3. La boîte à outils des mécaniques déportées dans l'Asymétrie V0.5 : le Barrage d'entrée exclusif, le Déplacement réactif après révélation d'un gobelet, le renvoi au Chantier d'une Machine parée (au lieu de rester sur place), et le "2e mouvement programmé contrarié" (inspiré de Colt Express et adapté au coopératif, où le 2e pas ou pouvoir programmé peut tomber dans le vide comme contrepartie d'équilibrage d'un pouvoir fort ou d'une synergie).*
@@ -22,7 +24,7 @@
 > *5. Le fonctionnement arrêté pour la mécanique spécifique partagée du "Rêve" (Entités Magiques à 4 pts vs Humains Chamanes à 3 pts).*
 > *6. L'anthologie de mes idées et inspirations thématiques.*
 > 
-> *Notre objectif de travail : Affiner et formaliser chaque règle et avantage associé aux Peuples, case par case de la matrice, de manière itérative et collaborative sur ce socle V0.5 recommandé.*
+> *Notre objectif de travail : Affiner et formaliser chaque règle et avantage associé aux Peuples, case par case de la matrice, de manière itérative et collaborative sur ce socle V0.5 recommandé (jouable de 3 à 6 joueurs).*
 > 
 > *RÈGLES D'INTERACTION STRICTES :*
 > *- Ne génère PAS une solution globale d'un coup.*
@@ -52,18 +54,18 @@ Ce système d'asymétrie repose sur 3 concepts exclusifs et une échelle de vale
 
 ---
 
-## 2. LE SOCLE ARRÊTÉ : LA VARIANTE RECOMMANDÉE V0.5 (`Curseur 1B · 2A · 3A`)
+## 2. LE SOCLE ARRÊTÉ : LA VARIANTE RECOMMANDÉE V0.5 (`Curseur 1B · 2A · 3A` — 3 à 6 Joueurs)
 
-À l'issue des campagnes comparatives V0.5, la **Variante Recommandée** (`v05_2c_lineaire_1def_surplace`) constitue désormais le socle de référence unique sur lequel se greffent les 6 Peuples. Elle se résume en **5 règles fondamentales** :
+À l'issue des campagnes comparatives V0.5, la **Variante Recommandée** (`v05_2c_lineaire_1def_surplace`) constitue désormais le socle de référence unique pour **3 à 6 joueurs** sur lequel se greffent les 6 Peuples. Elle se résume en **5 règles fondamentales** :
 
-### 2.1. Les 5 Piliers de la Variante Recommandée V0.5
+### 2.1. Les 5 Piliers de la Variante Recommandée V0.5 (Échelle 3 à 6 Joueurs)
 
-| Pilier du Socle V0.5 | Règle retenue dans la Variante Recommandée | Ouverture offerte à l'Asymétrie des 6 Peuples |
+| Pilier du Socle V0.5 | Règle retenue dans la Variante Recommandée (3 à 6 Joueurs) | Ouverture offerte à l'Asymétrie des 6 Peuples |
 | :--- | :--- | :--- |
-| **1. Plateau & Effectifs** | **Plateau Double Face Fixe** (Recto 3–4J à 9 zones : 1 Cœur, 4 Clairières, 4 Lisières avec diagonales d'entraide ; Verso 5–6J à 13 zones). **1 pion Défenseur par joueur** (à 4J), **4 Machines initiales** en Lisière (2 au Chantier), **4 tours**. Capacité illimitée par zone. | • Un joueur seul ne couvre qu'une seule zone à la fois $\to$ valorise le transport d'allié (Oiseaux) et la démultiplication de présence (Insectes). |
+| **1. Plateau, Chantier & Fin de Partie** | **Plateau Double Face Fixe** (Recto 3–4J : 9 zones, 38 arbres · Verso 5–6J : 13 zones, 54 arbres). **1 Défenseur/joueur**, **1 gobelet 2D6/joueur**, **4 tours**.<br>• **Chantier harmonisé (3–6J)** : 3 Machines en lisière (+3 au Chantier) à 3J ; **4 Machines en lisière (+2 au Chantier M4, M5) à 4, 5 et 6J**.<br>• **Zéro défaite à 0 arbre** : pas de Game Over si le Cœur tombe à 0 ; bilan final positif d'harmonie forestière au terme des 4 tours. | • Le Chantier contient toujours au moins 2 Machines en réserve de 3 à 6J $\to$ l'expulsion au Chantier garde la même valeur à 3, 4, 5 ou 6 joueurs.<br>• 1 pion/joueur $\to$ valorise le transport d'allié (Oiseaux) et l'Essaim (Insectes). |
 | **2. Tête du Méchant & 3 Tactiques** | Chacun lance **2D6 secrets** sous son gobelet en début de tour. **Somme (2–12)** = Tactique parmi **3 Tactiques épurées** (*Cupidité* = + d'arbres, *Percée* = vers le Cœur, *Opportunisme* = moins de Défenseurs). **Écart (0–5)** = Machine sur la piste statistique `1 – 2 – 3 – 0 – 4 – 5`. | • Lecture immédiate des probabilités $\to$ laisse toute la place mentale au **Versant du Rêve** (cases 8–12) des Entités et des Chamanes Humains. |
 | **3. Programmation Pur Placement** | **Zéro carte Action, zéro Mouvement Contrarié** dans le socle. Deux tours de table horaires publics : chacun annonce le **Déplacement I** (0 ou 1 zone adjacente), puis le **Déplacement II** (à partir de la zone atteinte en I). | • La trajectoire choisie est le seul signal silencieux.<br>• Le *Mouvement Contrarié* est réservé comme contrepartie des pouvoirs forts. |
-| **4. Curseur 1B — Séquence Linéaire en 5 étapes** | 1) Lecture secrète des 2D6 $\to$ 2) Programmation I puis II $\to$ 3) Exécution du Déplacement I $\to$ 4) Exécution immédiate du Déplacement II $\to$ 5) **Révélation des gobelets 2D6 un par un** : chaque Machine se déplace vers sa cible, résout son verdict et met à jour les pistes **avant** le gobelet suivant. | • Crée un enchaînement dynamique entre les gobelets d'un même tour.<br>• Rend exceptionnel le pouvoir des **Reptiles (Secteur B)** qui jouent leur 2e pas *après* le déplacement d'une Machine ! |
+| **4. Curseur 1B — Séquence Linéaire en 5 étapes** | 1) Lecture secrète des 2D6 $\to$ 2) Programmation I puis II $\to$ 3) Exécution du Déplacement I $\to$ 4) Exécution immédiate du Déplacement II $\to$ 5) **Révélation des gobelets 2D6 un par un (de J1 à JN)** : chaque Machine se déplace vers sa cible, résout son verdict et met à jour les pistes **avant** le gobelet suivant. | • Crée un enchaînement dynamique entre les gobelets d'un même tour.<br>• Rend exceptionnel le pouvoir des **Reptiles (Secteur B)** qui jouent leur 2e pas *après* le déplacement d'une Machine ! |
 | **5. Curseurs 2A & 3A — Règle unique de Parade** | **Zéro Barrage d'entrée** : la Machine entre toujours librement sur sa cible. Au moment où elle veut couper :<br>• **Seuil 2A (≥ 1 Défenseur)** : si au moins 1 Défenseur occupe la zone, la coupe est **annulée** et les 2 pistes reculent d'un cran (vers 2/12 et vers la droite `case 5`).<br>• **Sort 3A (Sur place)** : la Machine parée **reste sur sa zone** pour le tour suivant.<br>• Sinon : **-1 arbre** et les 2 pistes avancent (vers `7` et vers la gauche `case 1`). | • Puisque la Machine parée reste sur place dans le socle, **l'expulsion au Chantier** (Reptiles / Mammifères ou synergie à 2 Peuples) et le **Barrage d'entrée** (Mammifères) deviennent de vrais pouvoirs asymétriques majeurs ! |
 
 ---

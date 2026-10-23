@@ -3173,27 +3173,31 @@ export function genererLivretPhysiqueVariante(
   const arbresTable =
     variante.foretsCoeur +
     nbSecteursFixes * 2 * variante.foretsParCaseSecteur;
-  const machinesEnJeuTable = Math.min(6, Math.max(3, tableCible));
+  // Harmonisation du Chantier de 3 à 6 joueurs : toujours au moins 2 Machines au Chantier au départ (3 en jeu à 3J, 4 en jeu à 4-6J)
+  const machinesEnJeuTable = tableCible === 3 ? 3 : 4;
+  const machinesChantierTable = 6 - machinesEnJeuTable;
   const est3Tactiques =
     variante.paletteTactiques === '3_tactiques_sans_represailles';
 
   if (estV05) {
     return [
       {
-        section: '1. But du Jeu & Conditions de Fin de Partie (3 à 6 Joueurs)',
-        materielConcerne: `Plateau Double-Face (Recto 38 Forêts / Verso 54 Forêts) · Marqueur de Compte-Tours (1 à ${variante.nbTours}).`,
+        section: '1. But du Jeu & Bilan Positif de Préservation (3 à 6 Joueurs)',
+        materielConcerne: `Table ${tableCible}J : Plateau ${tableCible <= 4 ? 'Recto (9 zones, 38 Forêts)' : 'Verso (13 zones, 54 Forêts)'} · Compte-Tours (1 à ${variante.nbTours}).`,
         texteRegle: [
-          `• Coopération intégrale pour 3 à 6 joueurs : Les 3 à 6 joueurs incarnent les Peuples Défenseurs de la Forêt et luttent ensemble contre les 6 Machines d’abattage de la Tête du Méchant.`,
-          `• Durée de la partie : La partie se joue rigoureusement en ${variante.nbTours} tours complets, quel que soit le nombre de joueurs.`,
-          `• Décompte final & Victoire : À la fin du Tour ${variante.nbTours}, l’équipe compte le nombre total de pions Forêt en bois encore debout sur l’ensemble du plateau :`,
-          `  — À 3 ou 4 joueurs (Plateau Recto, 9 zones) : pourcentage d’arbres sauvés sur les 38 arbres de départ.`,
-          `  — À 5 ou 6 joueurs (Plateau Verso, 13 zones) : pourcentage d’arbres sauvés sur les 54 arbres de départ.`,
-          `  — Objectif d’excellence : Préserver au moins 50 % de la canopée pour sauver la Forêt Ancestrale (au-delà de 70 %, victoire éclatante des Peuples !). Si le Cœur de la Forêt est complètement rasé (0 arbre), la défaite est immédiate.`,
+          `• Coopération intégrale pour 3 à 6 joueurs : Les 3 à 6 joueurs incarnent les Peuples Défenseurs de la Forêt et unissent leurs forces face aux 6 Machines de la Tête du Méchant.`,
+          `• Durée fixe sans élimination : La partie se joue toujours en ${variante.nbTours} tours complets, quel que soit le nombre de joueurs. Il n’existe aucune condition de « Game Over » prématuré ni de défaite à 0 arbre.`,
+          `• Plancher garanti & Satisfaction psychologique : Chaque activation de Machine n’abattant qu’un seul arbre, plus de la moitié de la forêt survit toujours, même lors des parties les plus difficiles. L’équipe termine systématiquement la partie avec la satisfaction concrète d’avoir sauvé une forêt vivante.`,
+          `• Échelle d’Harmonie Forestière (décompte final à la fin du Tour ${variante.nbTours}) :`,
+          `  — À 3 ou 4 joueurs (sur 38 arbres initiaux) / À 5 ou 6 joueurs (sur 54 arbres initiaux) :`,
+          `  • 55 % à 69 % d’arbres préservés : 🌱 Forêt Sauvegardée (la régénération naturelle est assurée).`,
+          `  • 70 % à 84 % d’arbres préservés : 🌿 Canopée Florissante (belle coordination inter-peuples).`,
+          `  • 85 % à 100 % d’arbres préservés : 🌳 Sanctuaire Ancestral Intact (maîtrise coopérative exemplaire !).`,
         ].join('\n'),
       },
       {
         section: '2. Architecture du Plateau Central Fixe (Double Face Recto 3–4J / Verso 5–6J)',
-        materielConcerne: `1 Grand Plateau Central Fixe Double Face : Recto (3–4 Joueurs, 9 zones) / Verso (5–6 Joueurs, 13 zones).`,
+        materielConcerne: `1 Grand Plateau Central Fixe Double Face : Recto (3–4J, 9 zones) / Verso (5–6J, 13 zones) — Table active : ${nbZonesTable} zones.`,
         texteRegle: [
           `• Choix de la face selon la table :`,
           `  — À 3 et 4 Joueurs : Posez le plateau sur sa face RECTO « 3–4 Joueurs » comprenant 9 zones (1 Cœur Central + 4 Clairières Intérieures + 4 Lisières Extérieures).`,
@@ -3207,13 +3211,14 @@ export function genererLivretPhysiqueVariante(
       },
       {
         section: '3. Mise en Place Complète & Échelle de Table (3, 4, 5 ou 6 Joueurs)',
-        materielConcerne: `54 Pions Forêt en bois, 6 Pions Défenseurs (1 par couleur de Peuple), 6 Figurines Machines (M0 à M5), Plateau Double Piste, 6 Gobelets opaques + 6 paires de dés 2D6.`,
+        materielConcerne: `Table ${tableCible}J : ${arbresTable} Pions Forêt, ${tableCible} Défenseurs (1/joueur), ${machinesEnJeuTable} Machines en lisière + ${machinesChantierTable} au Chantier, ${tableCible} Gobelets 2D6.`,
         texteRegle: [
-          `• Tableau d’adaptation de la table selon le nombre de joueurs :`,
-          `  — À 3 JOUEURS : Plateau Recto (9 zones) · 38 Forêts (6 au Cœur, 4×8 sur les 8 zones périphériques) · 3 Défenseurs (1/joueur) · 3 Gobelets 2D6 · 3 Machines en jeu (M0, M1, M2 sur les lisières) · 3 Machines au Chantier (M3, M4, M5).`,
-          `  — À 4 JOUEURS (Standard) : Plateau Recto (9 zones) · 38 Forêts · 4 Défenseurs (1/joueur) · 4 Gobelets 2D6 · 4 Machines en jeu (M0, M1, M2, M3 sur les lisières) · 2 Machines au Chantier (M4, M5).`,
-          `  — À 5 JOUEURS : Plateau Verso (13 zones) · 54 Forêts (6 au Cœur, 4×12 sur les 12 zones périphériques) · 5 Défenseurs (1/joueur) · 5 Gobelets 2D6 · 5 Machines en jeu (M0 à M4 sur les lisières) · 1 Machine au Chantier (M5).`,
-          `  — À 6 JOUEURS : Plateau Verso (13 zones) · 54 Forêts · 6 Défenseurs (1/joueur) · 6 Gobelets 2D6 · 6 Machines en jeu (M0 à M5, toutes sur les lisières) · 0 Machine au Chantier.`,
+          `• Tableau d’adaptation de la table selon le nombre de joueurs (Réserve du Chantier toujours active) :`,
+          `  — À 3 JOUEURS : Plateau Recto (9 zones) · 38 Forêts (6 au Cœur, 4 sur chacune des 8 autres zones) · 3 Défenseurs (1/joueur) · 3 Gobelets 2D6 · 3 Machines sur les lisières (M0, M1, M2) · 3 Machines au Chantier (M3, M4, M5).`,
+          `  — À 4 JOUEURS (Standard) : Plateau Recto (9 zones) · 38 Forêts · 4 Défenseurs (1/joueur) · 4 Gobelets 2D6 · 4 Machines sur les lisières (M0, M1, M2, M3) · 2 Machines au Chantier (M4, M5).`,
+          `  — À 5 JOUEURS : Plateau Verso (13 zones) · 54 Forêts (6 au Cœur, 4 sur chacune des 12 autres zones) · 5 Défenseurs (1/joueur) · 5 Gobelets 2D6 · 4 Machines sur les lisières (M0, M1, M2, M3) · 2 Machines au Chantier (M4, M5).`,
+          `  — À 6 JOUEURS : Plateau Verso (13 zones) · 54 Forêts · 6 Défenseurs (1/joueur) · 6 Gobelets 2D6 · 4 Machines sur les lisières (M0, M1, M2, M3) · 2 Machines au Chantier (M4, M5).`,
+          `  (Garantie d’équilibre : conserver toujours au moins 2 Machines au Chantier de 3 à 6 joueurs assure que l’irruption depuis la Réserve et les effets de renvoi au Chantier gardent la même valeur stratégique à toute taille de table !)`,
           `• Disposition des Pistes de la Tête du Méchant (identique de 3 à 6 joueurs) :`,
           `  1) Piste Tactique (cases 2 à 12, somme de 2D6) :`,
           est3Tactiques

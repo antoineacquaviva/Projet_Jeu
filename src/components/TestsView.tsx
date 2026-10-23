@@ -936,13 +936,13 @@ export const TestsView: React.FC<TestsViewProps> = ({
                 </span>
               </div>
               <h3 className="text-sm font-bold text-[#16211B]">
-                Équilibre 3–6 Joueurs & Robustesse CVaR 10%
+                Constance d’Intérêt 3–6 Joueurs, Tables Mixtes & Plancher CVaR 10%
               </h3>
               <div className="text-[11px] font-mono bg-white px-2 py-1 rounded border border-[#D8DFD5] text-[#1E3528]">
-                Écart-type Inter-Tables σ(3–6J) · Décile D1 (CVaR)
+                σ_survie & σ_intérêt (3–6J) · Tables Mixtes · Zéro Déroute (CVaR)
               </div>
               <p className="text-xs text-[#55645B] leading-relaxed">
-                Sanctionne toute dérive de difficulté entre 3, 4, 5 et 6 joueurs et évalue la résilience sur les 10% de tirages 2D6 les plus hostiles (Conditional Value at Risk).
+                Favorise les variantes dont la survie ET l’intérêt de l’apprentissage restent constants à 3, 4, 5 et 6 joueurs (tables homogènes et mixtes), tout en garantissant un plancher d’arbres sauvés élevé (zéro défaite à 0 arbre).
               </p>
             </div>
             <div>
@@ -1899,7 +1899,7 @@ export const TestsView: React.FC<TestsViewProps> = ({
 
                   <div className="p-4 rounded-lg bg-white border border-[#D8DFD5] space-y-3">
                     <div className="text-xs font-mono font-bold uppercase text-[#1E3528]">
-                      Banc Multi-Joueurs (Tables de 3, 4, 5 et 6 Joueurs)
+                      Banc Multi-Joueurs (Tables de 3, 4, 5 et 6 Joueurs — Homogènes & Mixtes)
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                       {(rapportInspecte.equilibreParJoueurs
@@ -1912,17 +1912,26 @@ export const TestsView: React.FC<TestsViewProps> = ({
                           key={eq.nbJoueurs}
                           className="p-3 rounded-lg bg-[#F4F5F0] border border-[#D8DFD5] font-mono text-xs"
                         >
-                          <div className="font-bold text-[#1E3528]">
-                            Table {eq.nbJoueurs} Joueurs
+                          <div className="font-bold text-[#1E3528] flex items-center justify-between">
+                            <span>Table {eq.nbJoueurs}J</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900">
+                              Intérêt {eq.scoreStrategique}/100
+                            </span>
                           </div>
                           <div className="text-base font-bold text-[#16211B] mt-1">
-                            {eq.survieMoyennePct}%
+                            {eq.survieMoyennePct}%{' '}
+                            <span className="text-[10px] font-normal text-[#55645B]">
+                              sauvés
+                            </span>
                           </div>
                           <div className="text-[11px] text-[#55645B] mt-0.5">
-                            CVaR D1 : {eq.pireDecilePct}%
+                            Table Mixte : {eq.survieTableMixtePct ?? eq.survieMoyennePct}%
                           </div>
                           <div className="text-[11px] text-[#55645B]">
-                            Gain Coop : +{eq.ecartMechantVsGlouton} pts
+                            Plancher D1 : {eq.pireDecilePct}%
+                          </div>
+                          <div className="text-[11px] text-[#256B45] font-semibold">
+                            Gain Strat. : +{eq.ecartMechantVsGlouton} pts
                           </div>
                         </div>
                       ))}

@@ -451,6 +451,8 @@ export interface BilanJoueurs36 {
   scoreStrategique: number;
   sabotagesMoyens: number;
   ecartMechantVsGlouton: number;
+  survieTableMixtePct?: number;
+  impactApprentissagePts?: number;
 }
 
 export interface TroisAxesPrioritaires {

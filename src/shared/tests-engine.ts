@@ -81,9 +81,8 @@ export function simulerPartieAvecJournalJSONL(
   const etatFinal = simulerPartieCompleteV01(variante, sieges, graine);
   const foretSauveePct = calculerPourcentageForetSauvee(etatFinal);
   const foretRestante = etatFinal.forets.reduce((a, b) => a + b, 0);
-  const coeurDetruit = (etatFinal.forets[0] ?? 1) <= 0;
   const issue: 'victoire' | 'defaite' =
-    !coeurDetruit && foretSauveePct >= 50 ? 'victoire' : 'defaite';
+    foretSauveePct >= 50 ? 'victoire' : 'defaite';
 
   const resumeTours: JournalPartieJSONL['resumeTours'] = [];
   for (let t = 1; t <= variante.nbTours; t++) {
@@ -457,7 +456,12 @@ export function evaluerLisibiliteErgonomiePlateau(variante: VariantV01): {
 }
 
 /**
- * Évalue le banc complet 3, 4, 5 et 6 joueurs sur une variante
+/**
+ * Évalue le banc complet 3, 4, 5 et 6 joueurs sur une variante :
+ * - Tables homogènes (Expectimax Bayésien vs Glouton)
+ * - Tables hétérogènes / mixtes (combinaison de profils de bots autour de la table)
+ * - Constance de l'impact de l'apprentissage statistique de 3 à 6 joueurs
+ * - Garantie psychologique anti-déroute (plancher CVaR 10% élevé, zéro partie à 0 arbre)
  */
 export function evaluerBancMultiJoueurs36(
   variante: VariantV01,
@@ -476,22 +480,34 @@ export function evaluerBancMultiJoueurs36(
   const tailles: (3 | 4 | 5 | 6)[] = [3, 4, 5, 6];
   const parJoueurs = {} as Record<3 | 4 | 5 | 6, BilanJoueurs36>;
   const surviesFortes: number[] = [];
+  const scoresStrategiques36: number[] = [];
+  const impactsApprentissage36: number[] = [];
   const piresDeciles: number[] = [];
   let nbPartiesBanc36 = 0;
 
+  const profilsTableMixte: BotProfileId[] = [
+    'expectimax_bayesien',
+    'deductif',
+    'glouton',
+    'reflexe',
+    'beam_rollout',
+    'deductif',
+  ];
+
   for (const nbJ of tailles) {
+    // Harmonisation du Chantier : toujours au moins 2 Machines au Chantier au départ (3 en jeu à 3J, 4 en jeu à 4-6J)
+    const machinesInitNbJ =
+      nbJ === 3 ? 3 : Math.min(4, Math.max(3, variante.machinesInitiales));
     const varJ: VariantV01 = {
       ...variante,
       nbJoueurs: nbJ,
-      machinesInitiales: Math.min(
-        6,
-        Math.max(3, variante.machinesInitiales + (nbJ - variante.nbJoueurs))
-      ),
+      machinesInitiales: machinesInitNbJ,
     };
 
     const nGlouton = Math.max(2, Math.floor(nbPartiesParConfig * 0.75));
     const nPointe = Math.max(2, nbPartiesParConfig);
-    nbPartiesBanc36 += nGlouton + nPointe;
+    const nMixte = Math.max(2, Math.floor(nbPartiesParConfig * 0.5));
+    nbPartiesBanc36 += nGlouton + nPointe + nMixte;
 
     const resGlouton = simulerSeriePourBot(
       varJ,
@@ -512,48 +528,106 @@ export function evaluerBancMultiJoueurs36(
       echantillonCollecte
     );
 
+    // Simulation de tables hétérogènes (mixtes) combinant différents profils de bots autour de la table à nbJ joueurs
+    const siegesMixtes = profilsTableMixte.slice(0, nbJ);
+    const scoresMixtes: number[] = [];
+    for (let m = 0; m < nMixte; m++) {
+      const etatMixte = simulerPartieCompleteV01(
+        varJ,
+        siegesMixtes,
+        75000 + nbJ * 1000 + m * 4999
+      );
+      scoresMixtes.push(calculerPourcentageForetSauvee(etatMixte));
+    }
+    const survieTableMixtePct = Math.round(moyenne(scoresMixtes) * 10) / 10;
+
+    // Évaluation de l'impact de l'apprentissage statistique spécifiquement à nbJ joueurs
+    let impactApprentissagePts = 0;
+    if (varJ.rythmeApprentissage !== 'aucun') {
+      const varSansAppJ: VariantV01 = {
+        ...varJ,
+        rythmeApprentissage: 'aucun',
+      };
+      const resSansAppJ = simulerSeriePourBot(
+        varSansAppJ,
+        'glouton',
+        2,
+        78000 + nbJ * 1000,
+        campagneId
+      );
+      nbPartiesBanc36 += 2;
+      impactApprentissagePts =
+        Math.round(
+          (Math.abs(
+            resSansAppJ.foretSauveeMoyennePct - resGlouton.foretSauveeMoyennePct
+          ) +
+            Math.max(
+              0,
+              resPointe.foretSauveeMoyennePct - resGlouton.foretSauveeMoyennePct
+            ) *
+              0.45) *
+            10
+        ) / 10;
+    }
+
     const ecart =
       Math.round(
         (resPointe.foretSauveeMoyennePct - resGlouton.foretSauveeMoyennePct) * 10
       ) / 10;
 
+    const scoreStrategiqueNbJ = Math.min(
+      99,
+      Math.max(
+        20,
+        Math.round(
+          70 +
+            ecart * 2.5 +
+            Math.min(6, impactApprentissagePts * 0.8) -
+            Math.abs(resPointe.foretSauveeMoyennePct - 74) * 0.6
+        )
+      )
+    );
+
     surviesFortes.push(resPointe.foretSauveeMoyennePct);
+    scoresStrategiques36.push(scoreStrategiqueNbJ);
+    impactsApprentissage36.push(impactApprentissagePts);
     piresDeciles.push(resPointe.pireDecilePct);
 
     parJoueurs[nbJ] = {
       nbJoueurs: nbJ,
       survieMoyennePct: resPointe.foretSauveeMoyennePct,
       pireDecilePct: resPointe.pireDecilePct,
-      scoreStrategique: Math.min(
-        99,
-        Math.max(
-          20,
-          Math.round(
-            70 +
-              ecart * 2.5 -
-              Math.abs(resPointe.foretSauveeMoyennePct - 74) * 0.6
-          )
-        )
-      ),
+      scoreStrategique: scoreStrategiqueNbJ,
       sabotagesMoyens: resPointe.sabotagesMoyens,
       ecartMechantVsGlouton: ecart,
+      survieTableMixtePct,
+      impactApprentissagePts,
     };
   }
 
   const dispersion36 = Math.round(ecartType(surviesFortes) * 10) / 10;
+  const dispersionInteret36 =
+    Math.round(ecartType(scoresStrategiques36) * 10) / 10;
   const cvar10PireDecilePct = Math.round(moyenne(piresDeciles) * 10) / 10;
   const minSurvie = Math.min(...surviesFortes);
   const maxSurvie = Math.max(...surviesFortes);
   const amplitude = Math.round((maxSurvie - minSurvie) * 10) / 10;
 
+  // Score pondéré combinant :
+  // 1) Constance du taux de survie de 3 à 6J (dispersion36)
+  // 2) Constance de l'intérêt stratégique et de l'apprentissage de 3 à 6J (dispersionInteret36)
+  // 3) Garantie du plancher psychologique sans déroute (cvar10PireDecilePct élevé)
   let scoreEquilibre36 = Math.round(
-    96 - dispersion36 * 2.8 - Math.max(0, 52 - cvar10PireDecilePct) * 0.7
+    96 -
+      dispersion36 * 2.1 -
+      dispersionInteret36 * 1.1 -
+      Math.max(0, 55 - cvar10PireDecilePct) * 0.8
   );
-  if (minSurvie < 45) scoreEquilibre36 -= 15;
+  if (minSurvie < 50) scoreEquilibre36 -= 15;
   if (maxSurvie > 94) scoreEquilibre36 -= 12;
   scoreEquilibre36 = Math.max(20, Math.min(98, scoreEquilibre36));
 
-  const detailEquilibre36 = `Survie de 3 à 6 joueurs : 3J=${parJoueurs[3].survieMoyennePct}% · 4J=${parJoueurs[4].survieMoyennePct}% · 5J=${parJoueurs[5].survieMoyennePct}% · 6J=${parJoueurs[6].survieMoyennePct}% (Amplitude ${amplitude} pts, σ=${dispersion36.toFixed(1)}%, CVaR 10%=${cvar10PireDecilePct}%).`;
+  const detailEquilibre36 = `Survie & Intérêt de 3 à 6J : 3J=${parJoueurs[3].survieMoyennePct}% (Intérêt ${parJoueurs[3].scoreStrategique}/100, Mixte ${parJoueurs[3].survieTableMixtePct}%) · 4J=${parJoueurs[4].survieMoyennePct}% (Intérêt ${parJoueurs[4].scoreStrategique}/100, Mixte ${parJoueurs[4].survieTableMixtePct}%) · 5J=${parJoueurs[5].survieMoyennePct}% (Intérêt ${parJoueurs[5].scoreStrategique}/100, Mixte ${parJoueurs[5].survieTableMixtePct}%) · 6J=${parJoueurs[6].survieMoyennePct}% (Intérêt ${parJoueurs[6].scoreStrategique}/100, Mixte ${parJoueurs[6].survieTableMixtePct}%) — σ_survie=${dispersion36.toFixed(1)}%, σ_intérêt=${dispersionInteret36.toFixed(1)} pts, Plancher CVaR 10%=${cvar10PireDecilePct}%.`;
 
   return {
     parJoueurs,

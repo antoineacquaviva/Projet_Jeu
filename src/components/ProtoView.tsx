@@ -172,7 +172,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
     return {
       ...variante,
       nbJoueurs: nbJoueursTable,
-      machinesInitiales: Math.min(6, Math.max(3, nbJoueursTable)),
+      machinesInitiales: nbJoueursTable === 3 ? 3 : 4,
     };
   }, [variante, nbJoueursTable]);
 
@@ -186,7 +186,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
           {
             ...variante,
             nbJoueurs: nbJoueursTable,
-            machinesInitiales: Math.min(6, Math.max(3, nbJoueursTable)),
+            machinesInitiales: nbJoueursTable === 3 ? 3 : 4,
           },
           20261019
         )
@@ -213,7 +213,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
     const varAdaptee: VariantV01 = {
       ...variante,
       nbJoueurs: nouveauNb,
-      machinesInitiales: Math.min(6, Math.max(3, nouveauNb)),
+      machinesInitiales: nouveauNb === 3 ? 3 : 4,
     };
     setSieges((prev) => construireSiegesDefaut(nouveauNb, prev));
     const neuf = creerEtatInitialV01(varAdaptee, graine);
@@ -237,7 +237,7 @@ export const ProtoView: React.FC<ProtoViewProps> = ({
     const varAdaptee: VariantV01 = {
       ...variante,
       nbJoueurs: nbJoueursTable,
-      machinesInitiales: Math.min(6, Math.max(3, nbJoueursTable)),
+      machinesInitiales: nbJoueursTable === 3 ? 3 : 4,
     };
     setSieges((prev) => construireSiegesDefaut(nbJoueursTable, prev));
     const nouvelEtat = creerEtatInitialV01(varAdaptee, graine);
